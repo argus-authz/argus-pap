@@ -1,0 +1,55 @@
+<deployment
+  xmlns="http://xml.apache.org/axis/wsdd/"
+  xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+
+  <service
+    name="ProvisioningService"
+    provider="java:RPC"
+    style="document"
+    use="literal">
+
+    <parameter
+      name="className"
+      value="org.glite.authz.pap.provisioning.ProvisioningService" />
+    
+    <parameter
+      name="typeMappingVersion"
+      value="1.2" />
+    
+    <parameter
+      name="allowedMethods"
+      value="*" />
+    
+    <parameter
+      name="scope"
+      value="Application" />
+
+    <typeMapping
+      xmlns:ns="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol"
+      qname="ns:XACMLPolicyQuery"
+      type="java:org.opensaml.xacml.profile.saml.XACMLPolicyQueryType"
+      serializer="org.glite.authz.pap.provisioning.axis.SerializerFactory"
+      deserializer="org.glite.authz.pap.provisioning.axis.DeserializerFactory"
+      encodingStyle="" />
+
+    <typeMapping
+      xmlns:ns="urn:oasis:names:tc:SAML:2.0:protocol"
+      qname="ns:ResponseType"
+      type="java:org.opensaml.saml2.core.Response"
+      serializer="org.glite.authz.pap.provisioning.axis.SerializerFactory"
+      deserializer="org.glite.authz.pap.provisioning.axis.DeserializerFactory"
+      encodingStyle="" />
+
+  </service>
+
+  <handler
+    name="URLMapper"
+    type="java:org.apache.axis.handlers.http.URLMapper" />
+
+  <transport name="http">
+    <requestFlow>
+      <handler type="URLMapper" />
+    </requestFlow>
+  </transport>
+
+</deployment>

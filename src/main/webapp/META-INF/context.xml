@@ -1,0 +1,7 @@
+<!--
+    Context
+-->
+
+<Context path="/pap">
+  <Parameter name="ConfigurationFile" value="/home/valerio/configuration.properties"/>
+</Context>
