@@ -25,7 +25,6 @@ public class ReferenceId implements XACMLObject {
 		}
 	}
 
-	@Override
 	public Node getDOM() {
 		return dom;
 	}
@@ -34,12 +33,10 @@ public class ReferenceId implements XACMLObject {
 		return value;
 	}
 
-	@Override
 	public boolean isPolicy() {
 		return false;
 	}
 
-	@Override
 	public boolean isPolicyReference() {
 		return isPolicyIdReference;
 	}
@@ -48,12 +45,10 @@ public class ReferenceId implements XACMLObject {
 		return false;
 	}
 
-	@Override
 	public boolean isPolicySetReference() {
 		return !isPolicyIdReference;
 	}
 
-	@Override
 	public boolean isReference() {
 		return true;
 	}

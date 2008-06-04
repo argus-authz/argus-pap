@@ -52,7 +52,6 @@ public class PolicySetImpl implements PolicySet {
 		init(readXACMLFromFile(fileName));
 	}
 	
-	@Override
 	public void deletePolicyReference(String policyId) {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
@@ -64,7 +63,6 @@ public class PolicySetImpl implements PolicySet {
 		}
 	}
 	
-	@Override
 	public void deletePolicySetReference(String policySetId) {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
@@ -76,7 +74,6 @@ public class PolicySetImpl implements PolicySet {
 		}
 	}
 
-	@Override
 	public Node getDOM() {
 		return this.policySetDOM;
 	}
@@ -105,7 +102,6 @@ public class PolicySetImpl implements PolicySet {
 		return getOrderedListOfXACMLObjectChildren().size();
 	}
 	
-	@Override
 	public List<XACMLObject> getOrderedListOfXACMLObjectChildren() {
 		List<XACMLObject> result = new LinkedList<XACMLObject>();
 		NodeList nodeList = policySetDOM.getChildNodes();
@@ -166,32 +162,26 @@ public class PolicySetImpl implements PolicySet {
 		}
 	}
 	
-	@Override
 	public boolean isPolicy() {
 		return false;
 	}
 
-	@Override
 	public boolean isPolicyReference() {
 		return false;
 	}
 	
-	@Override
 	public boolean isPolicySet() {
 		return true;
 	}
 
-	@Override
 	public boolean isPolicySetReference() {
 		return false;
 	}
 
-	@Override
 	public boolean isReference() {
 		return false;
 	}
 
-	@Override
 	public boolean policyReferenceIdExists(String id) {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
@@ -204,7 +194,6 @@ public class PolicySetImpl implements PolicySet {
 		return false;
 	}
 
-	@Override
 	public boolean policySetReferenceIdExists(String id) {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
@@ -217,7 +206,6 @@ public class PolicySetImpl implements PolicySet {
 		return false;
 	}
 
-	@Override
 	public void printXACMLDOMToFile(File file) {
 		FileOutputStream fos;
 		try {
@@ -241,7 +229,6 @@ public class PolicySetImpl implements PolicySet {
 		printXACMLDOMToFile(file);
 	}
 
-	@Override
 	public boolean referenceIdExists(String id) {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {

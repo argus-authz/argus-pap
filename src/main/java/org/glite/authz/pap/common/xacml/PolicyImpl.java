@@ -48,12 +48,10 @@ public class PolicyImpl implements Policy {
 		init(readXACMLFromFile(fileName));
 	}
 	
-	@Override
 	public String getId() {
 		return attributeId.getNodeValue();
 	}
 
-	@Override
 	public void printXACMLDOMToFile(File file) {
 		FileOutputStream fos;
 		try {
@@ -72,43 +70,35 @@ public class PolicyImpl implements Policy {
 		}
 	}
 
-	@Override
 	public void printXACMLDOMToFile(String fileName) {
 		File file = new File(fileName);
 		printXACMLDOMToFile(file);
 	}
 
-	@Override
 	public void setId(String policyId) {
 		attributeId.setNodeValue(policyId);
 	}
 
-	@Override
 	public Node getDOM() {
 		return this.policyDOM;
 	}
 
-	@Override
 	public boolean isPolicy() {
 		return true;
 	}
 
-	@Override
 	public boolean isPolicyReference() {
 		return false;
 	}
 
-	@Override
 	public boolean isPolicySet() {
 		return false;
 	}
 
-	@Override
 	public boolean isPolicySetReference() {
 		return false;
 	}
 
-	@Override
 	public boolean isReference() {
 		return false;
 	}
