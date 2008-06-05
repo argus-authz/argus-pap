@@ -39,7 +39,7 @@ public class FileSystemDAOFactory extends DAOFactory {
 				throw new RepositoryException("Cannot create DB dir");
 			}
 		}
-		if (!(rootDir.canExecute() && rootDir.canRead() && rootDir.canWrite())) {
+		if (!(rootDir.canRead() && rootDir.canWrite())) {
 			throw new RepositoryException("Permission denied for DB dir");
 		}
 	}
