@@ -1,0 +1,322 @@
+PARSER_BEGIN(BWParser)
+package org.glite.authz.pap.encoder;
+import java.lang.String;
+
+class BWParser {
+//     public static String main(String args[]) throws ParseException {
+//         BWParser parser = new BWParser(System.in);
+//         try {
+//             return parser.Text();  
+//         }
+//         catch (ParseException e) {
+//             System.out.println("EXCEPTION");
+//             System.out.println(e);
+//         }
+//     }
+}
+PARSER_END(BWParser)
+
+
+/* WHITE SPACE */
+
+SKIP :
+{
+  " "
+| "\t"
+| "\n"
+| "\r"
+| "\f"
+}
+
+TOKEN:
+{
+   <ALLOW:    "allow">
+|  <DENY:     "deny">
+|  <FQAN:     "fqan">
+|  <DN:       "dn">
+|  <GA:       "ga">
+|  <RESOURCE: "resource">
+|  <CERT:     "certificate">
+|  <SERVICE:  "service_class_assignment">
+|  <PILOT:    "pilot">
+|  <NO:       "no">
+|  <YES:      "yes">
+|  <BW:       "blacklist">
+|  <CLASS:    "service_class">
+|  <EXCEPT:   "except">
+|  <PRIVATE:  "private">
+|  <STRING:         "\""
+      (   (~["\"","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "\""
+>
+|  < ID:
+      "'"
+      (   (~["'","\\","\n","\r"])
+        | ("\\"
+            ( ["n","t","b","r","f","\\","'","\""]
+            | ["0"-"7"] ( ["0"-"7"] )?
+            | ["0"-"3"] ["0"-"7"] ["0"-"7"]
+            )
+          )
+      )*
+      "'"
+>
+| <ID2: (["a"-"z", "A"-"Z", "0"-"9"])+>
+}
+
+
+String Text() :
+{
+  Policies policies = null;
+  Policies allpolicies = new Policies();
+  String output = new String();
+}
+{ 
+  (policies=Section() { 
+      System.out.println("policies.size = " + allpolicies.policies.size());
+      System.out.println("input.size = " + policies.policies.size());
+    allpolicies.policies.addAll(policies.policies); 
+    })*
+  { return allpolicies.Output(); }
+}
+
+Policies Section() :
+{
+  Policies policies = null;
+}
+{
+  "[" policies=SectionType()
+  { return policies; }
+}
+
+Policies SectionType() :
+{
+  Policies policies = null;
+}
+{
+  <BW> "]" policies = BW_Policies()
+  { return policies; }
+| <SERVICE> "]" policies = ServiceClassPolicies()
+  { return policies; }
+}
+
+Policies BW_Policies() :
+{
+  Policy policy = null;
+  Policies policies = new Policies();
+}
+{
+  (policy=BW_Policy() {policies.policies.add(policy);})+
+  {
+    return policies;
+  }
+}
+
+Policy BW_Policy() :
+{
+  String resource=null;
+  Conds conds = null;
+  Policy policy = new Policy();
+}
+{
+  <RESOURCE> resource=TextString() "{" conds=Conditions() "}"
+  {
+    policy.name = resource;
+    policy.type = Policy.POLICY_TYPE_BW;
+    policy.conds = conds;
+    policy.policies = null;
+    return policy;
+  }
+}
+
+Policies ServiceClassPolicies() :
+{
+  Policy policy = null;
+  Policies policies = new Policies();
+}
+{
+  (
+    policy=ServiceClassPolicy()
+    {
+      policies.policies.add(policy);
+    }
+  )+
+  {
+    return policies;
+  }
+
+}
+
+Policy ServiceClassPolicy() :
+{
+  String resource=null;
+  Conds conds = null;
+  Policy policy = new Policy();
+  Policies policies = null;
+}
+{
+  <CLASS> resource=TextString() "{" policies=BW_Policies() "}"
+  {
+    policy.name = resource;
+    policy.type = Policy.POLICY_TYPE_CLASS;
+    policy.conds = null;
+    policy.policies = policies;
+    return policy;
+  }
+}
+
+Conds Conditions() :
+{
+  FullCondition fc = null;
+  Conds conds = new Conds();
+}
+{
+  (fc=Condition() {conds.fullconditions.add(fc);})*
+  { return conds; }
+}
+
+FullCondition Condition() :
+{
+  FullCondition fc = null;
+}
+{
+  <PRIVATE> fc = PublicCondition()
+  {
+    fc.isprivate = true;
+    return fc;
+  }
+| fc = PublicCondition()
+  {
+    fc.isprivate = false;
+    return fc;
+  }
+}
+
+FullCondition PublicCondition() :
+{
+  boolean result = false;
+  ConditionRow item = null;
+  ConditionList excepts = new ConditionList();
+  FullCondition fc = new FullCondition();
+  ConditionRow except = null;
+}
+{
+  result=AllowOrDeny() item=ItemsRow() ((except = Exception() {excepts.rows.add(except);})*)
+  {
+    fc.allow = result;
+    fc.simples = item;
+    fc.excepts = excepts;
+    return fc;
+  }
+}
+
+boolean AllowOrDeny() :
+{boolean result;}
+{
+  <DENY>
+  {
+    return false;
+  }
+| <ALLOW>
+  {
+    return true;
+  }
+}
+
+ConditionRow Exception() :
+{
+  ConditionRow row = null;
+}
+{
+  <EXCEPT> row = ItemsRow()
+  {
+    return row;
+  }
+}
+
+ConditionRow ItemsRow() :
+{ 
+  SingleCondition sc=null;
+  ConditionRow row = new ConditionRow();
+}
+{
+  (sc = Item()
+  { row.singles.add(sc);})*
+  { return row;}
+}
+
+SingleCondition Item() :
+{ boolean value = false;
+  String s1 = null;
+  String s2 = null;
+  SingleCondition sc = new SingleCondition();
+}
+{
+  <FQAN> "=" s1=TextString()
+  {
+    sc.type = SingleCondition.TYPE_FQAN;
+    sc.value1 = s1;
+    return sc;
+  }
+| <DN> "=" s1=TextString()
+  {
+    sc.type = SingleCondition.TYPE_DN;
+    sc.value1 = s1;
+    return sc;
+  }
+| <GA> "=" s1=TextString() "=" s2=TextString()
+  {
+    sc.type = SingleCondition.TYPE_GA;
+    sc.value1 = s1;
+    sc.value2 = s2;
+    return sc;
+  }
+| <CERT> "(" s1=TextString() ":" s2=TextString() ")"
+  {
+    sc.type = SingleCondition.TYPE_CERT;
+    sc.value1 = s1;
+    sc.value2 = s2;
+    return sc;
+  }
+| <RESOURCE> "=" s1=TextString()
+  {
+    sc.type = SingleCondition.TYPE_RESOURCE;
+    sc.value1 = s1;
+    return sc;
+  }
+| <PILOT> "=" value=YesOrNo()
+  { 
+    sc.type = SingleCondition.TYPE_PILOT;
+    sc.yesorno= value;
+    return sc;
+  }
+}
+
+boolean YesOrNo() :
+{}
+{
+  <YES>
+  { return true; }
+| <NO>
+  { return false; }
+}
+
+String TextString():
+{
+  Token t = null;
+}
+{
+  t=<STRING>
+  { return t.toString(); }
+| t=<ID>
+  { return t.toString(); }
+| t=<ID2>
+  { return t.toString(); } 
+}
