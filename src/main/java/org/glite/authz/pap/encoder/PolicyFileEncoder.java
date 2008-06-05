@@ -7,7 +7,7 @@ import java.io.File;
 import java.lang.String;
 
 public class PolicyFileEncoder {
-    BWParser parser;
+    BWParser parser; 
 
     PolicyFileEncoder() {
         parser = null;
