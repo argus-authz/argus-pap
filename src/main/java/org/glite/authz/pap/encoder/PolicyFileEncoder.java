@@ -14,7 +14,7 @@ public class PolicyFileEncoder {
     }
 
     private void init(InputStream stream) {
-        if (parser != null) {
+        if (parser != null) { 
             System.out.println("Reinit");
             parser.ReInit(stream);
         }
