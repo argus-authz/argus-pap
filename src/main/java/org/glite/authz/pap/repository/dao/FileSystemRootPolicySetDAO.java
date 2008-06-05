@@ -8,7 +8,6 @@ import org.glite.authz.pap.common.RepositoryConfiguration;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetImpl;
 import org.glite.authz.pap.common.xacml.ReferenceId;
-import org.glite.authz.pap.common.xacml.XACMLException;
 import org.glite.authz.pap.common.xacml.XACMLObject;
 import org.glite.authz.pap.repository.AlreadyExistsRepositoryException;
 import org.glite.authz.pap.repository.RepositoryException;
@@ -34,8 +33,9 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		}
 	}
 
-	public void createPAPAsFirst(String papId) {
-		createPAP(papId);
+	public void createPAPAsFirst(PolicySet policySet) {
+		createPAP(policySet);
+		String papId = policySet.getId();
 		PolicySet rootPS = getRoot();
 		rootPS.insertPolicySetReferenceAsFirst(papId);
 		updateRoot(rootPS);
@@ -99,17 +99,8 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		ps.printXACMLDOMToFile(getPAPFileNameAbsolutePath(papId));
 	}
 
-	private void updateRoot(PolicySet ps) {
-		ps.printXACMLDOMToFile(this.rootPolicySetFileNameAbsolutePath);
-	}
-
-	/**
-	 * @param papId
-	 * @throws RepositoryException
-	 *             Cannot write, invalid XACML
-	 * @throws AlreadyExistsRepositoryException
-	 */
-	private void createPAP(String papId) {
+	private void createPAP(PolicySet papRootPolicySet) {
+		String papId = papRootPolicySet.getId();
 		if (existsPAP(papId)) {
 			throw new AlreadyExistsRepositoryException();
 		}
@@ -120,13 +111,12 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 			}
 		}
 		File papPolicySetFile = new File(getPAPFileNameAbsolutePath(papId));
-		try {
-			PolicySetImpl papPolicySetTemplate = new PolicySetImpl(RepositoryConfiguration.getPapPolicySetTemplatePath());
-			papPolicySetTemplate.setId(papId);
-			papPolicySetTemplate.printXACMLDOMToFile(papPolicySetFile.getAbsolutePath());
-		} catch (XACMLException e) {
-			throw new RepositoryException("Invalid XACML file: " + RepositoryConfiguration.getPapPolicySetTemplatePath(), e);
-		}
+		papRootPolicySet.printXACMLDOMToFile(papPolicySetFile.getAbsolutePath());
+//		try {
+//			//PolicySetImpl papPolicySetTemplate = new PolicySetImpl(RepositoryConfiguration.getPapPolicySetTemplatePath());
+//		} catch (XACMLException e) {
+//			throw new RepositoryException("Invalid XACML file: " + RepositoryConfiguration.getPapPolicySetTemplatePath(), e);
+//		}
 	}
 
 	private String getPAPDirAbsolutePath(String papId) {
@@ -138,5 +128,9 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 				+ RepositoryConfiguration.getRootPAPPolicySetId()
 				+ RepositoryConfiguration.getXACMLFileNameExtension();
 		return getPAPDirAbsolutePath(papId) + File.separator + fileName;
+	}
+
+	private void updateRoot(PolicySet ps) {
+		ps.printXACMLDOMToFile(this.rootPolicySetFileNameAbsolutePath);
 	}
 }

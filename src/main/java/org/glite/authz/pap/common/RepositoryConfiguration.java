@@ -11,7 +11,6 @@ public class RepositoryConfiguration {
 	private static final String policyFileNamePrefix = "Policy_";
 	private static final String xacmlFileNameExtension = ".xml";
 	private static final String rootPolicySetTemplatePath = "files/RootPolicySetTemplate.xml";
-	private static final String papPolicySetTemplatePath = "files/RootPAPPolicySetTemplate.xml";
 
 	public static String getFileSystemDatabaseDir() {
 		return fileSystemDatabaseDir;
@@ -19,10 +18,6 @@ public class RepositoryConfiguration {
 
 	public static String getPAPDirAbsolutePath(String papId) {
 		return fileSystemDatabaseDir + File.separator + papId + File.separator;
-	}
-
-	public static String getPapPolicySetTemplatePath() {
-		return papPolicySetTemplatePath;
 	}
 
 	public static String getPolicyAbsolutePath(String papId, String policyId) {
