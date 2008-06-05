@@ -66,7 +66,6 @@ class Policy {
     }
 
     public String Output() {
-        System.out.println("Output Type = " + type);
         if (type == POLICY_TYPE_BW)
             return OutputBW();
         else
@@ -93,7 +92,6 @@ class Policy {
             XACML += OutputFC(fc);
         }
         XACML += "</PolicySet>";
-        System.out.println("OutputBW="+XACML);
         return XACML;
     }
 
@@ -120,7 +118,6 @@ class Policy {
     "   </Obligation>\n" +
     " </Obligations>\n" +
     "</PolicySet>\n";
-        System.out.println("OutputSClass="+XACML);
         return XACML;
     }
 
@@ -248,9 +245,7 @@ class Policies {
     public String Output() {
         String XACML = new String();
         Enumeration i = policies.elements();
-        System.out.println("Output called.");
-        System.out.println("Policies = " + policies);
-        System.out.println("Policies size = " + policies.size());
+
         while (i.hasMoreElements()) {
             XACML += ((Policy)i.nextElement()).Output();
         }

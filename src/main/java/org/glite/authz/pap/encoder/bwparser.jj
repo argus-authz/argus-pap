@@ -80,8 +80,6 @@ String Text() :
 }
 { 
   (policies=Section() { 
-      System.out.println("policies.size = " + allpolicies.policies.size());
-      System.out.println("input.size = " + policies.policies.size());
     allpolicies.policies.addAll(policies.policies); 
     })*
   { return allpolicies.Output(); }

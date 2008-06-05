@@ -19,8 +19,6 @@ class BWParser implements BWParserConstants {
         break label_1;
       }
       policies = Section();
-      System.out.println("policies.size = " + allpolicies.policies.size());
-      System.out.println("input.size = " + policies.policies.size());
     allpolicies.policies.addAll(policies.policies);
     }
     {if (true) return allpolicies.Output();}
