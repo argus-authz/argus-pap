@@ -26,6 +26,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

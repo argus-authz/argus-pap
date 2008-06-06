@@ -20,7 +20,7 @@
 
  **************************************************************************/
 
-package org.glite.authz.pap.common;
+package org.glite.authz.pap.common.exceptions;
 
 /**
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
