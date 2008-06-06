@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.RepositoryConfiguration;
 import org.glite.authz.pap.common.xacml.PolicySet;
+import org.glite.authz.pap.common.xacml.PolicySetBuilder;
 import org.glite.authz.pap.common.xacml.PolicySetImpl;
 import org.glite.authz.pap.repository.RepositoryException;
 
@@ -16,9 +17,11 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 	}
 
 	private final String policySetFileNamePrefix;
+	private final PolicySetBuilder policySetBuilder;
 
 	private FileSystemPolicySetDAO() {
 		policySetFileNamePrefix = RepositoryConfiguration.getPolicyFileNamePrefix();
+		policySetBuilder = RepositoryConfiguration.getPolicySetBuilder();
 	}
 	
 	public void delete(String papId, String policySetId) {
@@ -40,7 +43,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 				continue;
 			}
 			if (file.getName().startsWith(policySetFileNamePrefix)) {
-				policySetList.add(new PolicySetImpl(file));
+				policySetList.add(policySetBuilder.buildFromFile(file));
 			}
 		}
 		return policySetList;
@@ -51,7 +54,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 		if (!policySetFile.exists()) {
 			throw new RepositoryException("PolicySet does not exist: " + policySetId);
 		}
-		return new PolicySetImpl(policySetFile);
+		return policySetBuilder.buildFromFile(policySetFile);
 	}
 	
 	public void store(String papId, PolicySet ps) {

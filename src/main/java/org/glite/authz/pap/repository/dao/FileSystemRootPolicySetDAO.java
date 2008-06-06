@@ -6,8 +6,9 @@ import java.util.List;
 
 import org.glite.authz.pap.common.RepositoryConfiguration;
 import org.glite.authz.pap.common.xacml.PolicySet;
+import org.glite.authz.pap.common.xacml.PolicySetBuilder;
 import org.glite.authz.pap.common.xacml.PolicySetImpl;
-import org.glite.authz.pap.common.xacml.ReferenceId;
+import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.XACMLObject;
 import org.glite.authz.pap.repository.AlreadyExistsRepositoryException;
 import org.glite.authz.pap.repository.RepositoryException;
@@ -18,16 +19,17 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return new FileSystemRootPolicySetDAO();
 	}
 
-	private String dbDir;
-	private String rootPolicySetFileNameAbsolutePath;
+	private final String dbDir;
+	private final String rootPolicySetFileNameAbsolutePath;
+	private final PolicySetBuilder policySetBuilder;
 
 	private FileSystemRootPolicySetDAO() {
-		this.dbDir = RepositoryConfiguration.getFileSystemDatabaseDir();
-		this.rootPolicySetFileNameAbsolutePath = dbDir + File.separator
+		dbDir = RepositoryConfiguration.getFileSystemDatabaseDir();
+		rootPolicySetFileNameAbsolutePath = dbDir + File.separator
 				+ RepositoryConfiguration.getPolicySetFileNamePrefix()
 				+ RepositoryConfiguration.getRootPolicySetFileName()
 				+ RepositoryConfiguration.getXACMLFileNameExtension();
-
+		policySetBuilder = RepositoryConfiguration.getPolicySetBuilder();
 		if (!existsRoot()) {
 			createRoot();
 		}
@@ -43,7 +45,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
 	public void createRoot() {
 		if (!existsRoot()) {
-			PolicySetImpl rootPS = new PolicySetImpl(RepositoryConfiguration.getRootPolicySetTemplatePath());
+			PolicySet rootPS = policySetBuilder.buildFromFile(RepositoryConfiguration.getRootPolicySetTemplatePath());
 			rootPS.printXACMLDOMToFile(this.rootPolicySetFileNameAbsolutePath);
 		} else {
 			throw new AlreadyExistsRepositoryException();
@@ -73,11 +75,11 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 	}
 
 	public PolicySet getPAPRoot(String papId) {
-		return new PolicySetImpl(getPAPFileNameAbsolutePath(papId));
+		return policySetBuilder.buildFromFile(getPAPFileNameAbsolutePath(papId));
 	}
 
 	public PolicySet getRoot() {
-		return new PolicySetImpl(this.rootPolicySetFileNameAbsolutePath);
+		return policySetBuilder.buildFromFile(rootPolicySetFileNameAbsolutePath);
 	}
 
 	public List<String> listPAPs() {
@@ -86,7 +88,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		List<String> papList = new ArrayList<String>(childrenList.size());
 		for (XACMLObject child : childrenList) {
 			if (child.isPolicySetReference()) {
-				papList.add(((ReferenceId) child).getValue());
+				papList.add(((IdReference) child).getValue());
 			}
 		}
 		return papList;
