@@ -2,13 +2,14 @@ package org.glite.authz.pap.repository.dao;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.RepositoryConfiguration;
+import org.glite.authz.pap.common.xacml.IdReference;
+import org.glite.authz.pap.common.xacml.Policy;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
-import org.glite.authz.pap.common.xacml.PolicySetImpl;
-import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.XACMLObject;
 import org.glite.authz.pap.repository.AlreadyExistsRepositoryException;
 import org.glite.authz.pap.repository.RepositoryException;
@@ -78,8 +79,56 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return policySetBuilder.buildFromFile(getPAPFileNameAbsolutePath(papId));
 	}
 
+	public List<XACMLObject> getPAPRootAll(String papId) {
+		PolicySetDAO policySetDAO = FileSystemPolicySetDAO.getInstance();
+		PolicyDAO policyDAO = FileSystemPolicyDAO.getInstance();
+		PolicySet papRoot = getPAPRoot(papId);
+		
+		List<PolicySet> policySetList = policySetDAO.getAll(papId);
+		List<Policy> policyList = policyDAO.getAll(papId);
+		
+		List<XACMLObject> papAll = new ArrayList<XACMLObject>(1 + policySetList.size() + policyList.size());
+		papAll.add(papRoot);
+		papAll.addAll(policySetList);
+		papAll.addAll(policyList);
+		return papAll;
+	}
+
 	public PolicySet getRoot() {
 		return policySetBuilder.buildFromFile(rootPolicySetFileNameAbsolutePath);
+	}
+
+	public List<XACMLObject> getRootAll() {
+		PolicySet rootPolicySet = getRoot();
+		List<String> papIdList = listPAPs();
+		List<XACMLObject> rootAll = new LinkedList<XACMLObject>();
+		rootAll.add(rootPolicySet);
+		for (String id:papIdList) {
+			rootAll.addAll(getPAPRootAll(id));
+		}
+		return rootAll;
+	}
+
+	public List<XACMLObject> GetRootAll(String[] papIdList) {
+		PolicySet rootPolicySet = getRoot();
+		for (String id:listPAPs()) {
+			boolean found = false;
+			for (String requestedId:papIdList) {
+				if (requestedId.equals(id)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				rootPolicySet.deletePolicySetReference(id);
+			}
+		}
+		List<XACMLObject> rootAll = new LinkedList<XACMLObject>();
+		rootAll.add(rootPolicySet);
+		for (String requestedPAPId:papIdList) {
+			rootAll.addAll(getPAPRootAll(requestedPAPId));
+		}
+		return rootAll;
 	}
 
 	public List<String> listPAPs() {
@@ -114,11 +163,6 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		}
 		File papPolicySetFile = new File(getPAPFileNameAbsolutePath(papId));
 		papRootPolicySet.printXACMLDOMToFile(papPolicySetFile.getAbsolutePath());
-//		try {
-//			//PolicySetImpl papPolicySetTemplate = new PolicySetImpl(RepositoryConfiguration.getPapPolicySetTemplatePath());
-//		} catch (XACMLException e) {
-//			throw new RepositoryException("Invalid XACML file: " + RepositoryConfiguration.getPapPolicySetTemplatePath(), e);
-//		}
 	}
 
 	private String getPAPDirAbsolutePath(String papId) {

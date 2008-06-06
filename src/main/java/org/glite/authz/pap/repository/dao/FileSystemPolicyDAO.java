@@ -47,7 +47,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 				policyList.add(policyBuilder.buildFromFile(file));
 			}
 		}
-		return null;
+		return policyList;
 	}
 
 	public Policy getById(String papId, String policyId) {
