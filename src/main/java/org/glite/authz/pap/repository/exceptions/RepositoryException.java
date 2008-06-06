@@ -1,4 +1,4 @@
-package org.glite.authz.pap.repository;
+package org.glite.authz.pap.repository.exceptions;
 
 public class RepositoryException extends RuntimeException {
 

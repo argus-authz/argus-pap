@@ -1,4 +1,4 @@
-package org.glite.authz.pap.repository.dao;
+package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -11,8 +11,11 @@ import org.glite.authz.pap.common.xacml.Policy;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
 import org.glite.authz.pap.common.xacml.XACMLObject;
-import org.glite.authz.pap.repository.AlreadyExistsRepositoryException;
-import org.glite.authz.pap.repository.RepositoryException;
+import org.glite.authz.pap.repository.dao.PolicyDAO;
+import org.glite.authz.pap.repository.dao.PolicySetDAO;
+import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
+import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
+import org.glite.authz.pap.repository.exceptions.RepositoryException;
 
 public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
@@ -49,7 +52,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 			PolicySet rootPS = policySetBuilder.buildFromFile(RepositoryConfiguration.getRootPolicySetTemplatePath());
 			rootPS.printXACMLDOMToFile(this.rootPolicySetFileNameAbsolutePath);
 		} else {
-			throw new AlreadyExistsRepositoryException();
+			throw new AlreadyExistsException();
 		}
 	}
 
@@ -153,7 +156,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 	private void createPAP(PolicySet papRootPolicySet) {
 		String papId = papRootPolicySet.getId();
 		if (existsPAP(papId)) {
-			throw new AlreadyExistsRepositoryException();
+			throw new AlreadyExistsException();
 		}
 		File directory = new File(getPAPDirAbsolutePath(papId));
 		if (!directory.exists()) {

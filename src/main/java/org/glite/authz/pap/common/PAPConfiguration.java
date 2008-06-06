@@ -45,8 +45,7 @@ public class PAPConfiguration {
 
   private PAPConfiguration() {}
   
-  public static PAPConfiguration getInstance(String configurationFileName) 
-    throws PAPConfigurationException {
+  public static PAPConfiguration getInstance(String configurationFileName){
     
     /* load properties from file */
     

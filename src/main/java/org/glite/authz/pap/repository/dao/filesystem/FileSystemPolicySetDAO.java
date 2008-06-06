@@ -1,4 +1,4 @@
-package org.glite.authz.pap.repository.dao;
+package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -7,7 +7,8 @@ import java.util.List;
 import org.glite.authz.pap.common.RepositoryConfiguration;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
-import org.glite.authz.pap.repository.RepositoryException;
+import org.glite.authz.pap.repository.dao.PolicySetDAO;
+import org.glite.authz.pap.repository.exceptions.RepositoryException;
 
 public class FileSystemPolicySetDAO implements PolicySetDAO {
 	

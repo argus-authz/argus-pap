@@ -1,9 +1,13 @@
-package org.glite.authz.pap.repository.dao;
+package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
 
 import org.glite.authz.pap.common.RepositoryConfiguration;
-import org.glite.authz.pap.repository.RepositoryException;
+import org.glite.authz.pap.repository.dao.DAOFactory;
+import org.glite.authz.pap.repository.dao.PolicyDAO;
+import org.glite.authz.pap.repository.dao.PolicySetDAO;
+import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
+import org.glite.authz.pap.repository.exceptions.RepositoryException;
 
 public class FileSystemDAOFactory extends DAOFactory {
 	private static FileSystemDAOFactory instance = null;

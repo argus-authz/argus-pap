@@ -26,10 +26,35 @@ package org.glite.authz.pap.common.exceptions;
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
  *
  */
-public class PAPConfigurationException extends Exception {
+public class PAPConfigurationException extends RuntimeException {
 
-  public PAPConfigurationException( Exception e ) {
-    super(e);
-  }
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
+    public PAPConfigurationException() {
+
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+    public PAPConfigurationException( String message, Throwable cause ) {
+
+        super( message, cause );
+        // TODO Auto-generated constructor stub
+    }
+
+    public PAPConfigurationException( String message ) {
+
+        super( message );
+        // TODO Auto-generated constructor stub
+    }
+
+    public PAPConfigurationException( Throwable cause ) {
+
+        super( cause );
+        // TODO Auto-generated constructor stub
+    }
 
 }
