@@ -2,6 +2,12 @@ package org.glite.authz.pap.common;
 
 import java.io.File;
 
+import org.glite.authz.pap.common.xacml.PolicyBuilder;
+import org.glite.authz.pap.common.xacml.PolicyBuilderImpl;
+import org.glite.authz.pap.common.xacml.PolicySetBuilder;
+import org.glite.authz.pap.common.xacml.PolicySetBuilderImpl;
+import org.glite.authz.pap.common.xacml.PolicySetBuilderOpenSAML;
+
 public class RepositoryConfiguration {
 
 	private static final String fileSystemDatabaseDir = "/tmp/paprep";
@@ -59,6 +65,14 @@ public class RepositoryConfiguration {
 
 	public static String getXACMLFileNameExtension() {
 		return xacmlFileNameExtension;
+	}
+	
+	public static PolicySetBuilder getPolicySetBuilder() {
+		return PolicySetBuilderImpl.getInstance();
+	}
+	
+	public static PolicyBuilder getPolicyBuilder() {
+		return PolicyBuilderImpl.getInstance();
 	}
 
 }
