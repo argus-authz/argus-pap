@@ -56,7 +56,7 @@ public class PolicySetImpl implements PolicySet {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
 			if (child.isPolicyReference()) {
-				if (policyId.equals(((ReferenceId) child).getValue())) {
+				if (policyId.equals(((IdReference) child).getValue())) {
 					policySetDOM.removeChild(child.getDOM());
 				}
 			}
@@ -67,7 +67,7 @@ public class PolicySetImpl implements PolicySet {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
 			if (child.isPolicySetReference()) {
-				if (policySetId.equals(((ReferenceId) child).getValue())) {
+				if (policySetId.equals(((IdReference) child).getValue())) {
 					policySetDOM.removeChild(child.getDOM());
 				}
 			}
@@ -115,9 +115,9 @@ public class PolicySetImpl implements PolicySet {
 				} else if ("Policy".equals(nodeName)) {
 					// TODO
 				} else if ("PolicySetIdReference".equals(nodeName)) {
-					result.add(new ReferenceId(ReferenceId.Type.POLICYSETIDREFERENCE, node.getTextContent(), node));
+					result.add(new ReferenceIdImpl(IdReference.Type.POLICYSETIDREFERENCE, node.getTextContent(), node));
 				} else if ("PolicyIdReference".equals(nodeName)) {
-					result.add(new ReferenceId(ReferenceId.Type.POLICYIDREFERENCE, node.getTextContent(), node));
+					result.add(new ReferenceIdImpl(IdReference.Type.POLICYIDREFERENCE, node.getTextContent(), node));
 				}
 			}
 		}
@@ -186,7 +186,7 @@ public class PolicySetImpl implements PolicySet {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
 			if (child.isPolicyReference()) {
-				if (id.equals(((ReferenceId) child).getValue())) {
+				if (id.equals(((IdReference) child).getValue())) {
 					return true;
 				}
 			}
@@ -198,7 +198,7 @@ public class PolicySetImpl implements PolicySet {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
 			if (child.isPolicySetReference()) {
-				if (id.equals(((ReferenceId) child).getValue())) {
+				if (id.equals(((IdReference) child).getValue())) {
 					return true;
 				}
 			}
@@ -233,7 +233,7 @@ public class PolicySetImpl implements PolicySet {
 		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
 		for (XACMLObject child:children) {
 			if (child.isReference()) {
-				if (id.equals(((ReferenceId) child).getValue())) {
+				if (id.equals(((IdReference) child).getValue())) {
 					return true;
 				}
 			}

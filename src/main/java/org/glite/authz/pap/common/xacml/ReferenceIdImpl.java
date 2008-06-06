@@ -2,20 +2,17 @@ package org.glite.authz.pap.common.xacml;
 
 import org.w3c.dom.Node;
 
-public class ReferenceId implements XACMLObject {
-	public enum Type {
-		POLICYIDREFERENCE, POLICYSETIDREFERENCE;
-	}
+public class ReferenceIdImpl implements IdReference {
 	private String value;
 	private Node dom;
 	
 	private boolean isPolicyIdReference;
 	
-	public ReferenceId(Type type, String value) {
+	public ReferenceIdImpl(Type type, String value) {
 		this(type, value, null);
 	}
 	
-	public ReferenceId(Type type, String value, Node dom) {
+	public ReferenceIdImpl(Type type, String value, Node dom) {
 		this.dom = dom;
 		this.value = value;
 		if (type == Type.POLICYIDREFERENCE) {
