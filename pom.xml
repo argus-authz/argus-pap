@@ -1,19 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project>
-
+<?xml version="1.0" encoding="UTF-8"?><project>
   <modelVersion>4.0.0</modelVersion>
-
   <groupId>org.glite.security.authz.pap</groupId>
   <artifactId>org.glite.security.authz.pap</artifactId>
-  <name>PAP</name>
-
-  <version>0.1</version>
-  
   <packaging>war</packaging>
-  
+  <name>PAP</name>
+  <version>0.1</version>
   <build>
-    <plugins>    
-      <!--  compiler plugin -->
+    <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
         <configuration>
@@ -22,7 +15,6 @@
           <debug>true</debug>
         </configuration>
       </plugin>
-      <!--  Tomcat plugin -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>tomcat-maven-plugin</artifactId>
@@ -32,46 +24,36 @@
       </plugin>
     </plugins>
   </build>
-
-  <!--  Internet2 repository for OpenSAML -->
   <repositories>
     <repository>
-      <id>shibboleth.internet2.edu</id>
-      <name>Internet2</name>
-      <layout>default</layout>
-      <url>http://shibboleth.internet2.edu/downloads/maven2</url>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
+      <id>shibboleth.internet2.edu</id>
+      <name>Internet2</name>
+      <url>http://shibboleth.internet2.edu/downloads/maven2</url>
     </repository>
   </repositories>
-
   <dependencies>
-  
-    <!--  JUnit 3.8.1 -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
-  
-    <!-- OpenSAML -->
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml</artifactId>
       <version>2.1.0</version>
     </dependency>
-
-    <!--  Axis -->
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis</artifactId>
       <version>1.4</version>
       <exclusions>
         <exclusion>
-          <groupId>commons-logging</groupId>
           <artifactId>commons-logging</artifactId>
+          <groupId>commons-logging</groupId>
         </exclusion>
       </exclusions>
     </dependency>
@@ -85,8 +67,6 @@
       <artifactId>axis-jaxrpc</artifactId>
       <version>1.4</version>
     </dependency>
-
-    <!-- SLF4J -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
@@ -102,8 +82,6 @@
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.5.0</version>
     </dependency>
-    
-    <!-- Servlet & Jsp -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
@@ -116,7 +94,11 @@
       <version>2.0</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.glite</groupId>
+      <artifactId>glite-security-util-java</artifactId>
+      <version>1.4.0</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
-
 </project>
