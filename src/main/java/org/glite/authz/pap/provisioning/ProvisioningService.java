@@ -22,10 +22,9 @@
 
 package org.glite.authz.pap.provisioning;
 
-import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.repository.PolicyRepository;
-import org.glite.authz.pap.repository.PolicyRepositoryException;
-import org.glite.authz.pap.repository.impl.FilePolicyRepository;
+import org.glite.authz.pap.common.xacml.PolicySet;
+import org.glite.authz.pap.repository.dao.DAOFactory;
+import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
@@ -37,25 +36,6 @@ public class ProvisioningService {
 
   final Logger logger = LoggerFactory.getLogger( ProvisioningService.class );
 
-  private PolicyRepository policyRepository;
-
-  
-  public ProvisioningService() {
-    
-    // get an instance of the configuration
-    PAPConfiguration configuration = PAPConfiguration.getInstance();
-    
-    /* instantiate the policy repository */
-    
-    try {
-      policyRepository = new FilePolicyRepository(configuration.getPolicyFile());
-    } 
-    catch ( PolicyRepositoryException e ) {
-      throw new Error(e);
-    }
-    
-  }
-  
   public Response XACMLPolicyQuery( XACMLPolicyQueryType query )
       throws java.rmi.RemoteException {
 
@@ -78,10 +58,17 @@ public class ProvisioningService {
       return ProvisioningServiceUtils.createResponse( query , e );
     }
 
-    /* call the repository for the root policy sets */
-
-    Element policySetElement = policyRepository.getRootPolicySet();
-
+    /* get a DAO */
+    
+    DAOFactory daoFactory = DAOFactory.getDAOFactory(); 
+    
+    RootPolicySetDAO rootPolicySetDAO = 
+      daoFactory.getRootPolicySetDAO();
+    
+    PolicySet policySet = rootPolicySetDAO.getRoot();
+    
+    Element policySetElement = (Element) policySet.getDOM();
+    
     /* convert the policy set element to an OpenSAML object */
 
     PolicySetType resultPolicySet = 
