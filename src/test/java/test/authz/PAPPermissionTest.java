@@ -1,4 +1,4 @@
-package org.glite.authz.pap.authz.unittest;
+package test.authz;
 
 import java.util.EnumSet;
 

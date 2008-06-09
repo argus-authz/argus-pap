@@ -34,64 +34,71 @@ import org.opensaml.xml.XMLConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class PAPConfiguration {
-  
-  final static Logger logger = LoggerFactory.getLogger(PAPConfiguration.class);
-  
-  private final static PAPConfiguration instance = new PAPConfiguration();
 
-  private static Properties properties = new Properties();
+    final static Logger logger = LoggerFactory
+            .getLogger( PAPConfiguration.class );
 
-  private PAPConfiguration() {}
-  
-  public static PAPConfiguration getInstance(String configurationFileName){
-    
-    /* load properties from file */
-    
-    try {
-      loadConfigurationProperties( configurationFileName );
-    } catch ( IOException e ) {
-      throw new PAPConfigurationException( e );
+    private final static PAPConfiguration instance = new PAPConfiguration();
+
+    private static Properties properties = new Properties();
+
+    private PAPConfiguration() {
+
     }
 
-    /* configure OpenSAML */
-    
-    try {
-      configureOpenSAML();
-    } catch (ConfigurationException e) {
-      throw new PAPConfigurationException( e );
+    public static PAPConfiguration getInstance( String configurationFileName ) {
+
+        /* load properties from file */
+
+        try {
+            loadConfigurationProperties( configurationFileName );
+        } catch ( IOException e ) {
+            throw new PAPConfigurationException( e );
+        }
+
+        /* configure OpenSAML */
+
+        try {
+            configureOpenSAML();
+        } catch ( ConfigurationException e ) {
+            throw new PAPConfigurationException( e );
+        }
+
+        return instance;
     }
 
-    return instance;
-  }
+    private static void loadConfigurationProperties(
+            String configurationFileName ) throws IOException {
 
-  private static void loadConfigurationProperties( String configurationFileName )
-      throws IOException {
-    
-    FileInputStream inputStream = 
-      new FileInputStream( configurationFileName );
+        FileInputStream inputStream = new FileInputStream(
+                configurationFileName );
 
-    properties.load( inputStream );
-    
-  }
+        properties.load( inputStream );
 
-  public static PAPConfiguration getInstance() {
-    return instance;
-  }
+    }
 
-  public String getPolicyFile() {
-    return properties.getProperty("policyFile");
-  }
+    public static PAPConfiguration getInstance() {
 
-  private static void configureOpenSAML() throws ConfigurationException {
-    
-    DefaultBootstrap.bootstrap();
-    XMLConfigurator xmlConfigurator = new XMLConfigurator();
-    xmlConfigurator.load(Configuration.class.getResourceAsStream("/xacml2-saml2-profile-config.xml"));
-    xmlConfigurator.load(Configuration.class.getResourceAsStream("/xacml20-context-config.xml"));
-    xmlConfigurator.load(Configuration.class.getResourceAsStream("/xacml20-policy-config.xml"));
-    
-  }
-  
+        return instance;
+    }
+
+    public String getPolicyFile() {
+
+        return properties.getProperty( "policyFile" );
+    }
+
+    private static void configureOpenSAML() throws ConfigurationException {
+
+        DefaultBootstrap.bootstrap();
+        XMLConfigurator xmlConfigurator = new XMLConfigurator();
+        xmlConfigurator.load( Configuration.class
+                .getResourceAsStream( "/xacml2-saml2-profile-config.xml" ) );
+        xmlConfigurator.load( Configuration.class
+                .getResourceAsStream( "/xacml20-context-config.xml" ) );
+        xmlConfigurator.load( Configuration.class
+                .getResourceAsStream( "/xacml20-policy-config.xml" ) );
+
+    }
+
 }
