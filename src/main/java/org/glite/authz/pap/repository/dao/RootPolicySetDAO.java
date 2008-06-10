@@ -15,7 +15,7 @@ public interface RootPolicySetDAO {
 
 	public List<XACMLObject> getAll();
 
-	public List<XACMLObject> getAllByPAPId(String[] papIdList);
+	public List<XACMLObject> getByPAPId(String[] papIdList);
 
 	public List<String> listPAPs();
 

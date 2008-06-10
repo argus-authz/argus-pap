@@ -63,7 +63,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return rootAll;
 	}
 
-	public List<XACMLObject> getAllByPAPId(String[] papIdList) {
+	public List<XACMLObject> getByPAPId(String[] papIdList) {
 		PolicySet rootPolicySet = get();
 		for (String id:listPAPs()) {
 			boolean found = false;
