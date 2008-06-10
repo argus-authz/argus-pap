@@ -62,10 +62,9 @@ public class ProvisioningService {
     
     DAOFactory daoFactory = DAOFactory.getDAOFactory(); 
     
-    RootPolicySetDAO rootPolicySetDAO = 
-      daoFactory.getRootPolicySetDAO();
+    RootPolicySetDAO rootPolicySetDAO = daoFactory.getRootPolicySetDAO();
     
-    PolicySet policySet = rootPolicySetDAO.getRoot();
+    PolicySet policySet = rootPolicySetDAO.get();
     
     Element policySetElement = (Element) policySet.getDOM();
     

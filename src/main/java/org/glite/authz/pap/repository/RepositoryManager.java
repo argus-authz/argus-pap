@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common;
+package org.glite.authz.pap.repository;
 
 import java.io.File;
 
@@ -6,10 +6,13 @@ import org.glite.authz.pap.common.xacml.PolicyBuilder;
 import org.glite.authz.pap.common.xacml.PolicyBuilderImpl;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
 import org.glite.authz.pap.common.xacml.PolicySetBuilderImpl;
-import org.glite.authz.pap.common.xacml.PolicySetBuilderOpenSAML;
+import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class RepositoryConfiguration {
+public class RepositoryManager {
 
+	private static final Logger logger = LoggerFactory.getLogger( RepositoryManager.class );
 	private static final String fileSystemDatabaseDir = "/tmp/paprep";
 	private static final String rootPolicySetId = "Root";
 	private static final String rootPAPPolicySetId = "PAPRoot";
@@ -17,6 +20,35 @@ public class RepositoryConfiguration {
 	private static final String policyFileNamePrefix = "Policy_";
 	private static final String xacmlFileNameExtension = ".xml";
 	private static final String rootPolicySetTemplatePath = "files/RootPolicySetTemplate.xml";
+	
+	private static RepositoryManager instance = null;
+	
+	public static RepositoryManager getInstance() {
+		if (instance == null) {
+			instance = new RepositoryManager();
+		}
+		return instance;
+	}
+	
+	private RepositoryManager() { }
+	
+	public void start() {
+		logger.info("Starting PolicyRepository manager: filesystem implementation...");
+		startFileSystemDB();
+	}
+	
+	public void startFileSystemDB() {
+		File rootDir = new File(RepositoryManager.getFileSystemDatabaseDir());
+		if (!rootDir.exists()) {
+			if (!rootDir.mkdirs()) {
+				throw new RepositoryException("Cannot create DB dir");
+			}
+		}
+		if (!(rootDir.canRead() && rootDir.canWrite())) {
+			throw new RepositoryException("Permission denied for DB dir");
+		}
+	}
+
 
 	public static String getFileSystemDatabaseDir() {
 		return fileSystemDatabaseDir;

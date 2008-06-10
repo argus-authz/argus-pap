@@ -1,13 +1,14 @@
 package org.glite.authz.pap.test;
 
-import org.glite.authz.pap.common.RepositoryConfiguration;
 import org.glite.authz.pap.common.xacml.Policy;
 import org.glite.authz.pap.common.xacml.PolicyBuilder;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
+import org.glite.authz.pap.repository.dao.PAPPolicySetDAO;
 import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
 
 public class TestRepository {
@@ -19,20 +20,21 @@ public class TestRepository {
 
 	public static void main(String[] args) {
 		
-		policySetBuilder = RepositoryConfiguration.getPolicySetBuilder();
+		policySetBuilder = RepositoryManager.getPolicySetBuilder();
 
 		DAOFactory daoFactory = DAOFactory.getDAOFactory();
 		RootPolicySetDAO rootPolicySetDAO = daoFactory.getRootPolicySetDAO();
+		PAPPolicySetDAO papDAO = daoFactory.getPapDAO();
 		
-		if (!rootPolicySetDAO.existsRoot()) {
-				rootPolicySetDAO.createRoot();
+		if (!rootPolicySetDAO.exists()) {
+				rootPolicySetDAO.create();
 		}
 
 		// Create a PAP PolicySet
 		PolicySet localPAPPolicySet = policySetBuilder.buildFromFile(papPolicySetTemplatePath);
 		localPAPPolicySet.setId("LocalPolicySet");
-		if (!rootPolicySetDAO.existsPAP(localPAPPolicySet.getId())) {
-			rootPolicySetDAO.createPAPAsFirst(localPAPPolicySet);
+		if (!papDAO.exists(localPAPPolicySet.getId())) {
+			papDAO.createAsFirst(localPAPPolicySet);
 		}
 		
 		// Insert PolicySet in the PAP
