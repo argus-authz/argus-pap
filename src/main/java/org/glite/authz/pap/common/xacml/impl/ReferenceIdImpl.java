@@ -1,5 +1,7 @@
-package org.glite.authz.pap.common.xacml;
+package org.glite.authz.pap.common.xacml.impl;
 
+import org.glite.authz.pap.common.xacml.IdReference;
+import org.glite.authz.pap.common.xacml.IdReference.Type;
 import org.w3c.dom.Node;
 
 public class ReferenceIdImpl implements IdReference {

@@ -3,6 +3,9 @@ package org.glite.authz.pap.common.xacml;
 import java.io.File;
 import java.util.List;
 
+import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
+import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
+
 public interface PolicySet extends XACMLObject {
 	public void deletePolicyReference(String policyId);
 	public void deletePolicySetReference(String policySetId);

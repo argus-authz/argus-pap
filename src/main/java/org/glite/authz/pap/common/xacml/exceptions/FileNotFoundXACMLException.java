@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common.xacml;
+package org.glite.authz.pap.common.xacml.exceptions;
 
 public class FileNotFoundXACMLException extends XACMLException {
 

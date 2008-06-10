@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.xacml.Policy;
 import org.glite.authz.pap.common.xacml.PolicyBuilder;
-import org.glite.authz.pap.common.xacml.PolicyImpl;
+import org.glite.authz.pap.common.xacml.impl.PolicyImpl;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;

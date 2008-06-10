@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common.xacml;
+package org.glite.authz.pap.common.xacml.impl;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,6 +7,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.glite.authz.pap.common.xacml.PolicySet;
+import org.glite.authz.pap.common.xacml.PolicySetBuilder;
+import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
+import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 

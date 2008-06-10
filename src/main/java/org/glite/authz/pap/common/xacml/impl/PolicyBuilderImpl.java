@@ -1,7 +1,9 @@
-package org.glite.authz.pap.common.xacml;
+package org.glite.authz.pap.common.xacml.impl;
 
 import java.io.File;
 
+import org.glite.authz.pap.common.xacml.Policy;
+import org.glite.authz.pap.common.xacml.PolicyBuilder;
 import org.w3c.dom.Document;
 
 public class PolicyBuilderImpl implements PolicyBuilder {

@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common.xacml;
+package org.glite.authz.pap.common.xacml.impl;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,6 +16,10 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.glite.authz.pap.common.xacml.Policy;
+import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
+import org.glite.authz.pap.common.xacml.exceptions.InvalidPolicySet;
+import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;

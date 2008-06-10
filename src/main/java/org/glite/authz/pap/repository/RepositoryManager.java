@@ -3,9 +3,9 @@ package org.glite.authz.pap.repository;
 import java.io.File;
 
 import org.glite.authz.pap.common.xacml.PolicyBuilder;
-import org.glite.authz.pap.common.xacml.PolicyBuilderImpl;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
-import org.glite.authz.pap.common.xacml.PolicySetBuilderImpl;
+import org.glite.authz.pap.common.xacml.impl.PolicyBuilderImpl;
+import org.glite.authz.pap.common.xacml.impl.PolicySetBuilderImpl;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
