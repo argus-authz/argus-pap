@@ -36,7 +36,7 @@ import org.w3c.dom.Node;
 
 public class PolicySetOpenSAML implements PolicySet {
 
-	private XMLObjectBuilder<PolicySetType> policySetBuilder;
+	private XMLObjectBuilder<PolicySetType> policySetBuilder = null;
 	private PolicySetType policySet;
 	
 	public PolicySetOpenSAML(Element element) {
@@ -151,6 +151,22 @@ public class PolicySetOpenSAML implements PolicySet {
 		return referenceExists(id, policySet.getPolicySetIdReferences());
 	}
 
+	public boolean referenceIdExists(String id) {
+		List<AbstractPolicy> children = getOrderedChildren();
+		for (AbstractPolicy child:children) {
+			if (child.isReference()) {
+				if (((IdReference) child).getValue().equals(id)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public void setId(String policySetId) {
+		policySet.setPolicySetId(policySetId);
+	}
+
 	public void toFile(File file) {
 		FileOutputStream fos;
 		try {
@@ -167,28 +183,11 @@ public class PolicySetOpenSAML implements PolicySet {
 		}  catch (TransformerException e) {
 			throw new XACMLException(e);
 		}
-
 	}
-
+	
 	public void toFile(String fileName) {
 		File file = new File(fileName);
 		toFile(file);
-	}
-
-	public boolean referenceIdExists(String id) {
-		List<AbstractPolicy> children = getOrderedChildren();
-		for (AbstractPolicy child:children) {
-			if (child.isReference()) {
-				if (((IdReference) child).getValue().equals(id)) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-	
-	public void setId(String policySetId) {
-		policySet.setPolicySetId(policySetId);
 	}
 
 	private List<AbstractPolicy> getOrderedChildren() {

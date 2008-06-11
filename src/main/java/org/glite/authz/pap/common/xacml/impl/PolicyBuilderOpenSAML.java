@@ -6,35 +6,37 @@ import org.glite.authz.pap.common.xacml.Policy;
 import org.glite.authz.pap.common.xacml.PolicyBuilder;
 import org.w3c.dom.Document;
 
-public class PolicyBuilderImpl implements PolicyBuilder {
+public class PolicyBuilderOpenSAML implements PolicyBuilder {
 	
-private static PolicyBuilderImpl instance = null;
+private static PolicyBuilderOpenSAML instance = null;
 	
-	public static PolicyBuilderImpl getInstance() {
+	public static PolicyBuilderOpenSAML getInstance() {
 		if (instance == null) {
-			return new PolicyBuilderImpl();
+			return new PolicyBuilderOpenSAML();
 		} else {
 			return instance;
 		}
 	}
 	
-	private PolicyBuilderImpl() { } 
+	private PolicyBuilderOpenSAML() { } 
 
 	public Policy build(String policyId, String ruleCombinerAlgorithmId) {
+		return new PolicyOpenSAML(policyId, ruleCombinerAlgorithmId);
+	}
+
+	public Policy buildFromDOM(Document doc) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public Policy buildFromDOM(Document doc) {
-		return new PolicyImpl(doc);
-	}
-
 	public Policy buildFromFile(File file) {
-		return new PolicyImpl(file);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 	public Policy buildFromFile(String fileName) {
-		return new PolicyImpl(fileName);
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

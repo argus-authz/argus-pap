@@ -52,8 +52,36 @@ public class PolicyImpl implements Policy {
 		init(readXACMLFromFile(fileName));
 	}
 	
+	public Node getDOM() {
+		return this.policyDOM;
+	}
+
 	public String getId() {
 		return attributeId.getNodeValue();
+	}
+
+	public boolean isPolicy() {
+		return true;
+	}
+
+	public boolean isPolicyReference() {
+		return false;
+	}
+
+	public boolean isPolicySet() {
+		return false;
+	}
+
+	public boolean isPolicySetReference() {
+		return false;
+	}
+
+	public boolean isReference() {
+		return false;
+	}
+
+	public void setId(String policyId) {
+		attributeId.setNodeValue(policyId);
 	}
 
 	public void toFile(File file) {
@@ -78,39 +106,6 @@ public class PolicyImpl implements Policy {
 		File file = new File(fileName);
 		toFile(file);
 	}
-
-	public void setId(String policyId) {
-		attributeId.setNodeValue(policyId);
-	}
-
-	public Node getDOM() {
-		return this.policyDOM;
-	}
-
-	public boolean isPolicy() {
-		return true;
-	}
-
-	public boolean isPolicyReference() {
-		return false;
-	}
-
-	public boolean isPolicySet() {
-		return false;
-	}
-
-	public boolean isPolicySetReference() {
-		return false;
-	}
-
-	public boolean isReference() {
-		return false;
-	}
-	
-	private void init(Document doc) {
-		policyDOM = doc.getDocumentElement();
-		attributeId = getDOMPolicyAttributeId(doc);
-	}
 	
 	private Node getDOMPolicyAttributeId(Document doc) {
 		Node attributeId = null;
@@ -128,6 +123,11 @@ public class PolicyImpl implements Policy {
 			throw new InvalidPolicySet();
 		}
 		return attributeId;
+	}
+	
+	private void init(Document doc) {
+		policyDOM = doc.getDocumentElement();
+		attributeId = getDOMPolicyAttributeId(doc);
 	}
 	
 	/**

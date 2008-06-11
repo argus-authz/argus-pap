@@ -4,8 +4,7 @@ import java.io.File;
 
 import org.glite.authz.pap.common.xacml.PolicyBuilder;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
-import org.glite.authz.pap.common.xacml.impl.PolicyBuilderImpl;
-import org.glite.authz.pap.common.xacml.impl.PolicySetBuilderImpl;
+import org.glite.authz.pap.common.xacml.impl.PolicyBuilderOpenSAML;
 import org.glite.authz.pap.common.xacml.impl.PolicySetBuilderOpenSAML;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
@@ -20,7 +19,6 @@ public class RepositoryManager {
 	private static final String policySetFileNamePrefix = "PolicySet_";
 	private static final String policyFileNamePrefix = "Policy_";
 	private static final String xacmlFileNameExtension = ".xml";
-	private static final String rootPolicySetTemplatePath = "files/RootPolicySetTemplate.xml";
 	
 	private static RepositoryManager instance = null;
 	
@@ -49,7 +47,6 @@ public class RepositoryManager {
 			throw new RepositoryException("Permission denied for DB dir");
 		}
 	}
-
 
 	public static String getFileSystemDatabaseDir() {
 		return fileSystemDatabaseDir;
@@ -92,10 +89,6 @@ public class RepositoryManager {
 		return rootPolicySetId;
 	}
 
-	public static String getRootPolicySetTemplatePath() {
-		return rootPolicySetTemplatePath;
-	}
-
 	public static String getXACMLFileNameExtension() {
 		return xacmlFileNameExtension;
 	}
@@ -105,7 +98,7 @@ public class RepositoryManager {
 	}
 	
 	public static PolicyBuilder getPolicyBuilder() {
-		return PolicyBuilderImpl.getInstance();
+		return PolicyBuilderOpenSAML.getInstance();
 	}
 
 }
