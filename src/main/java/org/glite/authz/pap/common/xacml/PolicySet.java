@@ -16,15 +16,15 @@ public interface PolicySet extends AbstractPolicy {
 
 	public void deletePolicySetReference(String policySetId);
 
-	public AbstractPolicy getFirstXACMLObjectChildren();
+	public AbstractPolicy getFirstChildren();
 
 	public String getId();
 
-	public AbstractPolicy getLastXACMLObjectChildren();
+	public AbstractPolicy getLastChildren();
 
-	public int getNumberOfXACMLObjectChildren();
+	public int getNumberOfChildren();
 
-	public List<AbstractPolicy> getOrderedListOfXACMLObjectChildren();
+	public List<AbstractPolicy> getOrderedListOfChildren();
 
 	public void insertPolicyReferenceAsFirst(String value);
 	

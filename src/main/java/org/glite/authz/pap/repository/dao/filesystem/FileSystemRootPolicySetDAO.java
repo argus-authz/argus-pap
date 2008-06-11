@@ -87,7 +87,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
 	public List<String> listPAPs() {
 		PolicySet rootPolicySet = get();
-		List<AbstractPolicy> childrenList = rootPolicySet.getOrderedListOfXACMLObjectChildren();
+		List<AbstractPolicy> childrenList = rootPolicySet.getOrderedListOfChildren();
 		List<String> papList = new ArrayList<String>(childrenList.size());
 		for (AbstractPolicy child : childrenList) {
 			if (child.isPolicySetReference()) {

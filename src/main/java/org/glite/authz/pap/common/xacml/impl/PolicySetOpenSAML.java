@@ -81,7 +81,7 @@ public class PolicySetOpenSAML implements PolicySet {
 		return policySet.getDOM();
 	}
 
-	public AbstractPolicy getFirstXACMLObjectChildren() {
+	public AbstractPolicy getFirstChildren() {
 		List<AbstractPolicy> children = getOrderedChildren();
 		AbstractPolicy child = null;
 		if (!children.isEmpty()) {
@@ -94,16 +94,16 @@ public class PolicySetOpenSAML implements PolicySet {
 		return policySet.getPolicySetId();
 	}
 
-	public AbstractPolicy getLastXACMLObjectChildren() {
+	public AbstractPolicy getLastChildren() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public int getNumberOfXACMLObjectChildren() {
+	public int getNumberOfChildren() {
 		return getOrderedChildren().size();
 	}
 
-	public List<AbstractPolicy> getOrderedListOfXACMLObjectChildren() {
+	public List<AbstractPolicy> getOrderedListOfChildren() {
 		return getOrderedChildren();
 	}
 
