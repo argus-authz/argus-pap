@@ -20,7 +20,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.XACMLObject;
+import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.common.xacml.IdReference.Type;
 import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
 import org.glite.authz.pap.common.xacml.exceptions.InvalidPolicySet;
@@ -60,8 +60,8 @@ public class PolicySetImpl implements PolicySet {
 	}
 	
 	public void deletePolicyReference(String policyId) {
-		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
-		for (XACMLObject child:children) {
+		List<AbstractPolicy> children = getOrderedListOfXACMLObjectChildren();
+		for (AbstractPolicy child:children) {
 			if (child.isPolicyReference()) {
 				if (policyId.equals(((IdReference) child).getValue())) {
 					policySetDOM.removeChild(child.getDOM());
@@ -71,8 +71,8 @@ public class PolicySetImpl implements PolicySet {
 	}
 	
 	public void deletePolicySetReference(String policySetId) {
-		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
-		for (XACMLObject child:children) {
+		List<AbstractPolicy> children = getOrderedListOfXACMLObjectChildren();
+		for (AbstractPolicy child:children) {
 			if (child.isPolicySetReference()) {
 				if (policySetId.equals(((IdReference) child).getValue())) {
 					policySetDOM.removeChild(child.getDOM());
@@ -85,8 +85,8 @@ public class PolicySetImpl implements PolicySet {
 		return this.policySetDOM;
 	}
 
-	public XACMLObject getFirstXACMLObjectChildren() {
-		List<XACMLObject> childrenList = getOrderedListOfXACMLObjectChildren();
+	public AbstractPolicy getFirstXACMLObjectChildren() {
+		List<AbstractPolicy> childrenList = getOrderedListOfXACMLObjectChildren();
 		if (childrenList.isEmpty()) {
 			return null;
 		} 
@@ -97,8 +97,8 @@ public class PolicySetImpl implements PolicySet {
 		return attributeId.getNodeValue();
 	}
 
-	public XACMLObject getLastXACMLObjectChildren() {
-		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
+	public AbstractPolicy getLastXACMLObjectChildren() {
+		List<AbstractPolicy> children = getOrderedListOfXACMLObjectChildren();
 		if (children.isEmpty()) {
 			return null;
 		}
@@ -109,8 +109,8 @@ public class PolicySetImpl implements PolicySet {
 		return getOrderedListOfXACMLObjectChildren().size();
 	}
 	
-	public List<XACMLObject> getOrderedListOfXACMLObjectChildren() {
-		List<XACMLObject> result = new LinkedList<XACMLObject>();
+	public List<AbstractPolicy> getOrderedListOfXACMLObjectChildren() {
+		List<AbstractPolicy> result = new LinkedList<AbstractPolicy>();
 		NodeList nodeList = policySetDOM.getChildNodes();
 		Node node = null;
 		for (int i=0; i<nodeList.getLength(); i++) {
@@ -136,7 +136,7 @@ public class PolicySetImpl implements PolicySet {
 			throw new XACMLException("Reference already exists");
 		}
 		Node firstChild = null;
-		XACMLObject child = getFirstXACMLObjectChildren();
+		AbstractPolicy child = getFirstXACMLObjectChildren();
 		if (child != null) {
 			firstChild = getFirstXACMLObjectChildren().getDOM();
 		}
@@ -155,7 +155,7 @@ public class PolicySetImpl implements PolicySet {
 			throw new XACMLException("Reference already exists");
 		}
 		Node firstChild = null;
-		XACMLObject child = getFirstXACMLObjectChildren();
+		AbstractPolicy child = getFirstXACMLObjectChildren();
 		if (child != null) {
 			firstChild = getFirstXACMLObjectChildren().getDOM();
 		}
@@ -190,8 +190,8 @@ public class PolicySetImpl implements PolicySet {
 	}
 
 	public boolean policyReferenceIdExists(String id) {
-		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
-		for (XACMLObject child:children) {
+		List<AbstractPolicy> children = getOrderedListOfXACMLObjectChildren();
+		for (AbstractPolicy child:children) {
 			if (child.isPolicyReference()) {
 				if (id.equals(((IdReference) child).getValue())) {
 					return true;
@@ -202,8 +202,8 @@ public class PolicySetImpl implements PolicySet {
 	}
 
 	public boolean policySetReferenceIdExists(String id) {
-		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
-		for (XACMLObject child:children) {
+		List<AbstractPolicy> children = getOrderedListOfXACMLObjectChildren();
+		for (AbstractPolicy child:children) {
 			if (child.isPolicySetReference()) {
 				if (id.equals(((IdReference) child).getValue())) {
 					return true;
@@ -237,8 +237,8 @@ public class PolicySetImpl implements PolicySet {
 	}
 
 	public boolean referenceIdExists(String id) {
-		List<XACMLObject> children = getOrderedListOfXACMLObjectChildren();
-		for (XACMLObject child:children) {
+		List<AbstractPolicy> children = getOrderedListOfXACMLObjectChildren();
+		for (AbstractPolicy child:children) {
 			if (child.isReference()) {
 				if (id.equals(((IdReference) child).getValue())) {
 					return true;

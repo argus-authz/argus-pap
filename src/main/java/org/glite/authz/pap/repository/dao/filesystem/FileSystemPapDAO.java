@@ -7,7 +7,7 @@ import java.util.List;
 import org.glite.authz.pap.common.xacml.Policy;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
-import org.glite.authz.pap.common.xacml.XACMLObject;
+import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPPolicySetDAO;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
@@ -68,7 +68,7 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 		return policySetBuilder.buildFromFile(getPAPFileNameAbsolutePath(papId));
 	}
 
-	public List<XACMLObject> getAll(String papId) {
+	public List<AbstractPolicy> getAll(String papId) {
 		PolicySetDAO policySetDAO = FileSystemPolicySetDAO.getInstance();
 		PolicyDAO policyDAO = FileSystemPolicyDAO.getInstance();
 		PolicySet papRoot = get(papId);
@@ -76,7 +76,7 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 		List<PolicySet> policySetList = policySetDAO.getAll(papId);
 		List<Policy> policyList = policyDAO.getAll(papId);
 		
-		List<XACMLObject> papAll = new ArrayList<XACMLObject>(1 + policySetList.size() + policyList.size());
+		List<AbstractPolicy> papAll = new ArrayList<AbstractPolicy>(1 + policySetList.size() + policyList.size());
 		papAll.add(papRoot);
 		papAll.addAll(policySetList);
 		papAll.addAll(policyList);

@@ -6,14 +6,14 @@ import java.util.List;
 import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
 import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 
-public interface PolicySet extends XACMLObject {
+public interface PolicySet extends AbstractPolicy {
 	public void deletePolicyReference(String policyId);
 	public void deletePolicySetReference(String policySetId);
-	public XACMLObject getFirstXACMLObjectChildren();
+	public AbstractPolicy getFirstXACMLObjectChildren();
 	public String getId();
-	public XACMLObject getLastXACMLObjectChildren();
+	public AbstractPolicy getLastXACMLObjectChildren();
 	public int getNumberOfXACMLObjectChildren();
-	public List<XACMLObject> getOrderedListOfXACMLObjectChildren();
+	public List<AbstractPolicy> getOrderedListOfXACMLObjectChildren();
 	public void insertPolicyReferenceAsFirst(String value);
 	public void insertPolicySetReferenceAsFirst(String value);
 	/**

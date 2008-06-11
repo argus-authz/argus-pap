@@ -8,7 +8,7 @@ import java.util.List;
 import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
-import org.glite.authz.pap.common.xacml.XACMLObject;
+import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
@@ -52,10 +52,10 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return policySetBuilder.buildFromFile(rootPolicySetFileNameAbsolutePath);
 	}
 
-	public List<XACMLObject> getAll() {
+	public List<AbstractPolicy> getAll() {
 		PolicySet rootPolicySet = get();
 		List<String> papIdList = listPAPs();
-		List<XACMLObject> rootAll = new LinkedList<XACMLObject>();
+		List<AbstractPolicy> rootAll = new LinkedList<AbstractPolicy>();
 		rootAll.add(rootPolicySet);
 		for (String id:papIdList) {
 			rootAll.addAll(FileSystemPapDAO.getInstance().getAll(id));
@@ -63,7 +63,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return rootAll;
 	}
 
-	public List<XACMLObject> getByPAPId(String[] papIdList) {
+	public List<AbstractPolicy> getByPAPId(String[] papIdList) {
 		PolicySet rootPolicySet = get();
 		for (String id:listPAPs()) {
 			boolean found = false;
@@ -77,7 +77,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 				rootPolicySet.deletePolicySetReference(id);
 			}
 		}
-		List<XACMLObject> rootAll = new LinkedList<XACMLObject>();
+		List<AbstractPolicy> rootAll = new LinkedList<AbstractPolicy>();
 		rootAll.add(rootPolicySet);
 		for (String requestedPAPId:papIdList) {
 			rootAll.addAll(FileSystemPapDAO.getInstance().getAll(requestedPAPId));
@@ -87,9 +87,9 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
 	public List<String> listPAPs() {
 		PolicySet rootPolicySet = get();
-		List<XACMLObject> childrenList = rootPolicySet.getOrderedListOfXACMLObjectChildren();
+		List<AbstractPolicy> childrenList = rootPolicySet.getOrderedListOfXACMLObjectChildren();
 		List<String> papList = new ArrayList<String>(childrenList.size());
-		for (XACMLObject child : childrenList) {
+		for (AbstractPolicy child : childrenList) {
 			if (child.isPolicySetReference()) {
 				papList.add(((IdReference) child).getValue());
 			}

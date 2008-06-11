@@ -3,7 +3,7 @@ package org.glite.authz.pap.repository.dao;
 import java.util.List;
 
 import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.XACMLObject;
+import org.glite.authz.pap.common.xacml.AbstractPolicy;
 
 public interface RootPolicySetDAO {
 
@@ -13,9 +13,9 @@ public interface RootPolicySetDAO {
 
 	public PolicySet get();
 
-	public List<XACMLObject> getAll();
+	public List<AbstractPolicy> getAll();
 
-	public List<XACMLObject> getByPAPId(String[] papIdList);
+	public List<AbstractPolicy> getByPAPId(String[] papIdList);
 
 	public List<String> listPAPs();
 

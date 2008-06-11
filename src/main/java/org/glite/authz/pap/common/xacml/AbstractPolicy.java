@@ -2,7 +2,7 @@ package org.glite.authz.pap.common.xacml;
 
 import org.w3c.dom.Node;
 
-public interface XACMLObject {
+public interface AbstractPolicy {
 	public Node getDOM();
 	public boolean isPolicy();
 	public boolean isPolicyReference();
