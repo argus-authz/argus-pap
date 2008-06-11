@@ -56,7 +56,7 @@ public class PolicyImpl implements Policy {
 		return attributeId.getNodeValue();
 	}
 
-	public void printXACMLDOMToFile(File file) {
+	public void toFile(File file) {
 		FileOutputStream fos;
 		try {
 			fos = new FileOutputStream(file);
@@ -74,9 +74,9 @@ public class PolicyImpl implements Policy {
 		}
 	}
 
-	public void printXACMLDOMToFile(String fileName) {
+	public void toFile(String fileName) {
 		File file = new File(fileName);
-		printXACMLDOMToFile(file);
+		toFile(file);
 	}
 
 	public void setId(String policyId) {
