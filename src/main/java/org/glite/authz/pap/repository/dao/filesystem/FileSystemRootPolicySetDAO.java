@@ -27,7 +27,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		dbDir = RepositoryManager.getFileSystemDatabaseDir();
 		rootPolicySetFileNameAbsolutePath = dbDir + File.separator
 				+ RepositoryManager.getPolicySetFileNamePrefix()
-				+ RepositoryManager.getRootPolicySetFileName()
+				+ RepositoryManager.getRootPolicySetId()
 				+ RepositoryManager.getXACMLFileNameExtension();
 		policySetBuilder = RepositoryManager.getPolicySetBuilder();
 		if (!exists()) {
@@ -37,8 +37,8 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
 	public void create() {
 		if (!exists()) {
-			PolicySet rootPS = policySetBuilder.buildFromFile(RepositoryManager.getRootPolicySetTemplatePath());
-			rootPS.printXACMLDOMToFile(this.rootPolicySetFileNameAbsolutePath);
+			PolicySet rootPS = policySetBuilder.build(RepositoryManager.getRootPolicySetId(), PolicySet.COMB_ALG_FIRST_APPLICABLE); 
+			rootPS.toFile(this.rootPolicySetFileNameAbsolutePath);
 		} else {
 			throw new AlreadyExistsException();
 		}

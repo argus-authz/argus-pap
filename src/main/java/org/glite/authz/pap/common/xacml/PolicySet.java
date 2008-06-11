@@ -39,14 +39,14 @@ public interface PolicySet extends AbstractPolicy {
 	 * @throws FileNotFoundXACMLException
 	 * @throws XACMLException
 	 */
-	public void printXACMLDOMToFile(File file);
+	public void toFile(File file);
 
 	/**
 	 * @param fileName
 	 * @throws FileNotFoundXACMLException
 	 * @throws XACMLException
 	 */
-	public void printXACMLDOMToFile(String fileName);
+	public void toFile(String fileName);
 
 	public boolean referenceIdExists(String id);
 

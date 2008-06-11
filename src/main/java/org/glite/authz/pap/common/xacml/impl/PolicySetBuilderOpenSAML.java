@@ -28,6 +28,10 @@ public class PolicySetBuilderOpenSAML implements PolicySetBuilder {
 	
 	private PolicySetBuilderOpenSAML() { } 
 
+	public PolicySet build(String policySetId, String policyCombinerAlgorithmId) {
+		return new PolicySetOpenSAML(policySetId, policyCombinerAlgorithmId);
+	}
+
 	public PolicySet buildFromDOM(Document doc) {
 		return new PolicySetOpenSAML(doc.getDocumentElement());
 	}

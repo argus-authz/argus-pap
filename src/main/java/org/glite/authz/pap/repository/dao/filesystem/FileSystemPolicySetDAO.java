@@ -60,7 +60,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 	
 	public void store(String papId, PolicySet ps) {
 		if (!exists(papId, ps.getId())) {
-			ps.printXACMLDOMToFile(RepositoryManager.getPolicySetAbsolutePath(papId, ps.getId()));
+			ps.toFile(RepositoryManager.getPolicySetAbsolutePath(papId, ps.getId()));
 		}
 	}
 	
@@ -69,6 +69,6 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 		if (!policySetFile.exists()) {
 			throw new RepositoryException("PolicySet does not exist: " + ps.getId());
 		}
-		ps.printXACMLDOMToFile(policySetFile);
+		ps.toFile(policySetFile);
 	}
 }

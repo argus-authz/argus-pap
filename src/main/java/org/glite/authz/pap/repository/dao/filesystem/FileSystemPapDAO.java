@@ -29,7 +29,7 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 		dbDir = RepositoryManager.getFileSystemDatabaseDir();
 		rootPolicySetFileNameAbsolutePath = dbDir + File.separator
 				+ RepositoryManager.getPolicySetFileNamePrefix()
-				+ RepositoryManager.getRootPolicySetFileName()
+				+ RepositoryManager.getRootPolicySetId()
 				+ RepositoryManager.getXACMLFileNameExtension();
 		policySetBuilder = RepositoryManager.getPolicySetBuilder();
 	}
@@ -87,7 +87,7 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 		if (!exists(papId)) {
 			throw new RepositoryException("PAP does not exists");
 		}
-		newPolicySet.printXACMLDOMToFile(getPAPFileNameAbsolutePath(papId));
+		newPolicySet.toFile(getPAPFileNameAbsolutePath(papId));
 	}
 
 	private void createPAP(PolicySet papRootPolicySet) {
@@ -102,7 +102,7 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 			}
 		}
 		File papPolicySetFile = new File(getPAPFileNameAbsolutePath(papId));
-		papRootPolicySet.printXACMLDOMToFile(papPolicySetFile.getAbsolutePath());
+		papRootPolicySet.toFile(papPolicySetFile.getAbsolutePath());
 	}
 
 	private String getPAPDirAbsolutePath(String papId) {
@@ -117,6 +117,6 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 	}
 
 	private void updateRoot(PolicySet ps) {
-		ps.printXACMLDOMToFile(this.rootPolicySetFileNameAbsolutePath);
+		ps.toFile(this.rootPolicySetFileNameAbsolutePath);
 	}
 }

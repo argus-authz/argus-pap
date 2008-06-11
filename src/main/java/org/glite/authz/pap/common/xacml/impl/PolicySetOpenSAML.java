@@ -151,7 +151,7 @@ public class PolicySetOpenSAML implements PolicySet {
 		return referenceExists(id, policySet.getPolicySetIdReferences());
 	}
 
-	public void printXACMLDOMToFile(File file) {
+	public void toFile(File file) {
 		FileOutputStream fos;
 		try {
 			fos = new FileOutputStream(file);
@@ -170,9 +170,9 @@ public class PolicySetOpenSAML implements PolicySet {
 
 	}
 
-	public void printXACMLDOMToFile(String fileName) {
+	public void toFile(String fileName) {
 		File file = new File(fileName);
-		printXACMLDOMToFile(file);
+		toFile(file);
 	}
 
 	public boolean referenceIdExists(String id) {

@@ -6,6 +6,8 @@ import org.w3c.dom.Document;
 
 public interface PolicySetBuilder {
 	
+	public PolicySet build(String policySetId, String policyCombinerAlgorithmId);
+	
 	public PolicySet buildFromDOM(Document doc);
 
 	public PolicySet buildFromFile(File file);

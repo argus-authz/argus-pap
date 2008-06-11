@@ -20,6 +20,11 @@ private static PolicySetBuilderImpl instance = null;
 	
 	private PolicySetBuilderImpl() { } 
 
+	public PolicySet build(String policySetId, String policyCombinerAlgorithmId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 	public PolicySet buildFromDOM(Document doc) {
 		return new PolicySetImpl(doc);
 	}

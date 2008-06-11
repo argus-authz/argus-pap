@@ -88,7 +88,7 @@ public class RepositoryManager {
 		return rootPAPPolicySetId;
 	}
 
-	public static String getRootPolicySetFileName() {
+	public static String getRootPolicySetId() {
 		return rootPolicySetId;
 	}
 
