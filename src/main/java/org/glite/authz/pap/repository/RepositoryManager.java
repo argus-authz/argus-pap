@@ -6,6 +6,7 @@ import org.glite.authz.pap.common.xacml.PolicyBuilder;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
 import org.glite.authz.pap.common.xacml.impl.PolicyBuilderImpl;
 import org.glite.authz.pap.common.xacml.impl.PolicySetBuilderImpl;
+import org.glite.authz.pap.common.xacml.impl.PolicySetBuilderOpenSAML;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +101,7 @@ public class RepositoryManager {
 	}
 	
 	public static PolicySetBuilder getPolicySetBuilder() {
-		return PolicySetBuilderImpl.getInstance();
+		return PolicySetBuilderOpenSAML.getInstance();
 	}
 	
 	public static PolicyBuilder getPolicyBuilder() {

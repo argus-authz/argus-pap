@@ -14,10 +14,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.AbstractPolicy;
-import org.glite.authz.pap.common.xacml.IdReference.Type;
 import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
 import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 import org.opensaml.xacml.policy.IdReferenceType;
@@ -25,6 +24,7 @@ import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.XMLObjectBuilder;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.io.MarshallingException;
@@ -35,7 +35,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 public class PolicySetOpenSAML implements PolicySet {
-	
+
+	private XMLObjectBuilder<PolicySetType> policySetBuilder;
 	private PolicySetType policySet;
 	
 	public PolicySetOpenSAML(Element element) {
@@ -51,6 +52,15 @@ public class PolicySetOpenSAML implements PolicySet {
 	public PolicySetOpenSAML(PolicySetType openSAMLPolicySet) {
 		policySet = openSAMLPolicySet;
 	}
+	
+	@SuppressWarnings("unchecked")
+	public PolicySetOpenSAML(String policySetId, String policyCombinerAlgorithmId) {
+		policySetBuilder = Configuration.getBuilderFactory().getBuilder(org.opensaml.xacml.policy.PolicySetType.DEFAULT_ELEMENT_NAME);
+		policySet = policySetBuilder.buildObject(org.opensaml.xacml.policy.PolicySetType.DEFAULT_ELEMENT_NAME);
+		policySet.setPolicySetId(policySetId);
+		policySet.setTarget(new TargetOpenSAML().getOpenSAMLTargetType());
+		policySet.setPolicyCombiningAlgoId(policyCombinerAlgorithmId);
+	}
 
 	public void deletePolicyReference(String policyId) {
 		// TODO Auto-generated method stub
@@ -58,9 +68,6 @@ public class PolicySetOpenSAML implements PolicySet {
 	}
 
 	public void deletePolicySetReference(String policySetId) {
-		int index = getIndexOfPolicySetReference(policySetId);
-		List<XMLObject> children = policySet.getOrderedChildren();
-		children.remove(index);
 	}
 
 	public Node getDOM() {
@@ -101,16 +108,19 @@ public class PolicySetOpenSAML implements PolicySet {
 	}
 
 	public void insertPolicyReferenceAsFirst(String value) {
-		// TODO Auto-generated method stub
+		policySet.getPolicyIdReferences().add(0, new ReferenceIdOpenSAML(IdReference.Type.POLICYIDREFERENCE, value).getOpenSAMLObject());
+	}
 
+	public void insertPolicyReferenceAsLast(String value) {
+		policySet.getPolicyIdReferences().add(new ReferenceIdOpenSAML(IdReference.Type.POLICYIDREFERENCE, value).getOpenSAMLObject());
 	}
 
 	public void insertPolicySetReferenceAsFirst(String value) {
-		int index = getIndexOfFirstChildren();
-		//index = 0;
-		System.out.println("WWWW " + index);
-		List<XMLObject> xmlChildren = policySet.getOrderedChildren();
-		xmlChildren.add(index, new ReferenceIdOpenSAML(IdReference.Type.POLICYSETIDREFERENCE, value).getOpenSAMLObject());
+		policySet.getPolicySetIdReferences().add(0, new ReferenceIdOpenSAML(IdReference.Type.POLICYSETIDREFERENCE, value).getOpenSAMLObject());
+	}
+
+	public void insertPolicySetReferenceAsLast(String value) {
+		policySet.getPolicySetIdReferences().add(new ReferenceIdOpenSAML(IdReference.Type.POLICYSETIDREFERENCE, value).getOpenSAMLObject());
 	}
 
 	public boolean isPolicy() {
@@ -132,29 +142,13 @@ public class PolicySetOpenSAML implements PolicySet {
 	public boolean isReference() {
 		return false;
 	}
-
+	
 	public boolean policyReferenceIdExists(String id) {
-		List<AbstractPolicy> children = getOrderedChildren();
-		for (AbstractPolicy child:children) {
-			if (child.isPolicyReference()) {
-				if (((IdReference) child).getValue().equals(id)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return referenceExists(id, policySet.getPolicyIdReferences());
 	}
 
 	public boolean policySetReferenceIdExists(String id) {
-		List<AbstractPolicy> children = getOrderedChildren();
-		for (AbstractPolicy child:children) {
-			if (child.isPolicySetReference()) {
-				if (((IdReference) child).getValue().equals(id)) {
-					return true;
-				}
-			}
-		}
-		return false;
+		return referenceExists(id, policySet.getPolicySetIdReferences());
 	}
 
 	public void printXACMLDOMToFile(File file) {
@@ -192,11 +186,11 @@ public class PolicySetOpenSAML implements PolicySet {
 		}
 		return false;
 	}
-
+	
 	public void setId(String policySetId) {
 		policySet.setPolicySetId(policySetId);
 	}
-	
+
 	private List<AbstractPolicy> getOrderedChildren() {
 		List<AbstractPolicy> xacmlObjectChildren = new LinkedList<AbstractPolicy>();
 		List<XMLObject> children = policySet.getOrderedChildren();
@@ -211,34 +205,13 @@ public class PolicySetOpenSAML implements PolicySet {
 		}
 		return xacmlObjectChildren;
 	}
-	
-	private int getIndexOfFirstChildren() {
-		int index = 0;
-		List<XMLObject> children = policySet.getOrderedChildren();
-		for (XMLObject child : children) {
-			if ((child instanceof IdReferenceType)
-					|| (child instanceof PolicySetType)
-					|| (child instanceof PolicyType)) {
-				break;
+
+	private boolean referenceExists(String id, List<IdReferenceType> list) {
+		for (IdReferenceType ref:list) {
+			if (id.equals(ref.getValue())) {
+				return true;
 			}
-			index++;
 		}
-		return index;
-	}
-	
-	private int getIndexOfPolicySetReference(String id) {
-		int index = 0;
-		List<XMLObject> children = policySet.getOrderedChildren();
-		for (XMLObject child : children) {
-			if (child instanceof IdReferenceType) {
-				if (((IdReferenceType) child).getElementQName().equals(IdReferenceType.POLICY_SET_ID_REFERENCE_ELEMENT_NAME)) {
-					if (((IdReferenceType) child).getValue().equals(id)) {
-						break;
-					}
-				}
-			}
-			index++;
-		}
-		return index;
+		return false;
 	}
 }

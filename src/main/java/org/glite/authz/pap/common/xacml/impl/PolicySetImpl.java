@@ -150,6 +150,11 @@ public class PolicySetImpl implements PolicySet {
 		}
 	}
 
+	public void insertPolicyReferenceAsLast(String value) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 	public void insertPolicySetReferenceAsFirst(String value) {
 		if (policySetReferenceIdExists(value)) {
 			throw new XACMLException("Reference already exists");
@@ -168,6 +173,11 @@ public class PolicySetImpl implements PolicySet {
 			policySetDOM.insertBefore(ref, firstChild);
 		}
 	}
+
+	public void insertPolicySetReferenceAsLast(String value) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 	public boolean isPolicy() {
 		return false;
@@ -176,7 +186,7 @@ public class PolicySetImpl implements PolicySet {
 	public boolean isPolicyReference() {
 		return false;
 	}
-	
+
 	public boolean isPolicySet() {
 		return true;
 	}
