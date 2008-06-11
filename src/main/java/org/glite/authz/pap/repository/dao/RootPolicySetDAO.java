@@ -17,6 +17,6 @@ public interface RootPolicySetDAO {
 
 	public List<AbstractPolicy> getByPAPId(String[] papIdList);
 
-	public List<String> listPAPs();
+	public List<String> listPAPIds();
 
 }

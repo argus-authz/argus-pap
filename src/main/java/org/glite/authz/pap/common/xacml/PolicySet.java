@@ -1,58 +1,43 @@
 package org.glite.authz.pap.common.xacml;
 
-import java.io.File;
 import java.util.List;
 
-import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
-import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
+public abstract class PolicySet extends AbstractPolicy {
 
-public interface PolicySet extends AbstractPolicy {
+	public static final String COMB_ALG_FIRST_APPLICABLE = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:first-applicable";
+	public static final String COMB_ALG_ORDERED_DENY_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:ordered-deny-overrides";
+	public static final String COMB_ALG_ORDERED_PERMIT_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:ordered-permit-overrides";
 
-	static final String COMB_ALG_FIRST_APPLICABLE = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:first-applicable";
-	static final String COMB_ALG_ORDERED_DENY_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:ordered-deny-overrides";
-	static final String COMB_ALG_ORDERED_PERMIT_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:policy-combining-algorithm:ordered-permit-overrides";
+	public abstract void deletePolicyReference(String policyId);
 
-	public void deletePolicyReference(String policyId);
+	public abstract void deletePolicySetReference(String policySetId);
 
-	public void deletePolicySetReference(String policySetId);
+	public abstract AbstractPolicy getFirstChildren();
 
-	public AbstractPolicy getFirstChildren();
+	public abstract String getId();
 
-	public String getId();
+	public abstract AbstractPolicy getLastChildren();
 
-	public AbstractPolicy getLastChildren();
+	public abstract int getNumberOfChildren();
 
-	public int getNumberOfChildren();
+	public abstract List<AbstractPolicy> getOrderedListOfChildren();
 
-	public List<AbstractPolicy> getOrderedListOfChildren();
-
-	public void insertPolicyReferenceAsFirst(String value);
+	public abstract void insertPolicyReferenceAsFirst(String value);
 	
-	public void insertPolicyReferenceAsLast(String value);
+	public abstract void insertPolicyReferenceAsLast(String value);
 
-	public void insertPolicySetReferenceAsFirst(String value);
+	public abstract void insertPolicySetReferenceAsFirst(String value);
 	
-	public void insertPolicySetReferenceAsLast(String value);
+	public abstract void insertPolicySetReferenceAsLast(String value);
 
-	/**
-	 * @param file
-	 * @throws FileNotFoundXACMLException
-	 * @throws XACMLException
-	 */
-	public void toFile(File file);
+	public abstract boolean referenceIdExists(String id);
 
-	/**
-	 * @param fileName
-	 * @throws FileNotFoundXACMLException
-	 * @throws XACMLException
-	 */
-	public void toFile(String fileName);
+	public abstract boolean policySetReferenceIdExists(String id);
 
-	public boolean referenceIdExists(String id);
+	public abstract boolean policyReferenceIdExists(String id);
 
-	public boolean policySetReferenceIdExists(String id);
-
-	public boolean policyReferenceIdExists(String id);
-
-	public void setId(String policySetId);
+	public abstract void setId(String policySetId);
+	
+	public abstract List<String> getPolicySetIdReferences();
+	
 }

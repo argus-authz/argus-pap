@@ -1,27 +1,18 @@
 package org.glite.authz.pap.common.xacml.impl;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
+import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.AbstractPolicy;
-import org.glite.authz.pap.common.xacml.IdReference.Type;
 import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
 import org.glite.authz.pap.common.xacml.exceptions.InvalidPolicySet;
 import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
@@ -31,7 +22,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class PolicySetImpl implements PolicySet {
+public class PolicySetImpl extends PolicySet {
 
 	private Node policySetDOM;
 	private Node attributeId;
@@ -62,7 +53,7 @@ public class PolicySetImpl implements PolicySet {
 	public void deletePolicyReference(String policyId) {
 		List<AbstractPolicy> children = getOrderedListOfChildren();
 		for (AbstractPolicy child:children) {
-			if (child.isPolicyReference()) {
+			if (isPolicyReference(child)) {
 				if (policyId.equals(((IdReference) child).getValue())) {
 					policySetDOM.removeChild(child.getDOM());
 				}
@@ -73,7 +64,7 @@ public class PolicySetImpl implements PolicySet {
 	public void deletePolicySetReference(String policySetId) {
 		List<AbstractPolicy> children = getOrderedListOfChildren();
 		for (AbstractPolicy child:children) {
-			if (child.isPolicySetReference()) {
+			if (isPolicySetReference(child)) {
 				if (policySetId.equals(((IdReference) child).getValue())) {
 					policySetDOM.removeChild(child.getDOM());
 				}
@@ -122,9 +113,23 @@ public class PolicySetImpl implements PolicySet {
 				} else if ("Policy".equals(nodeName)) {
 					// TODO
 				} else if ("PolicySetIdReference".equals(nodeName)) {
-					result.add(new ReferenceIdImpl(IdReference.Type.POLICYSETIDREFERENCE, node.getTextContent(), node));
+					result.add(new IdReferenceImpl(IdReference.Type.POLICYSETIDREFERENCE, node.getTextContent(), node));
 				} else if ("PolicyIdReference".equals(nodeName)) {
-					result.add(new ReferenceIdImpl(IdReference.Type.POLICYIDREFERENCE, node.getTextContent(), node));
+					result.add(new IdReferenceImpl(IdReference.Type.POLICYIDREFERENCE, node.getTextContent(), node));
+				}
+			}
+		}
+		return result;
+	}
+
+	public List<String> getPolicySetIdReferences() {
+		List<AbstractPolicy> list = getOrderedListOfChildren();
+		List<String> result = new ArrayList<String>(list.size());
+		for (AbstractPolicy ap:list) {
+			if (ap instanceof IdReference) {
+				IdReference ref = (IdReference) ap;
+				if (ref.isPolicySetReference()) {
+					result.add(ref.getValue());
 				}
 			}
 		}
@@ -149,12 +154,12 @@ public class PolicySetImpl implements PolicySet {
 			policySetDOM.insertBefore(ref, firstChild);
 		}
 	}
-
+	
 	public void insertPolicyReferenceAsLast(String value) {
 		// TODO Auto-generated method stub
 		
 	}
-	
+
 	public void insertPolicySetReferenceAsFirst(String value) {
 		if (policySetReferenceIdExists(value)) {
 			throw new XACMLException("Reference already exists");
@@ -173,36 +178,16 @@ public class PolicySetImpl implements PolicySet {
 			policySetDOM.insertBefore(ref, firstChild);
 		}
 	}
-
+	
 	public void insertPolicySetReferenceAsLast(String value) {
 		// TODO Auto-generated method stub
 		
-	}
-	
-	public boolean isPolicy() {
-		return false;
-	}
-
-	public boolean isPolicyReference() {
-		return false;
-	}
-
-	public boolean isPolicySet() {
-		return true;
-	}
-
-	public boolean isPolicySetReference() {
-		return false;
-	}
-
-	public boolean isReference() {
-		return false;
 	}
 
 	public boolean policyReferenceIdExists(String id) {
 		List<AbstractPolicy> children = getOrderedListOfChildren();
 		for (AbstractPolicy child:children) {
-			if (child.isPolicyReference()) {
+			if (isPolicyReference(child)) {
 				if (id.equals(((IdReference) child).getValue())) {
 					return true;
 				}
@@ -214,7 +199,7 @@ public class PolicySetImpl implements PolicySet {
 	public boolean policySetReferenceIdExists(String id) {
 		List<AbstractPolicy> children = getOrderedListOfChildren();
 		for (AbstractPolicy child:children) {
-			if (child.isPolicySetReference()) {
+			if (isPolicySetReference(child)) {
 				if (id.equals(((IdReference) child).getValue())) {
 					return true;
 				}
@@ -223,33 +208,10 @@ public class PolicySetImpl implements PolicySet {
 		return false;
 	}
 
-	public void toFile(File file) {
-		FileOutputStream fos;
-		try {
-			fos = new FileOutputStream(file);
-			Transformer tr = TransformerFactory.newInstance().newTransformer();
-			tr.setOutputProperty(OutputKeys.INDENT, "yes");
-			tr.setOutputProperty(OutputKeys.METHOD,"xml");
-			tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-			tr.transform(new DOMSource(this.policySetDOM),new StreamResult(fos));
-		} catch (FileNotFoundException e) {
-			throw new FileNotFoundXACMLException(e);
-		}  catch (TransformerConfigurationException e) {
-			throw new XACMLException(e);
-		}  catch (TransformerException e) {
-			throw new XACMLException(e);
-		}
-	}
-
-	public void toFile(String fileName) {
-		File file = new File(fileName);
-		toFile(file);
-	}
-
 	public boolean referenceIdExists(String id) {
 		List<AbstractPolicy> children = getOrderedListOfChildren();
 		for (AbstractPolicy child:children) {
-			if (child.isReference()) {
+			if (child instanceof IdReference) {
 				if (id.equals(((IdReference) child).getValue())) {
 					return true;
 				}
@@ -323,5 +285,19 @@ public class PolicySetImpl implements PolicySet {
 	private Document readXACMLFromFile(String fileName) {
 		File file = new File(fileName);
 		return readXACMLFromFile(file);
+	}
+	
+	private boolean isPolicySetReference(AbstractPolicy ap) {
+		if (ap instanceof IdReference) {
+			return ((IdReference) ap).isPolicySetReference();
+		}
+		return false;
+	}
+	
+	private boolean isPolicyReference(AbstractPolicy ap) {
+		if (ap instanceof IdReference) {
+			return ((IdReference) ap).isPolicyReference();
+		}
+		return false;
 	}
 }

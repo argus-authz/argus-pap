@@ -1,14 +1,12 @@
 package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.xacml.IdReference;
+import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
-import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
@@ -54,7 +52,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
 	public List<AbstractPolicy> getAll() {
 		PolicySet rootPolicySet = get();
-		List<String> papIdList = listPAPs();
+		List<String> papIdList = listPAPIds();
 		List<AbstractPolicy> rootAll = new LinkedList<AbstractPolicy>();
 		rootAll.add(rootPolicySet);
 		for (String id:papIdList) {
@@ -65,7 +63,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
 	public List<AbstractPolicy> getByPAPId(String[] papIdList) {
 		PolicySet rootPolicySet = get();
-		for (String id:listPAPs()) {
+		for (String id:listPAPIds()) {
 			boolean found = false;
 			for (String requestedId:papIdList) {
 				if (requestedId.equals(id)) {
@@ -85,16 +83,8 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return rootAll;
 	}
 
-	public List<String> listPAPs() {
-		PolicySet rootPolicySet = get();
-		List<AbstractPolicy> childrenList = rootPolicySet.getOrderedListOfChildren();
-		List<String> papList = new ArrayList<String>(childrenList.size());
-		for (AbstractPolicy child : childrenList) {
-			if (child.isPolicySetReference()) {
-				papList.add(((IdReference) child).getValue());
-			}
-		}
-		return papList;
+	public List<String> listPAPIds() {
+		return get().getPolicySetIdReferences();
 	}
 
 }
