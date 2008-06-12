@@ -9,7 +9,7 @@ import java.lang.String;
 public class PolicyFileEncoder {
     BWParser parser; 
 
-    PolicyFileEncoder() {
+    public PolicyFileEncoder() {
         parser = null;
     }
 
@@ -33,17 +33,17 @@ public class PolicyFileEncoder {
         }
     }
 
-    String parse(InputStream stream) throws EncodingException {
+    public String parse(InputStream stream) throws EncodingException {
         init(stream);
         return doParse();
     }
 
-    String parse(String text) throws EncodingException {
+    public String parse(String text) throws EncodingException {
         init(new ByteArrayInputStream(text.getBytes()));
         return doParse();
     }
 
-    String parse(File file) throws EncodingException {
+    public String parse(File file) throws EncodingException {
         try {
             init(new FileInputStream(file));
         } catch (FileNotFoundException e) {
