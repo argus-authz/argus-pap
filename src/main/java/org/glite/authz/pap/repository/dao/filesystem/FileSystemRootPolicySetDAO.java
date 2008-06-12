@@ -84,7 +84,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 	}
 
 	public List<String> listPAPIds() {
-		return get().getPolicySetIdReferences();
+		return get().getPolicySetIdReferencesValues();
 	}
 
 }

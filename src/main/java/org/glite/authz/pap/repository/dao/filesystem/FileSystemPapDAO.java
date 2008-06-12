@@ -38,7 +38,7 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 		createPAP(policySet);
 		String papId = policySet.getId();
 		PolicySet rootPS = FileSystemRootPolicySetDAO.getInstance().get();
-		rootPS.insertPolicySetReferenceAsFirst(papId);
+		rootPS.addPolicySetReference(0, papId);
 		updateRoot(rootPS);
 	}
 

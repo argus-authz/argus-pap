@@ -50,6 +50,46 @@ public class PolicySetImpl extends PolicySet {
 		init(readXACMLFromFile(fileName));
 	}
 	
+	public void addPolicyReference(int index, String value) {
+		if (policyReferenceIdExists(value)) {
+			throw new XACMLException("Reference already exists");
+		}
+		Document doc = policySetDOM.getOwnerDocument();
+		Element ref = doc.createElementNS(null, "PolicyIdReference");
+		ref.setTextContent(value);
+		Node childAtIndex = getChildAtIndex(index);
+		if (childAtIndex == null) {
+			policySetDOM.appendChild(ref);
+		} else {
+			policySetDOM.insertBefore(ref, childAtIndex);
+		}
+	}
+	
+	public void addPolicyReference(String value) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void addPolicySetReference(int index, String value) {
+		if (policySetReferenceIdExists(value)) {
+			throw new XACMLException("Reference already exists");
+		}
+		Document doc = policySetDOM.getOwnerDocument();
+		Element ref = doc.createElementNS(null, "PolicySetIdReference");
+		ref.setTextContent(value);
+		Node childAtIndex = getChildAtIndex(index);
+		if (childAtIndex == null) {
+			policySetDOM.appendChild(ref);
+		} else {
+			policySetDOM.insertBefore(ref, childAtIndex);
+		}
+	}
+
+	public void addPolicySetReference(String value) {
+		// TODO Auto-generated method stub
+		
+	}
+
 	public void deletePolicyReference(String policyId) {
 		List<AbstractPolicy> children = getOrderedListOfChildren();
 		for (AbstractPolicy child:children) {
@@ -60,7 +100,7 @@ public class PolicySetImpl extends PolicySet {
 			}
 		}
 	}
-	
+
 	public void deletePolicySetReference(String policySetId) {
 		List<AbstractPolicy> children = getOrderedListOfChildren();
 		for (AbstractPolicy child:children) {
@@ -75,31 +115,15 @@ public class PolicySetImpl extends PolicySet {
 	public Node getDOM() {
 		return this.policySetDOM;
 	}
-
-	public AbstractPolicy getFirstChildren() {
-		List<AbstractPolicy> childrenList = getOrderedListOfChildren();
-		if (childrenList.isEmpty()) {
-			return null;
-		} 
-		return childrenList.get(0);
-	}
-
+	
 	public String getId() {
 		return attributeId.getNodeValue();
-	}
-
-	public AbstractPolicy getLastChildren() {
-		List<AbstractPolicy> children = getOrderedListOfChildren();
-		if (children.isEmpty()) {
-			return null;
-		}
-		return children.get(children.size()-1);
 	}
 
 	public int getNumberOfChildren() {
 		return getOrderedListOfChildren().size();
 	}
-	
+
 	public List<AbstractPolicy> getOrderedListOfChildren() {
 		List<AbstractPolicy> result = new LinkedList<AbstractPolicy>();
 		NodeList nodeList = policySetDOM.getChildNodes();
@@ -121,8 +145,8 @@ public class PolicySetImpl extends PolicySet {
 		}
 		return result;
 	}
-
-	public List<String> getPolicySetIdReferences() {
+	
+	public List<String> getPolicySetIdReferencesValues() {
 		List<AbstractPolicy> list = getOrderedListOfChildren();
 		List<String> result = new ArrayList<String>(list.size());
 		for (AbstractPolicy ap:list) {
@@ -134,54 +158,6 @@ public class PolicySetImpl extends PolicySet {
 			}
 		}
 		return result;
-	}
-
-	public void insertPolicyReferenceAsFirst(String value) {
-		if (policyReferenceIdExists(value)) {
-			throw new XACMLException("Reference already exists");
-		}
-		Node firstChild = null;
-		AbstractPolicy child = getFirstChildren();
-		if (child != null) {
-			firstChild = getFirstChildren().getDOM();
-		}
-		Document doc = policySetDOM.getOwnerDocument();
-		Element ref = doc.createElementNS(null, "PolicyIdReference");
-		ref.setTextContent(value);
-		if (firstChild == null) {
-			policySetDOM.appendChild(ref);
-		} else {
-			policySetDOM.insertBefore(ref, firstChild);
-		}
-	}
-	
-	public void insertPolicyReferenceAsLast(String value) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void insertPolicySetReferenceAsFirst(String value) {
-		if (policySetReferenceIdExists(value)) {
-			throw new XACMLException("Reference already exists");
-		}
-		Node firstChild = null;
-		AbstractPolicy child = getFirstChildren();
-		if (child != null) {
-			firstChild = getFirstChildren().getDOM();
-		}
-		Document doc = policySetDOM.getOwnerDocument();
-		Element ref = doc.createElementNS(null, "PolicySetIdReference");
-		ref.setTextContent(value);
-		if (firstChild == null) {
-			policySetDOM.appendChild(ref);
-		} else {
-			policySetDOM.insertBefore(ref, firstChild);
-		}
-	}
-	
-	public void insertPolicySetReferenceAsLast(String value) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public boolean policyReferenceIdExists(String id) {
@@ -224,6 +200,39 @@ public class PolicySetImpl extends PolicySet {
 		attributeId.setNodeValue(policySetId);
 	}
 
+	private Node getChildAtIndex(int index) {
+		NodeList nodeList = policySetDOM.getChildNodes();
+		Node node = null;
+		for (int i=0, j=0; i<nodeList.getLength(); i++) {
+			node = nodeList.item(i);
+			String nodeName = node.getLocalName();
+			if (nodeName != null) {
+				if ("PolicySet".equals(nodeName)) {
+					if (j == index) {
+						return node;
+					}
+					j++;
+				} else if ("Policy".equals(nodeName)) {
+					if (j == index) {
+						return node;
+					}
+					j++;
+				} else if ("PolicySetIdReference".equals(nodeName)) {
+					if (j == index) {
+						return node;
+					}
+					j++;
+				} else if ("PolicyIdReference".equals(nodeName)) {
+					if (j == index) {
+						return node;
+					}
+					j++;
+				}
+			}
+		}
+		return null;
+	}
+
 	private Node getDOMPolicySetAttributeId(Document doc) {
 		Node attributeId = null;
 		NodeList nodeList = doc.getChildNodes();
@@ -247,6 +256,20 @@ public class PolicySetImpl extends PolicySet {
 		attributeId = getDOMPolicySetAttributeId(doc);
 	}
 
+	private boolean isPolicyReference(AbstractPolicy ap) {
+		if (ap instanceof IdReference) {
+			return ((IdReference) ap).isPolicyReference();
+		}
+		return false;
+	}
+	
+	private boolean isPolicySetReference(AbstractPolicy ap) {
+		if (ap instanceof IdReference) {
+			return ((IdReference) ap).isPolicySetReference();
+		}
+		return false;
+	}
+	
 	/**
 	 * @param file
 	 * @return
@@ -275,7 +298,7 @@ public class PolicySetImpl extends PolicySet {
 		}
 		return doc;
 	}
-
+	
 	/**
 	 * @param fileName
 	 * @return
@@ -285,19 +308,5 @@ public class PolicySetImpl extends PolicySet {
 	private Document readXACMLFromFile(String fileName) {
 		File file = new File(fileName);
 		return readXACMLFromFile(file);
-	}
-	
-	private boolean isPolicySetReference(AbstractPolicy ap) {
-		if (ap instanceof IdReference) {
-			return ((IdReference) ap).isPolicySetReference();
-		}
-		return false;
-	}
-	
-	private boolean isPolicyReference(AbstractPolicy ap) {
-		if (ap instanceof IdReference) {
-			return ((IdReference) ap).isPolicyReference();
-		}
-		return false;
 	}
 }
