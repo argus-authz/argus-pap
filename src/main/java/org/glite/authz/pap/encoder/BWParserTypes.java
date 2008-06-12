@@ -128,7 +128,7 @@ class Policy {
       "   <Target>\n" +
       "     <Resources>\n" +
       "       <Resource>\n";
-        if (name != "*")
+        if (name.compareTo("\"*\"") != 0)
             XACML += "         " + name + "\n";
 
         XACML += "       </Resource>\n" +
