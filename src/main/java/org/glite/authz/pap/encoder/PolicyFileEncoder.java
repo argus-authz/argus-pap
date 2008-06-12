@@ -10,7 +10,7 @@ public class PolicyFileEncoder {
     BWParser parser; 
 
     public PolicyFileEncoder() {
-        parser = null; 
+        parser = null;  
     }
 
     private void init(InputStream stream) {
