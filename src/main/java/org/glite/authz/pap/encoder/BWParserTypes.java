@@ -127,9 +127,11 @@ class Policy {
       "  RuleCombiningAlgorithmId=\"urn:oasis:names:tc:xacml:2.0:policy-combining-algorithm:ordered-deny-override\">\n" +
       "   <Target>\n" +
       "     <Resources>\n" +
-      "       <Resource>\n" +
-      "         " + name + "\n" +
-      "       </Resource>\n" +
+      "       <Resource>\n";
+        if (name != "*")
+            XACML += "         " + name + "\n";
+
+        XACML += "       </Resource>\n" +
       "     </Resources>\n" +
       "   </Target>\n";
 
@@ -246,9 +248,19 @@ class Policies {
         String XACML = new String();
         Enumeration i = policies.elements();
 
+        XACML =     "<PolicySet\n" +
+    "  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\"\n" +
+    "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
+    "  xsi:schemaLocation=\"urn:oasis:names:tc:xacml:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\"\n" +
+    "  PolicySetId=\"all-policies\"" +
+    "  PolicyCombiningAlgId=\"urn:oasis:names:tc:xacml:2.0:policy-combining-algorithm:ordered-deny-overrides\">" +
+            " <Target></Target>\n";
+
         while (i.hasMoreElements()) {
             XACML += ((Policy)i.nextElement()).Output();
         }
+
+        XACML += "</PolicySet>";
         return XACML;
     }
 };

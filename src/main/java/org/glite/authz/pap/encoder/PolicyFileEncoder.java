@@ -15,11 +15,9 @@ public class PolicyFileEncoder {
 
     private void init(InputStream stream) {
         if (parser != null) { 
-            System.out.println("Reinit");
             parser.ReInit(stream);
         }
         else {
-            System.out.println("Init");
             parser = new BWParser(stream);
         }
     }
@@ -27,7 +25,7 @@ public class PolicyFileEncoder {
     private String doParse() throws EncodingException {
         try {
             String s = parser.Text();
-            System.out.println("Text = " + s);
+
             return s;
         }
         catch (ParseException e) {
