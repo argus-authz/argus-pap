@@ -7,15 +7,19 @@ import org.glite.authz.pap.common.xacml.AbstractPolicy;
 
 public interface PAPPolicySetDAO {
 
-	public void createAsFirst(PolicySet policySet);
+	public void add(int index, PolicySet policySet);
+	
+	public void add(PolicySet policySet);
 
 	public void delete(String papId);
+	
+	public void deleteRemoteAll();
 
 	public boolean exists(String papId);
 
 	public PolicySet get(String papId);
 
-	public List<AbstractPolicy> getAll(String papId);
+	public List<AbstractPolicy> getTree(String papId);
 
 	public void update(String papId, PolicySet newPolicySet);
 

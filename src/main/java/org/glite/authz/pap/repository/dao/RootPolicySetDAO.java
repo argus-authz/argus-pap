@@ -13,10 +13,12 @@ public interface RootPolicySetDAO {
 
 	public PolicySet get();
 
-	public List<AbstractPolicy> getAll();
+	public List<AbstractPolicy> getTreeAsList();
 
-	public List<AbstractPolicy> getByPAPId(String[] papIdList);
+	public List<AbstractPolicy> getPartialTreeAsList(String[] papIdList);
 
 	public List<String> listPAPIds();
+	
+	public void update(PolicySet newPolicySet);
 
 }

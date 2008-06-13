@@ -15,7 +15,7 @@ public class RepositoryManager {
 	private static final Logger logger = LoggerFactory.getLogger( RepositoryManager.class );
 	private static final String fileSystemDatabaseDir = "/tmp/paprep";
 	private static final String rootPolicySetId = "Root";
-	private static final String rootPAPPolicySetId = "PAPRoot";
+	private static final String localPAPId = "Local";
 	private static final String policySetFileNamePrefix = "PolicySet_";
 	private static final String policyFileNamePrefix = "Policy_";
 	private static final String xacmlFileNameExtension = ".xml";
@@ -31,12 +31,12 @@ public class RepositoryManager {
 	
 	private RepositoryManager() { }
 	
-	public void start() {
+	public void bootstrap() {
 		logger.info("Starting PolicyRepository manager: filesystem implementation...");
-		startFileSystemDB();
+		bootstrapFileSystemDB();
 	}
 	
-	public void startFileSystemDB() {
+	public void bootstrapFileSystemDB() {
 		File rootDir = new File(RepositoryManager.getFileSystemDatabaseDir());
 		if (!rootDir.exists()) {
 			if (!rootDir.mkdirs()) {
@@ -81,8 +81,8 @@ public class RepositoryManager {
 		return policySetFileNamePrefix;
 	}
 
-	public static String getRootPAPPolicySetId() {
-		return rootPAPPolicySetId;
+	public static String getLocalPAPId() {
+		return localPAPId;
 	}
 
 	public static String getRootPolicySetId() {

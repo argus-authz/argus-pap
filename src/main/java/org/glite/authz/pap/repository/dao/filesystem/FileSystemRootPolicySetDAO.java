@@ -8,8 +8,10 @@ import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
 import org.glite.authz.pap.repository.RepositoryManager;
+import org.glite.authz.pap.repository.dao.PAPPolicySetDAO;
 import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
+import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 	
@@ -20,6 +22,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 	private final String dbDir;
 	private final String rootPolicySetFileNameAbsolutePath;
 	private final PolicySetBuilder policySetBuilder;
+	private final PAPPolicySetDAO papDAO;
 
 	private FileSystemRootPolicySetDAO() {
 		dbDir = RepositoryManager.getFileSystemDatabaseDir();
@@ -28,6 +31,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 				+ RepositoryManager.getRootPolicySetId()
 				+ RepositoryManager.getXACMLFileNameExtension();
 		policySetBuilder = RepositoryManager.getPolicySetBuilder();
+		papDAO = FileSystemPapDAO.getInstance();
 		if (!exists()) {
 			create();
 		}
@@ -50,18 +54,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return policySetBuilder.buildFromFile(rootPolicySetFileNameAbsolutePath);
 	}
 
-	public List<AbstractPolicy> getAll() {
-		PolicySet rootPolicySet = get();
-		List<String> papIdList = listPAPIds();
-		List<AbstractPolicy> rootAll = new LinkedList<AbstractPolicy>();
-		rootAll.add(rootPolicySet);
-		for (String id:papIdList) {
-			rootAll.addAll(FileSystemPapDAO.getInstance().getAll(id));
-		}
-		return rootAll;
-	}
-
-	public List<AbstractPolicy> getByPAPId(String[] papIdList) {
+	public List<AbstractPolicy> getPartialTreeAsList(String[] papIdList) {
 		PolicySet rootPolicySet = get();
 		for (String id:listPAPIds()) {
 			boolean found = false;
@@ -78,7 +71,18 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		List<AbstractPolicy> rootAll = new LinkedList<AbstractPolicy>();
 		rootAll.add(rootPolicySet);
 		for (String requestedPAPId:papIdList) {
-			rootAll.addAll(FileSystemPapDAO.getInstance().getAll(requestedPAPId));
+			rootAll.addAll(papDAO.getTree(requestedPAPId));
+		}
+		return rootAll;
+	}
+
+	public List<AbstractPolicy> getTreeAsList() {
+		PolicySet rootPolicySet = get();
+		List<String> papIdList = listPAPIds();
+		List<AbstractPolicy> rootAll = new LinkedList<AbstractPolicy>();
+		rootAll.add(rootPolicySet);
+		for (String id:papIdList) {
+			rootAll.addAll(papDAO.getTree(id));
 		}
 		return rootAll;
 	}
@@ -87,4 +91,10 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 		return get().getPolicySetIdReferencesValues();
 	}
 
+	public void update(PolicySet newPolicySet) {
+		if (!exists()) {
+			throw new NotFoundException();
+		}
+		newPolicySet.toFile(this.rootPolicySetFileNameAbsolutePath);
+	}
 }
