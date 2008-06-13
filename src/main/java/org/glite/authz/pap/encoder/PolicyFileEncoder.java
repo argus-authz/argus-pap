@@ -7,10 +7,10 @@ import java.io.File;
 import java.lang.String;
 
 public class PolicyFileEncoder {
-    BWParser parser; 
+    BWParser parser;
 
     public PolicyFileEncoder() {
-        parser = null;  
+        parser = null;
     }
 
     private void init(InputStream stream) {
