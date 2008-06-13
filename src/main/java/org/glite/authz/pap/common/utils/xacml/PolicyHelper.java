@@ -1,6 +1,5 @@
 package org.glite.authz.pap.common.utils.xacml;
 
-import org.glite.authz.pap.common.xacml.impl.TargetOpenSAML;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xml.Configuration;
 
@@ -18,7 +17,7 @@ public class PolicyHelper extends XACMLHelper<PolicyType> {
 				.getBuilder(PolicyType.DEFAULT_ELEMENT_NAME).buildObject(
 						PolicyType.DEFAULT_ELEMENT_NAME);
 		policy.setPolicyId(policyId);
-		policy.setTarget(new TargetOpenSAML().getOpenSAMLTargetType());
+		policy.setTarget(TargetHelper.build());
 		policy.setRuleCombiningAlgoId(ruleCombinerAlgorithmId);
 		return policy;
 	}
