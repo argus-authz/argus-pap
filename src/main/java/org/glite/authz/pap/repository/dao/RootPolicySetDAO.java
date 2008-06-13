@@ -2,8 +2,8 @@ package org.glite.authz.pap.repository.dao;
 
 import java.util.List;
 
-import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.AbstractPolicy;
+import org.opensaml.xacml.XACMLObject;
+import org.opensaml.xacml.policy.PolicySetType;
 
 public interface RootPolicySetDAO {
 
@@ -11,14 +11,14 @@ public interface RootPolicySetDAO {
 
 	public boolean exists();
 
-	public PolicySet get();
+	public PolicySetType get();
 
-	public List<AbstractPolicy> getTreeAsList();
+	public List<XACMLObject> getTreeAsList();
 
-	public List<AbstractPolicy> getPartialTreeAsList(String[] papIdList);
+	public List<XACMLObject> getPartialTreeAsList(String[] papIdList);
 
 	public List<String> listPAPIds();
 	
-	public void update(PolicySet newPolicySet);
+	public void update(PolicySetType newPolicySet);
 
 }

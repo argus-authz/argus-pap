@@ -4,11 +4,11 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.PolicySetBuilder;
+import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.opensaml.xacml.policy.PolicySetType;
 
 public class FileSystemPolicySetDAO implements PolicySetDAO {
 	
@@ -17,11 +17,11 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 	}
 
 	private final String policySetFileNamePrefix;
-	private final PolicySetBuilder policySetBuilder;
+	private final PolicySetHelper policySetHelper;
 
 	private FileSystemPolicySetDAO() {
 		policySetFileNamePrefix = RepositoryManager.getPolicySetFileNamePrefix();
-		policySetBuilder = RepositoryManager.getPolicySetBuilder();
+		policySetHelper = PolicySetHelper.getInstance();
 	}
 	
 	public void delete(String papId, String policySetId) {
@@ -35,8 +35,8 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 		return new File(RepositoryManager.getPolicySetAbsolutePath(papId, policySetId)).exists();
 	}
 
-	public List<PolicySet> getAll(String papId) {
-		List<PolicySet> policySetList = new LinkedList<PolicySet>();
+	public List<PolicySetType> getAll(String papId) {
+		List<PolicySetType> policySetList = new LinkedList<PolicySetType>();
 		File papDir = new File(RepositoryManager.getPAPDirAbsolutePath(papId));
 		for (File file:papDir.listFiles()) {
 			if (file.isDirectory()) {
@@ -44,31 +44,31 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 			}
 			if (file.getName().startsWith(policySetFileNamePrefix)) {
 				System.out.println("Reading: " + file.getName());
-				policySetList.add(policySetBuilder.buildFromFile(file));
+				policySetList.add(policySetHelper.buildFromFile(file));
 			}
 		}
 		return policySetList;
 	}
 	
-	public PolicySet getById(String papId, String policySetId) {
+	public PolicySetType getById(String papId, String policySetId) {
 		File policySetFile = new File(RepositoryManager.getPolicySetAbsolutePath(papId, policySetId));
 		if (!policySetFile.exists()) {
 			throw new RepositoryException("PolicySet does not exist: " + policySetId);
 		}
-		return policySetBuilder.buildFromFile(policySetFile);
+		return policySetHelper.buildFromFile(policySetFile);
 	}
 	
-	public void store(String papId, PolicySet ps) {
-		if (!exists(papId, ps.getId())) {
-			ps.toFile(RepositoryManager.getPolicySetAbsolutePath(papId, ps.getId()));
+	public void store(String papId, PolicySetType ps) {
+		if (!exists(papId, ps.getPolicySetId())) {
+			policySetHelper.toFile(RepositoryManager.getPolicySetAbsolutePath(papId, ps.getPolicySetId()), ps);
 		}
 	}
 	
-	public void update(String papId, PolicySet ps) {
-		File policySetFile = new File(RepositoryManager.getPolicySetAbsolutePath(papId, ps.getId()));
+	public void update(String papId, PolicySetType ps) {
+		File policySetFile = new File(RepositoryManager.getPolicySetAbsolutePath(papId, ps.getPolicySetId()));
 		if (!policySetFile.exists()) {
-			throw new RepositoryException("PolicySet does not exist: " + ps.getId());
+			throw new RepositoryException("PolicySet does not exist: " + ps.getPolicySetId());
 		}
-		ps.toFile(policySetFile);
+		policySetHelper.toFile(policySetFile, ps);
 	}
 }

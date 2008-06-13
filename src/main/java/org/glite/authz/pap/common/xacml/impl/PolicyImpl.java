@@ -7,10 +7,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.glite.authz.pap.common.utils.xacml.FileNotFoundXACMLException;
+import org.glite.authz.pap.common.utils.xacml.InvalidPolicySet_TO_DELETE;
+import org.glite.authz.pap.common.utils.xacml.XACMLException;
 import org.glite.authz.pap.common.xacml.Policy;
-import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
-import org.glite.authz.pap.common.xacml.exceptions.InvalidPolicySet;
-import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -68,7 +68,7 @@ public class PolicyImpl extends Policy {
 			}
 		}
 		if ((element == null) || (attributeId == null)) {
-			throw new InvalidPolicySet();
+			throw new InvalidPolicySet_TO_DELETE();
 		}
 		return attributeId;
 	}

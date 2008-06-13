@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.glite.authz.pap.common.utils.xacml.XACMLException;
 import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 import org.opensaml.xacml.policy.IdReferenceType;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -44,8 +44,7 @@ public class PolicySetOpenSAML extends PolicySet {
 	}
 
 	@SuppressWarnings("unchecked")
-	public PolicySetOpenSAML(String policySetId,
-			String policyCombinerAlgorithmId) {
+	public PolicySetOpenSAML(String policySetId, String policyCombinerAlgorithmId) {
 		XMLObjectBuilder<PolicySetType> policySetBuilder = Configuration
 				.getBuilderFactory()
 				.getBuilder(
@@ -85,7 +84,7 @@ public class PolicySetOpenSAML extends PolicySet {
 
 	public void deletePolicyReference(String policyId) {
 		List<IdReferenceType> policyRefList = policySet.getPolicyIdReferences();
-		for (IdReferenceType policyRef:policyRefList) {
+		for (IdReferenceType policyRef : policyRefList) {
 			if (policyRef.getValue().equals(policyId)) {
 				policyRefList.remove(policyRef);
 			}
@@ -94,7 +93,7 @@ public class PolicySetOpenSAML extends PolicySet {
 
 	public void deletePolicySetReference(String policySetId) {
 		List<IdReferenceType> psRefList = policySet.getPolicySetIdReferences();
-		for (IdReferenceType psRef:psRefList) {
+		for (IdReferenceType psRef : psRefList) {
 			if (psRef.getValue().equals(policySetId)) {
 				psRefList.remove(psRef);
 			}

@@ -1,26 +1,18 @@
 package org.glite.authz.pap.common.xacml.impl;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.glite.authz.pap.common.utils.xacml.InvalidPolicySet_TO_DELETE;
+import org.glite.authz.pap.common.utils.xacml.XACMLException;
 import org.glite.authz.pap.common.xacml.AbstractPolicy;
 import org.glite.authz.pap.common.xacml.IdReference;
 import org.glite.authz.pap.common.xacml.PolicySet;
-import org.glite.authz.pap.common.xacml.exceptions.FileNotFoundXACMLException;
-import org.glite.authz.pap.common.xacml.exceptions.InvalidPolicySet;
-import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class PolicySetImpl extends PolicySet {
 
@@ -29,25 +21,6 @@ public class PolicySetImpl extends PolicySet {
 	
 	public PolicySetImpl(Document doc) {
 		init(doc);
-	}
-	
-	/**
-	 * @param file
-	 * @throws FileNotFoundXACMLException
-	 * @throws XACMLException XML parse error
-	 */
-	public PolicySetImpl(File file) {
-		init(readXACMLFromFile(file));
-	}
-	
-	
-	/**
-	 * @param fileName
-	 * @throws FileNotFoundXACMLException
-	 * @throws XACMLException XML parse error
-	 */
-	public PolicySetImpl(String fileName) {
-		init(readXACMLFromFile(fileName));
 	}
 	
 	public void addPolicyReference(int index, String value) {
@@ -246,7 +219,7 @@ public class PolicySetImpl extends PolicySet {
 			}
 		}
 		if ((element == null) || (attributeId == null)) {
-			throw new InvalidPolicySet();
+			throw new InvalidPolicySet_TO_DELETE();
 		}
 		return attributeId;
 	}
@@ -268,45 +241,5 @@ public class PolicySetImpl extends PolicySet {
 			return ((IdReference) ap).isPolicySetReference();
 		}
 		return false;
-	}
-	
-	/**
-	 * @param file
-	 * @return
-	 * @throws FileNotFoundXACMLException
-	 * @throws XACMLException XML parse error.
-	 */
-	private Document readXACMLFromFile(File file) {
-		if (!file.exists()) {
-			throw new FileNotFoundXACMLException();
-		}
-		if (!file.canRead()) {
-			throw new FileNotFoundXACMLException();
-		}
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
-		Document doc = null;
-		try {
-			DocumentBuilder db = dbf.newDocumentBuilder();
-			doc = db.parse(file);
-		} catch(ParserConfigurationException e) {
-			throw new XACMLException(e);
-		} catch(SAXException e) {
-			throw new XACMLException(e);
-		} catch(IOException e) {
-			throw new XACMLException(e);
-		}
-		return doc;
-	}
-	
-	/**
-	 * @param fileName
-	 * @return
-	 * @throws FileNotFoundXACMLException
-	 * @throws XACMLException XML parse error
-	 */
-	private Document readXACMLFromFile(String fileName) {
-		File file = new File(fileName);
-		return readXACMLFromFile(file);
 	}
 }

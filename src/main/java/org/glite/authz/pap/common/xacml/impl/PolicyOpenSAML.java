@@ -1,7 +1,7 @@
 package org.glite.authz.pap.common.xacml.impl;
 
+import org.glite.authz.pap.common.utils.xacml.XACMLException;
 import org.glite.authz.pap.common.xacml.Policy;
-import org.glite.authz.pap.common.xacml.exceptions.XACMLException;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObjectBuilder;

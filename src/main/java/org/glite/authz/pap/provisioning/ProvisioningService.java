@@ -22,7 +22,6 @@
 
 package org.glite.authz.pap.provisioning;
 
-import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
 import org.opensaml.saml2.core.Response;
@@ -30,7 +29,6 @@ import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 public class ProvisioningService {
 
@@ -64,14 +62,10 @@ public class ProvisioningService {
     
     RootPolicySetDAO rootPolicySetDAO = daoFactory.getRootPolicySetDAO();
     
-    PolicySet policySet = rootPolicySetDAO.get();
-    
-    Element policySetElement = (Element) policySet.getDOM();
     
     /* convert the policy set element to an OpenSAML object */
 
-    PolicySetType resultPolicySet = 
-      ProvisioningServiceUtils.createPolicySet( policySetElement );
+    PolicySetType resultPolicySet = rootPolicySetDAO.get();
 
     /* prepare the response */
 

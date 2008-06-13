@@ -1,12 +1,10 @@
 package org.glite.authz.pap.common.xacml.impl;
 
-import java.io.File;
-
 import org.glite.authz.pap.common.xacml.PolicySet;
 import org.glite.authz.pap.common.xacml.PolicySetBuilder;
 import org.w3c.dom.Document;
 
-public class PolicySetBuilderImpl implements PolicySetBuilder {
+public class PolicySetBuilderImpl extends PolicySetBuilder {
 	
 private static PolicySetBuilderImpl instance = null;
 	
@@ -25,16 +23,7 @@ private static PolicySetBuilderImpl instance = null;
 		return null;
 	}
 
-	public PolicySet buildFromDOM(Document doc) {
+	public PolicySet build(Document doc) {
 		return new PolicySetImpl(doc);
 	}
-
-	public PolicySet buildFromFile(File file) {
-		return new PolicySetImpl(file);
-	}
-
-	public PolicySet buildFromFile(String fileName) {
-		return new PolicySetImpl(fileName);
-	}
-
 }

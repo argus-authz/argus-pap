@@ -2,7 +2,7 @@ package org.glite.authz.pap.repository.dao;
 
 import java.util.List;
 
-import org.glite.authz.pap.common.xacml.Policy;
+import org.opensaml.xacml.policy.PolicyType;
 
 public interface PolicyDAO {
 	
@@ -10,12 +10,12 @@ public interface PolicyDAO {
 
 	public boolean exists(String papId, String policyId);
 
-	public List<Policy> getAll(String papId);
+	public List<PolicyType> getAll(String papId);
 
-	public Policy getById(String papId, String policyId);
+	public PolicyType getById(String papId, String policyId);
 
-	public void store(String papId, Policy policy);
+	public void store(String papId, PolicyType policy);
 
-	public void update(String papId, Policy policy);
+	public void update(String papId, PolicyType policy);
 
 }
