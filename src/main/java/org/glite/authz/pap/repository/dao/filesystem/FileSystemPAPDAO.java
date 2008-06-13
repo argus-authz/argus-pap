@@ -16,10 +16,10 @@ import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 
-public class FileSystemPapDAO implements PAPPolicySetDAO {
+public class FileSystemPAPDAO implements PAPPolicySetDAO {
 
-	public static FileSystemPapDAO getInstance() {
-		return new FileSystemPapDAO();
+	public static FileSystemPAPDAO getInstance() {
+		return new FileSystemPAPDAO();
 	}
 
 	private final String dbDir;
@@ -27,7 +27,7 @@ public class FileSystemPapDAO implements PAPPolicySetDAO {
 	private final String localPAPId;
 	private final PolicySetHelper policySetHelper;
 
-	private FileSystemPapDAO() {
+	private FileSystemPAPDAO() {
 		dbDir = RepositoryManager.getFileSystemDatabaseDir();
 		rootDAO = FileSystemRootPolicySetDAO.getInstance();
 		localPAPId = RepositoryManager.getLocalPAPId();

@@ -19,7 +19,7 @@ public class FileSystemDAOFactory extends DAOFactory {
 	private FileSystemDAOFactory() { }
 
 	public PAPPolicySetDAO getPapDAO() {
-		return FileSystemPapDAO.getInstance();
+		return FileSystemPAPDAO.getInstance();
 	}
 
 	public PolicyDAO getPolicyDAO() {

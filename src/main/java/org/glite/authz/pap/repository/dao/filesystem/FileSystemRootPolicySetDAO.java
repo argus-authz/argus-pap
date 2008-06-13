@@ -68,7 +68,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 				PolicySetHelper.deletePolicySetReference(rootPolicySet, id);
 			}
 		}
-		PAPPolicySetDAO papDAO = FileSystemPapDAO.getInstance();
+		PAPPolicySetDAO papDAO = FileSystemPAPDAO.getInstance();
 		List<XACMLObject> rootAll = new LinkedList<XACMLObject>();
 		rootAll.add(rootPolicySet);
 		for (String requestedPAPId:papIdList) {
@@ -78,7 +78,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 	}
 
 	public List<XACMLObject> getTreeAsList() {
-		PAPPolicySetDAO papDAO = FileSystemPapDAO.getInstance();
+		PAPPolicySetDAO papDAO = FileSystemPAPDAO.getInstance();
 		PolicySetType rootPolicySet = get();
 		List<String> papIdList = listPAPIds();
 		List<XACMLObject> rootAll = new LinkedList<XACMLObject>();
