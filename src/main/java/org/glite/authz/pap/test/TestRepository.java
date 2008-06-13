@@ -34,7 +34,7 @@ public class TestRepository {
 		PolicySet localPAPPolicySet = policySetBuilder.buildFromFile(papPolicySetTemplatePath);
 		localPAPPolicySet.setId("LocalPolicySet");
 		if (!papDAO.exists(localPAPPolicySet.getId())) {
-			papDAO.createAsFirst(localPAPPolicySet);
+			papDAO.add(0, localPAPPolicySet);
 		}
 		
 		// Insert PolicySet in the PAP
