@@ -209,6 +209,8 @@ public class ProvisioningServiceUtils {
       throw new MissingIssuerException();
     }
 
+    /* the format MUST be omitted or have the entity value */
+    
     String issuerFormat = issuer.getFormat();
 
     if ( issuerFormat != null && issuerFormat != NameID.ENTITY ) {

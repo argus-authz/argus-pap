@@ -38,7 +38,7 @@ public class ProvisioningService {
       throws java.rmi.RemoteException {
 
     if ( logger.isDebugEnabled() ) {
-      logger.debug( ProvisioningServiceUtils.xmlObjectToString( query ) );
+      logger.debug( "Received XACLMPolicyQuery " + ProvisioningServiceUtils.xmlObjectToString( query ) );
     }
 
     /* check a few things about the query */
@@ -47,12 +47,15 @@ public class ProvisioningService {
       ProvisioningServiceUtils.checkQuery( query );
     } 
     catch ( VersionMismatchException e ) {
+      logger.error( e.getMessage(), e );
       return ProvisioningServiceUtils.createResponse( query , e );
     } 
     catch ( MissingIssuerException e ) {
+      logger.error( e.getMessage(), e );
       return ProvisioningServiceUtils.createResponse( query , e );
     } 
     catch ( WrongFormatIssuerException e ) {
+      logger.error( e.getMessage(), e );
       return ProvisioningServiceUtils.createResponse( query , e );
     }
 
