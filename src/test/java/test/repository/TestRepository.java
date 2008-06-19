@@ -23,13 +23,13 @@ public class TestRepository {
 		}
 
 		// Create a PAP PolicySet
-		PolicySetType localPAPPolicySet = PolicySetHelper.build("LocalPolicySet", PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
+		PolicySetType localPAPPolicySet = PolicySetHelper.buildWithAnyTarget("LocalPolicySet", PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
 		if (!papDAO.exists(localPAPPolicySet.getPolicySetId())) {
 			papDAO.add(0, localPAPPolicySet);
 		}
 		
 		// Insert PolicySet in the PAP
-		PolicySetType examplePolicySet = PolicySetHelper.build("example_policyset_01", PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
+		PolicySetType examplePolicySet = PolicySetHelper.buildWithAnyTarget("example_policyset_01", PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
 		PolicySetDAO policySetDAO = daoFactory.getPolicySetDAO();
 		policySetDAO.store(localPAPPolicySet.getPolicySetId(), examplePolicySet);
 		

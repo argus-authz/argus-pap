@@ -37,7 +37,7 @@ public class FileSystemRootPolicySetDAO implements RootPolicySetDAO {
 
 	public void create() {
 		if (!exists()) {
-			PolicySetType rootPolicySet = PolicySetHelper.build(RepositoryManager.getRootPolicySetId(), PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+			PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(RepositoryManager.getRootPolicySetId(), PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
 			policySetHelper.toFile(this.rootPolicySetFileNameAbsolutePath, rootPolicySet);
 			//PolicySet rootPS = policySetBuilder.build(RepositoryManager.getRootPolicySetId(), PolicySet.COMB_ALG_FIRST_APPLICABLE); 
 			//rootPS.toFile(this.rootPolicySetFileNameAbsolutePath);

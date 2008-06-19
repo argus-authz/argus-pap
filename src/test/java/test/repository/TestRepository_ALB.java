@@ -99,7 +99,6 @@ public class TestRepository_ALB {
 		
 		PAPConfiguration.bootstrap();
 		
-		
 		List<WizardAttribute> attributeList = new LinkedList<WizardAttribute>();
 		for (int i=0; i<2; i++) {
 			WizardAttribute entry = new WizardAttribute(WizardAttribute.Type.SUBJECT_FQAN, "FQAN_" + i);
@@ -135,13 +134,13 @@ public class TestRepository_ALB {
 
 		PAPPolicySetDAO papDAO = daoFactory.getPapDAO();
 		// Create a PAP PolicySet
-		PolicySetType localPAPPolicySet = PolicySetHelper.build(papId, PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
+		PolicySetType localPAPPolicySet = PolicySetHelper.buildWithAnyTarget(papId, PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
 		if (!papDAO.exists(papId)) {
 			papDAO.add(localPAPPolicySet);
 		}
 		
 		// Insert PolicySet in the PAP
-		PolicySetType examplePolicySet = PolicySetHelper.build("example_policyset_01", PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
+		PolicySetType examplePolicySet = PolicySetHelper.buildWithAnyTarget("example_policyset_01", PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
 		PolicySetDAO policySetDAO = daoFactory.getPolicySetDAO();
 		policySetDAO.store(papId, examplePolicySet);
 		

@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.IdReferenceType;
+import org.opensaml.xacml.policy.ObligationsType;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.policy.TargetType;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObject;
 
@@ -53,19 +55,38 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 						idReferenceValue));
 	}
 
-	public static PolicySetType build() {
+	private static PolicySetType build() {
 		return (PolicySetType) Configuration.getBuilderFactory().getBuilder(
 				PolicySetType.DEFAULT_ELEMENT_NAME).buildObject(
 				PolicySetType.DEFAULT_ELEMENT_NAME);
 	}
 
 	public static PolicySetType build(String policySetId,
-			String policyCombinerAlgorithmId) {
+			String policyCombinerAlgorithmId, TargetType target) {
+		
+		return build(policySetId, policyCombinerAlgorithmId, target, null);
+	}
+	
+	public static PolicySetType build(String policySetId,
+			String policyCombiningAlgorithmId, TargetType target, ObligationsType obligations) {
 		PolicySetType policySet = build();
 		policySet.setPolicySetId(policySetId);
-		policySet.setTarget(TargetHelper.buildAnyTarget());
-		policySet.setPolicyCombiningAlgoId(policyCombinerAlgorithmId);
+		policySet.setPolicyCombiningAlgoId(policyCombiningAlgorithmId);
+		if (target == null) {
+			policySet.setTarget(TargetHelper.buildAnyTarget());
+		} else {
+			policySet.setTarget(target);
+		}
+		if (obligations != null) {
+			policySet.setObligations(obligations);
+		}
 		return policySet;
+	}
+	
+	public static PolicySetType buildWithAnyTarget(String policySetId,
+			String policyCombinerAlgorithmId) {
+		
+		return build(policySetId, policyCombinerAlgorithmId, null, null);
 	}
 
 	public static void deletePolicyReference(PolicySetType policySet,
@@ -88,34 +109,6 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 		}
 	}
 
-	public static PolicySetHelper getInstance() {
-		if (instance == null) {
-			instance = new PolicySetHelper();
-		}
-		return instance;
-	}
-
-	public static int getNumberOfChildren(PolicySetType policySet) {
-		return getChildrenOrderedList(policySet).size();
-	}
-	
-	public static List<String> getPolicySetIdReferencesValues(PolicySetType policySet) {
-		List<IdReferenceType> refList = policySet.getPolicySetIdReferences();
-		List<String> list = new ArrayList<String>(refList.size());
-		for (IdReferenceType ref : refList) {
-			list.add(ref.getValue());
-		}
-		return list;
-	}
-	
-	public static boolean policyReferenceIdExists(PolicySetType policySet, String id) {
-		return idIsContainedInList(id, policySet.getPolicyIdReferences());
-	}
-
-	public static boolean policySetReferenceIdExists(PolicySetType policySet, String id) {
-		return idIsContainedInList(id, policySet.getPolicySetIdReferences());
-	}
-	
 	private static List<XACMLObject> getChildrenOrderedList(PolicySetType policySet) {
 		List<XACMLObject> xacmlObjectChildren = new LinkedList<XACMLObject>();
 		List<XMLObject> children = policySet.getOrderedChildren();
@@ -129,6 +122,26 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 		return xacmlObjectChildren;
 	}
 
+	public static PolicySetHelper getInstance() {
+		if (instance == null) {
+			instance = new PolicySetHelper();
+		}
+		return instance;
+	}
+	
+	public static int getNumberOfChildren(PolicySetType policySet) {
+		return getChildrenOrderedList(policySet).size();
+	}
+	
+	public static List<String> getPolicySetIdReferencesValues(PolicySetType policySet) {
+		List<IdReferenceType> refList = policySet.getPolicySetIdReferences();
+		List<String> list = new ArrayList<String>(refList.size());
+		for (IdReferenceType ref : refList) {
+			list.add(ref.getValue());
+		}
+		return list;
+	}
+
 	private static boolean idIsContainedInList(String id, List<IdReferenceType> list) {
 		for (IdReferenceType ref : list) {
 			if (id.equals(ref.getValue())) {
@@ -138,7 +151,12 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 		return false;
 	}
 	
-	private PolicySetHelper() {
+	public static boolean policyReferenceIdExists(PolicySetType policySet, String id) {
+		return idIsContainedInList(id, policySet.getPolicyIdReferences());
+	}
+
+	public static boolean policySetReferenceIdExists(PolicySetType policySet, String id) {
+		return idIsContainedInList(id, policySet.getPolicySetIdReferences());
 	}
 	
 	public static boolean referenceIdExists(PolicySetType policySet, String id) {
@@ -153,6 +171,9 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 			}
 		}
 		return false;
+	}
+	
+	private PolicySetHelper() {
 	}
 
 }
