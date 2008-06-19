@@ -96,9 +96,8 @@ public class TestRepository_PRIVATE {
 		pln("Start");
 		
 		// Initialize the library
-		DefaultBootstrap.bootstrap();
-		XMLConfigurator xmlConfigurator = new XMLConfigurator();
-		xmlConfigurator.load( Configuration.class.getResourceAsStream( "/opensaml_bugfix.xml" ) );
+		
+		PAPConfiguration.bootstrap();
 		
 		
 		List<WizardAttribute> attributeList = new LinkedList<WizardAttribute>();
@@ -124,9 +123,6 @@ public class TestRepository_PRIVATE {
 		pln("Stop");
 		
 		//System.exit(0);
-		
-		RepositoryManager rm = RepositoryManager.getInstance();
-		rm.bootstrap();
 		
 		policySetHelper = PolicySetHelper.getInstance();
 		policyHelper = PolicyHelper.getInstance();

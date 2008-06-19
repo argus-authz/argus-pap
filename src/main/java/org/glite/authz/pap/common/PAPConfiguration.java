@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
@@ -87,6 +88,15 @@ public class PAPConfiguration {
 
         return properties.getProperty( "policyFile" );
     }
+    
+    public static void bootstrap() throws ConfigurationException {
+    	configureOpenSAML();
+    	configureRepository();
+    }
+    
+    private static void configureRepository() {
+    	RepositoryManager.bootstrap();
+    }
 
     public static void configureOpenSAML() throws ConfigurationException {
 
@@ -95,13 +105,6 @@ public class PAPConfiguration {
         
         // Needed because of a "bug" in opensaml 2.1.0... can be removed when opensaml is updated
 		xmlConfigurator.load( Configuration.class.getResourceAsStream( "/opensaml_bugfix.xml" ) );
-		
-//        xmlConfigurator.load( Configuration.class
-//                .getResourceAsStream( "/xacml2-saml2-profile-config.xml" ) );
-//        xmlConfigurator.load( Configuration.class
-//                .getResourceAsStream( "/xacml20-context-config.xml" ) );
-//        xmlConfigurator.load( Configuration.class
-//                .getResourceAsStream( "/xacml20-policy-config.xml" ) );
 
     }
 

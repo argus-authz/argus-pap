@@ -18,6 +18,10 @@ public class RepositoryManager {
 	
 	private static RepositoryManager instance = null;
 	
+	public static String getFileSystemDatabaseDir() {
+		return fileSystemDatabaseDir;
+	}
+	
 	public static RepositoryManager getInstance() {
 		if (instance == null) {
 			instance = new RepositoryManager();
@@ -25,29 +29,10 @@ public class RepositoryManager {
 		return instance;
 	}
 	
-	private RepositoryManager() { }
-	
-	public void bootstrap() {
-		logger.info("Starting PolicyRepository manager: filesystem implementation...");
-		bootstrapFileSystemDB();
+	public static String getLocalPAPId() {
+		return localPAPId;
 	}
 	
-	public void bootstrapFileSystemDB() {
-		File rootDir = new File(RepositoryManager.getFileSystemDatabaseDir());
-		if (!rootDir.exists()) {
-			if (!rootDir.mkdirs()) {
-				throw new RepositoryException("Cannot create DB dir");
-			}
-		}
-		if (!(rootDir.canRead() && rootDir.canWrite())) {
-			throw new RepositoryException("Permission denied for DB dir");
-		}
-	}
-
-	public static String getFileSystemDatabaseDir() {
-		return fileSystemDatabaseDir;
-	}
-
 	public static String getPAPDirAbsolutePath(String papId) {
 		return fileSystemDatabaseDir + File.separator + papId + File.separator;
 	}
@@ -77,15 +62,30 @@ public class RepositoryManager {
 		return policySetFileNamePrefix;
 	}
 
-	public static String getLocalPAPId() {
-		return localPAPId;
-	}
-
 	public static String getRootPolicySetId() {
 		return rootPolicySetId;
 	}
 
 	public static String getXACMLFileNameExtension() {
 		return xacmlFileNameExtension;
+	}
+
+	private RepositoryManager() { }
+
+	public static void bootstrap() {
+		logger.info("Starting PolicyRepository manager: filesystem implementation...");
+		bootstrapFileSystemDB();
+	}
+
+	private static void bootstrapFileSystemDB() {
+		File rootDir = new File(getFileSystemDatabaseDir());
+		if (!rootDir.exists()) {
+			if (!rootDir.mkdirs()) {
+				throw new RepositoryException("Cannot create DB dir");
+			}
+		}
+		if (!(rootDir.canRead() && rootDir.canWrite())) {
+			throw new RepositoryException("Permission denied for DB dir");
+		}
 	}
 }
