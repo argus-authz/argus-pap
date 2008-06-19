@@ -88,16 +88,20 @@ public class PAPConfiguration {
         return properties.getProperty( "policyFile" );
     }
 
-    private static void configureOpenSAML() throws ConfigurationException {
+    public static void configureOpenSAML() throws ConfigurationException {
 
         DefaultBootstrap.bootstrap();
         XMLConfigurator xmlConfigurator = new XMLConfigurator();
-        xmlConfigurator.load( Configuration.class
-                .getResourceAsStream( "/xacml2-saml2-profile-config.xml" ) );
-        xmlConfigurator.load( Configuration.class
-                .getResourceAsStream( "/xacml20-context-config.xml" ) );
-        xmlConfigurator.load( Configuration.class
-                .getResourceAsStream( "/xacml20-policy-config.xml" ) );
+        
+        // Needed because of a "bug" in opensaml 2.1.0... can be removed when opensaml is updated
+		xmlConfigurator.load( Configuration.class.getResourceAsStream( "/opensaml_bugfix.xml" ) );
+		
+//        xmlConfigurator.load( Configuration.class
+//                .getResourceAsStream( "/xacml2-saml2-profile-config.xml" ) );
+//        xmlConfigurator.load( Configuration.class
+//                .getResourceAsStream( "/xacml20-context-config.xml" ) );
+//        xmlConfigurator.load( Configuration.class
+//                .getResourceAsStream( "/xacml20-policy-config.xml" ) );
 
     }
 
