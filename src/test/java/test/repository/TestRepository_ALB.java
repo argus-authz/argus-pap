@@ -51,7 +51,7 @@ import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.io.MarshallingException;
 
-public class TestRepository_PRIVATE {
+public class TestRepository_ALB {
 	
 	private static PolicySetHelper policySetHelper;
 	private static PolicyHelper policyHelper;
