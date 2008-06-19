@@ -68,7 +68,7 @@ public class DistributionConfigurationParser {
 		if (line == null) {
 			return false;
 		}
-		if (line.isEmpty()) {
+		if (line.length() == 0) {
 			return false;
 		}
 		Matcher commentMatcher = commentPattern.matcher(line);
