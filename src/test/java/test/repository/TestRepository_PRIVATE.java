@@ -12,10 +12,10 @@ import java.util.Map.Entry;
 import javax.xml.namespace.QName;
 
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.exceptions.XACMLException;
 import org.glite.authz.pap.common.utils.xacml.DataType;
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
-import org.glite.authz.pap.common.utils.xacml.XACMLException;
 import org.glite.authz.pap.common.utils.xacml.XACMLHelper;
 import org.glite.authz.pap.distribution.DistributionConfigurationParser;
 import org.glite.authz.pap.distribution.DistributionModule;

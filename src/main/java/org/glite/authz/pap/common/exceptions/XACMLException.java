@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common.utils.xacml;
+package org.glite.authz.pap.common.exceptions;
 
 public class XACMLException extends RuntimeException {
 
