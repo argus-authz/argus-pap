@@ -1,4 +1,4 @@
-package org.glite.authz.pap.test;
+package test.repository;
 
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;

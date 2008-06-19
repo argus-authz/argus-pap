@@ -17,7 +17,7 @@ public class PolicyHelper extends XACMLHelper<PolicyType> {
 				.getBuilder(PolicyType.DEFAULT_ELEMENT_NAME).buildObject(
 						PolicyType.DEFAULT_ELEMENT_NAME);
 		policy.setPolicyId(policyId);
-		policy.setTarget(TargetHelper.build());
+		policy.setTarget(TargetHelper.buildAnyTarget());
 		policy.setRuleCombiningAlgoId(ruleCombinerAlgorithmId);
 		return policy;
 	}

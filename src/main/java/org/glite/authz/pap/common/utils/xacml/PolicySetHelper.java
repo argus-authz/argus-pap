@@ -63,7 +63,7 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 			String policyCombinerAlgorithmId) {
 		PolicySetType policySet = build();
 		policySet.setPolicySetId(policySetId);
-		policySet.setTarget(TargetHelper.build());
+		policySet.setTarget(TargetHelper.buildAnyTarget());
 		policySet.setPolicyCombiningAlgoId(policyCombinerAlgorithmId);
 		return policySet;
 	}
