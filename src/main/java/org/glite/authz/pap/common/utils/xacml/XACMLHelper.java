@@ -48,10 +48,7 @@ public class XACMLHelper<XACMLObjectType extends XACMLObject> {
 	}
 
 	public XACMLObjectType buildFromFile(File file) {
-		if (!file.exists()) {
-			throw new FileNotFoundXACMLException();
-		}
-		if (!file.canRead()) {
+		if ((!file.exists()) || (!file.canRead())) {
 			throw new FileNotFoundXACMLException();
 		}
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
