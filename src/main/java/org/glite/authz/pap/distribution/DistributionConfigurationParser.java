@@ -13,6 +13,7 @@ import org.glite.authz.pap.distribution.exceptions.DistributionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class DistributionConfigurationParser {
 	private static final Logger log = LoggerFactory
 			.getLogger(DistributionConfigurationParser.class);
