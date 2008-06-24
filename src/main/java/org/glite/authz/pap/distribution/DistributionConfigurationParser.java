@@ -28,8 +28,7 @@ public class DistributionConfigurationParser {
 	private static final Pattern endpointPattern = Pattern
 			.compile(endpointRegex);
 	private static final String remotePAPRegex = "\"()\"\\s\"([\\w\\.]+)\"";
-	private static final Pattern remotePAPPattern = Pattern
-			.compile(remotePAPRegex);
+	private static final Pattern remotePAPPattern = Pattern.compile(remotePAPRegex);
 
 	public static DistributionConfigurationParser getInstance() {
 		return new DistributionConfigurationParser();
