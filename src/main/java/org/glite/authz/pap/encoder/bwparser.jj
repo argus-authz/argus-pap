@@ -269,14 +269,7 @@ SingleCondition Item() :
     sc.value1 = s1;
     return sc;
   }
-| <GA> "=" s1=TextString() "=" s2=TextString()
-  {
-    sc.type = SingleCondition.TYPE_GA;
-    sc.value1 = s1;
-    sc.value2 = s2;
-    return sc;
-  }
-| <CERT> "(" s1=TextString() ":" s2=TextString() ")"
+| <CERT> "=" "(" s1=TextString() ":" s2=TextString() ")"
   {
     sc.type = SingleCondition.TYPE_CERT;
     sc.value1 = s1;
@@ -293,6 +286,13 @@ SingleCondition Item() :
   { 
     sc.type = SingleCondition.TYPE_PILOT;
     sc.yesorno= value;
+    return sc;
+  }
+| s1=TextString() "=" s2=TextString()
+  {
+    sc.type = SingleCondition.TYPE_GA;
+    sc.value1 = s1;
+    sc.value2 = s2;
     return sc;
   }
 }

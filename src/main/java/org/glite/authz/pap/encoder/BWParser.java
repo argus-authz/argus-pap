@@ -239,10 +239,12 @@ class BWParser implements BWParserConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case FQAN:
       case DN:
-      case GA:
       case RESOURCE:
       case CERT:
       case PILOT:
+      case STRING:
+      case ID:
+      case ID2:
         ;
         break;
       default:
@@ -278,19 +280,9 @@ class BWParser implements BWParserConstants {
     sc.value1 = s1;
     {if (true) return sc;}
       break;
-    case GA:
-      jj_consume_token(GA);
-      jj_consume_token(28);
-      s1 = TextString();
-      jj_consume_token(28);
-      s2 = TextString();
-    sc.type = SingleCondition.TYPE_GA;
-    sc.value1 = s1;
-    sc.value2 = s2;
-    {if (true) return sc;}
-      break;
     case CERT:
       jj_consume_token(CERT);
+      jj_consume_token(28);
       jj_consume_token(29);
       s1 = TextString();
       jj_consume_token(30);
@@ -315,6 +307,17 @@ class BWParser implements BWParserConstants {
       value = YesOrNo();
     sc.type = SingleCondition.TYPE_PILOT;
     sc.yesorno= value;
+    {if (true) return sc;}
+      break;
+    case STRING:
+    case ID:
+    case ID2:
+      s1 = TextString();
+      jj_consume_token(28);
+      s2 = TextString();
+    sc.type = SingleCondition.TYPE_GA;
+    sc.value1 = s1;
+    sc.value2 = s2;
     {if (true) return sc;}
       break;
     default:
@@ -378,7 +381,7 @@ class BWParser implements BWParserConstants {
       jj_la1_0();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x1000000,0x22000,0x800,0x40000,0x1000c0,0x1000c0,0x80000,0xc0,0x5f00,0x5f00,0x18000,0xe00000,};
+      jj_la1_0 = new int[] {0x1000000,0x22000,0x800,0x40000,0x1000c0,0x1000c0,0x80000,0xc0,0xe05b00,0xe05b00,0x18000,0xe00000,};
    }
 
   public BWParser(java.io.InputStream stream) {
