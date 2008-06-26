@@ -50,7 +50,7 @@ public class TestRepository {
 		String papId = papContainer.getPAP().getPapId();
 		for (int i=0; i<10; i++) {
 			PolicyType policy = PolicyHelper.build(papId + "_ex_" + i, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
-			if (papContainer.existsPolicy(policy.getPolicyId())) {
+			if (papContainer.hasPolicy(policy.getPolicyId())) {
 				log.info("Policy \"" + policy.getPolicyId() + "\" already exists... action is overwrite it.");
 			} else {
 				log.info("Adding policy \"" + policy.getPolicyId() + "\" to PAP \"" + papId + "\" ");
