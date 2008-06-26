@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.distribution.exceptions.DistributionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +37,13 @@ public class DistributionConfigurationParser {
 
 	private int lineCounter = 0;
 
-	private List<RemotePAP> remotePAPList = null;
+	private List<PAP> remotePAPList = null;
 
 	private DistributionConfigurationParser() {
-		remotePAPList = new LinkedList<RemotePAP>();
+		remotePAPList = new LinkedList<PAP>();
 	}
 
-	public List<RemotePAP> parse(File file) {
+	public List<PAP> parse(File file) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 
@@ -82,12 +83,12 @@ public class DistributionConfigurationParser {
 		return true;
 	}
 
-	protected RemotePAP parseLine(String line) {
+	protected PAP parseLine(String line) {
 		Matcher remotePAPMatcher = remotePAPPattern.matcher(line);
 		if (remotePAPMatcher.matches()) {
-			return new RemotePAP(null, "YES: " + remotePAPMatcher.group(2));
+			return new PAP("YES: " + remotePAPMatcher.group(2), null, null);
 		}
-		return new RemotePAP(null, "NO");
+		return new PAP("NO", null, null);
 	}
 
 }

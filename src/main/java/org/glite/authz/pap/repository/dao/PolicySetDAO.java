@@ -7,6 +7,8 @@ import org.opensaml.xacml.policy.PolicySetType;
 public interface PolicySetDAO {
 
 	public void delete(String papId, String policySetId);
+	
+	public void deleteAll(String papId);
 
 	public boolean exists(String papId, String policySetId);
 

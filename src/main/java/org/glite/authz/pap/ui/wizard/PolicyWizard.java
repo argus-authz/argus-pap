@@ -23,8 +23,8 @@ import org.opensaml.xacml.policy.TargetType;
 
 public class PolicyWizard {
 
-	public static PolicyType build(List<WizardAttribute> targetAttributeList,
-			List<WizardAttribute> exceptionsAttributeList, EffectType effect) {
+	public static PolicyType build(List<AttributeWizard> targetAttributeList,
+			List<AttributeWizard> exceptionsAttributeList, EffectType effect) {
 		
 		PolicyType blacklistPolicy = PolicyHelper.build("BlackListPolicy",
 				PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
@@ -59,11 +59,11 @@ public class PolicyWizard {
 		return target;
 	}
 
-	private static void divideIntoSubLists(List<WizardAttribute> list,
+	private static void divideIntoSubLists(List<AttributeWizard> list,
 			List<AttributeType> subjectAttributes,
 			List<AttributeType> resourceAttributes,
 			List<AttributeType> environmentAttributes) {
-		for (WizardAttribute entry : list) {
+		for (AttributeWizard entry : list) {
 			AttributeType attribute = entry.getAttributeType();
 			if (entry.isSubjectAttribute()) {
 				subjectAttributes.add(attribute);

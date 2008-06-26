@@ -95,7 +95,7 @@ public class PAPConfiguration {
     }
     
     private static void configureRepository() {
-    	RepositoryManager.bootstrap();
+    	RepositoryManager.getInstance().bootstrap();
     }
 
     public static void configureOpenSAML() throws ConfigurationException {

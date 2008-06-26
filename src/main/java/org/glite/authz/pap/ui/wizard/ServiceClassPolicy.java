@@ -9,8 +9,8 @@ public class ServiceClassPolicy {
 	
 	private ServiceClassPolicy() {}
 	
-	public static PolicyType build(List<WizardAttribute> targetAttributeList,
-			List<WizardAttribute> exceptionsAttributeList, EffectType effect) {
+	public static PolicyType build(List<AttributeWizard> targetAttributeList,
+			List<AttributeWizard> exceptionsAttributeList, EffectType effect) {
 		return PolicyWizard.build(targetAttributeList, exceptionsAttributeList, effect);
 	}
 

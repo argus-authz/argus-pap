@@ -9,8 +9,8 @@ public class BlacklistPolicy {
 	
 	private BlacklistPolicy() {}
 	
-	public static PolicyType build(List<WizardAttribute> targetAttributeList,
-			List<WizardAttribute> exceptionsAttributeList) {
+	public static PolicyType build(List<AttributeWizard> targetAttributeList,
+			List<AttributeWizard> exceptionsAttributeList) {
 		return PolicyWizard.build(targetAttributeList, exceptionsAttributeList, EffectType.Deny);
 	}
 

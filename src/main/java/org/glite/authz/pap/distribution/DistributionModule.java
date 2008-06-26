@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.repository.dao.DAOFactory;
-import org.glite.authz.pap.repository.dao.PAPPolicySetDAO;
-import org.glite.authz.pap.repository.dao.PolicyDAO;
-import org.glite.authz.pap.repository.dao.PolicySetDAO;
+import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.PAPManager;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -16,12 +16,8 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
 
-	private static final Logger log = LoggerFactory
-			.getLogger(DistributionModule.class);
+	private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
 	private static DistributionModule instance = null;
-	private static PAPPolicySetDAO papDAO;
-	private static PolicySetDAO policySetDAO;
-	private static PolicyDAO policyDAO;
 
 	public static DistributionModule getInstance() {
 		if (instance == null) {
@@ -30,7 +26,7 @@ public class DistributionModule extends Thread {
 		return instance;
 	}
 
-	private List<RemotePAP> remotePAPs;
+	private List<PAP> remotePAPs;
 	private long sleepTime;
 
 	private DistributionModule() {
@@ -45,13 +41,12 @@ public class DistributionModule extends Thread {
 	public void run() {
 		try {
 			while (!this.isInterrupted()) {
-				papDAO.deleteRemoteAll();
-				for (RemotePAP remotePAP : remotePAPs) {
+				for (PAP remotePAP : remotePAPs) {
 					if (this.isInterrupted()) {
 						break;
 					}
 					List<XACMLObject> papTree = getPoliciesFromPAP(remotePAP);
-					storePAPTree(remotePAP, papTree);
+					storePAPPolicies(remotePAP, papTree);
 				}
 				sleep(sleepTime);
 			}
@@ -60,7 +55,7 @@ public class DistributionModule extends Thread {
 		log.info("Shut down distribution module");
 	}
 
-	private List<XACMLObject> getPoliciesFromPAP(RemotePAP remotePAP) {
+	private List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
 		List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 		
 		// Fake policy generation
@@ -70,30 +65,35 @@ public class DistributionModule extends Thread {
 	}
 
 	private void init() {
-		papDAO = DAOFactory.getDAOFactory().getPapDAO();
-		policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
-		policySetDAO = DAOFactory.getDAOFactory().getPolicySetDAO();
 		sleepTime = 15000;
-		remotePAPs = new ArrayList<RemotePAP>(20);
+		remotePAPs = new ArrayList<PAP>(20);
 		for (int i = 0; i < 20; i++) {
-			remotePAPs.add(new RemotePAP("enpoint", "remote_pap_" + i));
+			remotePAPs.add(new PAP("remote_pap_" + i, "enpoint", "dn"));
 		}
 	}
 
-	private void storePAPTree(RemotePAP remotePAP, List<XACMLObject> papTree) {
+	private void storePAPPolicies(PAP remotePAP, List<XACMLObject> papPolicies) {
 		String papId = remotePAP.getDn();
-		if (papTree.isEmpty()) {
+		if (papPolicies.isEmpty()) {
 			log.debug("Empty list retrieved from PAP: " + papId);
 		}
-		XACMLObject papRoot = papTree.get(0);
+		PAPContainer papContainer = null;
+		PAPManager papManager = RepositoryManager.getPAPManager();
+		if (!papManager.exists(remotePAP)) {
+			papContainer = papManager.create(remotePAP);
+		} else {
+			papContainer = papManager.get(remotePAP);
+			papContainer.deleteAllPolicies();
+			papContainer.deleteAllPolicySets();
+		}
+		XACMLObject papRoot = papPolicies.get(0);
 		if (papRoot instanceof PolicySetType) {
-			papDAO.add((PolicySetType) papRoot);
-			for (int i=1; i<papTree.size(); i++) {
-				XACMLObject ab = papTree.get(i);
-				if (ab instanceof PolicySetType) {
-					policySetDAO.store(papId, (PolicySetType) ab);
-				} else if (ab instanceof PolicyType) {
-					policyDAO.store(papId, (PolicyType) ab);
+			((PolicySetType) papRoot).setPolicySetId(papContainer.getPAP().getPapId());
+			for (XACMLObject xacmlObject: papPolicies) {
+				if (xacmlObject instanceof PolicySetType) {
+					papContainer.storePolicySet((PolicySetType) xacmlObject);
+				} else if (xacmlObject instanceof PolicyType) {
+					papContainer.storePolicy((PolicyType) xacmlObject);
 				} else {
 					log.error("Invalid AbstractPolicy received from PAP: " + papId);
 				}

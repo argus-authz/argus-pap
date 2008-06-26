@@ -5,7 +5,7 @@ import org.glite.authz.pap.common.utils.xacml.DataType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xml.Configuration;
 
-public class WizardAttribute {
+public class AttributeWizard {
 	
 	public enum Type {
 		SUBJECT_DN, SUBJECT_FQAN, SUBJECT_GENERIC_ATTRIBUTE, RESOURCE_RESOURCE_URI, RESOURCE_SERVICE_CLASS
@@ -18,7 +18,7 @@ public class WizardAttribute {
 	private boolean isResourceAttribute = false;
 	private boolean isEnvironmentAttribute = false;
 	
-	public WizardAttribute(Type type, String value) {
+	public AttributeWizard(Type type, String value) {
 		switch (type) {
 		case SUBJECT_DN:
 			attributeId = "DN";

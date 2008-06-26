@@ -10,10 +10,6 @@ public abstract class DAOFactory {
 
 	public abstract PolicySetDAO getPolicySetDAO();
 
-	public abstract PAPPolicySetDAO getPapDAO();
-
 	public abstract PolicyDAO getPolicyDAO();
-	
-	public abstract RootPolicySetDAO getRootPolicySetDAO();
 	
 }

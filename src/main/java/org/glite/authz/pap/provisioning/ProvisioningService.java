@@ -22,10 +22,14 @@
 
 package org.glite.authz.pap.provisioning;
 
-import org.glite.authz.pap.repository.dao.DAOFactory;
-import org.glite.authz.pap.repository.dao.RootPolicySetDAO;
+import java.util.List;
+
+import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,21 +63,17 @@ public class ProvisioningService {
       return ProvisioningServiceUtils.createResponse( query , e );
     }
 
-    /* get a DAO */
+    /* get local policies */
     
-    DAOFactory daoFactory = DAOFactory.getDAOFactory(); 
+    PAPContainer papContainer = RepositoryManager.getPAPManager().get( new PAP( "Local" ) );
     
-    RootPolicySetDAO rootPolicySetDAO = daoFactory.getRootPolicySetDAO();
+    List<PolicySetType> policySetList = papContainer.getAllPolicySets();
+    List<PolicyType> policyList = papContainer.getAllPolicies();
     
-    
-    /* convert the policy set element to an OpenSAML object */
-
-    PolicySetType resultPolicySet = rootPolicySetDAO.get();
-
     /* prepare the response */
 
-    Response response = 
-      ProvisioningServiceUtils.createResponse( query , resultPolicySet );
+//    Response response = ProvisioningServiceUtils.createResponse( query , resultList );
+    Response response = null;
 
     if ( logger.isDebugEnabled() ) {
       logger.debug( ProvisioningServiceUtils.xmlObjectToString( response ) );
