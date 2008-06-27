@@ -1,6 +1,7 @@
 package org.glite.authz.pap.common.utils.xacml;
 
 import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.policy.TargetType;
 import org.opensaml.xml.Configuration;
 
 public class PolicyHelper extends XACMLHelper<PolicyType> {
@@ -11,15 +12,22 @@ public class PolicyHelper extends XACMLHelper<PolicyType> {
 
 	private static PolicyHelper instance = null;
 
-	public static PolicyType build(String policyId,
-			String ruleCombinerAlgorithmId) {
+	public static PolicyType build(String policyId, String ruleCombinerAlgorithmId, TargetType target) {
 		PolicyType policy = (PolicyType) Configuration.getBuilderFactory()
 				.getBuilder(PolicyType.DEFAULT_ELEMENT_NAME).buildObject(
 						PolicyType.DEFAULT_ELEMENT_NAME);
 		policy.setPolicyId(policyId);
-		policy.setTarget(TargetHelper.buildAnyTarget());
 		policy.setRuleCombiningAlgoId(ruleCombinerAlgorithmId);
+		if (target == null) {
+			policy.setTarget(TargetHelper.buildAnyTarget());
+		} else {
+			policy.setTarget(target);
+		}
 		return policy;
+	}
+	
+	public static PolicyType buildWithAnyTarget(String policyId, String ruleCombinerAlgorithmId) {
+		return build(policyId, ruleCombinerAlgorithmId, null);
 	}
 
 	public static PolicyHelper getInstance() {

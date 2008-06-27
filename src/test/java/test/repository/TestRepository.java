@@ -49,7 +49,7 @@ public class TestRepository {
 	private static void insertBunchOfPolicies(PAPContainer papContainer) {
 		String papId = papContainer.getPAP().getPapId();
 		for (int i=0; i<10; i++) {
-			PolicyType policy = PolicyHelper.build(papId + "_ex_" + i, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+			PolicyType policy = PolicyHelper.buildWithAnyTarget(papId + "_ex_" + i, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 			if (papContainer.hasPolicy(policy.getPolicyId())) {
 				log.info("Policy \"" + policy.getPolicyId() + "\" already exists... action is overwrite it.");
 			} else {
@@ -60,7 +60,6 @@ public class TestRepository {
 	}
 	
 	private static void deleteAllPolicies(PAPContainer papContainer) {
-		String papId = papContainer.getPAP().getPapId();
 		List<PolicyType> policies = papContainer.getAllPolicies();
 		for (PolicyType policy:policies) {
 			papContainer.deletePolicy(policy.getPolicyId());

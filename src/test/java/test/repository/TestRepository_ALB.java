@@ -11,6 +11,7 @@ import java.util.Map.Entry;
 
 import javax.xml.namespace.QName;
 
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.XACMLException;
 import org.glite.authz.pap.common.utils.xacml.DataType;
@@ -95,6 +96,16 @@ public class TestRepository_ALB {
 		// Initialize the library
 		
 		PAPConfiguration.bootstrap();
+		
+		DistributionModule distribution = DistributionModule.getInstance();
+		distribution.start();
+		pln("Going on...");
+		for (int i=0; i<100000; i++) for (int j=0; j<1000000; j++);
+		distribution.end();
+		
+		pln("Bye");
+		
+		System.exit(0);
 		
 		List<AttributeWizard> attributeList = new LinkedList<AttributeWizard>();
 		for (int i=0; i<2; i++) {

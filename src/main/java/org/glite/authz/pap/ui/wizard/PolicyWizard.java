@@ -26,7 +26,7 @@ public class PolicyWizard {
 	public static PolicyType build(List<AttributeWizard> targetAttributeList,
 			List<AttributeWizard> exceptionsAttributeList, EffectType effect) {
 		
-		PolicyType blacklistPolicy = PolicyHelper.build("BlackListPolicy",
+		PolicyType blacklistPolicy = PolicyHelper.buildWithAnyTarget("BlackListPolicy",
 				PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 		List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
 		List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();

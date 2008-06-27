@@ -23,13 +23,9 @@ public class DistributionConfigurationParser {
 			.compile(emptyLineRegex);
 	private static final String commentRegex = "^#.*$";
 	private static final Pattern commentPattern = Pattern.compile(commentRegex);
-	private static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
-	private static final Pattern dnPattern = Pattern.compile(dnRegex);
-	private static final String endpointRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
-	private static final Pattern endpointPattern = Pattern
-			.compile(endpointRegex);
-	private static final String remotePAPRegex = "\"()\"\\s\"([\\w\\.]+)\"";
-	private static final Pattern remotePAPPattern = Pattern.compile(remotePAPRegex);
+	//private static final String lineRegex = "\"()\"\\s\"([\\w\\.]+)\"";
+	private static final String lineRegex = "\"(.+)\"\\s\"(.+)\"";
+	private static final Pattern linePattern = Pattern.compile(lineRegex);
 
 	public static DistributionConfigurationParser getInstance() {
 		return new DistributionConfigurationParser();
@@ -51,10 +47,15 @@ public class DistributionConfigurationParser {
 			lineCounter = 0;
 			do {
 				line = reader.readLine();
-				lineCounter++;
 				if (lineIsMeaningful(line)) {
-					remotePAPList.add(parseLine(line));
+					PAP pap = parseLine(line);
+					if (pap == null) {
+						log.error("Syntax error at line " + lineCounter + " of file " + file.getAbsolutePath() + " (line skipped)");
+					} else {
+						remotePAPList.add(pap);
+					}
 				}
+				lineCounter++;
 			} while (line != null);
 
 			return remotePAPList;
@@ -84,11 +85,10 @@ public class DistributionConfigurationParser {
 	}
 
 	protected PAP parseLine(String line) {
-		Matcher remotePAPMatcher = remotePAPPattern.matcher(line);
-		if (remotePAPMatcher.matches()) {
-			return new PAP("YES: " + remotePAPMatcher.group(2), null, null);
-		}
-		return new PAP("NO", null, null);
+		Matcher lineMatcher = linePattern.matcher(line);
+		if (lineMatcher.matches()) {
+			return new PAP(lineMatcher.group(1), lineMatcher.group(2));
+		} 
+		return null;
 	}
-
 }

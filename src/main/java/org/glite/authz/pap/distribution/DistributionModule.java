@@ -1,10 +1,13 @@
 package org.glite.authz.pap.distribution;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
+import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.PAPManager;
 import org.glite.authz.pap.repository.RepositoryManager;
@@ -16,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
 
+	private static final String remotePAPConfigurationFile = "/tmp/remote_pap_list.txt";
 	private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
 	private static DistributionModule instance = null;
 
@@ -26,7 +30,7 @@ public class DistributionModule extends Thread {
 		return instance;
 	}
 
-	private List<PAP> remotePAPs;
+	private List<PAP> remotePAPs = new ArrayList<PAP>();
 	private long sleepTime;
 
 	private DistributionModule() {
@@ -34,10 +38,12 @@ public class DistributionModule extends Thread {
 	}
 
 	public void end() {
+		log.info("Shutting down distribution module...");
 		this.interrupt();
 		while (this.isAlive());
+		log.info("Distribution module stopped");
 	}
-
+	
 	public void run() {
 		try {
 			while (!this.isInterrupted()) {
@@ -52,13 +58,17 @@ public class DistributionModule extends Thread {
 			}
 		} catch (InterruptedException e) {
 		}
-		log.info("Shut down distribution module");
 	}
 
 	private List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
 		List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 		
-		// Fake policy generation
+		// Fake policy generation... here the client gets the policies from the remote PAP
+		papPolicies.add(PolicySetHelper.buildWithAnyTarget(remotePAP.getPapId(), PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS));
+		for (int i=0; i<10; i++) {
+			papPolicies.add(PolicySetHelper.buildWithAnyTarget(remotePAP.getPapId() + "_Ex_" + i, PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS));
+			papPolicies.add(PolicyHelper.buildWithAnyTarget(remotePAP.getPapId() + "_Ex_" + i, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS));
+		}
 		
 		log.info("Retrieved policies from: " + remotePAP.getDn());
 		return papPolicies;
@@ -66,9 +76,13 @@ public class DistributionModule extends Thread {
 
 	private void init() {
 		sleepTime = 15000;
-		remotePAPs = new ArrayList<PAP>(20);
-		for (int i = 0; i < 20; i++) {
-			remotePAPs.add(new PAP("remote_pap_" + i, "enpoint", "dn"));
+		File configFile = new File(remotePAPConfigurationFile);
+		if (configFile.exists()) {
+			log.info("Reading remote PAP list configuration file: " + remotePAPConfigurationFile);
+			remotePAPs = DistributionConfigurationParser.getInstance().parse(configFile);
+			log.info("Found " + remotePAPs.size() + " remote PAPs");
+		} else {
+			log.info("Remote PAP list configuration file not found: " + remotePAPConfigurationFile);
 		}
 	}
 

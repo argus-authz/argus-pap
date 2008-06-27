@@ -6,14 +6,14 @@ public class PAP {
 	private String endpoint;
 	private String dn;
 	
-	public PAP(String papId, String endpoint, String dn) {
-		this.papId = papId;
+	public PAP(String endpoint, String dn) {
+		this.papId = dn;
 		this.endpoint = endpoint;
 		this.dn = dn;
 	}
 	
 	public PAP(String papId) {
-		this(papId, null, null);
+		this(null, papId);
 	}
 
 	public String getDn() {
