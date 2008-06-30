@@ -120,7 +120,7 @@ public class TestRepository_ALB {
 			AttributeWizard entry = new AttributeWizard(AttributeWizard.Type.RESOURCE_RESOURCE_URI, "RESOURCE_URI_" + i);
 			attributeList.add(entry);
 		}
-		PolicyType policy = PolicyWizard.build(attributeList, attributeList, EffectType.Deny);
+		PolicyType policy = PolicyWizard.build("prova", attributeList, attributeList, EffectType.Deny);
 		pln("Creata la policy");
 		
 		pln("Ora scrivo su file");

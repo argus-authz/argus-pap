@@ -21,38 +21,53 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 	
 	private static PolicySetHelper instance = null;
 
-	public static void addPolicyReference(PolicySetType policySet, int index,
-			String idReferenceValue) {
+	
+	public static void addPolicy(PolicySetType policySet, int index, PolicyType policy) {
+		policySet.getPolicies().add(index, policy);
+	}
+
+	public static void addPolicy(PolicySetType policySet, PolicyType policy) {
+		policySet.getPolicies().add(policy);
+	}
+	
+	public static void addPolicyReference(PolicySetType policySet, int index, String idValue) {
 		policySet.getPolicyIdReferences().add(
 				index,
 				IdReferenceHelper.build(
 						IdReferenceHelper.Type.POLICY_ID_REFERENCE,
-						idReferenceValue));
+						idValue));
 	}
 
-	public static void addPolicyReference(PolicySetType policySet,
-			String idReferenceValue) {
+	public static void addPolicyReference(PolicySetType policySet, String idValue) {
 		policySet.getPolicyIdReferences().add(
 				IdReferenceHelper.build(
 						IdReferenceHelper.Type.POLICY_ID_REFERENCE,
-						idReferenceValue));
+						idValue));
+	}
+	
+	public static void addPolicySet(PolicySetType policySet, int index, PolicySetType childPolicySet) {
+		policySet.getPolicySets().add(index, childPolicySet);
 	}
 
+	public static void addPolicySet(PolicySetType policySet, PolicySetType childPolicySet) {
+		policySet.getPolicySets().add(childPolicySet);
+	}
+	
 	public static void addPolicySetReference(PolicySetType policySet,
-			int index, String idReferenceValue) {
+			int index, String idValue) {
 		policySet.getPolicySetIdReferences().add(
 				index,
 				IdReferenceHelper.build(
 						IdReferenceHelper.Type.POLICYSET_ID_REFERENCE,
-						idReferenceValue));
+						idValue));
 	}
 
 	public static void addPolicySetReference(PolicySetType policySet,
-			String idReferenceValue) {
+			String idValue) {
 		policySet.getPolicySetIdReferences().add(
 				IdReferenceHelper.build(
 						IdReferenceHelper.Type.POLICYSET_ID_REFERENCE,
-						idReferenceValue));
+						idValue));
 	}
 
 	private static PolicySetType build() {

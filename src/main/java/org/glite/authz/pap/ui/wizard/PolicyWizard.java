@@ -23,23 +23,25 @@ import org.opensaml.xacml.policy.TargetType;
 
 public class PolicyWizard {
 
-	public static PolicyType build(List<AttributeWizard> targetAttributeList,
+	public static PolicyType build(String policyId, List<AttributeWizard> targetAttributeList,
 			List<AttributeWizard> exceptionsAttributeList, EffectType effect) {
 		
-		PolicyType blacklistPolicy = PolicyHelper.buildWithAnyTarget("BlackListPolicy",
+		PolicyType policy = PolicyHelper.buildWithAnyTarget(policyId,
 				PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+		
 		List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
 		List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();
 		List<AttributeType> environmentAttributes = new LinkedList<AttributeType>();
-		divideIntoSubLists(targetAttributeList, subjectAttributes, resourceAttributes,
-				environmentAttributes);
-		blacklistPolicy.setTarget(createTarget(subjectAttributes,
-				resourceAttributes, environmentAttributes));
-		blacklistPolicy.getRules().add(
-				ExceptionsRule.build(subjectAttributes, resourceAttributes,
-						environmentAttributes, effect));
+		divideIntoSubLists(targetAttributeList, subjectAttributes, resourceAttributes, environmentAttributes);
+		
+		policy.setTarget(createTarget(subjectAttributes, resourceAttributes, environmentAttributes));
+		subjectAttributes.clear();
+		resourceAttributes.clear();
+		environmentAttributes.clear();
+		divideIntoSubLists(exceptionsAttributeList, subjectAttributes, resourceAttributes, environmentAttributes);
+		policy.getRules().add(ExceptionsRule.build(subjectAttributes, resourceAttributes, environmentAttributes, effect));
 
-		return blacklistPolicy;
+		return policy;
 	}
 
 	private static TargetType createTarget(List<AttributeType> sbjAttr,
