@@ -1,6 +1,8 @@
 package org.glite.authz.pap.repository;
 
 import org.glite.authz.pap.repository.dao.DAOFactory;
+import org.glite.authz.pap.repository.dao.filesystem.FileSystemPAPManager;
+import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager;
 
 public abstract class RepositoryManager {
 

@@ -1,7 +1,8 @@
-package org.glite.authz.pap.repository;
+package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
 
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
-import org.glite.authz.pap.repository.FileSystemRepositoryManager;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicyType;
