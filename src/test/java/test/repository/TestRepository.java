@@ -28,7 +28,7 @@ public class TestRepository {
 		PAPContainer papContainer = null;
 		if (papContainerList.isEmpty()) {
 			log.info("No PAP present in the Repository");
-			PAP newPAP = new PAP("Local");
+			PAP newPAP = new PAP(PAP.localPAPId);
 			papContainer = papManager.create(newPAP);
 			log.info("Created PAP: " + newPAP.getPapId());
 			// Add a PolicySet

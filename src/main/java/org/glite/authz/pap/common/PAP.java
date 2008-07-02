@@ -1,7 +1,7 @@
 package org.glite.authz.pap.common;
 
 public class PAP {
-	
+	public static final String localPAPId = "Local";
 	private String papId;
 	private String endpoint;
 	private String dn;

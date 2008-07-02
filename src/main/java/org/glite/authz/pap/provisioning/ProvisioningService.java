@@ -24,12 +24,9 @@ package org.glite.authz.pap.provisioning;
 
 import java.util.List;
 
-import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.repository.PAPContainer;
-import org.glite.authz.pap.repository.RepositoryManager;
+import org.glite.authz.pap.repository.dao.ProvisioningServiceDAO;
 import org.opensaml.saml2.core.Response;
-import org.opensaml.xacml.policy.PolicySetType;
-import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,10 +62,9 @@ public class ProvisioningService {
 
     /* get local policies */
     
-    PAPContainer papContainer = RepositoryManager.getPAPManager().get( new PAP( "Local" ) );
-    
-    List<PolicySetType> policySetList = papContainer.getAllPolicySets();
-    List<PolicyType> policyList = papContainer.getAllPolicies();
+    // List<XACMLObject> resultList = ProvisioningServiceDAO.getInstance().papQuery();
+    // or
+    List<XACMLObject> resultList = ProvisioningServiceDAO.getInstance().pdpQuery();
     
     /* prepare the response */
 
