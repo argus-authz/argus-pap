@@ -36,18 +36,10 @@ public class UsageExample {
 
 		// Blacklist stuff example
 		List<AttributeWizard> targetAttributeList = new LinkedList<AttributeWizard>();
-		try {
-			targetAttributeList.add(new AttributeWizard("fqan", "FQAN_value"));
-		} catch (UnsupportedAttributeException e) {
-			// ERROR... must do something here....
-		}
+		targetAttributeList.add(new AttributeWizard("fqan", "FQAN_value"));
 		
 		List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
-		try {
-			exceptionsAttributeList.add(new AttributeWizard("dn", "DN_value"));
-		} catch (UnsupportedAttributeException e) {
-			// ERROR... must do something here....
-		}
+		exceptionsAttributeList.add(new AttributeWizard("dn", "DN_value"));
 		
 		PolicyType blacklistPolicy = BlacklistPolicy.build(targetAttributeList, exceptionsAttributeList);
 		

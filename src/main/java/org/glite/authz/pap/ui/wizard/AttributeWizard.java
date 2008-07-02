@@ -39,14 +39,14 @@ public class AttributeWizard {
 	private boolean isEnvironmentAttribute = false;
 	private boolean isActionAttribute = false;
 	
-	public AttributeWizard(String identifier, String value) throws UnsupportedAttributeException {
+	public AttributeWizard(String identifier, String value) {
 		boolean found = false;
-		for (Attribute attr:Attribute.values()) {
-			if (attr.id.equals(identifier)) {
-				this.attributeId = attr.xacmlId;
-				this.dataType = attr.dataType;
+		for (Attribute supportedAttribute:Attribute.values()) {
+			if (supportedAttribute.id.equals(identifier)) {
+				this.attributeId = supportedAttribute.xacmlId;
+				this.dataType = supportedAttribute.dataType;
 				this.value = value;
-				switch (attr.category) {
+				switch (supportedAttribute.category) {
 				case SUBJECT:
 					isSubjectAttribute = true;
 				break;
@@ -64,7 +64,10 @@ public class AttributeWizard {
 			}
 		}
 		if (!found) {
-			throw new UnsupportedAttributeException();
+			this.attributeId = identifier;
+			this.dataType = DataType.STRING;
+			this.value = value;
+			isSubjectAttribute = true;
 		}
 	}
 	
