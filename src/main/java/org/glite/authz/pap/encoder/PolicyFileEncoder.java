@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.lang.String;
+import org.glite.authz.pap.ui.wizard.*;
 
 public class PolicyFileEncoder {
     BWParser parser;
@@ -22,7 +23,7 @@ public class PolicyFileEncoder {
         }
     }
 
-    private String doParse() throws EncodingException {
+    private PolicySetType doParse() throws EncodingException {
         try {
             String s = parser.Text();
 
@@ -33,17 +34,17 @@ public class PolicyFileEncoder {
         }
     }
 
-    public String parse(InputStream stream) throws EncodingException {
+    public PolicySetType parse(InputStream stream) throws EncodingException {
         init(stream);
         return doParse();
     }
 
-    public String parse(String text) throws EncodingException {
+    public PolicySetType parse(String text) throws EncodingException {
         init(new ByteArrayInputStream(text.getBytes()));
         return doParse();
     }
 
-    public String parse(File file) throws EncodingException {
+    public PolicySetType parse(File file) throws EncodingException {
         try {
             init(new FileInputStream(file));
         } catch (FileNotFoundException e) {
@@ -52,22 +53,22 @@ public class PolicyFileEncoder {
         return doParse();
     }
 
-    public static void main(String[] args) {
-        PolicyFileEncoder encoder = new PolicyFileEncoder();
+//     public static void main(String[] args) {
+//         PolicyFileEncoder encoder = new PolicyFileEncoder();
 
-        try {
-            if (args.length > 0) {
-                int i = 0;
-                while (i < args.length) {
-                    File f = new File(args[i++]);
-                    System.out.println(encoder.parse(f));
-                }
-            }
-            else
-                System.out.println(encoder.parse(System.in));
-        }
-        catch (EncodingException e) {
-            System.out.println(e.toString());
-        }
-    }
+//         try {
+//             if (args.length > 0) {
+//                 int i = 0;
+//                 while (i < args.length) {
+//                     File f = new File(args[i++]);
+//                     System.out.println(encoder.parse(f));
+//                 }
+//             }
+//             else
+//                 System.out.println(encoder.parse(System.in));
+//         }
+//         catch (EncodingException e) {
+//             System.out.println(e.toString());
+//         }
+//     }
 }

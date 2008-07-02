@@ -3,6 +3,7 @@ package org.glite.authz.pap.encoder;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.String;
+import org.glite.authz.pap.ui.wizard.*;
 
 class SingleCondition {
     int type;
@@ -57,183 +58,121 @@ class Policy {
     int type;
     Conds conds;
     Policies policies;
-    public static final int POLICY_TYPE_BW    = 0;
-    public static final int POLICY_TYPE_CLASS = 1;
-    private int index;
+    public static final int POLICY_TYPE_BW      = 0;
+    public static final int POLICY_TYPE_CLASS   = 1;
+    public static final int POLICY_TYPE_UNKNOWN = -1;
 
     public Policy() {
         type = POLICY_TYPE_BW;
     }
 
-    public String Output() {
+    public PolicySetType Output(int previousType) {
         if (type == POLICY_TYPE_BW)
-            return OutputBW();
+            return OutputBW(previousType);
         else
-            return OutputSClass();
+            return OutputSClass(previousType);
     }
 
-    private String OutputBW() {
-        String XACML="<xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-    "<PolicySet\n" +
-    "  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\"\n" +
-    "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-    "  xsi:schemaLocation=\"urn:oasis:names:tc:xacml:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\"\n" +
-    "  PolicySetId=\"black-and-white\"" +
-    "  PolicyCombiningAlgId=\"urn:oasis:names:tc:xacml:2.0:policy-combining-algorithm:ordered-deny-overrides\">" +
-            " <Target></Target>\n";
+    private PolicySetType OutputBW(int previousType) {
+        PolicySetType policySet = null;
 
-        int i = 0;
-        int j = 0;
+        if (previousType == POLICY_TYPE_CLASS)
+            policySet = ServiceClassPolicySet.build();
+        else
+            policySet = BlackListPolicySet.build();
+
 
         Enumeration conditions = conds.fullconditions.elements();
 
         while (conditions.hasMoreElements()) {
             FullCondition fc = (FullCondition)conditions.nextElement();
-            XACML += OutputFC(fc);
+            PolicyType policy = OutputFC(fc, previousType);
+
+            PolicySetHelper.addPolicyReference(policySet, policy.getPolicyId());
         }
-        XACML += "</PolicySet>";
-        return XACML;
+
+        return policySet
     }
 
-    private String OutputSClass() {
-        String XACML = "<xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-    "<PolicySet\n" +
-    "  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\"\n" +
-    "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-    "  xsi:schemaLocation=\"urn:oasis:names:tc:xacml:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\"\n" +
-    "  PolicySetId=\"specificclass\"" +
-    "  PolicyCombiningAlgId=\"urn:oasis:names:tc:xacml:2.0:policy-combining-algorithm:ordered-deny-overrides\">" +
-    " <Target></Target>\n";
-        
-        XACML += policies.Output();
-
-        XACML += 
-    " <Obligations>\n" +
-    "   <Obligation ObligationId=\"SERVICE_CLASS_ASSIGNMENT\" FulfillOn=\"Permit\">\n" +
-    "     <AttributeAssignment AttributeId=\"SERVICECLASS\">\n       ";
-
-        XACML += name;
-        XACML += "\n" +
-    "     </AttributeAssignment>\n" +
-    "   </Obligation>\n" +
-    " </Obligations>\n" +
-    "</PolicySet>\n";
-        return XACML;
+    private PolicySetType OutputSClass(int previousType) {
+        return policies.Output(POLICY_TYPE_CLASS);
     }
 
-    private String OutputFC(FullCondition fc) {
-        String XACML = "<Policy\n" +
-      "  PolicyId=\"policy" + index++ + "\"\n" +
-      "  RuleCombiningAlgorithmId=\"urn:oasis:names:tc:xacml:2.0:policy-combining-algorithm:ordered-deny-override\">\n" +
-      "   <Target>\n" +
-      "     <Resources>\n" +
-      "       <Resource>\n";
-        if (name.compareTo("\"*\"") != 0)
-            XACML += "         " + name + "\n";
-
-        XACML += "       </Resource>\n" +
-      "     </Resources>\n" +
-      "   </Target>\n";
-
+    private PolicyType OutputFC(FullCondition fc, int previousType) {
         ConditionRow denys = fc.simples;
         ConditionList excepts = fc.excepts;
 
-        XACML += "   <Rule RuleId=\"rule" + index++ +"\n" +
-            "         Effect=\"";
-        if (fc.allow)
-            XACML += "Permit";
-        else
-            XACML += "Deny";
-                
-        XACML += "\">\n" +
-      "     <Condition>\n" +
-      "       <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0;function:and\">\n";
+        List<AttributeWizard> targetAttributeList = new LinkedList<AttributeWizard>();
+        targetAttributeList.add(new AttributeWizard("resource_uri", name));
 
         Enumeration singles = denys.singles.elements();
         while (singles.hasMoreElements()) {
-            XACML += OutputCondition((SingleCondition) singles.nextElement());
+            targetAttributeList.add(OutputCondition((SingleCondition) singles.nextElement()));
         }
 
+        List<List<AttributeWizard>> exceptList = new LinkedList<List<AttributeWizard>>();
         if (excepts != null) {
             Enumeration exceptlist = excepts.rows.elements();
+
             while (exceptlist.hasMoreElements()) {
-                XACML +=  "         <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:not\">\n" +
-                    "           <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0;function:and\">\n";
                 Enumeration singlesexcepts = ((ConditionRow)(exceptlist.nextElement())).singles.elements();
+                List<AttributeWizard> exceptRowList = new LinkedList<AttributeWizard>();
                 while (singlesexcepts.hasMoreElements()) {
-                    XACML += OutputCondition((SingleCondition) singlesexcepts.nextElement());
+                    exceptRowList.add(OutputCondition((SingleCondition) singlesexcepts.nextElement()));
                 }
-                XACML +=       "           </Apply>\n" +
-                    "         </Apply>\n";
+                exceptsList.add(exceptRowList);
             }
         }
 
-        XACML +=       "       </Apply>\n" +
-      "     </Condition>\n" +
-      "   </Rule>\n" +
-            " </Policy>\n";
+        PolicyType policy = null;
 
-        return XACML;
+        switch (previousType) {
+        case POLICY_TYPE_BW:
+            policy = new BlacklistPolicy.build(targetAttributeList, exceptList);
+            break;
+
+        case POLICY_TYPE_SCLASS:
+            policy = new ServiceClassPolicy(targetAttributeList, exceptList, (fc.allow ? "Permit" : "Deny"));
+            break;
+
+        case POLICY_TYPE_UNKNOWN:
+            Random gen = new Random();
+            String id = "policy_" + gen.nextLong();
+            policy = new PolicyWizard.build(id, targetAttributeList, exceptList,
+                                            (fc.allow ? "Permit" : "Deny"));
+            break;
+        }
+
+        return policy;
     }
 
-    private String OutputCondition(SingleCondition sc) {
-        String XACML = new String();
-
+    private AttributeWizard OutputCondition(SingleCondition sc) {
         switch (sc.type) {
 
         case SingleCondition.TYPE_FQAN:
-            XACML = 
-                    "       <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n" +
-                    "         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" +
-                    "         <AttributeValue DataType=\"FQAN\">" + sc.value1 + "</AttributeValue>\n" +
-                    "         <SubjectAttributeDesignator \n" +
-                    "           AttributeId=\"FQANS\" DataType=\"FQAN\">\n" +
-                    "       </Apply>\n";
+            return new AttributeWizard("fqan", sc.value1);
             break;
-            
+
         case SingleCondition.TYPE_DN:
-            XACML =
-                    "       <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n" +
-                    "         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" +
-                    "         <AttributeValue DataType=\"DN\">" + sc.value1 + "</AttributeValue>\n" +
-                    "         <SubjectAttributeDesignator \n" +
-                    "           AttributeId=\"FQANS\" DataType=\"FQAN\">\n" +
-                    "       </Apply>\n";
+            return new AttributeWizard("dn", sc.value1);
             break;
 
         case SingleCondition.TYPE_GA:
-            XACML =
-                    "       <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n" +
-                    "         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" +
-                    "         <AttributeValue DataType=\"GA\">" +
-                sc.value1 + "=" + sc.value2 + "</AttributeValue>\n" +
-                    "         <SubjectAttributeDesignator \n" +
-                    "           AttributeId=\"GenericAttribute\" DataType=\"GA\">\n" +
-                "       </Apply>\n";
+            return new AttributeWizard(sc.value1, sc.value2);
             break;
 
         case SingleCondition.TYPE_CERT:
-            XACML =
-                    "       <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n" +
-                    "         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" +
-                    "         <AttributeValue DataType=\"CERT\">" +
-                sc.value1 + ":" + sc.value2 +"</AttributeValue>\n" +
-                    "         <SubjectAttributeDesignator \n" +
-                    "           AttributeId=\"CertificateIdentifier\" DataType=\"CERT\">\n" +
-                "       </Apply>\n";
+            return new AttributeWizard("cert", sc.value1 + ":" + sc.value2);
             break;
 
         case SingleCondition.TYPE_PILOT:
-            XACML =
-                    "       <Apply FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:any-of\">\n" +
-                    "         <Function FunctionId=\"urn:oasis:names:tc:xacml:1.0:function:string-equal\">\n" +
-                    "         <AttributeValue DataType=\"PILOT\">" +
-                (sc.yesorno ? "Yes" : "No") +"</AttributeValue>\n" +
-                    "         <SubjectAttributeDesignator \n" +
-                "           AttributeId=\"PilotIdentifier\" DataType=\"PILOT\">\n"; 
+            return new AttributeWizard("pilot", (sc.yesorno ? "Yes" : "No"));
+            break;
+
+        case SingleCondition.TYPE_RESOURCE:
+            return new AttributeWizard("resource_uri", sc.value1);
             break;
         }
-        return XACML;
     }
 };
 
@@ -244,24 +183,20 @@ class Policies {
         policies = new Vector();
     }
 
-    public String Output() {
+    public List<XACMLObject> Output() {
         String XACML = new String();
         Enumeration i = policies.elements();
 
-        XACML =     "<PolicySet\n" +
-    "  xmlns=\"urn:oasis:names:tc:xacml:2.0:policy:schema:os\"\n" +
-    "  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" +
-    "  xsi:schemaLocation=\"urn:oasis:names:tc:xacml:schema:os http://docs.oasis-open.org/xacml/access_control-xacml-2.0-policy-schema-os.xsd\"\n" +
-    "  PolicySetId=\"all-policies\"" +
-    "  PolicyCombiningAlgId=\"urn:oasis:names:tc:xacml:2.0:policy-combining-algorithm:ordered-deny-overrides\">" +
-            " <Target></Target>\n";
+        List <XACMLObject> resultList = new LinkedList<XACMLObject>();
+
+        PolicySetType localPAPPolicySet = LocalPAPPolicySet.build();
 
         while (i.hasMoreElements()) {
-            XACML += ((Policy)i.nextElement()).Output();
+            localPAPPolicySet.add(((Policy)i.nextElement()).Output());
         }
+        resultList.add(localPAPPolicySet);
 
-        XACML += "</PolicySet>";
-        return XACML;
+        return resultList;
     }
 };
 
