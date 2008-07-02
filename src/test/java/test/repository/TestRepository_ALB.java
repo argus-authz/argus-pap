@@ -28,6 +28,7 @@ import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.glite.authz.pap.ui.wizard.AttributeWizard;
+import org.glite.authz.pap.ui.wizard.UnsupportedAttributeException;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -57,7 +58,7 @@ public class TestRepository_ALB {
 	private static final String tempOutputDir = "/tmp/pap_output_dir";
 	private static final String policyRepositoryFile = "/home/alb/pap/policy_repository.txt";
 
-	public static void main(String[] args) throws ConfigurationException {
+	public static void main(String[] args) throws ConfigurationException, UnsupportedAttributeException {
 		
 //		DistributionModule dm = DistributionModule.getInstance();
 //		dm.start();
@@ -109,15 +110,15 @@ public class TestRepository_ALB {
 		
 		List<AttributeWizard> attributeList = new LinkedList<AttributeWizard>();
 		for (int i=0; i<2; i++) {
-			AttributeWizard entry = new AttributeWizard(AttributeWizard.Type.SUBJECT_FQAN, "FQAN_" + i);
+			AttributeWizard entry = new AttributeWizard("fqan", "FQAN_" + i);
 			attributeList.add(entry);
 		}
 		for (int i=0; i<2; i++) {
-			AttributeWizard entry = new AttributeWizard(AttributeWizard.Type.SUBJECT_DN, "DN_" + i);
+			AttributeWizard entry = new AttributeWizard("dn", "DN_" + i);
 			attributeList.add(entry);
 		}
 		for (int i=0; i<2; i++) {
-			AttributeWizard entry = new AttributeWizard(AttributeWizard.Type.RESOURCE_RESOURCE_URI, "RESOURCE_URI_" + i);
+			AttributeWizard entry = new AttributeWizard("resource_uri", "RESOURCE_URI_" + i);
 			attributeList.add(entry);
 		}
 		PolicyType policy = PolicyWizard.build("prova", attributeList, attributeList, EffectType.Deny);

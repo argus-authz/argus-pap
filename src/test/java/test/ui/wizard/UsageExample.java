@@ -10,6 +10,7 @@ import org.glite.authz.pap.ui.wizard.BlacklistPolicy;
 import org.glite.authz.pap.ui.wizard.BlacklistPolicySet;
 import org.glite.authz.pap.ui.wizard.LocalPAPPolicySet;
 import org.glite.authz.pap.ui.wizard.ServiceClassPolicySet;
+import org.glite.authz.pap.ui.wizard.UnsupportedAttributeException;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -35,10 +36,18 @@ public class UsageExample {
 
 		// Blacklist stuff example
 		List<AttributeWizard> targetAttributeList = new LinkedList<AttributeWizard>();
-		targetAttributeList.add(new AttributeWizard(AttributeWizard.Type.SUBJECT_FQAN, "FQAN_value"));
+		try {
+			targetAttributeList.add(new AttributeWizard("fqan", "FQAN_value"));
+		} catch (UnsupportedAttributeException e) {
+			// ERROR... must do something here....
+		}
 		
 		List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
-		exceptionsAttributeList.add(new AttributeWizard(AttributeWizard.Type.SUBJECT_DN, "DN_value"));
+		try {
+			exceptionsAttributeList.add(new AttributeWizard("dn", "DN_value"));
+		} catch (UnsupportedAttributeException e) {
+			// ERROR... must do something here....
+		}
 		
 		PolicyType blacklistPolicy = BlacklistPolicy.build(targetAttributeList, exceptionsAttributeList);
 		
