@@ -38,17 +38,19 @@ public class UsageExample {
 		List<AttributeWizard> targetAttributeList = new LinkedList<AttributeWizard>();
 		targetAttributeList.add(new AttributeWizard("fqan", "FQAN_value"));
 		
-		List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
-		exceptionsAttributeList.add(new AttributeWizard("dn", "DN_value"));
+		List<List<AttributeWizard>> orExceptionsList = new LinkedList<List<AttributeWizard>>();
+		List<AttributeWizard> andExceptionsList = new LinkedList<AttributeWizard>();
+		andExceptionsList.add(new AttributeWizard("dn", "DN_value"));
+		andExceptionsList.add(new AttributeWizard("pilot", "yes"));
+		orExceptionsList.add(andExceptionsList);
 		
-		PolicyType blacklistPolicy = BlacklistPolicy.build(targetAttributeList, exceptionsAttributeList);
+		PolicyType blacklistPolicy = BlacklistPolicy.build(targetAttributeList, orExceptionsList);
 		
 		// add the whole policy (in this case do not add the policy to the "resultList")
 		PolicySetHelper.addPolicy(blacklistPolicySet, blacklistPolicy);
 		
 		// ...or add a reference
-		exceptionsAttributeList.clear();
-		blacklistPolicy = BlacklistPolicy.build(targetAttributeList, exceptionsAttributeList);
+		blacklistPolicy = BlacklistPolicy.build(targetAttributeList, orExceptionsList);
 		PolicySetHelper.addPolicyReference(blacklistPolicySet, blacklistPolicy.getPolicyId());
 		resultList.add(blacklistPolicy);
 		

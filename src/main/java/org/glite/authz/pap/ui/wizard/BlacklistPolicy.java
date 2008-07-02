@@ -11,7 +11,7 @@ public class BlacklistPolicy {
 	private BlacklistPolicy() {}
 	
 	public static PolicyType build(List<AttributeWizard> targetAttributeList,
-			List<AttributeWizard> exceptionsAttributeList) {
+			List<List<AttributeWizard>> exceptionsAttributeList) {
 		
 		Random generator = new Random();
 		String id = "blacklist_" + generator.nextLong(); 

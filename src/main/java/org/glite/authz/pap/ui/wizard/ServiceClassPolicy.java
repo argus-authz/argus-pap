@@ -11,7 +11,7 @@ public class ServiceClassPolicy {
 	private ServiceClassPolicy() {}
 	
 	public static PolicyType build(List<AttributeWizard> targetAttributeList,
-			List<AttributeWizard> exceptionsAttributeList, EffectType effect) {
+			List<List<AttributeWizard>> exceptionsAttributeList, EffectType effect) {
 		
 		Random generator = new Random();
 		String id = "serviceclass_" + generator.nextLong(); 

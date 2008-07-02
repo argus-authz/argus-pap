@@ -109,19 +109,29 @@ public class TestRepository_ALB {
 		System.exit(0);
 		
 		List<AttributeWizard> attributeList = new LinkedList<AttributeWizard>();
+		List<List<AttributeWizard>> exceptionsList = new LinkedList<List<AttributeWizard>>();
 		for (int i=0; i<2; i++) {
 			AttributeWizard entry = new AttributeWizard("fqan", "FQAN_" + i);
 			attributeList.add(entry);
+			LinkedList<AttributeWizard> list = new LinkedList<AttributeWizard>();
+			list.add(entry);
+			exceptionsList.add(list);
 		}
 		for (int i=0; i<2; i++) {
 			AttributeWizard entry = new AttributeWizard("dn", "DN_" + i);
 			attributeList.add(entry);
+			LinkedList<AttributeWizard> list = new LinkedList<AttributeWizard>();
+			list.add(entry);
+			exceptionsList.add(list);
 		}
 		for (int i=0; i<2; i++) {
 			AttributeWizard entry = new AttributeWizard("resource_uri", "RESOURCE_URI_" + i);
 			attributeList.add(entry);
+			LinkedList<AttributeWizard> list = new LinkedList<AttributeWizard>();
+			list.add(entry);
+			exceptionsList.add(list);
 		}
-		PolicyType policy = PolicyWizard.build("prova", attributeList, attributeList, EffectType.Deny);
+		PolicyType policy = PolicyWizard.build("prova", attributeList, exceptionsList, EffectType.Deny);
 		pln("Creata la policy");
 		
 		pln("Ora scrivo su file");

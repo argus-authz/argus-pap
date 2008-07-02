@@ -24,10 +24,14 @@ import org.opensaml.xacml.policy.TargetType;
 public class PolicyWizard {
 
 	public static PolicyType build(String policyId, List<AttributeWizard> targetAttributeList,
-			List<AttributeWizard> exceptionsAttributeList, EffectType effect) {
+			List<List<AttributeWizard>> orExceptionsAttributeList, EffectType effect) {
 		
-		PolicyType policy = PolicyHelper.buildWithAnyTarget(policyId,
-				PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+		List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
+		for (List<AttributeWizard> andList:orExceptionsAttributeList) {
+			exceptionsAttributeList.addAll(andList);
+		}
+		// TODO: gestire list exceptions Or e AND
+		PolicyType policy = PolicyHelper.buildWithAnyTarget(policyId, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 		
 		List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
 		List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();
