@@ -4,6 +4,16 @@ import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
+import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.XACMLObject;
+import java.util.List;
+import java.util.LinkedList;
+import java.util.Random;
+
+
+
 
 class SingleCondition {
     int type;
@@ -79,7 +89,7 @@ class Policy {
         if (previousType == POLICY_TYPE_CLASS)
             policySet = ServiceClassPolicySet.build();
         else
-            policySet = BlackListPolicySet.build();
+            policySet = BlacklistPolicySet.build();
 
 
         Enumeration conditions = conds.fullconditions.elements();
@@ -91,11 +101,21 @@ class Policy {
             PolicySetHelper.addPolicyReference(policySet, policy.getPolicyId());
         }
 
-        return policySet
+        return policySet;
     }
 
     private PolicySetType OutputSClass(int previousType) {
-        return policies.Output(POLICY_TYPE_CLASS);
+        PolicySetType policySet = ServiceClassPolicySet.build();
+
+        Vector policiesList = policies.policies;
+
+        Enumeration i = policiesList.elements();
+
+        while (i.hasMoreElements()) {
+            PolicySetHelper.addPolicySetReference(policySet, (((Policy)i.nextElement()).Output(previousType)).getPolicySetId());
+        }
+
+        return policySet;
     }
 
     private PolicyType OutputFC(FullCondition fc, int previousType) {
@@ -110,17 +130,17 @@ class Policy {
             targetAttributeList.add(OutputCondition((SingleCondition) singles.nextElement()));
         }
 
-        List<List<AttributeWizard>> exceptList = new LinkedList<List<AttributeWizard>>();
+        List<List<AttributeWizard>> exceptsAttributes = new LinkedList<List<AttributeWizard>>();
         if (excepts != null) {
-            Enumeration exceptlist = excepts.rows.elements();
+            Enumeration exceptList = excepts.rows.elements();
 
-            while (exceptlist.hasMoreElements()) {
-                Enumeration singlesexcepts = ((ConditionRow)(exceptlist.nextElement())).singles.elements();
+            while (exceptList.hasMoreElements()) {
+                Enumeration singlesexcepts = ((ConditionRow)(exceptList.nextElement())).singles.elements();
                 List<AttributeWizard> exceptRowList = new LinkedList<AttributeWizard>();
                 while (singlesexcepts.hasMoreElements()) {
                     exceptRowList.add(OutputCondition((SingleCondition) singlesexcepts.nextElement()));
                 }
-                exceptsList.add(exceptRowList);
+                exceptsAttributes.add(exceptRowList);
             }
         }
 
@@ -128,18 +148,14 @@ class Policy {
 
         switch (previousType) {
         case POLICY_TYPE_BW:
-            policy = new BlacklistPolicy.build(targetAttributeList, exceptList);
+            policy = BlacklistPolicy.build(targetAttributeList, exceptsAttributes);
             break;
 
-        case POLICY_TYPE_SCLASS:
-            policy = new ServiceClassPolicy(targetAttributeList, exceptList, (fc.allow ? "Permit" : "Deny"));
+        case POLICY_TYPE_CLASS:
+            policy = ServiceClassPolicy.build(targetAttributeList, exceptsAttributes, (fc.allow ? org.opensaml.xacml.policy.EffectType.Permit : org.opensaml.xacml.policy.EffectType.Deny));
             break;
 
         case POLICY_TYPE_UNKNOWN:
-            Random gen = new Random();
-            String id = "policy_" + gen.nextLong();
-            policy = new PolicyWizard.build(id, targetAttributeList, exceptList,
-                                            (fc.allow ? "Permit" : "Deny"));
             break;
         }
 
@@ -177,14 +193,13 @@ class Policy {
 };
 
 class Policies {
-    Vector policies;
+    public Vector policies;
 
     public Policies() {
         policies = new Vector();
     }
 
     public List<XACMLObject> Output() {
-        String XACML = new String();
         Enumeration i = policies.elements();
 
         List <XACMLObject> resultList = new LinkedList<XACMLObject>();
@@ -192,11 +207,10 @@ class Policies {
         PolicySetType localPAPPolicySet = LocalPAPPolicySet.build();
 
         while (i.hasMoreElements()) {
-            localPAPPolicySet.add(((Policy)i.nextElement()).Output());
+            PolicySetHelper.addPolicySetReference(localPAPPolicySet, (((Policy)i.nextElement()).Output(Policy.POLICY_TYPE_BW)).getPolicySetId());
         }
         resultList.add(localPAPPolicySet);
 
         return resultList;
     }
 };
-

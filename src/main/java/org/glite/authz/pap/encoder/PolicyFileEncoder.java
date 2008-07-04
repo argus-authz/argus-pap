@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.File;
 import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
+import org.opensaml.xacml.policy.PolicySetType;
 
 public class PolicyFileEncoder {
     BWParser parser;
@@ -25,9 +26,7 @@ public class PolicyFileEncoder {
 
     private PolicySetType doParse() throws EncodingException {
         try {
-            String s = parser.Text();
-
-            return s;
+            return parser.Text();
         }
         catch (ParseException e) {
             throw new EncodingException(e);
