@@ -2,10 +2,12 @@
 package org.glite.authz.pap.encoder;
 import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
+import org.opensaml.xacml.XACMLObject;
+import java.util.List;
 
 class BWParser implements BWParserConstants {
 
-  static final public PolicySetType Text() throws ParseException {
+  static final public List<XACMLObject> Text() throws ParseException {
   Policies policies = null;
   Policies allpolicies = new Policies();
   String output = new String();

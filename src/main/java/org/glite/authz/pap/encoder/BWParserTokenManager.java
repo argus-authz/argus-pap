@@ -2,6 +2,8 @@
 package org.glite.authz.pap.encoder;
 import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
+import org.opensaml.xacml.XACMLObject;
+import java.util.List;
 
 public class BWParserTokenManager implements BWParserConstants
 {

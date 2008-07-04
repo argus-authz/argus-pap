@@ -2,6 +2,8 @@ PARSER_BEGIN(BWParser)
 package org.glite.authz.pap.encoder;
 import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
+import org.opensaml.xacml.XACMLObject;
+import java.util.List;
 
 class BWParser {
 //     public static String main(String args[]) throws ParseException {
@@ -73,7 +75,7 @@ TOKEN:
 }
 
 
-PolicySetType Text() :
+List<XACMLObject> Text() :
 {
   Policies policies = null;
   Policies allpolicies = new Policies();

@@ -1,13 +1,13 @@
 package org.glite.authz.pap.encoder;
 
+import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.XACMLObject;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
-import org.opensaml.xacml.policy.PolicySetType;
-import org.opensaml.xacml.policy.PolicyType;
-import org.opensaml.xacml.XACMLObject;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.Random;
@@ -167,28 +167,23 @@ class Policy {
 
         case SingleCondition.TYPE_FQAN:
             return new AttributeWizard("fqan", sc.value1);
-            break;
 
         case SingleCondition.TYPE_DN:
             return new AttributeWizard("dn", sc.value1);
-            break;
 
         case SingleCondition.TYPE_GA:
             return new AttributeWizard(sc.value1, sc.value2);
-            break;
 
         case SingleCondition.TYPE_CERT:
             return new AttributeWizard("cert", sc.value1 + ":" + sc.value2);
-            break;
 
         case SingleCondition.TYPE_PILOT:
             return new AttributeWizard("pilot", (sc.yesorno ? "Yes" : "No"));
-            break;
 
         case SingleCondition.TYPE_RESOURCE:
             return new AttributeWizard("resource_uri", sc.value1);
-            break;
         }
+        return null;
     }
 };
 
