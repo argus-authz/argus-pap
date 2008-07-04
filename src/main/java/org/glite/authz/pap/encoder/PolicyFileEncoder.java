@@ -7,6 +7,8 @@ import java.io.File;
 import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
 import org.opensaml.xacml.policy.PolicySetType;
+import java.util.List;
+import org.opensaml.xacml.XACMLObject;
 
 public class PolicyFileEncoder {
     BWParser parser;
@@ -24,7 +26,7 @@ public class PolicyFileEncoder {
         }
     }
 
-    private PolicySetType doParse() throws EncodingException {
+    private List<XACMLObject> doParse() throws EncodingException {
         try {
             return parser.Text();
         }
@@ -33,17 +35,17 @@ public class PolicyFileEncoder {
         }
     }
 
-    public PolicySetType parse(InputStream stream) throws EncodingException {
+    public  List<XACMLObject> parse(InputStream stream) throws EncodingException {
         init(stream);
         return doParse();
     }
 
-    public PolicySetType parse(String text) throws EncodingException {
+    public  List<XACMLObject> parse(String text) throws EncodingException {
         init(new ByteArrayInputStream(text.getBytes()));
         return doParse();
     }
 
-    public PolicySetType parse(File file) throws EncodingException {
+    public  List<XACMLObject> parse(File file) throws EncodingException {
         try {
             init(new FileInputStream(file));
         } catch (FileNotFoundException e) {
