@@ -145,7 +145,7 @@ public class TestRepository_ALB {
 		PolicyFileEncoder  penc = new PolicyFileEncoder();
 		
 		File prFile = new File(policyRepositoryFile);
-		String policies = "";
+		List<XACMLObject> policies = null;
 		try {
 			policies = penc.parse(prFile);
 		} catch (EncodingException e) {
@@ -154,7 +154,16 @@ public class TestRepository_ALB {
 		}
 		
 		pln("PolicyRepository read... here it is:");
-		pln(policies);
+		for (XACMLObject xacmlObject:policies) {
+			if (xacmlObject instanceof PolicySetType) {
+          System.out.println("PolicySet: " + ((PolicySetType)xacmlObject).getPolicySetId());
+//				PolicySetHelper.getInstance().toFile("/tmp/PolicySet_" + ((PolicySetType)xacmlObject).getPolicySetId() + ".xml", (PolicySetType)xacmlObject);
+			} else if (xacmlObject instanceof PolicyType) {
+          System.out.println("Policy   : " + ((PolicyType)xacmlObject).getPolicyId());
+//				PolicyHelper.getInstance().toFile("/tmp/Policy_" + ((PolicyType)xacmlObject).getPolicyId() + ".xml", (PolicyType)xacmlObject);
+			}
+		}
+
 		pln("Game over");
 	}
 	
