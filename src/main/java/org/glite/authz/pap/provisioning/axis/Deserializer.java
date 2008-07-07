@@ -26,7 +26,7 @@ import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.DeserializerImpl;
 import org.apache.axis.message.MessageElement;
 import org.opensaml.Configuration;
-import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
+import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Unmarshaller;
 import org.opensaml.xml.io.UnmarshallerFactory;
 import org.w3c.dom.Element;
@@ -54,10 +54,9 @@ public class Deserializer extends DeserializerImpl {
 			UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
 			Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
 			
-      XACMLPolicyQueryType policyQuery = 
-        (XACMLPolicyQueryType) unmarshaller.unmarshall(element);
+      XMLObject xmlObject = unmarshaller.unmarshall(element);
 			
-     setValue(policyQuery);
+      setValue(xmlObject);
      
 		} 
 		

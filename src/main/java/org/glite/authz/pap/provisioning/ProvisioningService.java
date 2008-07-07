@@ -62,14 +62,11 @@ public class ProvisioningService {
 
     /* get local policies */
     
-    // List<XACMLObject> resultList = ProvisioningServiceDAO.getInstance().papQuery();
-    // or
     List<XACMLObject> resultList = ProvisioningServiceDAO.getInstance().pdpQuery();
     
     /* prepare the response */
 
-//    Response response = ProvisioningServiceUtils.createResponse( query , resultList );
-    Response response = null;
+    Response response = ProvisioningServiceUtils.createResponse( query , resultList );
 
     if ( logger.isDebugEnabled() ) {
       logger.debug( ProvisioningServiceUtils.xmlObjectToString( response ) );

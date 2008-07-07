@@ -33,6 +33,7 @@ import org.apache.axis.wsdl.fromJava.Types;
 import org.opensaml.Configuration;
 import org.opensaml.saml2.core.Assertion;
 import org.opensaml.saml2.core.Response;
+import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.signature.Signature;
@@ -60,15 +61,15 @@ public class Serializer implements org.apache.axis.encoding.Serializer
     try
     {
       
-      Response response = (Response) value;
+      XMLObject xmlObject = (XMLObject) value;
 
       /* call OpenSAML serializing */
 
       MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
-      Marshaller marshaller = marshallerFactory.getMarshaller(response);
-      Element element = marshaller.marshall(response);
+      Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
+      Element element = marshaller.marshall(xmlObject);
 
-      /* compute the signature value */
+      /* compute the signature value 
 
       List<Assertion> assertions = response.getAssertions();
       if (assertions.size() > 0)
@@ -81,6 +82,8 @@ public class Serializer implements org.apache.axis.encoding.Serializer
             Signer.signObject(signature);
         }
       }
+       
+      */
 
       /* */
 

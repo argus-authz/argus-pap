@@ -23,6 +23,7 @@
 package org.glite.authz.pap.provisioning;
 
 import java.io.StringReader;
+import java.util.Iterator;
 import java.util.UUID;
 
 import org.joda.time.DateTime;
@@ -40,7 +41,9 @@ import org.opensaml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.saml2.core.impl.ResponseBuilder;
 import org.opensaml.saml2.core.impl.StatusBuilder;
 import org.opensaml.saml2.core.impl.StatusCodeBuilder;
+import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyStatementType;
 import org.opensaml.xacml.profile.saml.impl.XACMLPolicyStatementTypeImplBuilder;
@@ -85,7 +88,7 @@ public class ProvisioningServiceUtils {
   }
 
   public static Response createResponse( XACMLPolicyQueryType inResponseTo ,
-                                         PolicySetType policySet ) {
+                                         java.util.List<XACMLObject> policyObjects ) {
 
     // get a builder factory
     XMLObjectBuilderFactory builderFactory = 
@@ -122,24 +125,45 @@ public class ProvisioningServiceUtils {
 
     assertion.setIssuer( issuer );
 
-    // build a policy statement object
+    /* build policy statements objects */
+
     XACMLPolicyStatementTypeImplBuilder policyStatementBuilder = 
       (XACMLPolicyStatementTypeImplBuilder) builderFactory.getBuilder( XACMLPolicyStatementType.TYPE_NAME_XACML20 );
-    XACMLPolicyStatementType policyStatement = 
-      policyStatementBuilder.buildObject( Statement.DEFAULT_ELEMENT_NAME , XACMLPolicyStatementType.TYPE_NAME_XACML20 );
     
-    policyStatement.getPolicySets().add( policySet );
+    Iterator<XACMLObject> iterator = policyObjects.iterator();
+    
+    while(iterator.hasNext()) {
+    
+      // build the policy statement
+      XACMLPolicyStatementType policyStatement = 
+        policyStatementBuilder.buildObject( Statement.DEFAULT_ELEMENT_NAME , XACMLPolicyStatementType.TYPE_NAME_XACML20 );
+    
+      // the objct is either a policy set or a policy
+      
+      XACMLObject xacmlObject = iterator.next();
+      
+      if(xacmlObject instanceof PolicySetType) {
+        
+        PolicySetType policySet = (PolicySetType) xacmlObject; 
+        policyStatement.getPolicySets().add( policySet );
+        
+      } else {
+        
+        PolicyType policy = (PolicyType) xacmlObject;
+        policyStatement.getPolicies().add( policy );
+      }
 
-    assertion.getStatements().add( policyStatement );
-
+      assertion.getStatements().add( policyStatement );
+    }
+    
     response.getAssertions().add( assertion );
 
-    // build a status object
+    //  build a status object
     StatusBuilder statusBuilder = 
       (StatusBuilder) builderFactory.getBuilder( Status.DEFAULT_ELEMENT_NAME );
     Status status = statusBuilder.buildObject();
 
-    // build a status code builder object
+    //  build a status code builder object
     StatusCodeBuilder statusCodeBuilder = 
       (StatusCodeBuilder) builderFactory.getBuilder( StatusCode.DEFAULT_ELEMENT_NAME );
     StatusCode statusCode = statusCodeBuilder.buildObject();
