@@ -1,22 +1,26 @@
 package org.glite.authz.pap.ui.wizard;
 
 import java.util.List;
-import java.util.Random;
 
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.PolicyType;
 
-public class BlacklistPolicy {
+public class BlacklistPolicy extends PolicyWizard {
+    
+    private static final String ID_PREFIX = "BlacklistPolicy_";
 	
-	private BlacklistPolicy() {}
-	
+	@Deprecated
 	public static PolicyType build(List<AttributeWizard> targetAttributeList,
 			List<List<AttributeWizard>> exceptionsAttributeList) {
 		
-		Random generator = new Random();
-		String id = "blacklist_" + generator.nextLong(); 
-		
-		return PolicyWizard.build(id, targetAttributeList, exceptionsAttributeList, EffectType.Deny);
+		return PolicyWizard.build(generateBlacklistPolicyId(), targetAttributeList, exceptionsAttributeList, EffectType.Deny);
 	}
 
+	private static String generateBlacklistPolicyId() {
+        return ID_PREFIX + generateRandomLong(); 
+	}
+	
+	public BlacklistPolicy(List<AttributeWizard> targetAttributeList, List<List<AttributeWizard>> orExceptionsAttributeList) {
+	    super(generateBlacklistPolicyId(), targetAttributeList, orExceptionsAttributeList, EffectType.Deny);
+	}
 }

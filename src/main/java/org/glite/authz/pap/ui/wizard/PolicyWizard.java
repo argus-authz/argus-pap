@@ -2,6 +2,7 @@ package org.glite.authz.pap.ui.wizard;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import org.glite.authz.pap.common.utils.xacml.ActionsHelper;
 import org.glite.authz.pap.common.utils.xacml.Functions;
@@ -21,8 +22,48 @@ import org.opensaml.xacml.policy.ResourcesType;
 import org.opensaml.xacml.policy.SubjectsType;
 import org.opensaml.xacml.policy.TargetType;
 
-public class PolicyWizard {
+public abstract class PolicyWizard {
+    
+    private final static Random generator = new Random();
+    private final PolicyType policy;
+    
+    protected PolicyWizard(String policyId, List<AttributeWizard> targetAttributeList,
+            List<List<AttributeWizard>> orExceptionsAttributeList, EffectType effect) {
+        
+        if (targetAttributeList == null) {
+            targetAttributeList = new LinkedList<AttributeWizard>();
+        }
+        if (orExceptionsAttributeList == null) {
+            orExceptionsAttributeList = new LinkedList<List<AttributeWizard>>();
+        }
+        
+        policy = PolicyHelper.buildWithAnyTarget(policyId, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+        
+        // TODO: gestire list exceptions Or e AND
+        List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
+        for (List<AttributeWizard> andList:orExceptionsAttributeList) {
+            exceptionsAttributeList.addAll(andList);
+        }
+        
+        List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
+        List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();
+        List<AttributeType> environmentAttributes = new LinkedList<AttributeType>();
+        divideIntoSubLists(targetAttributeList, subjectAttributes, resourceAttributes, environmentAttributes);
+        
+        policy.setTarget(createTarget(subjectAttributes, resourceAttributes, environmentAttributes));
+        subjectAttributes.clear();
+        resourceAttributes.clear();
+        environmentAttributes.clear();
+        divideIntoSubLists(exceptionsAttributeList, subjectAttributes, resourceAttributes, environmentAttributes);
+        policy.getRules().add(ExceptionsRule.build(subjectAttributes, resourceAttributes, environmentAttributes, effect));
+        
+    }
+    
+    public PolicyType getPolicyType() {
+        return policy;
+    }
 
+    @Deprecated
 	public static PolicyType build(String policyId, List<AttributeWizard> targetAttributeList,
 			List<List<AttributeWizard>> orExceptionsAttributeList, EffectType effect) {
 		
@@ -47,6 +88,10 @@ public class PolicyWizard {
 
 		return policy;
 	}
+    
+    protected static long generateRandomLong() {
+        return generator.nextLong(); 
+    }
 
 	private static TargetType createTarget(List<AttributeType> sbjAttr,
 			List<AttributeType> rsrcAttr, List<AttributeType> envAttr) {
@@ -81,6 +126,4 @@ public class PolicyWizard {
 		}
 	}
 
-	private PolicyWizard() {
-	}
 }
