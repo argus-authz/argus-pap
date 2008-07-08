@@ -6,6 +6,13 @@ public class PAPContext {
     String name;
     ACL acl;
     
+    
+    private PAPContext(String name) {
+
+        this.name = name;
+        acl = new ACL();
+        
+    }
     public String getName() {
     
         return name;
@@ -26,5 +33,8 @@ public class PAPContext {
         this.acl = acl;
     }
     
-    
+    public static PAPContext instance(String name) {
+
+        return new PAPContext(name);
+    }
 }

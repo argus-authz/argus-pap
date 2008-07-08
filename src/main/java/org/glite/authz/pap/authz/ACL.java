@@ -40,7 +40,14 @@ public class ACL {
         permissions.remove( a );
     }
     
-    @Override
+    
+    
+    public PAPPermission getAnyAuthenticatedUserPermissions(){
+        
+        return permissions.get( PAPAdminFactory.getAnyAuthenticatedUserAdmin() );
+    }
+    
+    
     public String toString() {
         return "\n"+StringUtils.join(permissions.entrySet().iterator(), "\n");
         

@@ -76,4 +76,37 @@ public class PAPPermission {
         
         return permissions.containsAll( perms );
     }
+    
+    public static PAPPermission getAllPermission(){
+        return PAPPermission.fromString( "ALL" );
+    }
+    
+    public static PAPPermission of (PermissionFlags p){
+        
+        PAPPermission papPerm = new PAPPermission();
+        papPerm.permissions.add( p );
+        return papPerm;
+    }
+
+    public static PAPPermission of (PermissionFlags first, PermissionFlags second){
+     
+        PAPPermission papPerm = new PAPPermission();
+        papPerm.permissions.add( first );
+        papPerm.permissions.add(second);
+        
+        return papPerm;
+    }
+    
+    
+    public static PAPPermission of(PermissionFlags first, PermissionFlags... flags){
+        
+        PAPPermission papPerm = new PAPPermission();
+        
+        papPerm.permissions.add(first);
+        
+        for (PermissionFlags p: flags)
+            papPerm.permissions.add(p);
+            
+        return papPerm;
+    }
 }

@@ -26,50 +26,36 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Valerio Venturi (valerio.venturi@cnaf.infn.it)
- *
+ * 
  */
-public class PAPContextListener implements ServletContextListener
-{
-  final Logger logger = LoggerFactory.getLogger(PAPContextListener.class);
-  
-  public PAPContextListener() {
-    super();
-  }
+public class PAPContextListener implements ServletContextListener {
 
-  public void contextInitialized(ServletContextEvent contextEvent) {
+    final Logger logger = LoggerFactory.getLogger( PAPContextListener.class );
 
-    // get the servlet context
-    ServletContext servletContext = contextEvent.getServletContext();
-   
-    /* get the value of the ConfigurationFile param in the context.xml file */
-    
-    String configurationFile = servletContext.getInitParameter("ConfigurationFile");
-    
-    if(configurationFile == null) {
-      logger.error( "Configuration file not given" );
-      throw new Error( "Configuration file not given" );
+    public PAPContextListener() {
+
+        super();
     }
-    
-    logger.info("Using configuration file " + configurationFile);
-    
-    /* instantiate the configuration object */
-    
-    try {
-      PAPConfiguration.getInstance(configurationFile);
-    } catch ( PAPConfigurationException e ) {
-      logger.error( e.getMessage() );
-      throw new Error(e);
-    }
-    
-  }
 
-  public void contextDestroyed(ServletContextEvent contextEvent) {
-  }
-  
+    public void contextInitialized( ServletContextEvent contextEvent ) {
+        
+        logger.info( "PAP service is being initialized!" );
+
+        // get the servlet context
+        ServletContext servletContext = contextEvent.getServletContext();
+
+        // Initialize configuaration
+        PAPConfiguration.initialize( servletContext );
+        
+    }
+
+    public void contextDestroyed( ServletContextEvent contextEvent ) {
+
+    }
+
 }
