@@ -24,9 +24,7 @@ package org.glite.authz.pap.provisioning;
 
 import java.util.List;
 
-import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
-import org.glite.authz.pap.repository.dao.ProvisioningServiceDAO;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
@@ -63,19 +61,15 @@ public class ProvisioningService {
     }
 
     /* get local policies */
+
+    /* TODO will check whether the query comes from a PAP or a PDP and possibly
+    use GetPoliciesForPAPOperation instead */
     
-    // List<XACMLObject> resultList = ProvisioningServiceDAO.getInstance().pdpQuery();
-    
-    // Do it with an Operation!!!
-    
-    // List<XACMLObject> resultList = GetPoliciesForPAPOperation.instance().execute();
-    // or
     List<XACMLObject> resultList = GetPoliciesForPDPOperation.instance().execute();
-    
+   
     /* prepare the response */
 
     Response response = ProvisioningServiceUtils.createResponse( query , resultList );
-
 
     if ( logger.isDebugEnabled() ) {
       logger.debug( ProvisioningServiceUtils.xmlObjectToString( response ) );
