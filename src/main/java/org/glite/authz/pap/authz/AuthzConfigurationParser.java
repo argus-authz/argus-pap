@@ -29,6 +29,9 @@ public final class AuthzConfigurationParser {
     public static final Pattern permissionPattern = Pattern
             .compile( permissionRegex );
 
+    public static final String anyUserRegex = "^ANYONE\\s*";
+    public static final Pattern anyUserPattern = Pattern.compile( anyUserRegex );
+    
     public static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
 
     public static final Pattern dnPattern = Pattern.compile( dnRegex );
@@ -120,8 +123,20 @@ public final class AuthzConfigurationParser {
             PAPPermission perm = PAPPermission.fromString( permissions );
 
             Matcher dnMatcher = dnPattern.matcher( principalName );
-
-            if ( dnMatcher.matches() ) {
+            Matcher anyUserMatcher = anyUserPattern.matcher( principalName );
+            
+            
+            if (anyUserMatcher.matches()){
+                
+                if ( !state.equals( ParserStates.DNs ) )
+                    throw new PAPAuthzConfigurationException(
+                            "Found an X509 ANYONE declaration outside of the [dn] stanza!" );
+                
+                PAPAdmin admin = PAPAdminFactory.getAnyAuthenticatedUserAdmin();
+                globalContextACL.setPermissions( admin,perm );
+                
+                
+            }else if ( dnMatcher.matches() ) {
 
                 if ( !state.equals( ParserStates.DNs ) )
                     throw new PAPAuthzConfigurationException(

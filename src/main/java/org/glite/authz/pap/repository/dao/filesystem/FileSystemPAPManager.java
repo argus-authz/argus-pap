@@ -47,8 +47,11 @@ public class FileSystemPAPManager implements PAPManager {
 		return directory.exists();
 	}
 
-	private String getPAPDirAbsolutePath(String papId) {
-		return dbDir + File.separator + papId;
+	public PAPContainer get(PAP pap) {
+		if (!exists(pap)) {
+			throw new NotFoundException();
+		} 
+		return new PAPContainer(pap);
 	}
 
 	public List<PAPContainer> getAll() {
@@ -63,10 +66,7 @@ public class FileSystemPAPManager implements PAPManager {
 		return idList;
 	}
 
-	public PAPContainer get(PAP pap) {
-		if (!exists(pap)) {
-			throw new NotFoundException();
-		} 
-		return new PAPContainer(pap);
+	private String getPAPDirAbsolutePath(String papId) {
+		return dbDir + File.separator + papId;
 	}
 }

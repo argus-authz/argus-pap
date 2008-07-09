@@ -1,14 +1,67 @@
 package org.glite.authz.pap.authz;
 
-import org.glite.authz.pap.common.PAPConfiguration;
+import java.io.File;
 
+import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
+import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 
 public class AuthorizationEngine {
 
-    public static void bootstrap(){
+    private boolean initialized = false;
+
+    private static AuthorizationEngine instance;
+
+    private PAPContext globalContext;
+
+    private AuthorizationEngine() {
         
+        String papConf = PAPConfiguration.instance()
+                .getPapAuthzConfigurationFileName();
+
+        File papConfFile = new File( papConf );
         
+        if ( !papConfFile.exists() )
+            throw new PAPConfigurationException(
+                    "PAP Authorization configuration file not found: "
+                            + papConfFile.getAbsolutePath() );
+
+        globalContext = PAPContext.instance( "global-context" );
+
+        // Parse ACL from configuration file
+        AuthzConfigurationParser confParser = AuthzConfigurationParser
+                .instance();
         
-        
+        confParser.parse( papConfFile );
+
+        globalContext.setAcl( confParser.getParsedACL() );
     }
+
+    public static AuthorizationEngine initialize(){
+        
+        if (instance == null)
+            instance = new AuthorizationEngine();
+        
+        return instance;
+    }
+    
+    
+    public static AuthorizationEngine instance() {
+
+        if ( instance == null )
+            throw new PAPAuthzException("Please initialize the authorization engine properly using the initialize method!");
+            
+        return instance;
+    }
+
+    public boolean isInitialized() {
+
+        return initialized;
+    }
+
+    public PAPContext getGlobalContext() {
+
+        return globalContext;
+    }
+
 }

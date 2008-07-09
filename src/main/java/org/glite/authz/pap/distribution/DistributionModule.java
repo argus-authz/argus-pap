@@ -1,6 +1,5 @@
 package org.glite.authz.pap.distribution;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,33 +7,41 @@ import java.util.List;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
+import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
+import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.PAPManager;
 import org.glite.authz.pap.repository.RepositoryManager;
+import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
 
-	private static final String remotePAPConfigurationFile = "/tmp/remote_pap_list.txt";
 	private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
-	private static DistributionModule instance = null;
+	private static DistributionModule instance = new DistributionModule();
+	private final ProvisioningServiceClient client;
 
 	public static DistributionModule getInstance() {
-		if (instance == null) {
-			instance = new DistributionModule();
-		}
 		return instance;
 	}
 
 	private List<PAP> remotePAPs = new ArrayList<PAP>();
 	private long sleepTime;
 
-	private DistributionModule() {
-		init();
+	public DistributionModule() {
+	    DistributionConfigurationParser conf = DistributionConfigurationParser.getInstance();
+	    sleepTime = conf.getPollingInterval();
+	    remotePAPs = conf.getRemotePAPs();
+	    
+	    ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory.getProvisioningServiceClientFactory();
+        client = factory.createPolicyProvisioningServiceClient();
+        
 	}
 
 	public void end() {
@@ -63,6 +70,12 @@ public class DistributionModule extends Thread {
 	private List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
 		List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 		
+		ProvisioningServicePortType port = client.getProvisioningServicePortType("http://example.org/ProvisioningService");
+		
+		XACMLPolicyQueryType query;
+		
+		//Response response = port.xacmlPolicyQuery(xacmlPolicyQueryType);
+		
 		// Fake policy generation... here the client gets the policies from the remote PAP
 		papPolicies.add(PolicySetHelper.buildWithAnyTarget(remotePAP.getPapId(), PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS));
 		for (int i=0; i<10; i++) {
@@ -75,15 +88,8 @@ public class DistributionModule extends Thread {
 	}
 
 	private void init() {
-		sleepTime = 15000;
-		File configFile = new File(remotePAPConfigurationFile);
-		if (configFile.exists()) {
-			log.info("Reading remote PAP list configuration file: " + remotePAPConfigurationFile);
-			remotePAPs = DistributionConfigurationParser.getInstance().parse(configFile);
-			log.info("Found " + remotePAPs.size() + " remote PAPs");
-		} else {
-			log.info("Remote PAP list configuration file not found: " + remotePAPConfigurationFile);
-		}
+	    
+		    
 	}
 
 	private void storePAPPolicies(PAP remotePAP, List<XACMLObject> papPolicies) {

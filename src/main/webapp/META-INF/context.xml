@@ -3,5 +3,6 @@
 -->
 
 <Context path="/pap">
-  <Parameter name="ConfigurationFile" value="/home/valerio/configuration.properties"/>
+	<Parameter name="PapConfigurationDir" value="/opt/glite/etc/pap"/>
+	<Parameter name="PapRepositoryDir" value="/var/glite/pap"/>
 </Context>

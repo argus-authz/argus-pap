@@ -6,6 +6,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,32 +16,36 @@ import org.glite.authz.pap.distribution.exceptions.DistributionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DistributionConfigurationParser {
-	private static final Logger log = LoggerFactory
-			.getLogger(DistributionConfigurationParser.class);
+// TODO: This class will be dismissed (or coded in the proper way) as soon as possible
 
+public class DistributionConfigurationParser {
+    
+	private static final Logger log = LoggerFactory.getLogger(DistributionConfigurationParser.class);
 	private static final String emptyLineRegex = "\\s*$";
-	private static final Pattern emptyLinePattern = Pattern
-			.compile(emptyLineRegex);
+	private static final Pattern emptyLinePattern = Pattern.compile(emptyLineRegex);
 	private static final String commentRegex = "^#.*$";
 	private static final Pattern commentPattern = Pattern.compile(commentRegex);
-	//private static final String lineRegex = "\"()\"\\s\"([\\w\\.]+)\"";
 	private static final String lineRegex = "\"(.+)\"\\s\"(.+)\"";
 	private static final Pattern linePattern = Pattern.compile(lineRegex);
+	private static final String remotePAPConfigurationFile = "/tmp/remote_pap_list.txt";
+	private long pollingInterval;
 
 	public static DistributionConfigurationParser getInstance() {
 		return new DistributionConfigurationParser();
 	}
 
 	private int lineCounter = 0;
-
 	private List<PAP> remotePAPList = null;
 
 	private DistributionConfigurationParser() {
 		remotePAPList = new LinkedList<PAP>();
+		File configFile = new File(remotePAPConfigurationFile);
+		log.info("Reading remote PAP list configuration file: " + remotePAPConfigurationFile);
+		parse(configFile);
+		log.info("Found " + remotePAPList.size() + " remote PAPs");
 	}
 
-	public List<PAP> parse(File file) {
+	protected void parse(File file) {
 		try {
 			BufferedReader reader = new BufferedReader(new FileReader(file));
 
@@ -58,11 +64,23 @@ public class DistributionConfigurationParser {
 				lineCounter++;
 			} while (line != null);
 
-			return remotePAPList;
-
 		} catch (IOException e) {
 			throw new DistributionException(e);
 		}
+	}
+	
+	protected void getConfFromProperties(Properties properties) {
+	    //Set<String> keySet = properties.keySet();
+	    // Retrieve remote PAPs as an unordered list
+	    
+	}
+	
+	public List<PAP> getRemotePAPs() {
+	    return remotePAPList;
+	}
+	
+	public long getPollingInterval() {
+	    return pollingInterval;
 	}
 
 	protected boolean lineIsMeaningful(String line) {
