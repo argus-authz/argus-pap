@@ -14,11 +14,8 @@ public class AuthorizationEngine {
 
     private PAPContext globalContext;
 
-    private AuthorizationEngine() {
+    private AuthorizationEngine(String papConf) {
         
-        String papConf = PAPConfiguration.instance()
-                .getPapAuthzConfigurationFileName();
-
         File papConfFile = new File( papConf );
         
         if ( !papConfFile.exists() )
@@ -37,10 +34,10 @@ public class AuthorizationEngine {
         globalContext.setAcl( confParser.getParsedACL() );
     }
 
-    public static AuthorizationEngine initialize(){
+    public static AuthorizationEngine initialize(String papAuthzConfFile){
         
         if (instance == null)
-            instance = new AuthorizationEngine();
+            instance = new AuthorizationEngine(papAuthzConfFile);
         
         return instance;
     }

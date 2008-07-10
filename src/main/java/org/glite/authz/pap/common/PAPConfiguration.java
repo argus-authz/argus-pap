@@ -67,18 +67,8 @@ public class PAPConfiguration {
 
         setupConfigurationDirectories( papConfigurationDir, papRepositoryDir);
 
-        try {
-
-            configureRepository();
-            configurePolicyDistribution();
-            configureAuthorizationEngine();
-            configureOpenSAML();
-
-        } catch ( ConfigurationException e ) {
-            logger.error( "Error configuring OpenSAML:" + e.getMessage() );
-            throw new PAPConfigurationException( "Error configuring OpenSAML:"
-                    + e.getMessage(), e );
-        }
+        loadPolicyDistributionConfiguration();
+            
     }
 
     private void setupConfigurationDirectories( String papConfDir, String papRepoDir) {
@@ -112,8 +102,6 @@ public class PAPConfiguration {
             String papRepoDir = context.getInitParameter( "papRepositoryDir" );
             
             return initialize( papConfDir,papRepoDir );
-    
-            
         }
                 
         return instance;
@@ -129,19 +117,14 @@ public class PAPConfiguration {
     public static PAPConfiguration initialize(String papConfigurationDir, String papRepositoryDir){
         
         if (instance == null)
-            return initialize( papConfigurationDir, papRepositoryDir );
+            instance = new PAPConfiguration(papConfigurationDir,papRepositoryDir);
         
         return instance;
     }
     
-    private void configureAuthorizationEngine(){
-        
-        logger.info( "Configuring authorization engine..." );
-        AuthorizationEngine.initialize();
-        
-    }
     
-    private void configurePolicyDistribution() {
+    
+    private void loadPolicyDistributionConfiguration() {
 
         logger.info( "Loading policy distribution configuration..." );
         String papConfDir = configuration.getString( "papConfigurationDir" );
@@ -171,22 +154,8 @@ public class PAPConfiguration {
 
     }
 
-    private void configureRepository() {
 
-        logger.info( "Loading repository manager configuration..." );
-        RepositoryManager.getInstance().bootstrap();
-    }
-
-    private void configureOpenSAML() throws ConfigurationException {
-
-        DefaultBootstrap.bootstrap();
-        XMLConfigurator xmlConfigurator = new XMLConfigurator();
-
-        // Needed because of a "bug" in opensaml 2.1.0... can be removed when opensaml is updated
-        xmlConfigurator.load( Configuration.class
-                .getResourceAsStream( "/opensaml_bugfix.xml" ) );
-
-    }
+    
 
     
     
@@ -204,7 +173,7 @@ public class PAPConfiguration {
     
     public String getPapAuthzConfigurationFileName(){
         
-        return getPAPConfigurationDir()+File.pathSeparator+DEFAULT_PAP_AUTHZ_FILE_NAME;
+        return getPAPConfigurationDir()+"/"+DEFAULT_PAP_AUTHZ_FILE_NAME;
     }
     
     public BigDecimal getBigDecimal( String key, BigDecimal defaultValue ) {

@@ -44,17 +44,19 @@ public class PAPContextListener implements ServletContextListener {
 
     public void contextInitialized( ServletContextEvent contextEvent ) {
         
-        logger.info( "PAP service is being initialized!" );
-
-        // get the servlet context
+                // get the servlet context
         ServletContext servletContext = contextEvent.getServletContext();
+        
+        PAPService.start( servletContext );
 
-        // Initialize configuaration
-        PAPConfiguration.initialize( servletContext );
+        logger.info( "PAP service initialization complete!" );
         
     }
 
     public void contextDestroyed( ServletContextEvent contextEvent ) {
+        
+        PAPService.stop();
+        logger.info( "PAP service shutdown complete!" );
 
     }
 
