@@ -22,10 +22,13 @@
 
 package org.glite.authz.pap.provisioning;
 
-import java.io.StringReader;
 import java.util.Iterator;
+import java.util.List;
 import java.util.UUID;
 
+import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
+import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
+import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLVersion;
@@ -52,15 +55,9 @@ import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
-import org.opensaml.xml.io.UnmarshallingException;
-import org.opensaml.xml.parse.BasicParserPool;
-import org.opensaml.xml.parse.XMLParserException;
 import org.opensaml.xml.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 /**
@@ -69,7 +66,8 @@ import org.w3c.dom.Element;
  */
 public class ProvisioningServiceUtils {
 
-  private static Logger logger = LoggerFactory.getLogger( ProvisioningServiceUtils.class );
+  private static Logger logger = 
+    LoggerFactory.getLogger( ProvisioningServiceUtils.class );
 
   public static String xmlObjectToString( XMLObject xmlObject ) {
 
@@ -87,16 +85,19 @@ public class ProvisioningServiceUtils {
 
   }
 
-  public static Response createResponse( XACMLPolicyQueryType inResponseTo ,
-                                         java.util.List<XACMLObject> policyObjects ) {
+  // TODO this method is too long, should be split
+  public static Response createResponse(XACMLPolicyQueryType inResponseTo ,
+                                        List<XACMLObject> policyObjects) {
 
     // get a builder factory
     XMLObjectBuilderFactory builderFactory = 
       Configuration.getBuilderFactory();
 
+    /* prepare the Response object to return */
+    
     // build a response object
     ResponseBuilder responseBuilder = 
-      (ResponseBuilder) builderFactory.getBuilder( Response.DEFAULT_ELEMENT_NAME );
+      (ResponseBuilder) builderFactory.getBuilder(Response.DEFAULT_ELEMENT_NAME);
     Response response = responseBuilder.buildObject();
 
     // set a few attributes for the response
@@ -104,6 +105,8 @@ public class ProvisioningServiceUtils {
     response.setVersion( SAMLVersion.VERSION_20 );
     response.setIssueInstant( new DateTime() );
     response.setInResponseTo( inResponseTo.getID() );
+    
+    /* add the Assertion element */
     
     // build an assertion object
     AssertionBuilder assertionBuilder = 
@@ -117,10 +120,10 @@ public class ProvisioningServiceUtils {
     
     // build an issuer object
     IssuerBuilder issuerBuilder = 
-      (IssuerBuilder) builderFactory.getBuilder( Issuer.DEFAULT_ELEMENT_NAME );
+      (IssuerBuilder) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
     Issuer issuer = issuerBuilder.buildObject();
     
-    // set the issuer value
+    // TODO here goes the name of the PAP
     issuer.setValue( "test" );
 
     assertion.setIssuer( issuer );
@@ -128,7 +131,8 @@ public class ProvisioningServiceUtils {
     /* build policy statements objects */
 
     XACMLPolicyStatementTypeImplBuilder policyStatementBuilder = 
-      (XACMLPolicyStatementTypeImplBuilder) builderFactory.getBuilder( XACMLPolicyStatementType.TYPE_NAME_XACML20 );
+      (XACMLPolicyStatementTypeImplBuilder) 
+        builderFactory.getBuilder(XACMLPolicyStatementType.TYPE_NAME_XACML20);
     
     Iterator<XACMLObject> iterator = policyObjects.iterator();
     
@@ -136,36 +140,42 @@ public class ProvisioningServiceUtils {
     
       // build the policy statement
       XACMLPolicyStatementType policyStatement = 
-        policyStatementBuilder.buildObject( Statement.DEFAULT_ELEMENT_NAME , XACMLPolicyStatementType.TYPE_NAME_XACML20 );
+        policyStatementBuilder.buildObject(Statement.DEFAULT_ELEMENT_NAME, 
+                                           XACMLPolicyStatementType.TYPE_NAME_XACML20);
     
-      // the objct is either a policy set or a policy
+      // TODO throw an exception if the list item is not PolicySet ot Policy
       
       XACMLObject xacmlObject = iterator.next();
       
       if(xacmlObject instanceof PolicySetType) {
         
         PolicySetType policySet = (PolicySetType) xacmlObject; 
-        policyStatement.getPolicySets().add( policySet );
+        policyStatement.getPolicySets().add(policySet);
         
       } else {
         
         PolicyType policy = (PolicyType) xacmlObject;
-        policyStatement.getPolicies().add( policy );
-      }
+        policyStatement.getPolicies().add(policy);
+        
+      } 
 
-      assertion.getStatements().add( policyStatement );
+      // add the statement to the assertion
+      assertion.getStatements().add(policyStatement);
     }
     
-    response.getAssertions().add( assertion );
+    // add the assertion to the response
+    response.getAssertions().add(assertion);
 
+    /* add the Status element */
+    
     //  build a status object
     StatusBuilder statusBuilder = 
       (StatusBuilder) builderFactory.getBuilder( Status.DEFAULT_ELEMENT_NAME );
     Status status = statusBuilder.buildObject();
 
-    //  build a status code builder object
+    //  build a status code object
     StatusCodeBuilder statusCodeBuilder = 
-      (StatusCodeBuilder) builderFactory.getBuilder( StatusCode.DEFAULT_ELEMENT_NAME );
+      (StatusCodeBuilder) builderFactory.getBuilder(StatusCode.DEFAULT_ELEMENT_NAME);
     StatusCode statusCode = statusCodeBuilder.buildObject();
     
     statusCode.setValue( StatusCode.SUCCESS_URI );
@@ -177,16 +187,20 @@ public class ProvisioningServiceUtils {
     return response;
   }
 
-  public static Response createResponse( XACMLPolicyQueryType inResponseTo ,
-                                         Exception e ) {
+  public static Response createResponse(XACMLPolicyQueryType inResponseTo ,
+                                        Exception e) {
 
     // get a builder factory
     XMLObjectBuilderFactory builderFactory = 
       Configuration.getBuilderFactory();
 
+    /* prepare the response */
+    
+    // TODO part of the response creation are repeated in the two create, share
+    
     // build a response object
     ResponseBuilder responseBuilder = 
-      (ResponseBuilder) builderFactory.getBuilder( Response.DEFAULT_ELEMENT_NAME );
+      (ResponseBuilder) builderFactory.getBuilder(Response.DEFAULT_ELEMENT_NAME);
     Response response = responseBuilder.buildObject();
 
     // set a few attributes for the response
@@ -195,6 +209,8 @@ public class ProvisioningServiceUtils {
     response.setIssueInstant( new DateTime() );
     response.setInResponseTo( inResponseTo.getID() );
 
+    /* add the Status element */
+    
     // build a status object
     StatusBuilder statusBuilder = 
       (StatusBuilder) builderFactory.getBuilder( Status.DEFAULT_ELEMENT_NAME );
@@ -205,7 +221,8 @@ public class ProvisioningServiceUtils {
       (StatusCodeBuilder) builderFactory.getBuilder( StatusCode.DEFAULT_ELEMENT_NAME );
     StatusCode statusCode = statusCodeBuilder.buildObject();
     
-    statusCode.setValue( StatusCode.RESPONDER_URI ); // TODO must discriminate by exception
+    // TODO must discriminate by exception
+    statusCode.setValue( StatusCode.RESPONDER_URI ); 
 
     status.setStatusCode( statusCode );
 
@@ -223,7 +240,7 @@ public class ProvisioningServiceUtils {
       throw new VersionMismatchException();
     }
 
-    // TODO check issue instant
+    /* TODO check issue instant */
 
     /* check the issuer is present and has the expected format */
     
@@ -232,53 +249,14 @@ public class ProvisioningServiceUtils {
     if ( issuer == null ) {
       throw new MissingIssuerException();
     }
-
-    /* the format MUST be omitted or have the entity value */
     
     String issuerFormat = issuer.getFormat();
 
+    // the format MUST be omitted or have the entity value
     if ( issuerFormat != null && issuerFormat != NameID.ENTITY ) {
       throw new WrongFormatIssuerException(issuerFormat);
     }
 
   }
   
-
-  public static PolicySetType createPolicySet( Element policySet ) {
-
-    BasicParserPool basicParserPool = new BasicParserPool();
-    basicParserPool.setNamespaceAware( true );
-
-    String policySetAsString = XMLHelper.nodeToString( policySet );
-    StringReader stringReader = new StringReader( policySetAsString );
-    
-    Element policySetElement = null;
-    
-    try {
-      Document policySetDocument = basicParserPool.parse( stringReader ); 
-      policySetElement = policySetDocument.getDocumentElement();
-    } 
-    catch ( XMLParserException e ) {
-      logger.error( e.getMessage() );
-      throw new Error( e );
-    }
-    
-    UnmarshallerFactory unmarshallerFactory = 
-      Configuration.getUnmarshallerFactory();
-    Unmarshaller unmarshaller = 
-      unmarshallerFactory.getUnmarshaller( policySetElement );
-
-    PolicySetType policySetType = null;
-
-    try {
-      policySetType = (PolicySetType) unmarshaller.unmarshall( policySetElement );
-    } 
-    catch ( UnmarshallingException e ) {
-      logger.error( e.getMessage() );
-      throw new Error( e );
-    }
-
-    return policySetType;
-  }
-
 }

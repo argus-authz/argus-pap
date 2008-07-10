@@ -24,9 +24,12 @@ package org.glite.authz.pap.provisioning;
 
 import java.util.List;
 
-import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
-import org.glite.authz.pap.repository.dao.ProvisioningServiceDAO;
+import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
+import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
+import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
+import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
+import org.opensaml.saml2.common.Extensions;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
@@ -40,8 +43,10 @@ public class ProvisioningService {
   public Response XACMLPolicyQuery( XACMLPolicyQueryType query )
       throws java.rmi.RemoteException {
 
+    // log the received query
     if ( logger.isDebugEnabled() ) {
-      logger.debug( "Received XACLMPolicyQuery " + ProvisioningServiceUtils.xmlObjectToString( query ) );
+      logger.debug( "Received XACLMPolicyQuery " + 
+                    ProvisioningServiceUtils.xmlObjectToString( query ) );
     }
 
     /* check a few things about the query */
@@ -63,22 +68,30 @@ public class ProvisioningService {
     }
 
     /* get local policies */
+
+    List<XACMLObject> resultList = null;
+
+    /* TODO discrimination between a PAP and a PDP is done after 
+     * the presence of the Extensions element, too simplistic  */
     
-    // List<XACMLObject> resultList = ProvisioningServiceDAO.getInstance().pdpQuery();
+    Extensions extensions = query.getExtensions();
     
-    // Do it with an Operation!!!
-    
-    // List<XACMLObject> resultList = GetPoliciesForPAPOperation.instance().execute();
-    // or
-    List<XACMLObject> resultList = GetPoliciesForPDPOperation.instance().execute();
-    
+    if(extensions != null) {
+      resultList = GetPoliciesForPDPOperation.instance().execute();
+    }
+    else {
+      resultList = GetPoliciesForPAPOperation.instance().execute();
+    }
+   
     /* prepare the response */
 
-    Response response = ProvisioningServiceUtils.createResponse( query , resultList );
+    Response response = 
+      ProvisioningServiceUtils.createResponse( query , resultList );
 
-
+    // log the outgoing response
     if ( logger.isDebugEnabled() ) {
-      logger.debug( ProvisioningServiceUtils.xmlObjectToString( response ) );
+      logger.debug( "Sending Response : " +
+                    ProvisioningServiceUtils.xmlObjectToString( response ) );
     }
 
     return response;
