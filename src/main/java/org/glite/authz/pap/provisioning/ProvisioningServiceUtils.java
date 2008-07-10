@@ -225,13 +225,13 @@ public class ProvisioningServiceUtils {
     
     // TODO now discriminates by exception but the code sucks, you happy?
     
-    if(e.getClass() == VersionMismatchException.class) {
+    if(e instanceof VersionMismatchException) {
       
       /* set status code */
       
       statusCode.setValue( StatusCode.VERSION_MISMATCH_URI );
       
-    } else if(e.getClass() == MissingIssuerException.class) {
+    } else if(e instanceof MissingIssuerException) {
       
       /* set status code */
       
@@ -247,7 +247,7 @@ public class ProvisioningServiceUtils {
       // add StatusMessage to Status
       status.setStatusMessage( statusMessage );
       
-    } else if(e.getClass() == WrongFormatIssuerException.class) {
+    } else if(e instanceof WrongFormatIssuerException) {
 
       /* set status code */
       
