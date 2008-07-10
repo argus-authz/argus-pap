@@ -25,6 +25,8 @@ package org.glite.authz.pap.provisioning;
 import java.util.List;
 
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
+import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
+import org.opensaml.saml2.common.Extensions;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
@@ -38,8 +40,10 @@ public class ProvisioningService {
   public Response XACMLPolicyQuery( XACMLPolicyQueryType query )
       throws java.rmi.RemoteException {
 
+    // log the received query
     if ( logger.isDebugEnabled() ) {
-      logger.debug( "Received XACLMPolicyQuery " + ProvisioningServiceUtils.xmlObjectToString( query ) );
+      logger.debug( "Received XACLMPolicyQuery " + 
+                    ProvisioningServiceUtils.xmlObjectToString( query ) );
     }
 
     /* check a few things about the query */
@@ -62,17 +66,29 @@ public class ProvisioningService {
 
     /* get local policies */
 
-    /* TODO will check whether the query comes from a PAP or a PDP and possibly
-    use GetPoliciesForPAPOperation instead */
+    List<XACMLObject> resultList = null;
+
+    /* TODO discrimination between a PAP and a PDP is done after 
+     * the presence of the Extensions element, too simplistic  */
     
-    List<XACMLObject> resultList = GetPoliciesForPDPOperation.instance().execute();
+    Extensions extensions = query.getExtensions();
+    
+    if(extensions != null) {
+      resultList = GetPoliciesForPDPOperation.instance().execute();
+    }
+    else {
+      resultList = GetPoliciesForPAPOperation.instance().execute();
+    }
    
     /* prepare the response */
 
-    Response response = ProvisioningServiceUtils.createResponse( query , resultList );
+    Response response = 
+      ProvisioningServiceUtils.createResponse( query , resultList );
 
+    // log the outgoing response
     if ( logger.isDebugEnabled() ) {
-      logger.debug( ProvisioningServiceUtils.xmlObjectToString( response ) );
+      logger.debug( "Sending Response : " +
+                    ProvisioningServiceUtils.xmlObjectToString( response ) );
     }
 
     return response;
