@@ -26,6 +26,9 @@ import java.util.List;
 
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
+import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
+import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
+import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
 import org.opensaml.saml2.common.Extensions;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;
