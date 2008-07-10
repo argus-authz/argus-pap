@@ -11,6 +11,17 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath*:applicationContext*.xml</param-value>
   </context-param>
+  
+  <!-- Filters -->
+  <filter>
+		<filter-name>security-context-filter</filter-name>
+		<filter-class>org.glite.authz.pap.servlet.SecurityContextFilter</filter-class>
+</filter>
+
+	<filter-mapping>
+		<filter-name>security-context-filter</filter-name>
+		<url-pattern>/services/*</url-pattern>
+	</filter-mapping>
 
   <!-- Listeners -->
 
