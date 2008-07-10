@@ -39,11 +39,13 @@ import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.Statement;
 import org.opensaml.saml2.core.Status;
 import org.opensaml.saml2.core.StatusCode;
+import org.opensaml.saml2.core.StatusMessage;
 import org.opensaml.saml2.core.impl.AssertionBuilder;
 import org.opensaml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.saml2.core.impl.ResponseBuilder;
 import org.opensaml.saml2.core.impl.StatusBuilder;
 import org.opensaml.saml2.core.impl.StatusCodeBuilder;
+import org.opensaml.saml2.core.impl.StatusMessageBuilder;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -216,14 +218,61 @@ public class ProvisioningServiceUtils {
       (StatusBuilder) builderFactory.getBuilder( Status.DEFAULT_ELEMENT_NAME );
     Status status = statusBuilder.buildObject();
 
-    // build a status code builder object
+    // build a status code object
     StatusCodeBuilder statusCodeBuilder = 
       (StatusCodeBuilder) builderFactory.getBuilder( StatusCode.DEFAULT_ELEMENT_NAME );
     StatusCode statusCode = statusCodeBuilder.buildObject();
     
-    // TODO must discriminate by exception
-    statusCode.setValue( StatusCode.RESPONDER_URI ); 
+    // TODO now discriminates by exception but the code sucks, you happy?
+    
+    if(e.getClass() == VersionMismatchException.class) {
+      
+      /* set status code */
+      
+      statusCode.setValue( StatusCode.VERSION_MISMATCH_URI );
+      
+    } else if(e.getClass() == MissingIssuerException.class) {
+      
+      /* set status code */
+      
+      statusCode.setValue( StatusCode.REQUESTER_URI );
+      
+      /* set status message with some details */
+      
+      StatusMessageBuilder statusMessageBuilder =
+        (StatusMessageBuilder) builderFactory.getBuilder( StatusMessage.DEFAULT_ELEMENT_NAME );
+      StatusMessage statusMessage = statusMessageBuilder.buildObject();
+      statusMessage.setMessage("The Issuer element MUST be present.");
+      
+      // add StatusMessage to Status
+      status.setStatusMessage( statusMessage );
+      
+    } else if(e.getClass() == WrongFormatIssuerException.class) {
 
+      /* set status code */
+      
+      statusCode.setValue( StatusCode.REQUESTER_URI ); 
+
+      /* set status message with some details */
+      
+      StatusMessageBuilder statusMessageBuilder =
+        (StatusMessageBuilder) builderFactory.getBuilder( StatusMessage.DEFAULT_ELEMENT_NAME );
+      StatusMessage statusMessage = statusMessageBuilder.buildObject();
+      statusMessage.setMessage("The Format attribute of the Issuer " +
+      		"element must be " + NameID.ENTITY);
+      
+      // add StatusMessage to Status
+      status.setStatusMessage( statusMessage );
+      
+    } else {
+      
+      /* set status code */
+      
+      statusCode.setValue( StatusCode.RESPONDER_URI );
+      
+    }
+
+    // add StatusCode to Status
     status.setStatusCode( statusCode );
 
     response.setStatus( status );
