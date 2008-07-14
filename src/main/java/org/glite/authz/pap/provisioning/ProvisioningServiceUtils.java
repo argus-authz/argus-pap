@@ -304,6 +304,8 @@ public class ProvisioningServiceUtils {
     if ( issuerFormat != null && ! issuerFormat.equals( NameID.ENTITY )) 
       throw new WrongFormatIssuerException(issuerFormat);
     
+    // TODO Check that the issuer is the same as in the transport 
+    
 
   }
   

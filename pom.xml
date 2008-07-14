@@ -20,7 +20,7 @@
         <artifactId>tomcat-maven-plugin</artifactId>
         <configuration>
           <server>tomcat</server>
-          <mode>both</mode>
+          <!-- <mode>both</mode> -->
         </configuration>
       </plugin>
     </plugins>
