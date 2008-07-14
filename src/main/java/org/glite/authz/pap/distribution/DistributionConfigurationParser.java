@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,7 +26,7 @@ public class DistributionConfigurationParser {
 	private static final Pattern commentPattern = Pattern.compile(commentRegex);
 	private static final String lineRegex = "\"(.+)\"\\s\"(.+)\"";
 	private static final Pattern linePattern = Pattern.compile(lineRegex);
-	private static final String remotePAPConfigurationFile = "/tmp/remote_pap_list.txt";
+	private static final String remotePAPConfigurationFile = "/var/remote_pap_list.txt";
 	private long pollingInterval;
 
 	public static DistributionConfigurationParser getInstance() {
@@ -40,8 +39,12 @@ public class DistributionConfigurationParser {
 	private DistributionConfigurationParser() {
 		remotePAPList = new LinkedList<PAP>();
 		File configFile = new File(remotePAPConfigurationFile);
-		log.info("Reading remote PAP list configuration file: " + remotePAPConfigurationFile);
-		parse(configFile);
+		if (!configFile.exists()) {
+		    log.error("Configuration file not found: " + remotePAPConfigurationFile);
+		} else {
+		    log.info("Reading remote PAP list configuration file: " + remotePAPConfigurationFile);
+		    parse(configFile);
+		}
 		log.info("Found " + remotePAPList.size() + " remote PAPs");
 	}
 
