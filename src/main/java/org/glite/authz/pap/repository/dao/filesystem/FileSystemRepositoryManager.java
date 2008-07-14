@@ -18,7 +18,7 @@ public class FileSystemRepositoryManager extends RepositoryManager {
 	private static final String xacmlFileNameExtension = ".xml";
 	
 	public void bootstrap() {
-		logger.info("Starting PolicyRepository manager: filesystem implementation...");
+		logger.info("Starting repository...");
 		File rootDir = new File(FileSystemRepositoryManager.getFileSystemDatabaseDir());
 		if (!rootDir.exists()) {
 			if (!rootDir.mkdirs()) {
