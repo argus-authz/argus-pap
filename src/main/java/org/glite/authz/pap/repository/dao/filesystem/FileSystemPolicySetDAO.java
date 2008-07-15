@@ -8,8 +8,12 @@ import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSystemPolicySetDAO implements PolicySetDAO {
+    
+    private static final Logger log = LoggerFactory.getLogger( FileSystemPolicySetDAO.class );
 	
 	public static FileSystemPolicySetDAO getInstance() {
 		return new FileSystemPolicySetDAO();
@@ -70,6 +74,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 	
 	public void store(String papId, PolicySetType ps) {
 		if (!exists(papId, ps.getPolicySetId())) {
+		    log.debug("Storing PolicySet \"" + ps.getPolicySetId() + "\" into PAP \"" + papId + "\"");
 			policySetHelper.toFile(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, ps.getPolicySetId()), ps);
 		}
 	}

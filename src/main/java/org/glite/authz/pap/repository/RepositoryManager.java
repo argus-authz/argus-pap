@@ -1,8 +1,11 @@
 package org.glite.authz.pap.repository;
 
+import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemPAPManager;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager;
+import org.opensaml.xacml.policy.PolicySetType;
 
 public abstract class RepositoryManager {
 
@@ -18,6 +21,18 @@ public abstract class RepositoryManager {
 		return FileSystemPAPManager.getInstance();
 	}
 	
-	public abstract void bootstrap();
+	public void bootstrap() {
+	    initialize();
+	    PAPManager papManager = getPAPManager();
+	    PAP localPAP = new PAP(PAP.localPAPId);
+	    if (!papManager.exists(localPAP)) {
+	        papManager.create(localPAP);
+	        PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(PAP.localPAPId, PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
+	        PAPContainer local = papManager.get(localPAP);
+	        local.storePolicySet(localPolicySet);
+	    }
+	}
+	
+	protected abstract void initialize();
 
 }

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemRepositoryManager extends RepositoryManager {
 	
-	private static final Logger logger = LoggerFactory.getLogger( FileSystemRepositoryManager.class );
+	private static final Logger log = LoggerFactory.getLogger( FileSystemRepositoryManager.class );
 	protected static final String fileSystemDatabaseDir = "/tmp/paprep";
 	private static final String rootPolicySetId = "Root";
 	private static final String localPAPId = "Local";
@@ -17,16 +17,16 @@ public class FileSystemRepositoryManager extends RepositoryManager {
 	private static final String policyFileNamePrefix = "Policy_";
 	private static final String xacmlFileNameExtension = ".xml";
 	
-	public void bootstrap() {
-		logger.info("Starting repository...");
+	protected void initialize() {
+		log.info("Initializing filesystem repository...");
 		File rootDir = new File(FileSystemRepositoryManager.getFileSystemDatabaseDir());
 		if (!rootDir.exists()) {
 			if (!rootDir.mkdirs()) {
-				throw new RepositoryException("Cannot create DB dir");
+				throw new RepositoryException("Cannot create DB root directory: " + rootDir.getAbsolutePath());
 			}
 		}
 		if (!(rootDir.canRead() && rootDir.canWrite())) {
-			throw new RepositoryException("Permission denied for DB dir");
+			throw new RepositoryException("Permission denied for root DB dir: " + rootDir.getAbsolutePath());
 		}
 	}
 
@@ -74,5 +74,4 @@ public class FileSystemRepositoryManager extends RepositoryManager {
 	public static String getXACMLFileNameExtension() {
 		return xacmlFileNameExtension;
 	}
-
 }
