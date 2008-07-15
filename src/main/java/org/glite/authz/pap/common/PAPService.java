@@ -30,11 +30,6 @@ public final class PAPService {
                 
         AuthorizationEngine.initialize(conf.getPapAuthzConfigurationFileName());
         
-        // Start repository manager
-        logger.info( "Starting repository manager..." );
-        RepositoryManager.getInstance().bootstrap();
-        
-        
         // Bootstrap opensaml
         try{
             
@@ -51,9 +46,10 @@ public final class PAPService {
             logger.error( "Error configuring OpenSAML:"+e.getMessage() );
             throw new PAPConfigurationException("Error configuring OpenSAML:"+e.getMessage(),e);
         }
-
-       
         
+        // Start repository manager
+        logger.info( "Starting repository manager..." );
+        RepositoryManager.getInstance().bootstrap();
     }
     
 

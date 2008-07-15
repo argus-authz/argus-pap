@@ -33,5 +33,12 @@ public interface ProvisioningServicePortType {
 
   public Response xacmlPolicyQuery( XACMLPolicyQueryType xacmlPolicyQueryType )
       throws ServiceException, RemoteException;
+  
+  public void setTargetEndpoint(String endpointURL);
+  
+  public void setClientCertificate(String certFile);
+  public void setClientPrivateKey(String keyFile);
+  public void setClientPrivateKeyPassword(String privateKeyPassword);
+  
 
 }
