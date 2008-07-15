@@ -61,8 +61,7 @@ public class ProvisioningServicePortTypeImpl
     AxisProperties.setProperty("axis.socketSecureFactory",
       "org.glite.security.trustmanager.axis.AXISSocketFactory");
 
-    // need to pass property to AXISSocketFactory
-    Properties properties = new Properties();
+    Properties properties = AXISSocketFactory.getCurrentProperties();
 
     // TODO will get cert and key form the configuration, with those as default
     properties.setProperty( "sslCertFile" , "/etc/grid-security/hostcert.pem" );
