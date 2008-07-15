@@ -68,6 +68,8 @@ public class ProvisioningServicePortTypeImpl
     properties.setProperty( "sslCertFile" , "/etc/grid-security/hostcert.pem" );
     properties.setProperty( "sslKey" , "/etc/grid-security/hostkey.pem" );
 
+    AXISSocketFactory.setCurrentProperties(properties);
+
     /* instantiate the axis service */
 
     Service service = new Service();
