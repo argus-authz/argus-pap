@@ -23,10 +23,12 @@
 package org.glite.authz.pap.provisioning.client.impl;
 
 import java.rmi.RemoteException;
+import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
+import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.constants.Style;
@@ -34,6 +36,7 @@ import org.apache.axis.constants.Use;
 import org.glite.authz.pap.provisioning.axis.DeserializerFactory;
 import org.glite.authz.pap.provisioning.axis.SerializerFactory;
 import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
+import org.glite.security.trustmanager.axis.AXISSocketFactory;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 
@@ -52,8 +55,21 @@ public class ProvisioningServicePortTypeImpl
     /* TODO this client is supposed to be used to contact PAPs, 
      * so check the proper extensions is present */
     
+    /* tell Axis to use trustmanager secure socket factory and set 
+     * the properties for the cert and key */
+
+    AxisProperties.setProperty("axis.socketSecureFactory",
+      "org.glite.security.trustmanager.axis.AXISSocketFactory");
+
+    // need to pass property to AXISSocketFactory
+    Properties properties = new Properties();
+
+    // TODO will get cert and key form the configuration, with those as default
+    properties.setProperty( "sslCertFile" , "/etc/grid-security/hostcert.pem" );
+    properties.setProperty( "sslKey" , "/etc/grid-security/hostkey.pem" );
+
     /* instantiate the axis service */
-    
+
     Service service = new Service();
 
     Call call = (Call) service.createCall();
@@ -66,22 +82,30 @@ public class ProvisioningServicePortTypeImpl
 
     /* register custom serializer and deserializer */
     
+    QName xacmlPolicyQueryQName = 
+      new QName("urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol", 
+                "XACMLPolicyQuery");
+    
+    QName responseQName =
+      new QName("urn:oasis:names:tc:SAML:2.0:protocol" , 
+                "Response");
+    
     call.registerTypeMapping( XACMLPolicyQueryType.class ,
-                              new QName( "urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol" ,
-                                         "XACMLPolicyQuery" ) ,
+                              xacmlPolicyQueryQName,
                               new SerializerFactory() ,
                               new DeserializerFactory() );
 
     call.registerTypeMapping( Response.class ,
-                              new QName("urn:oasis:names:tc:SAML:2.0:protocol" , 
-                                        "Response" ) ,
+                              responseQName,
                               new SerializerFactory() ,
                               new DeserializerFactory() );
 
+    
     /* call the service */
     
-    Response response = (Response) call.invoke( new Object[] { xacmlPolicyQuery } );
-
+    Response response = 
+      (Response) call.invoke( new Object[] { xacmlPolicyQuery } );
+    
     return response;
   }
 
