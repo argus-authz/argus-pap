@@ -1,14 +1,17 @@
 package org.glite.authz.pap.authz;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public abstract class BasePAPOperation <T> implements PAPOperation<T>{
 
+    Logger log = LoggerFactory.getLogger( BasePAPOperation.class );
+    
     protected Map <PAPContext, PAPPermission> requiredPermission;
     
     
@@ -30,8 +33,11 @@ public abstract class BasePAPOperation <T> implements PAPOperation<T>{
 
         logOperation();
         
-        if (!isAllowed())
+        if (!isAllowed()){
+            
+            log.info("Insufficient privileges to perform operation '"+getName()+"'");
             throw new PAPAuthzException("Insufficient privileges to perform operation '"+getName()+"'.");
+        }
         
         return doExecute();
     }
