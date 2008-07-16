@@ -220,46 +220,35 @@ public class ProvisioningServiceUtils {
 		.getBuilder(StatusCode.DEFAULT_ELEMENT_NAME);
 	StatusCode statusCode = statusCodeBuilder.buildObject();
 
-	// TODO now discriminates by exception but the code sucks, you happy?
+	// TODO now discriminates by exception but the code must be improved
 
 	if (e instanceof VersionMismatchException) {
 
-	    /* set status code */
-
 	    statusCode.setValue(StatusCode.VERSION_MISMATCH_URI);
 
-	} else if (e instanceof MissingIssuerException) {
+	} else if (e instanceof MissingIssuerException | 
+		e instanceof WrongFormatIssuerException) {
 
-	    /* set status code */
-
-	    statusCode.setValue(StatusCode.REQUESTER_URI);
-
-	    /* set status message with some details */
-
-	    StatusMessageBuilder statusMessageBuilder = (StatusMessageBuilder) builderFactory
-		    .getBuilder(StatusMessage.DEFAULT_ELEMENT_NAME);
-	    StatusMessage statusMessage = statusMessageBuilder.buildObject();
-	    statusMessage.setMessage("The Issuer element MUST be present.");
-
-	    // add StatusMessage to Status
-	    status.setStatusMessage(statusMessage);
-
-	} else if (e instanceof WrongFormatIssuerException) {
-
-	    /* set status code */
+	    // set the status code
 
 	    statusCode.setValue(StatusCode.REQUESTER_URI);
 
-	    /* set status message with some details */
+	    // set status message with some details, when provided
 
-	    StatusMessageBuilder statusMessageBuilder = (StatusMessageBuilder) builderFactory
-		    .getBuilder(StatusMessage.DEFAULT_ELEMENT_NAME);
-	    StatusMessage statusMessage = statusMessageBuilder.buildObject();
-	    statusMessage.setMessage("The Format attribute of the Issuer "
-		    + "element must be " + NameID.ENTITY);
+	    if (e.getMessage() != null) {
 
-	    // add StatusMessage to Status
-	    status.setStatusMessage(statusMessage);
+		StatusMessageBuilder statusMessageBuilder = (StatusMessageBuilder) builderFactory
+			.getBuilder(StatusMessage.DEFAULT_ELEMENT_NAME);
+		
+		StatusMessage statusMessage = statusMessageBuilder
+			.buildObject();
+		
+		statusMessage.setMessage(e.getMessage());
+
+		// add StatusMessage to Status
+		status.setStatusMessage(statusMessage);
+
+	    }
 
 	} else {
 

@@ -22,10 +22,13 @@
 
 package org.glite.authz.pap.provisioning.exceptions;
 
+import org.opensaml.saml2.core.NameID;
+
 public class WrongFormatIssuerException extends Exception {
 
     public WrongFormatIssuerException(String issuerFormat) {
-	super("Wrong issuer format " + issuerFormat);
+	super("When present, the Format attribute of the Issuer "
+		    + "element must be " + NameID.ENTITY);
     }
 
 }
