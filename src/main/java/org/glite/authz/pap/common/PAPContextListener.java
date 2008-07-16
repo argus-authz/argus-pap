@@ -35,28 +35,28 @@ import org.slf4j.LoggerFactory;
  */
 public class PAPContextListener implements ServletContextListener {
 
-    final Logger logger = LoggerFactory.getLogger( PAPContextListener.class );
+    final Logger logger = LoggerFactory.getLogger(PAPContextListener.class);
 
     public PAPContextListener() {
 
-        super();
+	super();
     }
 
-    public void contextInitialized( ServletContextEvent contextEvent ) {
-        
-                // get the servlet context
-        ServletContext servletContext = contextEvent.getServletContext();
-        
-        PAPService.start( servletContext );
+    public void contextInitialized(ServletContextEvent contextEvent) {
 
-        logger.info( "PAP service initialization complete!" );
-        
+	// get the servlet context
+	ServletContext servletContext = contextEvent.getServletContext();
+
+	PAPService.start(servletContext);
+
+	logger.info("PAP service initialization complete!");
+
     }
 
-    public void contextDestroyed( ServletContextEvent contextEvent ) {
-        
-        PAPService.stop();
-        logger.info( "PAP service shutdown complete!" );
+    public void contextDestroyed(ServletContextEvent contextEvent) {
+
+	PAPService.stop();
+	logger.info("PAP service shutdown complete!");
 
     }
 

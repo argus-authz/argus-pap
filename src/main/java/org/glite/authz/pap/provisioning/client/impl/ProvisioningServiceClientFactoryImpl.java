@@ -25,17 +25,16 @@ package org.glite.authz.pap.provisioning.client.impl;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
 
-
 /**
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
- *
+ * 
  */
-public class ProvisioningServiceClientFactoryImpl
-    extends ProvisioningServiceClientFactory {
+public class ProvisioningServiceClientFactoryImpl extends
+	ProvisioningServiceClientFactory {
 
-  @Override
-  public ProvisioningServiceClient createPolicyProvisioningServiceClient() {
-    return new ProvisioningServiceClientImpl();
-  }
+    @Override
+    public ProvisioningServiceClient createPolicyProvisioningServiceClient() {
+	return new ProvisioningServiceClientImpl();
+    }
 
 }

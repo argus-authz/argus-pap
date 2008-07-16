@@ -3,61 +3,34 @@ package org.glite.authz.pap.encoder;
 
 public interface BWParserConstants {
 
-  int EOF = 0;
-  int ALLOW = 6;
-  int DENY = 7;
-  int FQAN = 8;
-  int DN = 9;
-  int GA = 10;
-  int RESOURCE = 11;
-  int CERT = 12;
-  int SERVICE = 13;
-  int PILOT = 14;
-  int NO = 15;
-  int YES = 16;
-  int BW = 17;
-  int CLASS = 18;
-  int EXCEPT = 19;
-  int PRIVATE = 20;
-  int STRING = 21;
-  int ID = 22;
-  int ID2 = 23;
+    int EOF = 0;
+    int ALLOW = 6;
+    int DENY = 7;
+    int FQAN = 8;
+    int DN = 9;
+    int GA = 10;
+    int RESOURCE = 11;
+    int CERT = 12;
+    int SERVICE = 13;
+    int PILOT = 14;
+    int NO = 15;
+    int YES = 16;
+    int BW = 17;
+    int CLASS = 18;
+    int EXCEPT = 19;
+    int PRIVATE = 20;
+    int STRING = 21;
+    int ID = 22;
+    int ID2 = 23;
 
-  int DEFAULT = 0;
+    int DEFAULT = 0;
 
-  String[] tokenImage = {
-    "<EOF>",
-    "\" \"",
-    "\"\\t\"",
-    "\"\\n\"",
-    "\"\\r\"",
-    "\"\\f\"",
-    "\"allow\"",
-    "\"deny\"",
-    "\"fqan\"",
-    "\"dn\"",
-    "\"ga\"",
-    "\"resource\"",
-    "\"certificate\"",
-    "\"service_class_assignment\"",
-    "\"pilot\"",
-    "\"no\"",
-    "\"yes\"",
-    "\"blacklist\"",
-    "\"service_class\"",
-    "\"except\"",
-    "\"private\"",
-    "<STRING>",
-    "<ID>",
-    "<ID2>",
-    "\"[\"",
-    "\"]\"",
-    "\"{\"",
-    "\"}\"",
-    "\"=\"",
-    "\"(\"",
-    "\":\"",
-    "\")\"",
-  };
+    String[] tokenImage = { "<EOF>", "\" \"", "\"\\t\"", "\"\\n\"", "\"\\r\"",
+	    "\"\\f\"", "\"allow\"", "\"deny\"", "\"fqan\"", "\"dn\"", "\"ga\"",
+	    "\"resource\"", "\"certificate\"", "\"service_class_assignment\"",
+	    "\"pilot\"", "\"no\"", "\"yes\"", "\"blacklist\"",
+	    "\"service_class\"", "\"except\"", "\"private\"", "<STRING>",
+	    "<ID>", "<ID2>", "\"[\"", "\"]\"", "\"{\"", "\"}\"", "\"=\"",
+	    "\"(\"", "\":\"", "\")\"", };
 
 }

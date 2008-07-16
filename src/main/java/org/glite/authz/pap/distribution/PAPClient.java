@@ -26,55 +26,58 @@ public class PAPClient {
     private static final ProvisioningServiceClient client;
     private static final XACMLPolicyQueryType xacmlPolicyQuery;
     static {
-        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
-                .getProvisioningServiceClientFactory();
-        client = factory.createPolicyProvisioningServiceClient();
-        xacmlPolicyQuery = makeStandardPAPQuery();
+	ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
+		.getProvisioningServiceClientFactory();
+	client = factory.createPolicyProvisioningServiceClient();
+	xacmlPolicyQuery = makeStandardPAPQuery();
     }
 
     private static XACMLPolicyQueryType makeStandardPAPQuery() {
-        XACMLPolicyQueryType xacmlPolicyQuery = (XACMLPolicyQueryType) Configuration.getBuilderFactory()
-                .getBuilder(XACMLPolicyQueryType.TYPE_NAME_XACML20).buildObject(
-                        XACMLPolicyQueryType.TYPE_NAME_XACML20);
-        RequestType request = (RequestType) Configuration.getBuilderFactory().getBuilder(
-                RequestType.DEFAULT_ELEMENT_NAME).buildObject(RequestType.DEFAULT_ELEMENT_NAME);
-        xacmlPolicyQuery.getRequests().add(request);
-        return xacmlPolicyQuery;
+	XACMLPolicyQueryType xacmlPolicyQuery = (XACMLPolicyQueryType) Configuration
+		.getBuilderFactory().getBuilder(
+			XACMLPolicyQueryType.TYPE_NAME_XACML20).buildObject(
+			XACMLPolicyQueryType.TYPE_NAME_XACML20);
+	RequestType request = (RequestType) Configuration.getBuilderFactory()
+		.getBuilder(RequestType.DEFAULT_ELEMENT_NAME).buildObject(
+			RequestType.DEFAULT_ELEMENT_NAME);
+	xacmlPolicyQuery.getRequests().add(request);
+	return xacmlPolicyQuery;
     }
 
     private final ProvisioningServicePortType port;
 
     public PAPClient(String url) {
-        port = client.getProvisioningServicePortType(url);
+	port = client.getProvisioningServicePortType(url);
     }
 
     public List<XACMLObject> getLocalPolicies() {
-        List<XACMLObject> resultList = null;
-        Response response;
-        try {
-            response = port.xacmlPolicyQuery(xacmlPolicyQuery);
-            resultList = getXACMLObjectList(response);
-        } catch (RemoteException e) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
-            log.error("Remote exception");
-        } catch (ServiceException e) {
-            // TODO Auto-generated catch block
-            //e.printStackTrace();
-            log.error("Service exception");
-        }
-        return resultList;
+	List<XACMLObject> resultList = null;
+	Response response;
+	try {
+	    response = port.xacmlPolicyQuery(xacmlPolicyQuery);
+	    resultList = getXACMLObjectList(response);
+	} catch (RemoteException e) {
+	    // TODO Auto-generated catch block
+	    // e.printStackTrace();
+	    log.error("Remote exception");
+	} catch (ServiceException e) {
+	    // TODO Auto-generated catch block
+	    // e.printStackTrace();
+	    log.error("Service exception");
+	}
+	return resultList;
     }
 
     private List<XACMLObject> getXACMLObjectList(Response response) {
-        List<XACMLObject> responseList = new LinkedList<XACMLObject>();
-        Extensions extensions =  response.getExtensions();
-        List<XMLObject> xacmlPolicyStatementList = extensions.getUnknownXMLObjects(XACMLPolicyStatementType.DEFAULT_ELEMENT_NAME);
-        for (XMLObject xmlObject:xacmlPolicyStatementList) {
-            XACMLPolicyStatementType xacmlPolicyStatement = (XACMLPolicyStatementType) xmlObject;
-            responseList.addAll(xacmlPolicyStatement.getPolicySets());
-            responseList.addAll(xacmlPolicyStatement.getPolicies());
-        }
-        return responseList;
+	List<XACMLObject> responseList = new LinkedList<XACMLObject>();
+	Extensions extensions = response.getExtensions();
+	List<XMLObject> xacmlPolicyStatementList = extensions
+		.getUnknownXMLObjects(XACMLPolicyStatementType.DEFAULT_ELEMENT_NAME);
+	for (XMLObject xmlObject : xacmlPolicyStatementList) {
+	    XACMLPolicyStatementType xacmlPolicyStatement = (XACMLPolicyStatementType) xmlObject;
+	    responseList.addAll(xacmlPolicyStatement.getPolicySets());
+	    responseList.addAll(xacmlPolicyStatement.getPolicies());
+	}
+	return responseList;
     }
 }

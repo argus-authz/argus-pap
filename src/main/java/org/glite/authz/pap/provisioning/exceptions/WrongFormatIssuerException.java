@@ -22,11 +22,10 @@
 
 package org.glite.authz.pap.provisioning.exceptions;
 
-
 public class WrongFormatIssuerException extends Exception {
 
-  public WrongFormatIssuerException( String issuerFormat ) {
-    super("Wrong issuer format " + issuerFormat);
-  }
+    public WrongFormatIssuerException(String issuerFormat) {
+	super("Wrong issuer format " + issuerFormat);
+    }
 
 }

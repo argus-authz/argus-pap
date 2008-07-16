@@ -15,50 +15,50 @@ public class AuthorizationEngine {
     private PAPContext globalContext;
 
     private AuthorizationEngine(String papConf) {
-        
-        File papConfFile = new File( papConf );
-        
-        if ( !papConfFile.exists() )
-            throw new PAPConfigurationException(
-                    "PAP Authorization configuration file not found: "
-                            + papConfFile.getAbsolutePath() );
 
-        globalContext = PAPContext.instance( "global-context" );
+	File papConfFile = new File(papConf);
 
-        // Parse ACL from configuration file
-        AuthzConfigurationParser confParser = AuthzConfigurationParser
-                .instance();
-        
-        confParser.parse( papConfFile );
+	if (!papConfFile.exists())
+	    throw new PAPConfigurationException(
+		    "PAP Authorization configuration file not found: "
+			    + papConfFile.getAbsolutePath());
 
-        globalContext.setAcl( confParser.getParsedACL() );
+	globalContext = PAPContext.instance("global-context");
+
+	// Parse ACL from configuration file
+	AuthzConfigurationParser confParser = AuthzConfigurationParser
+		.instance();
+
+	confParser.parse(papConfFile);
+
+	globalContext.setAcl(confParser.getParsedACL());
     }
 
-    public static AuthorizationEngine initialize(String papAuthzConfFile){
-        
-        if (instance == null)
-            instance = new AuthorizationEngine(papAuthzConfFile);
-        
-        return instance;
+    public static AuthorizationEngine initialize(String papAuthzConfFile) {
+
+	if (instance == null)
+	    instance = new AuthorizationEngine(papAuthzConfFile);
+
+	return instance;
     }
-    
-    
+
     public static AuthorizationEngine instance() {
 
-        if ( instance == null )
-            throw new PAPAuthzException("Please initialize the authorization engine properly using the initialize method!");
-            
-        return instance;
+	if (instance == null)
+	    throw new PAPAuthzException(
+		    "Please initialize the authorization engine properly using the initialize method!");
+
+	return instance;
     }
 
     public boolean isInitialized() {
 
-        return initialized;
+	return initialized;
     }
 
     public PAPContext getGlobalContext() {
 
-        return globalContext;
+	return globalContext;
     }
 
 }

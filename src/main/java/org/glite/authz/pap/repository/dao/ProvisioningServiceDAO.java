@@ -16,40 +16,44 @@ public class ProvisioningServiceDAO {
     private static final ProvisioningServiceDAO instance = new ProvisioningServiceDAO();
 
     public static ProvisioningServiceDAO getInstance() {
-        return instance;
+	return instance;
     }
 
-    private ProvisioningServiceDAO() {}
+    private ProvisioningServiceDAO() {
+    }
 
     public List<XACMLObject> papQuery() {
-        List<XACMLObject> resultList = new LinkedList<XACMLObject>();
-        PAP localPAP = new PAP(PAP.localPAPId);
-        PAPContainer papContainer = RepositoryManager.getPAPManager().get(localPAP);
+	List<XACMLObject> resultList = new LinkedList<XACMLObject>();
+	PAP localPAP = new PAP(PAP.localPAPId);
+	PAPContainer papContainer = RepositoryManager.getPAPManager().get(
+		localPAP);
 
-        resultList.addAll(papContainer.getAllPolicySets());
-        resultList.addAll(papContainer.getAllPolicies());
+	resultList.addAll(papContainer.getAllPolicySets());
+	resultList.addAll(papContainer.getAllPolicies());
 
-        return resultList;
+	return resultList;
     }
 
     public List<XACMLObject> pdpQuery() {
-        List<XACMLObject> resultList = new LinkedList<XACMLObject>();
+	List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_papId", PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
-        resultList.add(rootPolicySet);
+	PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(
+		"RootPolicySet_papId",
+		PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+	resultList.add(rootPolicySet);
 
-        PolicySetHelper.addPolicySetReference(rootPolicySet, PAP.localPAPId);
+	PolicySetHelper.addPolicySetReference(rootPolicySet, PAP.localPAPId);
 
-        PAPManager papManager = RepositoryManager.getPAPManager();
-        for (PAPContainer papContainer : papManager.getAll()) {
-            String papId = papContainer.getPAP().getPapId();
-            if (!papId.equals(PAP.localPAPId)) {
-                PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
-            }
-            resultList.addAll(papContainer.getAllPolicySets());
-            resultList.addAll(papContainer.getAllPolicies());
-        }
+	PAPManager papManager = RepositoryManager.getPAPManager();
+	for (PAPContainer papContainer : papManager.getAll()) {
+	    String papId = papContainer.getPAP().getPapId();
+	    if (!papId.equals(PAP.localPAPId)) {
+		PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
+	    }
+	    resultList.addAll(papContainer.getAllPolicySets());
+	    resultList.addAll(papContainer.getAllPolicies());
+	}
 
-        return resultList;
+	return resultList;
     }
 }

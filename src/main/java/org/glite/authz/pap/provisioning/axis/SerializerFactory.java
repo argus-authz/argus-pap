@@ -27,23 +27,28 @@ import javax.xml.rpc.encoding.Serializer;
 
 /**
  * @author Valerio Venturi (valerio.venturi@cnaf.infn.it)
- *
+ * 
  */
-public class SerializerFactory implements org.apache.axis.encoding.SerializerFactory {
+public class SerializerFactory implements
+	org.apache.axis.encoding.SerializerFactory {
 
-	/* (non-Javadoc)
-	 * @see javax.xml.rpc.encoding.SerializerFactory#getSerializerAs(java.lang.String)
-	 */
-	public Serializer getSerializerAs(String arg0) {
-		return new org.glite.authz.pap.provisioning.axis.Serializer();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.xml.rpc.encoding.SerializerFactory#getSerializerAs(java.lang.String)
+     */
+    public Serializer getSerializerAs(String arg0) {
+	return new org.glite.authz.pap.provisioning.axis.Serializer();
+    }
 
-	/* (non-Javadoc)
-	 * @see javax.xml.rpc.encoding.SerializerFactory#getSupportedMechanismTypes()
-	 */
-	public Iterator getSupportedMechanismTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.xml.rpc.encoding.SerializerFactory#getSupportedMechanismTypes()
+     */
+    public Iterator getSupportedMechanismTypes() {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
 }

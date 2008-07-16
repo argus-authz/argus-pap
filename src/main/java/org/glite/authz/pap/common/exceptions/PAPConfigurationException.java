@@ -24,7 +24,7 @@ package org.glite.authz.pap.common.exceptions;
 
 /**
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
- *
+ * 
  */
 public class PAPConfigurationException extends RuntimeException {
 
@@ -35,26 +35,26 @@ public class PAPConfigurationException extends RuntimeException {
 
     public PAPConfigurationException() {
 
-        super();
-        // TODO Auto-generated constructor stub
+	super();
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPConfigurationException( String message, Throwable cause ) {
+    public PAPConfigurationException(String message, Throwable cause) {
 
-        super( message, cause );
-        // TODO Auto-generated constructor stub
+	super(message, cause);
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPConfigurationException( String message ) {
+    public PAPConfigurationException(String message) {
 
-        super( message );
-        // TODO Auto-generated constructor stub
+	super(message);
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPConfigurationException( Throwable cause ) {
+    public PAPConfigurationException(Throwable cause) {
 
-        super( cause );
-        // TODO Auto-generated constructor stub
+	super(cause);
+	// TODO Auto-generated constructor stub
     }
 
 }

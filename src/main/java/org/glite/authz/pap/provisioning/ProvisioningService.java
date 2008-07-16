@@ -38,63 +38,63 @@ import org.slf4j.LoggerFactory;
 
 public class ProvisioningService {
 
-    final Logger logger = LoggerFactory.getLogger( ProvisioningService.class );
+    final Logger logger = LoggerFactory.getLogger(ProvisioningService.class);
 
-    public Response XACMLPolicyQuery( XACMLPolicyQueryType query )
-            throws java.rmi.RemoteException {
+    public Response XACMLPolicyQuery(XACMLPolicyQueryType query)
+	    throws java.rmi.RemoteException {
 
-        // log the received query
-        if ( logger.isDebugEnabled() ) {
-            logger.debug( "Received XACLMPolicyQuery "
-                    + ProvisioningServiceUtils.xmlObjectToString( query ) );
-        }
+	// log the received query
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Received XACLMPolicyQuery "
+		    + ProvisioningServiceUtils.xmlObjectToString(query));
+	}
 
-        /* check a few things about the query */
+	/* check a few things about the query */
 
-        try {
-            ProvisioningServiceUtils.checkQuery( query );
-        } catch ( VersionMismatchException e ) {
-            logger.error( e.getMessage(), e );
-            return ProvisioningServiceUtils.createResponse( query, e );
-        } catch ( MissingIssuerException e ) {
-            logger.error( e.getMessage(), e );
-            return ProvisioningServiceUtils.createResponse( query, e );
-        } catch ( WrongFormatIssuerException e ) {
-            logger.error( e.getMessage(), e );
-            return ProvisioningServiceUtils.createResponse( query, e );
-        }
+	try {
+	    ProvisioningServiceUtils.checkQuery(query);
+	} catch (VersionMismatchException e) {
+	    logger.error(e.getMessage(), e);
+	    return ProvisioningServiceUtils.createResponse(query, e);
+	} catch (MissingIssuerException e) {
+	    logger.error(e.getMessage(), e);
+	    return ProvisioningServiceUtils.createResponse(query, e);
+	} catch (WrongFormatIssuerException e) {
+	    logger.error(e.getMessage(), e);
+	    return ProvisioningServiceUtils.createResponse(query, e);
+	}
 
-        /* get local policies */
+	/* get local policies */
 
-        List <XACMLObject> resultList = null;
+	List<XACMLObject> resultList = null;
 
-        /*
-         * TODO discrimination between a PAP and a PDP is done after the
-         * presence of the Extensions element, too simplistic
-         */
+	/*
+	 * TODO discrimination between a PAP and a PDP is done after the
+	 * presence of the Extensions element, too simplistic
+	 */
 
-        Extensions extensions = query.getExtensions();
+	Extensions extensions = query.getExtensions();
 
-        if ( extensions == null )
+	if (extensions == null)
 
-            resultList = GetPoliciesForPDPOperation.instance().execute();
+	    resultList = GetPoliciesForPDPOperation.instance().execute();
 
-        else
+	else
 
-            resultList = GetPoliciesForPAPOperation.instance().execute();
+	    resultList = GetPoliciesForPAPOperation.instance().execute();
 
-        /* prepare the response */
+	/* prepare the response */
 
-        Response response = ProvisioningServiceUtils.createResponse( query,
-                resultList );
+	Response response = ProvisioningServiceUtils.createResponse(query,
+		resultList);
 
-        // log the outgoing response
-        if ( logger.isDebugEnabled() ) {
-            logger.debug( "Sending Response : "
-                    + ProvisioningServiceUtils.xmlObjectToString( response ) );
-        }
+	// log the outgoing response
+	if (logger.isDebugEnabled()) {
+	    logger.debug("Sending Response : "
+		    + ProvisioningServiceUtils.xmlObjectToString(response));
+	}
 
-        return response;
+	return response;
     }
 
 }

@@ -28,24 +28,28 @@ import javax.xml.rpc.encoding.Deserializer;
 
 /**
  * @author Valerio Venturi (valerio.venturi@cnaf.infn.it)
- *
+ * 
  */
 public class DeserializerFactory implements
-		org.apache.axis.encoding.DeserializerFactory {
+	org.apache.axis.encoding.DeserializerFactory {
 
-	/* (non-Javadoc)
-	 * @see javax.xml.rpc.encoding.DeserializerFactory#getDeserializerAs(java.lang.String)
-	 */
-	public Deserializer getDeserializerAs(String arg0) {
-		return new org.glite.authz.pap.provisioning.axis.Deserializer();
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.xml.rpc.encoding.DeserializerFactory#getDeserializerAs(java.lang.String)
+     */
+    public Deserializer getDeserializerAs(String arg0) {
+	return new org.glite.authz.pap.provisioning.axis.Deserializer();
+    }
 
-	/* (non-Javadoc)
-	 * @see javax.xml.rpc.encoding.DeserializerFactory#getSupportedMechanismTypes()
-	 */
-	public Iterator getSupportedMechanismTypes() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.xml.rpc.encoding.DeserializerFactory#getSupportedMechanismTypes()
+     */
+    public Iterator getSupportedMechanismTypes() {
+	// TODO Auto-generated method stub
+	return null;
+    }
 
 }

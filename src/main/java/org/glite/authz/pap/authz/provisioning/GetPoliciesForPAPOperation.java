@@ -8,31 +8,31 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.repository.dao.ProvisioningServiceDAO;
 import org.opensaml.xacml.XACMLObject;
 
-
 public class GetPoliciesForPAPOperation extends
-        BasePAPOperation <List <XACMLObject>> {
+	BasePAPOperation<List<XACMLObject>> {
 
     private GetPoliciesForPAPOperation() {
 
-        // TODO Auto-generated constructor stub
+	// TODO Auto-generated constructor stub
     }
-    
+
     public static GetPoliciesForPAPOperation instance() {
 
-        return new GetPoliciesForPAPOperation();
+	return new GetPoliciesForPAPOperation();
     }
-    
-    @Override
-    protected List <XACMLObject> doExecute() {
 
-        return ProvisioningServiceDAO.getInstance().papQuery();
+    @Override
+    protected List<XACMLObject> doExecute() {
+
+	return ProvisioningServiceDAO.getInstance().papQuery();
     }
 
     @Override
     protected void setupPermissions() {
 
-        addRequiredPermission( PAPPermission.of( PermissionFlags.POLICY_READ_LOCAL) );
-        
+	addRequiredPermission(PAPPermission
+		.of(PermissionFlags.POLICY_READ_LOCAL));
+
     }
 
 }

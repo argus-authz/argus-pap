@@ -1,6 +1,5 @@
 package org.glite.authz.pap.common.exceptions;
 
-
 public class PAPException extends RuntimeException {
 
     /**
@@ -10,26 +9,26 @@ public class PAPException extends RuntimeException {
 
     public PAPException() {
 
-        super();
-        // TODO Auto-generated constructor stub
+	super();
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPException( String message, Throwable cause ) {
+    public PAPException(String message, Throwable cause) {
 
-        super( message, cause );
-        // TODO Auto-generated constructor stub
+	super(message, cause);
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPException( String message ) {
+    public PAPException(String message) {
 
-        super( message );
-        // TODO Auto-generated constructor stub
+	super(message);
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPException( Throwable cause ) {
+    public PAPException(Throwable cause) {
 
-        super( cause );
-        // TODO Auto-generated constructor stub
+	super(cause);
+	// TODO Auto-generated constructor stub
     }
-    
+
 }

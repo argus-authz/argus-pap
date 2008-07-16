@@ -9,30 +9,32 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 public abstract class RepositoryManager {
 
-	public static DAOFactory getDAOFactory() {
-		return DAOFactory.getDAOFactory();
+    public static DAOFactory getDAOFactory() {
+	return DAOFactory.getDAOFactory();
+    }
+
+    public static RepositoryManager getInstance() {
+	return new FileSystemRepositoryManager();
+    }
+
+    public static PAPManager getPAPManager() {
+	return FileSystemPAPManager.getInstance();
+    }
+
+    public void bootstrap() {
+	initialize();
+	PAPManager papManager = getPAPManager();
+	PAP localPAP = new PAP(PAP.localPAPId);
+	if (!papManager.exists(localPAP)) {
+	    papManager.create(localPAP);
+	    PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(
+		    PAP.localPAPId,
+		    PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
+	    PAPContainer local = papManager.get(localPAP);
+	    local.storePolicySet(localPolicySet);
 	}
-	
-	public static RepositoryManager getInstance() {
-		return new FileSystemRepositoryManager();
-	}
-	
-	public static PAPManager getPAPManager() {
-		return FileSystemPAPManager.getInstance();
-	}
-	
-	public void bootstrap() {
-	    initialize();
-	    PAPManager papManager = getPAPManager();
-	    PAP localPAP = new PAP(PAP.localPAPId);
-	    if (!papManager.exists(localPAP)) {
-	        papManager.create(localPAP);
-	        PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(PAP.localPAPId, PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
-	        PAPContainer local = papManager.get(localPAP);
-	        local.storePolicySet(localPolicySet);
-	    }
-	}
-	
-	protected abstract void initialize();
+    }
+
+    protected abstract void initialize();
 
 }

@@ -41,7 +41,7 @@ import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 
 public class ProvisioningServicePortTypeImpl implements
-        ProvisioningServicePortType {
+	ProvisioningServicePortType {
 
     private String url;
 
@@ -50,110 +50,109 @@ public class ProvisioningServicePortTypeImpl implements
     private String clientPrivateKey;
 
     private String clientPrivateKeyPassword;
-    
-    protected ProvisioningServicePortTypeImpl( String url ) {
-        
-        this.url = url;
+
+    protected ProvisioningServicePortTypeImpl(String url) {
+
+	this.url = url;
     }
 
-    public Response xacmlPolicyQuery( XACMLPolicyQueryType xacmlPolicyQuery )
-            throws ServiceException , RemoteException {
+    public Response xacmlPolicyQuery(XACMLPolicyQueryType xacmlPolicyQuery)
+	    throws ServiceException, RemoteException {
 
-        /*
-         * TODO this client is supposed to be used to contact PAPs, so check the
-         * proper extensions is present
-         */
+	/*
+	 * TODO this client is supposed to be used to contact PAPs, so check the
+	 * proper extensions is present
+	 */
 
-        /*
-         * tell Axis to use trustmanager secure socket factory and set the
-         * properties for the cert and key
-         */
+	/*
+	 * tell Axis to use trustmanager secure socket factory and set the
+	 * properties for the cert and key
+	 */
 
-        AxisProperties.setProperty( "axis.socketSecureFactory",
-                "org.glite.security.trustmanager.axis.AXISSocketFactory" );
+	AxisProperties.setProperty("axis.socketSecureFactory",
+		"org.glite.security.trustmanager.axis.AXISSocketFactory");
 
-        // need to pass property to AXISSocketFactory
-        Properties properties = AXISSocketFactory.getCurrentProperties();
+	// need to pass property to AXISSocketFactory
+	Properties properties = AXISSocketFactory.getCurrentProperties();
 
-        // TODO will get cert and key form the configuration, with those as
-        // default
+	// TODO will get cert and key form the configuration, with those as
+	// default
 
-        if ( clientCertificate == null )
-            properties.setProperty( "sslCertFile",
-                    "/etc/grid-security/hostcert.pem" );
-        else
-            properties.setProperty( "sslCertFile", clientCertificate );
+	if (clientCertificate == null)
+	    properties.setProperty("sslCertFile",
+		    "/etc/grid-security/hostcert.pem");
+	else
+	    properties.setProperty("sslCertFile", clientCertificate);
 
-        if ( clientPrivateKey == null )
-            properties.setProperty( "sslKey", "/etc/grid-security/hostkey.pem" );
-        else
-            properties.setProperty( "sslKey", clientPrivateKey );
-        
-        if (clientPrivateKeyPassword != null)
-            properties.setProperty( "sslKeyPasswd", clientPrivateKeyPassword );
-        
-        AXISSocketFactory.setCurrentProperties( properties );
+	if (clientPrivateKey == null)
+	    properties.setProperty("sslKey", "/etc/grid-security/hostkey.pem");
+	else
+	    properties.setProperty("sslKey", clientPrivateKey);
 
-        /* instantiate the axis service */
+	if (clientPrivateKeyPassword != null)
+	    properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
 
-        Service service = new Service();
+	AXISSocketFactory.setCurrentProperties(properties);
 
-        Call call = (Call) service.createCall();
+	/* instantiate the axis service */
 
+	Service service = new Service();
 
-        call.setTargetEndpointAddress( url );
-        call.setOperationName( new QName( "http://change.me.please.i.am.fictious", "xacmlPolicyQuery" ) );
-        
-        
-        call.setOperationStyle( Style.DOCUMENT );
-        call.setOperationUse( Use.LITERAL );
+	Call call = (Call) service.createCall();
 
-        /* register custom serializer and deserializer */
+	call.setTargetEndpointAddress(url);
+	call.setOperationName(new QName(
+		"http://change.me.please.i.am.fictious", "xacmlPolicyQuery"));
 
-        QName xacmlPolicyQueryQName = new QName(
-                "urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol",
-                "XACMLPolicyQuery" );
+	call.setOperationStyle(Style.DOCUMENT);
+	call.setOperationUse(Use.LITERAL);
 
-        QName responseQName = new QName(
-                "urn:oasis:names:tc:SAML:2.0:protocol", "Response" );
+	/* register custom serializer and deserializer */
 
-        call.registerTypeMapping( XACMLPolicyQueryType.class,
-                xacmlPolicyQueryQName, new SerializerFactory(),
-                new DeserializerFactory() );
+	QName xacmlPolicyQueryQName = new QName(
+		"urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol",
+		"XACMLPolicyQuery");
 
-        call.registerTypeMapping( Response.class, responseQName,
-                new SerializerFactory(), new DeserializerFactory() );
+	QName responseQName = new QName("urn:oasis:names:tc:SAML:2.0:protocol",
+		"Response");
 
-        /* call the service */
+	call.registerTypeMapping(XACMLPolicyQueryType.class,
+		xacmlPolicyQueryQName, new SerializerFactory(),
+		new DeserializerFactory());
 
-        Response response = (Response) call
-                .invoke( new Object[] { xacmlPolicyQuery } );
+	call.registerTypeMapping(Response.class, responseQName,
+		new SerializerFactory(), new DeserializerFactory());
 
-        return response;
+	/* call the service */
+
+	Response response = (Response) call
+		.invoke(new Object[] { xacmlPolicyQuery });
+
+	return response;
     }
 
-    public void setClientCertificate( String certFile ) {
+    public void setClientCertificate(String certFile) {
 
-        clientCertificate = certFile;
-        
+	clientCertificate = certFile;
+
     }
 
-    public void setClientPrivateKey( String keyFile ) {
+    public void setClientPrivateKey(String keyFile) {
 
-        clientPrivateKey = keyFile;
-        
+	clientPrivateKey = keyFile;
+
     }
 
-    public void setTargetEndpoint( String endpointURL ) {
+    public void setTargetEndpoint(String endpointURL) {
 
-        url = endpointURL;
-        
+	url = endpointURL;
+
     }
 
-    public void setClientPrivateKeyPassword( String privateKeyPassword ) {
+    public void setClientPrivateKeyPassword(String privateKeyPassword) {
 
-        clientPrivateKeyPassword = privateKeyPassword;
-        
+	clientPrivateKeyPassword = privateKeyPassword;
+
     }
 
 }

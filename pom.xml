@@ -25,6 +25,12 @@
       </plugin>
     </plugins>
   </build>
+  <distributionManagement>
+    <repository>
+      <id>internal</id>
+      <url>dav:http://pcceccanti.cnaf.infn.it:11250/archiva/repository/internal/</url>
+    </repository>
+  </distributionManagement>
   <repositories>
     <repository>
       <snapshots>
@@ -33,6 +39,17 @@
       <id>shibboleth.internet2.edu</id>
       <name>Internet2</name>
       <url>http://shibboleth.internet2.edu/downloads/maven2</url>
+    </repository>
+    <repository>
+      <id>internal</id>
+      <name>Cnaf Archiva Managed Internal Repository</name>
+      <url>http://pcceccanti.cnaf.infn.it:11250/archiva/repository/internal/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
   <dependencies>

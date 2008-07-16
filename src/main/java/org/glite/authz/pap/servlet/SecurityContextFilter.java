@@ -13,28 +13,28 @@ import org.glite.authz.pap.authz.InitSecurityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class SecurityContextFilter implements Filter {
 
-    protected Logger logger = LoggerFactory.getLogger( SecurityContextFilter.class );
-    
+    protected Logger logger = LoggerFactory
+	    .getLogger(SecurityContextFilter.class);
+
     public void destroy() {
 
-        // TODO Auto-generated method stub
+	// TODO Auto-generated method stub
 
     }
 
-    public void doFilter( ServletRequest request, ServletResponse response,
-            FilterChain chain ) throws IOException , ServletException {
+    public void doFilter(ServletRequest request, ServletResponse response,
+	    FilterChain chain) throws IOException, ServletException {
 
-        InitSecurityContext.setContextFromRequest( request );
-        chain.doFilter( request, response );
+	InitSecurityContext.setContextFromRequest(request);
+	chain.doFilter(request, response);
 
     }
 
-    public void init( FilterConfig filterConfig ) throws ServletException {
+    public void init(FilterConfig filterConfig) throws ServletException {
 
-        // TODO Auto-generated method stub
+	// TODO Auto-generated method stub
 
     }
 

@@ -1,6 +1,5 @@
 package org.glite.authz.pap.common.exceptions;
 
-
 public class VOMSSyntaxException extends PAPException {
 
     /**
@@ -10,26 +9,26 @@ public class VOMSSyntaxException extends PAPException {
 
     public VOMSSyntaxException() {
 
-        super();
-        // TODO Auto-generated constructor stub
+	super();
+	// TODO Auto-generated constructor stub
     }
 
-    public VOMSSyntaxException( String message, Throwable cause ) {
+    public VOMSSyntaxException(String message, Throwable cause) {
 
-        super( message, cause );
-        // TODO Auto-generated constructor stub
+	super(message, cause);
+	// TODO Auto-generated constructor stub
     }
 
-    public VOMSSyntaxException( String message ) {
+    public VOMSSyntaxException(String message) {
 
-        super( message );
-        // TODO Auto-generated constructor stub
+	super(message);
+	// TODO Auto-generated constructor stub
     }
 
-    public VOMSSyntaxException( Throwable cause ) {
+    public VOMSSyntaxException(Throwable cause) {
 
-        super( cause );
-        // TODO Auto-generated constructor stub
+	super(cause);
+	// TODO Auto-generated constructor stub
     }
-    
+
 }
