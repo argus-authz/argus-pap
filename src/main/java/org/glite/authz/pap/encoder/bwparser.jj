@@ -72,6 +72,8 @@ TOKEN:
       "'"
 >
 | <ID2: (["a"-"z", "A"-"Z", "0"-"9"])+>
+| <HEX:    "0x" (["0"-"9", "a"-"f", "A"-"F"])+>
+| <NUMBER: (["0"-"9"])+>
 }
 
 
@@ -82,7 +84,7 @@ List<XACMLObject> Text() :
   String output = new String();
 }
 { 
-  (policies=Section() { 
+  (policies=SectionType() { 
     allpolicies.policies.addAll(policies.policies); 
     })*
   { return allpolicies.Output(); }
@@ -90,22 +92,27 @@ List<XACMLObject> Text() :
 
 Policies Section() :
 {
-  Policies policies = null;
+  Policies policies=new Policies();
+  Policy policy=null;
 }
 {
-  "[" policies=SectionType()
+  ( policy=SectionType()
+    {policies.policies.add(policy); }
+  )+
   { return policies; }
 }
 
-Policies SectionType() :
+
+Policy SectionType() :
 {
-  Policies policies = null;
+  Policy policy = null;
 }
 {
-  <BW> "]" policies = BW_Policies()
-  { return policies; }
-| <SERVICE> "]" policies = ServiceClassPolicies()
-  { return policies; }
+        
+  <RESOURCE> policy = BW_Policy()
+  { return policy; }
+| <CLASS> policy = ServiceClassPolicy()
+  { return policy; }
 }
 
 Policies BW_Policies() :
@@ -114,7 +121,7 @@ Policies BW_Policies() :
   Policies policies = new Policies();
 }
 {
-  (policy=BW_Policy() {policies.policies.add(policy);})+
+  (<RESOURCE> policy=BW_Policy() {policies.policies.add(policy);})+
   {
     return policies;
   }
@@ -127,7 +134,7 @@ Policy BW_Policy() :
   Policy policy = new Policy();
 }
 {
-  <RESOURCE> resource=TextString() "{" conds=Conditions() "}"
+  resource=TextString() "{" conds=Conditions() "}"
   {
     policy.name = resource;
     policy.type = Policy.POLICY_TYPE_BW;
@@ -163,7 +170,7 @@ Policy ServiceClassPolicy() :
   Policies policies = null;
 }
 {
-  <CLASS> resource=TextString() "{" policies=BW_Policies() "}"
+  resource=TextString() "{" policies=BW_Policies() "}"
   {
     policy.name = resource;
     policy.type = Policy.POLICY_TYPE_CLASS;
@@ -272,7 +279,7 @@ SingleCondition Item() :
     sc.value1 = s1;
     return sc;
   }
-| <CERT> "=" "(" s1=TextString() ":" s2=TextString() ")"
+| <CERT> "=" "(" s1=TextString() ":" s2=Number() ")"
   {
     sc.type = SingleCondition.TYPE_CERT;
     sc.value1 = s1;
@@ -283,12 +290,6 @@ SingleCondition Item() :
   {
     sc.type = SingleCondition.TYPE_RESOURCE;
     sc.value1 = s1;
-    return sc;
-  }
-| <PILOT> "=" value=YesOrNo()
-  { 
-    sc.type = SingleCondition.TYPE_PILOT;
-    sc.yesorno= value;
     return sc;
   }
 | s1=TextString() "=" s2=TextString()
@@ -320,4 +321,15 @@ String TextString():
   { return t.toString(); }
 | t=<ID2>
   { return t.toString(); } 
+}
+
+String Number() :
+{
+  Token t = null;
+}
+{ 
+  t = <NUMBER>
+  { return t.toString(); }
+| t = <HEX>
+  { return t.toString(); }
 }

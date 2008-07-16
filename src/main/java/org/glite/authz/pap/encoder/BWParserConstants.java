@@ -22,6 +22,8 @@ public interface BWParserConstants {
   int STRING = 21;
   int ID = 22;
   int ID2 = 23;
+  int HEX = 24;
+  int NUMBER = 25;
 
   int DEFAULT = 0;
 
@@ -50,8 +52,8 @@ public interface BWParserConstants {
     "<STRING>",
     "<ID>",
     "<ID2>",
-    "\"[\"",
-    "\"]\"",
+    "<HEX>",
+    "<NUMBER>",
     "\"{\"",
     "\"}\"",
     "\"=\"",
