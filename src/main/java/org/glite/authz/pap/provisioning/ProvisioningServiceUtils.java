@@ -136,17 +136,13 @@ public class ProvisioningServiceUtils {
 	XACMLPolicyStatementTypeImplBuilder policyStatementBuilder = (XACMLPolicyStatementTypeImplBuilder) builderFactory
 		.getBuilder(XACMLPolicyStatementType.TYPE_NAME_XACML20);
 
+	XACMLPolicyStatementType policyStatement = policyStatementBuilder
+		.buildObject(Statement.DEFAULT_ELEMENT_NAME,
+			XACMLPolicyStatementType.TYPE_NAME_XACML20);
+	
 	Iterator<XACMLObject> iterator = policyObjects.iterator();
 
 	while (iterator.hasNext()) {
-
-	    // build the policy statement
-	    XACMLPolicyStatementType policyStatement = policyStatementBuilder
-		    .buildObject(Statement.DEFAULT_ELEMENT_NAME,
-			    XACMLPolicyStatementType.TYPE_NAME_XACML20);
-
-	    // TODO throw an exception if the list item is not PolicySet ot
-	    // Policy
 
 	    XACMLObject xacmlObject = iterator.next();
 
