@@ -4,6 +4,7 @@ import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
 import org.opensaml.xacml.XACMLObject;
 import java.util.List;
+import java.util.Vector;
 
 public class BWParserTokenManager implements BWParserConstants
 {

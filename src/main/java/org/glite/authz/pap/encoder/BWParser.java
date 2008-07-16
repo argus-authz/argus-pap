@@ -4,11 +4,12 @@ import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
 import org.opensaml.xacml.XACMLObject;
 import java.util.List;
+import java.util.Vector;
 
 class BWParser implements BWParserConstants {
 
   static final public List<XACMLObject> Text() throws ParseException {
-  Policies policies = null;
+  Policy policy = null;
   Policies allpolicies = new Policies();
   String output = new String();
     label_1:
@@ -22,8 +23,8 @@ class BWParser implements BWParserConstants {
         jj_la1[0] = jj_gen;
         break label_1;
       }
-      policies = SectionType();
-    allpolicies.policies.addAll(policies.policies);
+      policy = SectionType();
+    allpolicies.policies.add(policy);
     }
     {if (true) return allpolicies.Output();}
     throw new Error("Missing return statement in function");

@@ -4,6 +4,7 @@ import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
 import org.opensaml.xacml.XACMLObject;
 import java.util.List;
+import java.util.Vector;
 
 class BWParser {
 //     public static String main(String args[]) throws ParseException {
@@ -79,13 +80,13 @@ TOKEN:
 
 List<XACMLObject> Text() :
 {
-  Policies policies = null;
+  Policy policy = null;
   Policies allpolicies = new Policies();
   String output = new String();
 }
 { 
-  (policies=SectionType() { 
-    allpolicies.policies.addAll(policies.policies); 
+  (policy=SectionType() { 
+    allpolicies.policies.add(policy); 
     })*
   { return allpolicies.Output(); }
 }
