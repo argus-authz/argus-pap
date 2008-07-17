@@ -4,6 +4,7 @@ import javax.servlet.ServletContext;
 
 import org.glite.authz.pap.authz.AuthorizationEngine;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
+import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
@@ -50,12 +51,17 @@ public final class PAPService {
 	// Start repository manager
 	logger.info("Starting repository manager...");
 	RepositoryManager.getInstance().bootstrap();
-    }
+	
+	logger.info("Starting pap distribution module...");
+	DistributionModule.getInstance().startDistributionModule();    }
 
     public static void stop() {
 
 	logger.info("Shutting down PAP service...");
-
+	
+	logger.info("Shutting down distribution module...");
+	DistributionModule.getInstance().stopDistributionModule();
+	
     }
 
 }

@@ -34,13 +34,7 @@ import javax.servlet.ServletContext;
 
 import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.INIConfiguration;
-import org.glite.authz.pap.authz.AuthorizationEngine;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
-import org.glite.authz.pap.repository.RepositoryManager;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
