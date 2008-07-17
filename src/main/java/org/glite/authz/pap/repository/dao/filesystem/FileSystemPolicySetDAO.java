@@ -83,8 +83,6 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 
     public void store(String papId, PolicySetType ps) {
 	if (!exists(papId, ps.getPolicySetId())) {
-	    log.debug("Storing PolicySet \"" + ps.getPolicySetId()
-		    + "\" into PAP \"" + papId + "\"");
 	    policySetHelper.toFile(FileSystemRepositoryManager
 		    .getPolicySetAbsolutePath(papId, ps.getPolicySetId()), ps);
 	}
