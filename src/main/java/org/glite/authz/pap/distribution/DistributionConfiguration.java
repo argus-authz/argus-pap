@@ -56,7 +56,7 @@ public class DistributionConfiguration {
     public long getPollIntervallInMillis() {
 
         long pollIntervalInSecs = papConfiguration.getLong(pollIntervallKey());
-        log.info("Polling interval for remote PAPs is set to: " + pollIntervalInSecs);
+        log.info("Polling interval for remote PAPs is set to: " + pollIntervalInSecs + " seconds");
 
         return pollIntervalInSecs * 1000;
 
@@ -118,6 +118,9 @@ public class DistributionConfiguration {
             log.info("Adding remote PAP: " + pap);
             papList.add(pap);
         }
+        
+        if (papAliasList.isEmpty())
+            log.info("No remote PAPs has been defined");
 
         return papList;
     }
