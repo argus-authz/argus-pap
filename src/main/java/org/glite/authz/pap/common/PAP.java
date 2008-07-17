@@ -7,38 +7,42 @@ public class PAP {
     private String endpoint;
     private String dn;
 
-    public PAP(String endpoint, String dn) {
-	this.papId = dn;
-	this.endpoint = endpoint;
-	this.dn = dn;
+    public PAP(String papId) {
+        this(null, papId);
     }
 
-    public PAP(String papId) {
-	this(null, papId);
+    public PAP(String endpoint, String dn) {
+        this.papId = dn.replace('/', '_').replace('@', '-');
+        this.endpoint = endpoint;
+        this.dn = dn;
     }
 
     public String getDn() {
-	return dn;
+        return dn;
     }
 
     public String getEndpoint() {
-	return endpoint;
+        return endpoint;
     }
 
     public String getPapId() {
-	return papId;
+        return papId;
     }
 
     public void setDn(String dn) {
-	this.dn = dn;
+        this.dn = dn;
     }
 
     public void setEndpoint(String endpoint) {
-	this.endpoint = endpoint;
+        this.endpoint = endpoint;
     }
 
     public void setPapId(String papId) {
-	this.papId = papId;
+        this.papId = papId;
+    }
+
+    public String toString() {
+        return "dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
     }
 
 }
