@@ -16,6 +16,10 @@ public class PAP {
         this.endpoint = endpoint;
         this.dn = dn;
     }
+    
+    public static PAP makeLocalPAP() {
+        return new PAP("localhost", localPAPId);
+    }
 
     public String getDn() {
         return dn;
