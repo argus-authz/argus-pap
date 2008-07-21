@@ -25,121 +25,114 @@ import org.opensaml.xacml.policy.TargetType;
 public abstract class PolicyWizard {
 
     private final static Random generator = new Random();
-    private final PolicyType policy;
+    protected final PolicyType policy;
 
-    protected PolicyWizard(String policyId,
-	    List<AttributeWizard> targetAttributeList,
-	    List<List<AttributeWizard>> orExceptionsAttributeList,
-	    EffectType effect) {
+    protected PolicyWizard(String policyId, List<AttributeWizard> targetAttributeList,
+            List<List<AttributeWizard>> orExceptionsAttributeList, EffectType effect) {
 
-	if (targetAttributeList == null) {
-	    targetAttributeList = new LinkedList<AttributeWizard>();
-	}
-	if (orExceptionsAttributeList == null) {
-	    orExceptionsAttributeList = new LinkedList<List<AttributeWizard>>();
-	}
+        if (targetAttributeList == null) {
+            targetAttributeList = new LinkedList<AttributeWizard>();
+        }
+        if (orExceptionsAttributeList == null) {
+            orExceptionsAttributeList = new LinkedList<List<AttributeWizard>>();
+        }
 
-	policy = PolicyHelper.buildWithAnyTarget(policyId,
-		PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+        policy = PolicyHelper.buildWithAnyTarget(policyId, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 
-	// TODO: gestire list exceptions Or e AND
-	List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
-	for (List<AttributeWizard> andList : orExceptionsAttributeList) {
-	    exceptionsAttributeList.addAll(andList);
-	}
+        // TODO: gestire list exceptions Or e AND
+        List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
+        for (List<AttributeWizard> andList : orExceptionsAttributeList) {
+            exceptionsAttributeList.addAll(andList);
+        }
 
-	List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
-	List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();
-	List<AttributeType> environmentAttributes = new LinkedList<AttributeType>();
-	divideIntoSubLists(targetAttributeList, subjectAttributes,
-		resourceAttributes, environmentAttributes);
+        List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
+        List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();
+        List<AttributeType> environmentAttributes = new LinkedList<AttributeType>();
+        divideIntoSubLists(targetAttributeList, subjectAttributes, resourceAttributes,
+                environmentAttributes);
 
-	policy.setTarget(createTarget(subjectAttributes, resourceAttributes,
-		environmentAttributes));
-	subjectAttributes.clear();
-	resourceAttributes.clear();
-	environmentAttributes.clear();
-	divideIntoSubLists(exceptionsAttributeList, subjectAttributes,
-		resourceAttributes, environmentAttributes);
-	policy.getRules().add(
-		ExceptionsRule.build(subjectAttributes, resourceAttributes,
-			environmentAttributes, effect));
+        policy.setTarget(createTarget(subjectAttributes, resourceAttributes, environmentAttributes));
+        subjectAttributes.clear();
+        resourceAttributes.clear();
+        environmentAttributes.clear();
+        divideIntoSubLists(exceptionsAttributeList, subjectAttributes, resourceAttributes,
+                environmentAttributes);
+        policy.getRules().add(
+                ExceptionsRule.build(subjectAttributes, resourceAttributes, environmentAttributes,
+                        effect));
 
     }
 
     public PolicyType getPolicyType() {
-	return policy;
+        return policy;
     }
 
     @Deprecated
-    public static PolicyType build(String policyId,
-	    List<AttributeWizard> targetAttributeList,
-	    List<List<AttributeWizard>> orExceptionsAttributeList,
-	    EffectType effect) {
+    public static PolicyType build(String policyId, List<AttributeWizard> targetAttributeList,
+            List<List<AttributeWizard>> orExceptionsAttributeList, EffectType effect) {
 
-	List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
-	for (List<AttributeWizard> andList : orExceptionsAttributeList) {
-	    exceptionsAttributeList.addAll(andList);
-	}
-	// TODO: gestire list exceptions Or e AND
-	PolicyType policy = PolicyHelper.buildWithAnyTarget(policyId,
-		PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+        List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
+        for (List<AttributeWizard> andList : orExceptionsAttributeList) {
+            exceptionsAttributeList.addAll(andList);
+        }
+        // TODO: gestire list exceptions Or e AND
+        PolicyType policy = PolicyHelper.buildWithAnyTarget(policyId,
+                PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 
-	List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
-	List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();
-	List<AttributeType> environmentAttributes = new LinkedList<AttributeType>();
-	divideIntoSubLists(targetAttributeList, subjectAttributes,
-		resourceAttributes, environmentAttributes);
+        List<AttributeType> subjectAttributes = new LinkedList<AttributeType>();
+        List<AttributeType> resourceAttributes = new LinkedList<AttributeType>();
+        List<AttributeType> environmentAttributes = new LinkedList<AttributeType>();
+        divideIntoSubLists(targetAttributeList, subjectAttributes, resourceAttributes,
+                environmentAttributes);
 
-	policy.setTarget(createTarget(subjectAttributes, resourceAttributes,
-		environmentAttributes));
-	subjectAttributes.clear();
-	resourceAttributes.clear();
-	environmentAttributes.clear();
-	divideIntoSubLists(exceptionsAttributeList, subjectAttributes,
-		resourceAttributes, environmentAttributes);
-	policy.getRules().add(
-		ExceptionsRule.build(subjectAttributes, resourceAttributes,
-			environmentAttributes, effect));
+        policy.setTarget(createTarget(subjectAttributes, resourceAttributes, environmentAttributes));
+        subjectAttributes.clear();
+        resourceAttributes.clear();
+        environmentAttributes.clear();
+        divideIntoSubLists(exceptionsAttributeList, subjectAttributes, resourceAttributes,
+                environmentAttributes);
+        policy.getRules().add(
+                ExceptionsRule.build(subjectAttributes, resourceAttributes, environmentAttributes,
+                        effect));
 
-	return policy;
+        return policy;
     }
 
     protected static long generateRandomLong() {
-	return generator.nextLong();
+        return generator.nextLong();
     }
 
-    private static TargetType createTarget(List<AttributeType> sbjAttr,
-	    List<AttributeType> rsrcAttr, List<AttributeType> envAttr) {
+    private static TargetType createTarget(List<AttributeType> sbjAttr, List<AttributeType> rsrcAttr,
+            List<AttributeType> envAttr) {
 
-	SubjectsType subjects = SubjectsHelper.build(SubjectHelper
-		.build(SubjectMatchHelper.buildListWithDesignator(sbjAttr,
-			Functions.STRING_EQUAL)));
-	ActionsType actions = ActionsHelper.buildAnyAction();
+        SubjectsType subjects = SubjectsHelper.build(SubjectHelper.build(SubjectMatchHelper
+                .buildListWithDesignator(sbjAttr, Functions.STRING_EQUAL)));
+        ActionsType actions = ActionsHelper.buildAnyAction();
 
-	ResourcesType resources = ResourcesHelper.build(ResourceHelper
-		.build(ResourceMatchHelper.buildListWithDesignator(rsrcAttr,
-			Functions.STRING_EQUAL)));
+        ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(ResourceMatchHelper
+                .buildListWithDesignator(rsrcAttr, Functions.STRING_EQUAL)));
 
-	TargetType target = TargetHelper.build(subjects, actions, resources,
-		null);
-	return target;
+        TargetType target = TargetHelper.build(subjects, actions, resources, null);
+        return target;
     }
 
     private static void divideIntoSubLists(List<AttributeWizard> list,
-	    List<AttributeType> subjectAttributes,
-	    List<AttributeType> resourceAttributes,
-	    List<AttributeType> environmentAttributes) {
-	for (AttributeWizard entry : list) {
-	    AttributeType attribute = entry.getAttributeType();
-	    if (entry.isSubjectAttribute()) {
-		subjectAttributes.add(attribute);
-	    } else if (entry.isResourceAttribute()) {
-		resourceAttributes.add(attribute);
-	    } else if (entry.isEnvironmentAttribute()) {
-		environmentAttributes.add(attribute);
-	    }
-	}
+            List<AttributeType> subjectAttributes, List<AttributeType> resourceAttributes,
+            List<AttributeType> environmentAttributes) {
+        for (AttributeWizard entry : list) {
+            AttributeType attribute = entry.getAttributeType();
+            if (entry.isSubjectAttribute()) {
+                subjectAttributes.add(attribute);
+            } else if (entry.isResourceAttribute()) {
+                resourceAttributes.add(attribute);
+            } else if (entry.isEnvironmentAttribute()) {
+                environmentAttributes.add(attribute);
+            }
+        }
+    }
+    
+    public String toString() {
+        return PolicyHelper.getInstance().toString(policy);
     }
 
 }
