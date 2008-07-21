@@ -24,13 +24,12 @@ package org.glite.authz.pap.provisioning.client;
 
 import org.glite.authz.pap.provisioning.client.impl.ProvisioningServiceClientFactoryImpl;
 
-
 public abstract class ProvisioningServiceClientFactory {
 
-  public static ProvisioningServiceClientFactory getProvisioningServiceClientFactory() {
-    return new ProvisioningServiceClientFactoryImpl();
-  }
-  
-  public abstract ProvisioningServiceClient createPolicyProvisioningServiceClient();
-  
+    public static ProvisioningServiceClientFactory getProvisioningServiceClientFactory() {
+	return new ProvisioningServiceClientFactoryImpl();
+    }
+
+    public abstract ProvisioningServiceClient createPolicyProvisioningServiceClient();
+
 }

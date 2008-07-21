@@ -45,88 +45,80 @@ import org.xml.sax.Attributes;
  * @author Valerio Venturi (valerio.venturi@cnaf.infn.it)
  * 
  */
-public class Serializer implements org.apache.axis.encoding.Serializer
-{
+public class Serializer implements org.apache.axis.encoding.Serializer {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName,
-   *      org.xml.sax.Attributes, java.lang.Object,
-   *      org.apache.axis.encoding.SerializationContext)
-   */
-  public void serialize(QName name, Attributes attributes, Object value, SerializationContext context)
-      throws IOException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName,
+     *      org.xml.sax.Attributes, java.lang.Object,
+     *      org.apache.axis.encoding.SerializationContext)
+     */
+    public void serialize(QName name, Attributes attributes, Object value,
+	    SerializationContext context) throws IOException {
 
-    try
-    {
-      
-      XMLObject xmlObject = (XMLObject) value;
+	try {
 
-      /* call OpenSAML serializing */
+	    XMLObject xmlObject = (XMLObject) value;
 
-      MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
-      Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
-      Element element = marshaller.marshall(xmlObject);
+	    /* call OpenSAML serializing */
 
-      /* compute the signature value 
+	    MarshallerFactory marshallerFactory = Configuration
+		    .getMarshallerFactory();
+	    Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
+	    Element element = marshaller.marshall(xmlObject);
 
-      List<Assertion> assertions = response.getAssertions();
-      if (assertions.size() > 0)
-      {
-        Assertion assertion = assertions.get(0);
-        if (assertion != null)
-        {
-          Signature signature = assertion.getSignature();
-          if (signature != null)
-            Signer.signObject(signature);
-        }
-      }
-       
-      */
+	    /*
+	     * compute the signature value
+	     * 
+	     * List<Assertion> assertions = response.getAssertions(); if
+	     * (assertions.size() > 0) { Assertion assertion =
+	     * assertions.get(0); if (assertion != null) { Signature signature =
+	     * assertion.getSignature(); if (signature != null)
+	     * Signer.signObject(signature); } }
+	     * 
+	     */
 
-      /* */
+	    /* */
 
-      if (attributes != null)
-      {
-        for (int i = 0; i < attributes.getLength(); i++)
-        {
-          element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes.getValue(i));
-        }
-      }
+	    if (attributes != null) {
+		for (int i = 0; i < attributes.getLength(); i++) {
+		    element.setAttributeNS(attributes.getURI(i), attributes
+			    .getQName(i), attributes.getValue(i));
+		}
+	    }
 
-      context.setWriteXMLType(null);
-      context.writeDOMElement(element);
-      
-    } 
-    catch (Exception exception) {
-      
-      throw new IOException("Error serializing " + value.getClass().getName() + " : " + exception.getClass().getName());
-      
+	    context.setWriteXMLType(null);
+	    context.writeDOMElement(element);
+
+	} catch (Exception exception) {
+
+	    throw new IOException("Error serializing "
+		    + value.getClass().getName() + " : "
+		    + exception.getClass().getName());
+
+	}
     }
-  }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
-   *      org.apache.axis.wsdl.fromJava.Types)
-   */
-  public Element writeSchema(Class javaType, Types types) throws Exception
-  {
-    Element complexType = types.createElement("complexType");
-    return complexType;
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
+     *      org.apache.axis.wsdl.fromJava.Types)
+     */
+    public Element writeSchema(Class javaType, Types types) throws Exception {
+	Element complexType = types.createElement("complexType");
+	return complexType;
+    }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
-   */
-  public String getMechanismType()
-  {
-    // TODO Auto-generated method stub
-    return Constants.AXIS_SAX;
-  }
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
+     */
+    public String getMechanismType() {
+	// TODO Auto-generated method stub
+	return Constants.AXIS_SAX;
+    }
 
 }

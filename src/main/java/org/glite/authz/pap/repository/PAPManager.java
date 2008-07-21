@@ -6,14 +6,14 @@ import org.glite.authz.pap.common.PAP;
 
 public interface PAPManager {
 
-	public PAPContainer create(PAP pap);
+    public PAPContainer create(PAP pap);
 
-	public void delete(PAP pap);
+    public void delete(PAP pap);
 
-	public boolean exists(PAP pap);
-	
-	public PAPContainer get(PAP pap);
-	
-	public List<PAPContainer> getAll();
+    public boolean exists(PAP pap);
+
+    public PAPContainer get(PAP pap);
+
+    public List<PAPContainer> getAll();
 
 }

@@ -8,49 +8,49 @@ import org.opensaml.xacml.policy.TargetType;
 import org.opensaml.xml.Configuration;
 
 public class TargetHelper extends XACMLHelper<TargetType> {
-	private static TargetHelper instance = null;
+    private static TargetHelper instance = null;
 
-	public static TargetType buildAnyTarget() {
-		return (TargetType) Configuration.getBuilderFactory().getBuilder(
-				TargetType.DEFAULT_ELEMENT_NAME).buildObject(
-				TargetType.DEFAULT_ELEMENT_NAME);
-	}
+    public static TargetType buildAnyTarget() {
+	return (TargetType) Configuration.getBuilderFactory().getBuilder(
+		TargetType.DEFAULT_ELEMENT_NAME).buildObject(
+		TargetType.DEFAULT_ELEMENT_NAME);
+    }
 
-	public static TargetType build(SubjectsType subjects, ActionsType actions,
-			ResourcesType resources, EnvironmentsType environments) {
-		TargetType target = (TargetType) Configuration.getBuilderFactory()
-				.getBuilder(TargetType.DEFAULT_ELEMENT_NAME).buildObject(
-						TargetType.DEFAULT_ELEMENT_NAME);
-		if (subjects == null) {
-			subjects = SubjectsHelper.buildAnysubject();
-		}
-		if (actions == null) {
-			actions = ActionsHelper.buildAnyAction();
-		}
-		if (resources == null) {
-			resources = (ResourcesType) Configuration.getBuilderFactory()
-					.getBuilder(ResourcesType.DEFAULT_ELEMENT_NAME)
-					.buildObject(ResourcesType.DEFAULT_ELEMENT_NAME);
-		}
-		if (environments == null) {
-			environments = (EnvironmentsType) Configuration.getBuilderFactory()
-					.getBuilder(EnvironmentsType.DEFAULT_ELEMENT_NAME)
-					.buildObject(EnvironmentsType.DEFAULT_ELEMENT_NAME);
-		}
-		target.setSubjects(subjects);
-		target.setActions(actions);
-		target.setResources(resources);
-		target.setEnvironments(environments);
-		return target;
+    public static TargetType build(SubjectsType subjects, ActionsType actions,
+	    ResourcesType resources, EnvironmentsType environments) {
+	TargetType target = (TargetType) Configuration.getBuilderFactory()
+		.getBuilder(TargetType.DEFAULT_ELEMENT_NAME).buildObject(
+			TargetType.DEFAULT_ELEMENT_NAME);
+	if (subjects == null) {
+	    subjects = SubjectsHelper.buildAnysubject();
 	}
-	
-	public static TargetHelper getInstance() {
-		if (instance == null) {
-			instance = new TargetHelper();
-		}
-		return instance;
+	if (actions == null) {
+	    actions = ActionsHelper.buildAnyAction();
 	}
+	if (resources == null) {
+	    resources = (ResourcesType) Configuration.getBuilderFactory()
+		    .getBuilder(ResourcesType.DEFAULT_ELEMENT_NAME)
+		    .buildObject(ResourcesType.DEFAULT_ELEMENT_NAME);
+	}
+	if (environments == null) {
+	    environments = (EnvironmentsType) Configuration.getBuilderFactory()
+		    .getBuilder(EnvironmentsType.DEFAULT_ELEMENT_NAME)
+		    .buildObject(EnvironmentsType.DEFAULT_ELEMENT_NAME);
+	}
+	target.setSubjects(subjects);
+	target.setActions(actions);
+	target.setResources(resources);
+	target.setEnvironments(environments);
+	return target;
+    }
 
-	private TargetHelper() {
+    public static TargetHelper getInstance() {
+	if (instance == null) {
+	    instance = new TargetHelper();
 	}
+	return instance;
+    }
+
+    private TargetHelper() {
+    }
 }

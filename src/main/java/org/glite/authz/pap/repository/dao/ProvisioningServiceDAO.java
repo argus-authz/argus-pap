@@ -23,7 +23,8 @@ public class ProvisioningServiceDAO {
 
     public List<XACMLObject> papQuery() {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
-        PAP localPAP = new PAP(PAP.localPAPId);
+        
+        PAP localPAP = PAP.makeLocalPAP();
         PAPContainer papContainer = RepositoryManager.getPAPManager().get(localPAP);
 
         resultList.addAll(papContainer.getAllPolicySets());
@@ -35,17 +36,22 @@ public class ProvisioningServiceDAO {
     public List<XACMLObject> pdpQuery() {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_papId", PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        // Create the root PolicySet
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_" + PAP.localPAPId,
+                PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         resultList.add(rootPolicySet);
 
+        // Add the first reference, which is the reference to the local PAP
         PolicySetHelper.addPolicySetReference(rootPolicySet, PAP.localPAPId);
 
+        // Add references to the remote PAPs
         PAPManager papManager = RepositoryManager.getPAPManager();
         for (PAPContainer papContainer : papManager.getAll()) {
             String papId = papContainer.getPAP().getPapId();
-            if (!papId.equals(PAP.localPAPId)) {
+            
+            if (!papId.equals(PAP.localPAPId))
                 PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
-            }
+            
             resultList.addAll(papContainer.getAllPolicySets());
             resultList.addAll(papContainer.getAllPolicies());
         }

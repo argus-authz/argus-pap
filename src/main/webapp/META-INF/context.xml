@@ -4,5 +4,5 @@
 
 <Context path="/pap">
 	<Parameter name="PapConfigurationDir" value="/opt/glite/etc/pap"/>
-	<Parameter name="PapRepositoryDir" value="/var/glite/pap"/>
+	<Parameter name="PapRepositoryDir" value="/var/glite/etc/pap"/>
 </Context>

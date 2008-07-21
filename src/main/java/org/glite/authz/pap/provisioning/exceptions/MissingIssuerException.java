@@ -22,7 +22,10 @@
 
 package org.glite.authz.pap.provisioning.exceptions;
 
-
 public class MissingIssuerException extends Exception {
 
+    public MissingIssuerException() {
+	super("The Issuer element must be present");
+    }
+    
 }

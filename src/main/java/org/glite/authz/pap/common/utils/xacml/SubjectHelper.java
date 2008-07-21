@@ -7,30 +7,30 @@ import org.opensaml.xacml.policy.SubjectType;
 import org.opensaml.xml.Configuration;
 
 public class SubjectHelper extends XACMLHelper<SubjectType> {
-	private static SubjectHelper instance = null;
+    private static SubjectHelper instance = null;
 
-	public static SubjectHelper getInstance() {
-		if (instance == null) {
-			instance = new SubjectHelper();
-		}
-		return instance;
+    public static SubjectHelper getInstance() {
+	if (instance == null) {
+	    instance = new SubjectHelper();
 	}
+	return instance;
+    }
 
-	private SubjectHelper() {
-	}
+    private SubjectHelper() {
+    }
 
-	public static SubjectType build() {
-		return (SubjectType) Configuration.getBuilderFactory().getBuilder(
-				SubjectType.DEFAULT_ELEMENT_NAME).buildObject(
-				SubjectType.DEFAULT_ELEMENT_NAME);
-	}
+    public static SubjectType build() {
+	return (SubjectType) Configuration.getBuilderFactory().getBuilder(
+		SubjectType.DEFAULT_ELEMENT_NAME).buildObject(
+		SubjectType.DEFAULT_ELEMENT_NAME);
+    }
 
-	public static SubjectType build(List<SubjectMatchType> subjectMatchList) {
-		SubjectType subject = build();
-		for (SubjectMatchType subjectMatch : subjectMatchList) {
-			subject.getSubjectMatches().add(subjectMatch);
-		}
-		return subject;
+    public static SubjectType build(List<SubjectMatchType> subjectMatchList) {
+	SubjectType subject = build();
+	for (SubjectMatchType subjectMatch : subjectMatchList) {
+	    subject.getSubjectMatches().add(subjectMatch);
 	}
+	return subject;
+    }
 
 }
