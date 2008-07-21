@@ -9,6 +9,7 @@ import org.glite.authz.pap.ui.wizard.*;
 import org.opensaml.xacml.policy.PolicySetType;
 import java.util.List;
 import org.opensaml.xacml.XACMLObject;
+import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 
 public class PolicyFileEncoder {
     BWParser parser;
@@ -54,22 +55,33 @@ public class PolicyFileEncoder {
         return doParse();
     }
 
-//     public static void main(String[] args) {
-//         PolicyFileEncoder encoder = new PolicyFileEncoder();
+    private static void print(PolicySetType set) {
+        PolicySetHelper.getInstance().toString(set);
+    }
 
-//         try {
-//             if (args.length > 0) {
-//                 int i = 0;
-//                 while (i < args.length) {
-//                     File f = new File(args[i++]);
-//                     System.out.println(encoder.parse(f));
-//                 }
-//             }
-//             else
-//                 System.out.println(encoder.parse(System.in));
-//         }
-//         catch (EncodingException e) {
-//             System.out.println(e.toString());
-//         }
-//     }
+    public static void main(String[] args) {
+        PolicyFileEncoder encoder = new PolicyFileEncoder();
+
+        try {
+            if (args.length > 0) {
+                int i = 0;
+                while (i < args.length) {
+                    File f = new File(args[i++]);
+                    List<XACMLObject> list = encoder.parse(f);
+
+                    for (XACMLObject xacml: list) {
+                        System.out.println(xacml.getClass().getName());
+                        if (xacml instanceof org.opensaml.xacml.policy.PolicySetType) {
+                            print((org.opensaml.xacml.policy.PolicySetType)xacml);
+                        }
+                    }
+                }
+            }
+            else
+                System.out.println(encoder.parse(System.in));
+        }
+        catch (EncodingException e) {
+            System.out.println(e.toString());
+        }
+    }
 }
