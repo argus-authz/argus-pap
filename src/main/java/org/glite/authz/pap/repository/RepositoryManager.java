@@ -25,6 +25,7 @@ public abstract class RepositoryManager {
         
         initialize();
         
+        // Create the local PAP 
         PAPManager papManager = getPAPManager();
         PAP localPAP = PAP.makeLocalPAP();
         
