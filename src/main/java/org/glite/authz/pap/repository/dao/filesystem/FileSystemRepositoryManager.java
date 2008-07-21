@@ -101,8 +101,8 @@ public class FileSystemRepositoryManager extends RepositoryManager {
         try {
             createDirectoryPath(rootDir);
         } catch (RepositoryException e) {
-            log.error("Attempting to create repository root directory: " + rootDir.getAbsolutePath());
-            throw e;
+            throw new RepositoryException("Cannot create the repository root directory: "
+                    + rootDir.getAbsolutePath(), e);
         }
 
         log.info("Repository root directory is set to: " + rootDir.getAbsolutePath());
