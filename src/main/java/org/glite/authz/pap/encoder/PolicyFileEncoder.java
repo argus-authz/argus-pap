@@ -10,6 +10,7 @@ import org.opensaml.xacml.policy.PolicySetType;
 import java.util.List;
 import org.opensaml.xacml.XACMLObject;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.apache.log4j.PropertyConfigurator;
 
 public class PolicyFileEncoder {
     BWParser parser;
@@ -60,6 +61,7 @@ public class PolicyFileEncoder {
     }
 
     public static void main(String[] args) {
+        //        PropertyConfigurator.configure("/home/marotta/pap2/parser_changes/lo4j.properties");
         PolicyFileEncoder encoder = new PolicyFileEncoder();
 
         try {
