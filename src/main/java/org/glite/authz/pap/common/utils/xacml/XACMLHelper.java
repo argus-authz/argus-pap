@@ -1,5 +1,6 @@
 package org.glite.authz.pap.common.utils.xacml;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -34,85 +35,90 @@ import org.xml.sax.SAXException;
 
 public class XACMLHelper<XACMLObjectType extends XACMLObject> {
 
+    public XACMLHelper() {}
+
     @SuppressWarnings("unchecked")
     public XACMLObjectType build(Element element) {
-	UnmarshallerFactory unmarshallerFactory = Configuration
-		.getUnmarshallerFactory();
-	Unmarshaller unmarshaller = unmarshallerFactory
-		.getUnmarshaller(element);
-	try {
-	    return (XACMLObjectType) unmarshaller.unmarshall(element);
-	} catch (UnmarshallingException e) {
-	    throw new XACMLException(e);
-	}
+        UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+        Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
+        try {
+            return (XACMLObjectType) unmarshaller.unmarshall(element);
+        } catch (UnmarshallingException e) {
+            throw new XACMLException(e);
+        }
     }
 
     public XACMLObjectType buildFromFile(File file) {
-	if ((!file.exists()) || (!file.canRead())) {
-	    throw new FileNotFoundXACMLException();
-	}
-	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-	dbf.setNamespaceAware(true);
-	Document doc = null;
-	try {
-	    DocumentBuilder db = dbf.newDocumentBuilder();
-	    doc = db.parse(file);
-	} catch (ParserConfigurationException e) {
-	    throw new XACMLException(e);
-	} catch (SAXException e) {
-	    throw new XACMLException(e);
-	} catch (IOException e) {
-	    throw new XACMLException(e);
-	}
-	return build(doc.getDocumentElement());
+        if ((!file.exists()) || (!file.canRead())) {
+            throw new FileNotFoundXACMLException();
+        }
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
+        Document doc = null;
+        try {
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            doc = db.parse(file);
+        } catch (ParserConfigurationException e) {
+            throw new XACMLException(e);
+        } catch (SAXException e) {
+            throw new XACMLException(e);
+        } catch (IOException e) {
+            throw new XACMLException(e);
+        }
+        return build(doc.getDocumentElement());
     }
 
     public XACMLObjectType buildFromFile(String fileName) {
-	File file = new File(fileName);
-	return buildFromFile(file);
+        File file = new File(fileName);
+        return buildFromFile(file);
     }
 
     public Node getDOM(XACMLObjectType xacmlObject) {
-	MarshallerFactory marshallerFactory = Configuration
-		.getMarshallerFactory();
-	Marshaller marshaller = marshallerFactory.getMarshaller(xacmlObject);
-	try {
-	    marshaller.marshall(xacmlObject);
-	} catch (MarshallingException e) {
-	    throw new XACMLException(e);
-	}
-	return xacmlObject.getDOM();
+        MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
+        Marshaller marshaller = marshallerFactory.getMarshaller(xacmlObject);
+        try {
+            marshaller.marshall(xacmlObject);
+        } catch (MarshallingException e) {
+            throw new XACMLException(e);
+        }
+        return xacmlObject.getDOM();
     }
 
     public void toFile(File file, XACMLObjectType xacmlObject) {
 
-	// Use write()
-	FileOutputStream fos;
-	try {
-	    fos = new FileOutputStream(file);
-	    Transformer tr = TransformerFactory.newInstance().newTransformer();
-	    tr.setOutputProperty(OutputKeys.INDENT, "yes");
-	    tr.setOutputProperty(OutputKeys.METHOD, "xml");
-	    tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount",
-		    "3");
-	    tr.transform(new DOMSource(getDOM(xacmlObject).getOwnerDocument()),
-		    new StreamResult(fos));
-	} catch (FileNotFoundException e) {
-	    throw new FileNotFoundXACMLException(e);
-	} catch (TransformerConfigurationException e) {
-	    throw new XACMLException(e);
-	} catch (TransformerException e) {
-	    throw new XACMLException(e);
-	}
+        FileOutputStream fos;
+        try {
+            fos = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new FileNotFoundXACMLException(e);
+        }
+        write(fos, xacmlObject);
     }
 
     public void toFile(String fileName, XACMLObjectType xacmlObject) {
-	File file = new File(fileName);
-	toFile(file, xacmlObject);
+        File file = new File(fileName);
+        toFile(file, xacmlObject);
     }
 
-    public void write(OutputStream outputStream) {
-	// TODO
+    public String toString(XACMLObjectType xacmlObject) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        write(bos, xacmlObject);
+        return bos.toString();
+    }
+
+    public void write(OutputStream outputStream, XACMLObjectType xacmlObject) {
+        try {
+            Transformer tr = TransformerFactory.newInstance().newTransformer();
+            tr.setOutputProperty(OutputKeys.INDENT, "yes");
+            tr.setOutputProperty(OutputKeys.METHOD, "xml");
+            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+            tr.transform(new DOMSource(getDOM(xacmlObject).getOwnerDocument()), new StreamResult(
+                    outputStream));
+        } catch (TransformerConfigurationException e) {
+            throw new XACMLException(e);
+        } catch (TransformerException e) {
+            throw new XACMLException(e);
+        }
     }
 
 }
