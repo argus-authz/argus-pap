@@ -104,14 +104,12 @@ class Policy {
     private void OutputSClass(BlacklistPolicySet blSet,
                               ServiceClassPolicySet scSet,
                               int previousType) {
-        PolicySetType policySet = ServiceClassPolicySet.build();
-
         Vector policiesList = policies.policies;
 
         Enumeration i = policiesList.elements();
 
         while (i.hasMoreElements()) {
-            ((Policy)i.nextElement()).Output(blSet, scSet, previousType);
+            ((Policy)i.nextElement()).OutputBW(blSet, scSet, POLICY_TYPE_CLASS);
         }
     }
 
@@ -197,12 +195,12 @@ class Policies {
         BlacklistPolicySet blSet = new BlacklistPolicySet();
         ServiceClassPolicySet scSet = new ServiceClassPolicySet();
 
-        localPAPPolicySet.addPolicySet(blSet);
-        localPAPPolicySet.addPolicySet(scSet);
-
         while (i.hasMoreElements()) {
             ((Policy)i.nextElement()).Output(blSet, scSet, Policy.POLICY_TYPE_BW);
         }
+
+        localPAPPolicySet.addPolicySet(blSet);
+        localPAPPolicySet.addPolicySet(scSet);
 
         return localPAPPolicySet.getPolicyTreeAsList();
     }
