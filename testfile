@@ -1,0 +1,35 @@
+resource "t1.cnaf.infn.it" {
+   deny fqan = "/atlas/prd"
+   deny fqan = "/cms/test"
+}
+
+resource "*" {
+
+   deny fqan = "/dteam/prd/*"
+        funding_agency = none
+        except dn = "/C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Andrea Ceccanti/Email=aa@cnaf.infn.it"
+        except dn = "/C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Alberto Forti/Email=cc@cnaf.infn.it"
+        except fqan = "/dteam/prd/test"
+   
+   deny fqan = "/dteam/test"
+        except resource = "test-ce.cnaf.infn.it"
+
+   deny fqan = "/cms/analysis/*"
+        except dn = "/C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Andrea Ceccanti/Email=aa@cnaf.infn.it"
+}  
+
+
+service_class "gold" {
+    resource "*" {
+      allow fqan = "/dteam/prd/*"
+          except dn = "/C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Andrea Ceccanti/Email=aa@cnaf.infn.it"
+    }
+}
+
+service_class "silver" {
+    resource "*" {
+      allow fqan = "/dteam/prd/*"
+          except dn = "/C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Alberto Forti/Email=cc@cnaf.infn.it"
+      allow fqan = "/cms/prd/"
+    }
+}

@@ -4,55 +4,68 @@ import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
 import org.opensaml.xacml.XACMLObject;
 import java.util.List;
+import java.util.Vector;
 
 class BWParser implements BWParserConstants {
 
   static final public List<XACMLObject> Text() throws ParseException {
-  Policies policies = null;
+  Policy policy = null;
   Policies allpolicies = new Policies();
   String output = new String();
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case 24:
+      case RESOURCE:
+      case CLASS:
         ;
         break;
       default:
         jj_la1[0] = jj_gen;
         break label_1;
       }
-      policies = Section();
-    allpolicies.policies.addAll(policies.policies);
+      policy = SectionType();
+    allpolicies.policies.add(policy);
     }
     {if (true) return allpolicies.Output();}
     throw new Error("Missing return statement in function");
   }
 
   static final public Policies Section() throws ParseException {
-  Policies policies = null;
-    jj_consume_token(24);
-    policies = SectionType();
+  Policies policies=new Policies();
+  Policy policy=null;
+    label_2:
+    while (true) {
+      policy = SectionType();
+     policies.policies.add(policy);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case RESOURCE:
+      case CLASS:
+        ;
+        break;
+      default:
+        jj_la1[1] = jj_gen;
+        break label_2;
+      }
+    }
     {if (true) return policies;}
     throw new Error("Missing return statement in function");
   }
 
-  static final public Policies SectionType() throws ParseException {
-  Policies policies = null;
+  static final public Policy SectionType() throws ParseException {
+  Policy policy = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case BW:
-      jj_consume_token(BW);
-      jj_consume_token(25);
-      policies = BW_Policies();
-    {if (true) return policies;}
+    case RESOURCE:
+      jj_consume_token(RESOURCE);
+      policy = BW_Policy();
+    {if (true) return policy;}
       break;
-    case SERVICE:
-      jj_consume_token(SERVICE);
-      jj_consume_token(25);
-      policies = ServiceClassPolicies();
-    {if (true) return policies;}
+    case CLASS:
+      jj_consume_token(CLASS);
+      policy = ServiceClassPolicy();
+    {if (true) return policy;}
       break;
     default:
-      jj_la1[1] = jj_gen;
+      jj_la1[2] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -62,17 +75,18 @@ class BWParser implements BWParserConstants {
   static final public Policies BW_Policies() throws ParseException {
   Policy policy = null;
   Policies policies = new Policies();
-    label_2:
+    label_3:
     while (true) {
+      jj_consume_token(RESOURCE);
       policy = BW_Policy();
-                       policies.policies.add(policy);
+                                  policies.policies.add(policy);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case RESOURCE:
         ;
         break;
       default:
-        jj_la1[2] = jj_gen;
-        break label_2;
+        jj_la1[3] = jj_gen;
+        break label_3;
       }
     }
     {if (true) return policies;}
@@ -83,7 +97,6 @@ class BWParser implements BWParserConstants {
   String resource=null;
   Conds conds = null;
   Policy policy = new Policy();
-    jj_consume_token(RESOURCE);
     resource = TextString();
     jj_consume_token(26);
     conds = Conditions();
@@ -99,17 +112,19 @@ class BWParser implements BWParserConstants {
   static final public Policies ServiceClassPolicies() throws ParseException {
   Policy policy = null;
   Policies policies = new Policies();
-    label_3:
+    label_4:
     while (true) {
       policy = ServiceClassPolicy();
       policies.policies.add(policy);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case CLASS:
+      case STRING:
+      case ID:
+      case ID2:
         ;
         break;
       default:
-        jj_la1[3] = jj_gen;
-        break label_3;
+        jj_la1[4] = jj_gen;
+        break label_4;
       }
     }
     {if (true) return policies;}
@@ -121,7 +136,6 @@ class BWParser implements BWParserConstants {
   Conds conds = null;
   Policy policy = new Policy();
   Policies policies = null;
-    jj_consume_token(CLASS);
     resource = TextString();
     jj_consume_token(26);
     policies = BW_Policies();
@@ -137,7 +151,7 @@ class BWParser implements BWParserConstants {
   static final public Conds Conditions() throws ParseException {
   FullCondition fc = null;
   Conds conds = new Conds();
-    label_4:
+    label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ALLOW:
@@ -146,8 +160,8 @@ class BWParser implements BWParserConstants {
         ;
         break;
       default:
-        jj_la1[4] = jj_gen;
-        break label_4;
+        jj_la1[5] = jj_gen;
+        break label_5;
       }
       fc = Condition();
                    conds.fullconditions.add(fc);
@@ -172,7 +186,7 @@ class BWParser implements BWParserConstants {
     {if (true) return fc;}
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[6] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -187,15 +201,15 @@ class BWParser implements BWParserConstants {
   ConditionRow except = null;
     result = AllowOrDeny();
     item = ItemsRow();
-    label_5:
+    label_6:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case EXCEPT:
         ;
         break;
       default:
-        jj_la1[6] = jj_gen;
-        break label_5;
+        jj_la1[7] = jj_gen;
+        break label_6;
       }
       except = Exception();
                                                                excepts.rows.add(except);
@@ -219,7 +233,7 @@ class BWParser implements BWParserConstants {
     {if (true) return true;}
       break;
     default:
-      jj_la1[7] = jj_gen;
+      jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -237,22 +251,21 @@ class BWParser implements BWParserConstants {
   static final public ConditionRow ItemsRow() throws ParseException {
   SingleCondition sc=null;
   ConditionRow row = new ConditionRow();
-    label_6:
+    label_7:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case FQAN:
       case DN:
       case RESOURCE:
       case CERT:
-      case PILOT:
       case STRING:
       case ID:
       case ID2:
         ;
         break;
       default:
-        jj_la1[8] = jj_gen;
-        break label_6;
+        jj_la1[9] = jj_gen;
+        break label_7;
       }
       sc = Item();
     row.singles.add(sc);
@@ -289,7 +302,7 @@ class BWParser implements BWParserConstants {
       jj_consume_token(29);
       s1 = TextString();
       jj_consume_token(30);
-      s2 = TextString();
+      s2 = Number();
       jj_consume_token(31);
     sc.type = SingleCondition.TYPE_CERT;
     sc.value1 = s1;
@@ -304,14 +317,6 @@ class BWParser implements BWParserConstants {
     sc.value1 = s1;
     {if (true) return sc;}
       break;
-    case PILOT:
-      jj_consume_token(PILOT);
-      jj_consume_token(28);
-      value = YesOrNo();
-    sc.type = SingleCondition.TYPE_PILOT;
-    sc.yesorno= value;
-    {if (true) return sc;}
-      break;
     case STRING:
     case ID:
     case ID2:
@@ -324,7 +329,7 @@ class BWParser implements BWParserConstants {
     {if (true) return sc;}
       break;
     default:
-      jj_la1[9] = jj_gen;
+      jj_la1[10] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -342,7 +347,7 @@ class BWParser implements BWParserConstants {
     {if (true) return false;}
       break;
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[11] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -365,7 +370,26 @@ class BWParser implements BWParserConstants {
     {if (true) return t.toString();}
       break;
     default:
-      jj_la1[11] = jj_gen;
+      jj_la1[12] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
+    throw new Error("Missing return statement in function");
+  }
+
+  static final public String Number() throws ParseException {
+  Token t = null;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case NUMBER:
+      t = jj_consume_token(NUMBER);
+    {if (true) return t.toString();}
+      break;
+    case HEX:
+      t = jj_consume_token(HEX);
+    {if (true) return t.toString();}
+      break;
+    default:
+      jj_la1[13] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -378,13 +402,13 @@ class BWParser implements BWParserConstants {
   static public Token token, jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[12];
+  static final private int[] jj_la1 = new int[14];
   static private int[] jj_la1_0;
   static {
       jj_la1_0();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x1000000,0x22000,0x800,0x40000,0x1000c0,0x1000c0,0x80000,0xc0,0xe05b00,0xe05b00,0x18000,0xe00000,};
+      jj_la1_0 = new int[] {0x40800,0x40800,0x40800,0x800,0xe00000,0x1000c0,0x1000c0,0x80000,0xc0,0xe01b00,0xe01b00,0x18000,0xe00000,0x3000000,};
    }
 
   public BWParser(java.io.InputStream stream) {
@@ -403,7 +427,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 12; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.InputStream stream) {
@@ -415,7 +439,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 12; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   public BWParser(java.io.Reader stream) {
@@ -431,7 +455,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 12; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.Reader stream) {
@@ -440,7 +464,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 12; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   public BWParser(BWParserTokenManager tm) {
@@ -455,7 +479,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 12; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(BWParserTokenManager tm) {
@@ -463,7 +487,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 12; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   static final private Token jj_consume_token(int kind) throws ParseException {
@@ -518,7 +542,7 @@ class BWParser implements BWParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 12; i++) {
+    for (int i = 0; i < 14; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
