@@ -11,19 +11,20 @@ public class BlacklistPolicy extends PolicyWizard {
 
     @Deprecated
     public static PolicyType build(List<AttributeWizard> targetAttributeList,
-	    List<List<AttributeWizard>> exceptionsAttributeList) {
+            List<List<AttributeWizard>> exceptionsAttributeList) {
 
-	return PolicyWizard.build(generateBlacklistPolicyId(),
-		targetAttributeList, exceptionsAttributeList, EffectType.Deny);
+        return PolicyWizard.build(generateBlacklistPolicyId(), targetAttributeList,
+                exceptionsAttributeList, EffectType.Deny);
     }
 
     private static String generateBlacklistPolicyId() {
-	return ID_PREFIX + generateRandomLong();
+        return ID_PREFIX + generateRandomLong();
     }
 
     public BlacklistPolicy(List<AttributeWizard> targetAttributeList,
-	    List<List<AttributeWizard>> orExceptionsAttributeList) {
-	super(generateBlacklistPolicyId(), targetAttributeList,
-		orExceptionsAttributeList, EffectType.Deny);
+            List<List<AttributeWizard>> orExceptionsAttributeList) {
+        
+        super(generateBlacklistPolicyId(), targetAttributeList, orExceptionsAttributeList,
+                EffectType.Deny);
     }
 }

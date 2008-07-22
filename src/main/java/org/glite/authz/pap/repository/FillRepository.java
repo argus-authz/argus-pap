@@ -46,7 +46,7 @@ public class FillRepository {
         
         log.info("Storing " + numberOfPolicies + " policies in PAP " + papId + "...");
         for (int i=0; i<numberOfPolicies; i++) {
-            PolicyType policy = PolicyHelper.buildWithAnyTarget(papId + "_p_" + i, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+            PolicyType policy = PolicyHelper.build(papId + "_p_" + i, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
             container.storePolicy(policy);
         }
         

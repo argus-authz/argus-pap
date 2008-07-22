@@ -21,6 +21,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.glite.authz.pap.common.exceptions.FileNotFoundXACMLException;
 import org.glite.authz.pap.common.exceptions.XACMLException;
 import org.opensaml.xml.Configuration;
+import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.opensaml.xml.io.Marshaller;
 import org.opensaml.xml.io.MarshallerFactory;
 import org.opensaml.xml.io.MarshallingException;
@@ -34,6 +35,8 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class XACMLHelper<XACMLObjectType extends XACMLObject> {
+    
+    protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
     public XACMLHelper() {}
 

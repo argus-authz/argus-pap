@@ -5,52 +5,47 @@ import org.opensaml.xacml.policy.EnvironmentsType;
 import org.opensaml.xacml.policy.ResourcesType;
 import org.opensaml.xacml.policy.SubjectsType;
 import org.opensaml.xacml.policy.TargetType;
-import org.opensaml.xml.Configuration;
 
 public class TargetHelper extends XACMLHelper<TargetType> {
-    private static TargetHelper instance = null;
 
-    public static TargetType buildAnyTarget() {
-	return (TargetType) Configuration.getBuilderFactory().getBuilder(
-		TargetType.DEFAULT_ELEMENT_NAME).buildObject(
-		TargetType.DEFAULT_ELEMENT_NAME);
+    private static final javax.xml.namespace.QName elementQName = TargetType.DEFAULT_ELEMENT_NAME;
+    private static TargetHelper instance = new TargetHelper();
+
+    public static TargetType build() {
+        return (TargetType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
-    public static TargetType build(SubjectsType subjects, ActionsType actions,
-	    ResourcesType resources, EnvironmentsType environments) {
-	TargetType target = (TargetType) Configuration.getBuilderFactory()
-		.getBuilder(TargetType.DEFAULT_ELEMENT_NAME).buildObject(
-			TargetType.DEFAULT_ELEMENT_NAME);
-	if (subjects == null) {
-	    subjects = SubjectsHelper.buildAnysubject();
-	}
-	if (actions == null) {
-	    actions = ActionsHelper.buildAnyAction();
-	}
-	if (resources == null) {
-	    resources = (ResourcesType) Configuration.getBuilderFactory()
-		    .getBuilder(ResourcesType.DEFAULT_ELEMENT_NAME)
-		    .buildObject(ResourcesType.DEFAULT_ELEMENT_NAME);
-	}
-	if (environments == null) {
-	    environments = (EnvironmentsType) Configuration.getBuilderFactory()
-		    .getBuilder(EnvironmentsType.DEFAULT_ELEMENT_NAME)
-		    .buildObject(EnvironmentsType.DEFAULT_ELEMENT_NAME);
-	}
-	target.setSubjects(subjects);
-	target.setActions(actions);
-	target.setResources(resources);
-	target.setEnvironments(environments);
-	return target;
+    public static TargetType build(SubjectsType subjects, ActionsType actions, ResourcesType resources,
+            EnvironmentsType environments) {
+
+        TargetType target = (TargetType) builderFactory.getBuilder(elementQName)
+                .buildObject(elementQName);
+
+        if (subjects == null)
+            subjects = SubjectsHelper.build();
+
+        if (actions == null)
+            actions = ActionsHelper.buildAnyAction();
+
+        if (resources == null)
+            resources = (ResourcesType) builderFactory.getBuilder(ResourcesType.DEFAULT_ELEMENT_NAME)
+                    .buildObject(ResourcesType.DEFAULT_ELEMENT_NAME);
+
+        if (environments == null)
+            environments = (EnvironmentsType) builderFactory.getBuilder(
+                    EnvironmentsType.DEFAULT_ELEMENT_NAME).buildObject(
+                    EnvironmentsType.DEFAULT_ELEMENT_NAME);
+
+        target.setSubjects(subjects);
+        target.setActions(actions);
+        target.setResources(resources);
+        target.setEnvironments(environments);
+        return target;
     }
 
     public static TargetHelper getInstance() {
-	if (instance == null) {
-	    instance = new TargetHelper();
-	}
-	return instance;
+        return instance;
     }
 
-    private TargetHelper() {
-    }
+    private TargetHelper() {}
 }

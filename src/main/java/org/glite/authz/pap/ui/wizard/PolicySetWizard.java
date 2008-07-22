@@ -25,21 +25,23 @@ public abstract class PolicySetWizard {
                 PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
     }
 
-    protected final List<XACMLObject> policyTreeAsList;
+    protected final List<XACMLObject> policyList;
     protected final List<PolicySetWizard> policySetWizardList;
     protected final PolicySetType policySet;
 
     protected PolicySetWizard(String policySetId, String policyCombiningAlgorithmId, TargetType target,
             ObligationsType obligations) {
-        policyTreeAsList = new LinkedList<XACMLObject>();
+        
+        policyList = new LinkedList<XACMLObject>();
         policySetWizardList = new LinkedList<PolicySetWizard>();
-        if ((target == null) && (obligations == null)) {
+        
+        if ((target == null) && (obligations == null))
             policySet = PolicySetHelper.buildWithAnyTarget(policySetId, policyCombiningAlgorithmId);
-        } else {
+        else
             policySet = PolicySetHelper.build(policySetId, policyCombiningAlgorithmId, target,
                     obligations);
-        }
-        policyTreeAsList.add(policySet);
+
+        policyList.add(policySet);
     }
 
     public void addPolicy(PolicyType policy) {
@@ -68,16 +70,18 @@ public abstract class PolicySetWizard {
     }
 
     public List<XACMLObject> getPolicyTreeAsList() {
-        List<XACMLObject> resultList = new LinkedList<XACMLObject>(policyTreeAsList);
+        List<XACMLObject> resultList = new LinkedList<XACMLObject>(policyList);
+        
         for (PolicySetWizard elem : policySetWizardList) {
             resultList.addAll(elem.getPolicyTreeAsList());
         }
+        
         return resultList;
     }
 
     protected void addPolicyAsReference(PolicyType policy) {
         PolicySetHelper.addPolicyReference(policySet, policy.getPolicyId());
-        policyTreeAsList.add(policy);
+        policyList.add(policy);
     }
 
     protected void addPolicyAsReference(PolicyWizard policyWiz) {
@@ -93,17 +97,12 @@ public abstract class PolicySetWizard {
 
     }
 
-    // protected void addPolicySetAsReference(PolicySetType policySet) {
-    // PolicySetHelper.addPolicySetReference(this.policySet,
-    // policySet.getPolicySetId());
-    // policyTreeAsListList.add(policySet);
-    // }
-
-    protected void addPolicySetAsReference(PolicySetWizard policySetWiz) {
-        PolicySetType policySetT = policySetWiz.getPolicySetType();
-        PolicySetHelper.addPolicySetReference(this.policySet, policySetT.getPolicySetId());
-        policyTreeAsList.add(policySetT);
-        policySetWizardList.add(policySetWiz);
+    protected void addPolicySetAsReference(PolicySetWizard childPolicySetWizard) {
+        PolicySetType childPolicySet = childPolicySetWizard.getPolicySetType();
+        
+        PolicySetHelper.addPolicySetReference(this.policySet, childPolicySet.getPolicySetId());
+        
+        policySetWizardList.add(childPolicySetWizard);
     }
 
     protected void addPolicySetAsWholeObject(PolicySetType policySet) {

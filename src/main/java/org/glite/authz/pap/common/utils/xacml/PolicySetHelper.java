@@ -93,7 +93,7 @@ public class PolicySetHelper extends XACMLHelper<PolicySetType> {
 	policySet.setPolicySetId(policySetId);
 	policySet.setPolicyCombiningAlgoId(policyCombiningAlgorithmId);
 	if (target == null) {
-	    policySet.setTarget(TargetHelper.buildAnyTarget());
+	    policySet.setTarget(TargetHelper.build());
 	} else {
 	    policySet.setTarget(target);
 	}

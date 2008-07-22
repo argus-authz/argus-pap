@@ -4,33 +4,34 @@ import java.util.List;
 
 import org.opensaml.xacml.policy.ResourceMatchType;
 import org.opensaml.xacml.policy.ResourceType;
-import org.opensaml.xml.Configuration;
 
 public class ResourceHelper extends XACMLHelper<ResourceType> {
-    private static ResourceHelper instance = null;
 
-    public static ResourceHelper getInstance() {
-	if (instance == null) {
-	    instance = new ResourceHelper();
-	}
-	return instance;
-    }
-
-    private ResourceHelper() {
-    }
+    private static final javax.xml.namespace.QName elementQName = ResourceType.DEFAULT_ELEMENT_NAME;
+    private static ResourceHelper instance = new ResourceHelper();
 
     public static ResourceType build() {
-	return (ResourceType) Configuration.getBuilderFactory().getBuilder(
-		ResourceType.DEFAULT_ELEMENT_NAME).buildObject(
-		ResourceType.DEFAULT_ELEMENT_NAME);
+        return (ResourceType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
     public static ResourceType build(List<ResourceMatchType> resourceMatchList) {
-	ResourceType resource = build();
-	for (ResourceMatchType resourceMatch : resourceMatchList) {
-	    resource.getResourceMatches().add(resourceMatch);
-	}
-	return resource;
+        
+        if (resourceMatchList.isEmpty())
+            return null;
+        
+        ResourceType resource = build();
+        
+        for (ResourceMatchType resourceMatch : resourceMatchList) {
+            resource.getResourceMatches().add(resourceMatch);
+        }
+        
+        return resource;
     }
+
+    public static ResourceHelper getInstance() {
+        return instance;
+    }
+
+    private ResourceHelper() {}
 
 }
