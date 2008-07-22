@@ -3,7 +3,6 @@ package org.glite.authz.pap.ui.wizard;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.ObligationsType;
@@ -19,22 +18,16 @@ public abstract class PolicySetWizard {
 
     protected static final InsertionType INSERTION_TYPE = InsertionType.AS_REFERENCE;
 
-    @Deprecated
-    public static PolicySetType build() {
-        return PolicySetHelper.buildWithAnyTarget(PAP.localPAPId,
-                PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
-    }
-
     protected final List<XACMLObject> policyList;
     protected final List<PolicySetWizard> policySetWizardList;
     protected final PolicySetType policySet;
 
     protected PolicySetWizard(String policySetId, String policyCombiningAlgorithmId, TargetType target,
             ObligationsType obligations) {
-        
+
         policyList = new LinkedList<XACMLObject>();
         policySetWizardList = new LinkedList<PolicySetWizard>();
-        
+
         if ((target == null) && (obligations == null))
             policySet = PolicySetHelper.buildWithAnyTarget(policySetId, policyCombiningAlgorithmId);
         else
@@ -71,12 +64,16 @@ public abstract class PolicySetWizard {
 
     public List<XACMLObject> getPolicyTreeAsList() {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>(policyList);
-        
+
         for (PolicySetWizard elem : policySetWizardList) {
             resultList.addAll(elem.getPolicyTreeAsList());
         }
-        
+
         return resultList;
+    }
+
+    public String toString() {
+        return PolicySetHelper.getInstance().toString(policySet);
     }
 
     protected void addPolicyAsReference(PolicyType policy) {
@@ -99,9 +96,9 @@ public abstract class PolicySetWizard {
 
     protected void addPolicySetAsReference(PolicySetWizard childPolicySetWizard) {
         PolicySetType childPolicySet = childPolicySetWizard.getPolicySetType();
-        
+
         PolicySetHelper.addPolicySetReference(this.policySet, childPolicySet.getPolicySetId());
-        
+
         policySetWizardList.add(childPolicySetWizard);
     }
 
@@ -111,9 +108,5 @@ public abstract class PolicySetWizard {
 
     protected void addPolicySetAsWholeObject(PolicySetWizard policySetWiz) {
         addPolicySetAsWholeObject(policySetWiz.getPolicySetType());
-    }
-    
-    public String toString() {
-        return PolicySetHelper.getInstance().toString(policySet);
     }
 }
