@@ -98,5 +98,49 @@ public class AttributeWizard {
     public boolean isSubjectAttribute() {
         return isSubjectAttribute;
     }
+    
+    public static boolean isSubjectAttribute(AttributeType attribute) {
+        String xacmlId = attribute.getAttributeID();
+        for (Attribute supportedAttribute : Attribute.values()) {
+            if (supportedAttribute.xacmlId.equals(xacmlId)) {
+                if (supportedAttribute.category == Attribute.Category.SUBJECT)
+                    return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isResouceAttribute(AttributeType attribute) {
+        String xacmlId = attribute.getAttributeID();
+        for (Attribute supportedAttribute : Attribute.values()) {
+            if (supportedAttribute.xacmlId.equals(xacmlId)) {
+                if (supportedAttribute.category == Attribute.Category.RESOURCE)
+                    return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isEnvironmentAttribute(AttributeType attribute) {
+        String xacmlId = attribute.getAttributeID();
+        for (Attribute supportedAttribute : Attribute.values()) {
+            if (supportedAttribute.xacmlId.equals(xacmlId)) {
+                if (supportedAttribute.category == Attribute.Category.ENVIRONMENT)
+                    return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean isActionAttribute(AttributeType attribute) {
+        String xacmlId = attribute.getAttributeID();
+        for (Attribute supportedAttribute : Attribute.values()) {
+            if (supportedAttribute.xacmlId.equals(xacmlId)) {
+                if (supportedAttribute.category == Attribute.Category.ACTION)
+                    return true;
+            }
+        }
+        return false;
+    }
 
 }

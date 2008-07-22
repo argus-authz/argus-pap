@@ -12,6 +12,38 @@ public class ApplyHelper extends XACMLHelper<ApplyType> {
 
     private static ApplyHelper instance = new ApplyHelper();
 
+    public static ApplyType buildFunctionAnd() {
+
+        ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
+        apply.setFunctionId(Functions.AND);
+
+        return apply;
+    }
+
+    public static ApplyType buildFunctionAnyOf() {
+
+        ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
+        apply.setFunctionId(Functions.ANY_OF);
+
+        return apply;
+    }
+
+    public static ApplyType buildFunctionAnyOfAll() {
+
+        ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
+        apply.setFunctionId(Functions.ANY_OF_ALL);
+
+        return apply;
+    }
+
+    public static ApplyType buildFunctionAnyOfAny() {
+
+        ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
+        apply.setFunctionId(Functions.ANY_OF_ANY);
+
+        return apply;
+    }
+
     public static ApplyType buildFunctionNot() {
 
         ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
@@ -23,20 +55,7 @@ public class ApplyHelper extends XACMLHelper<ApplyType> {
 
         ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
         apply.setFunctionId(Functions.OR);
-        return apply;
-    }
 
-    public static ApplyType buildFunctionAnyOfAll() {
-
-        ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
-        apply.setFunctionId(Functions.ANY_OF_ALL);
-        return apply;
-    }
-    
-    public static ApplyType buildFunctionAnyOfAny() {
-
-        ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
-        apply.setFunctionId(Functions.ANY_OF_ANY);
         return apply;
     }
 
@@ -44,6 +63,7 @@ public class ApplyHelper extends XACMLHelper<ApplyType> {
 
         ApplyType apply = (ApplyType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
         apply.setFunctionId(Functions.STRING_BAG);
+
         return apply;
     }
 

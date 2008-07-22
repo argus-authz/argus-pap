@@ -74,6 +74,26 @@ public abstract class PolicyWizard {
 
         return resultList;
     }
+    
+    private static List<AttributeType> getAttributeList(List<AttributeWizard> list) {
+        List<AttributeType> resultList = new LinkedList<AttributeType>();
+
+        for (AttributeWizard attribute : list) {
+            resultList.add(attribute.getAttributeType());
+        }
+
+        return resultList;
+    }
+    
+    private static List<List<AttributeType>> getAttributeListList(List<List<AttributeWizard>> listList) {
+        List<List<AttributeType>> resultList = new LinkedList<List<AttributeType>>();
+
+        for (List<AttributeWizard> list:listList) {
+            resultList.add(getAttributeList(list));
+        }
+        
+        return resultList;
+    }
 
     protected static long generateRandomLong() {
         return generator.nextLong();
@@ -81,30 +101,28 @@ public abstract class PolicyWizard {
 
     protected final PolicyType policy;
 
-    protected PolicyWizard(String policyId, List<AttributeWizard> targetAttributeList,
-            List<List<AttributeWizard>> orExceptionsAttributeList, EffectType effect) {
+    protected PolicyWizard(String policyId, List<AttributeWizard> targetAttributeWizardList,
+            List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
 
-        if (targetAttributeList == null)
-            targetAttributeList = new LinkedList<AttributeWizard>();
+        if (targetAttributeWizardList == null)
+            targetAttributeWizardList = new LinkedList<AttributeWizard>();
 
-        if (orExceptionsAttributeList == null)
-            orExceptionsAttributeList = new LinkedList<List<AttributeWizard>>();
-
+        if (orExceptionsAttributeWizardList == null)
+            orExceptionsAttributeWizardList = new LinkedList<List<AttributeWizard>>();
+        
         policy = PolicyHelper.build(policyId, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 
         // TODO: gestire list exceptions Or e AND
         List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
-        for (List<AttributeWizard> andList : orExceptionsAttributeList) {
+        for (List<AttributeWizard> andList : orExceptionsAttributeWizardList) {
             exceptionsAttributeList.addAll(andList);
         }
 
-        TargetType target = createTarget(getSubjectAttributes(targetAttributeList),
-                getResourceAttributes(targetAttributeList),
-                getEnvironmentAttributes(targetAttributeList));
+        TargetType target = createTarget(getSubjectAttributes(targetAttributeWizardList),
+                getResourceAttributes(targetAttributeWizardList),
+                getEnvironmentAttributes(targetAttributeWizardList));
 
-        RuleType rule = ExceptionsRule.build(getSubjectAttributes(exceptionsAttributeList),
-                getResourceAttributes(exceptionsAttributeList),
-                getEnvironmentAttributes(exceptionsAttributeList), effect);
+        RuleType rule = ExceptionsRule.build(getAttributeListList(orExceptionsAttributeWizardList), effect);
 
         policy.setTarget(target);
         policy.getRules().add(rule);
