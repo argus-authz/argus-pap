@@ -4,8 +4,12 @@ import org.glite.authz.pap.common.utils.xacml.CtxAttributeValueHelper;
 import org.glite.authz.pap.common.utils.xacml.DataType;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xml.Configuration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AttributeWizard {
+    
+    private static final Logger log = LoggerFactory.getLogger(AttributeWizard.class);
 
     private enum Attribute {
         DN("dn", "DN", DataType.STRING, Category.SUBJECT),
@@ -64,6 +68,7 @@ public class AttributeWizard {
             }
         }
         if (!found) {
+            log.warn("Unsupported attribute \"" + identifier + "\". Assuming it to be a Generic Attribute");
             this.attributeId = identifier;
             this.dataType = DataType.STRING;
             this.value = value;

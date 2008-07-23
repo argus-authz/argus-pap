@@ -1,10 +1,6 @@
 package org.glite.authz.pap.ui.wizard;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.namespace.QName;
 
@@ -23,7 +19,6 @@ import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.FunctionType;
 import org.opensaml.xacml.policy.RuleType;
 import org.opensaml.xml.Configuration;
-import org.opensaml.xml.XMLObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,39 +28,6 @@ public class ExceptionsRule {
     private static final javax.xml.namespace.QName SUBJECT_DESIGNATOR = AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final javax.xml.namespace.QName RESOURCE_DESIGNATOR = AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final javax.xml.namespace.QName ENVIRONMENT_DESIGNATOR = AttributeDesignatorType.ENVIRONMENT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
-
-    public static RuleType build(List<AttributeType> sbjAttr, List<AttributeType> rsrcAttr,
-            List<AttributeType> envAttr, EffectType effect) {
-
-        ApplyType applyNot = ApplyHelper.buildFunctionNot();
-        ApplyType applyOr = ApplyHelper.buildFunctionOr();
-        applyNot.getExpressions().add(applyOr);
-
-        List<List<AttributeType>> listOfLists = getSubLists(sbjAttr);
-
-        for (List<AttributeType> list : listOfLists) {
-            applyOr.getExpressions().add(createFunctionAnyOfANY(list, SUBJECT_DESIGNATOR));
-        }
-
-        listOfLists = getSubLists(rsrcAttr);
-        for (List<AttributeType> list : listOfLists) {
-            applyOr.getExpressions().add(createFunctionAnyOfANY(list, RESOURCE_DESIGNATOR));
-        }
-
-        listOfLists = getSubLists(envAttr);
-        for (List<AttributeType> list : listOfLists) {
-            applyOr.getExpressions().add(createFunctionAnyOfANY(list, ENVIRONMENT_DESIGNATOR));
-        }
-
-        ConditionType condition = (ConditionType) Configuration.getBuilderFactory().getBuilder(
-                ConditionType.DEFAULT_ELEMENT_NAME).buildObject(ConditionType.DEFAULT_ELEMENT_NAME);
-        condition.setExpression(applyNot);
-
-        RuleType exceptionsRule = RuleHelper.build("ExceptionsRule", effect);
-        exceptionsRule.setCondition(condition);
-
-        return exceptionsRule;
-    }
 
     public static RuleType build(List<List<AttributeType>> orAttributeList, EffectType effect) {
 
@@ -103,26 +65,6 @@ public class ExceptionsRule {
         return exceptionsRule;
     }
 
-    public static RuleType buildo(List<AttributeType> attributeList, EffectType effect) {
-
-        ApplyType applyNot = ApplyHelper.buildFunctionNot();
-        ApplyType applyOr = ApplyHelper.buildFunctionOr();
-        applyNot.getExpressions().add(applyOr);
-
-        for (AttributeType attribute : attributeList) {
-            applyOr.getExpressions().add(createFunctionAnyOf(attribute, getDesignator(attribute)));
-        }
-
-        ConditionType condition = (ConditionType) Configuration.getBuilderFactory().getBuilder(
-                ConditionType.DEFAULT_ELEMENT_NAME).buildObject(ConditionType.DEFAULT_ELEMENT_NAME);
-        condition.setExpression(applyNot);
-
-        RuleType exceptionsRule = RuleHelper.build("ExceptionsRule", effect);
-        exceptionsRule.setCondition(condition);
-
-        return exceptionsRule;
-    }
-
     private static ApplyType createFunctionAnyOf(AttributeType attribute, QName designatorType) {
 
         FunctionType functionStringEqual = FunctionHelper.build(Functions.STRING_EQUAL);
@@ -145,30 +87,6 @@ public class ExceptionsRule {
         return applyAnyOf;
     }
 
-    private static ApplyType createFunctionAnyOfANY(List<AttributeType> attributeList,
-            QName designatorType) {
-
-        ApplyType applyAnyOfAll = ApplyHelper.buildFunctionAnyOfAny();
-        FunctionType functionStringEqual = FunctionHelper.build(Functions.STRING_EQUAL);
-        applyAnyOfAll.getExpressions().add(functionStringEqual);
-
-        ApplyType applyStringBag = ApplyHelper.buildFunctionStringBag();
-        if (!attributeList.isEmpty()) {
-            for (AttributeType attribute : attributeList) {
-                String dataType = attribute.getDataType();
-                for (XMLObject elem : attribute.getAttributeValues()) {
-                    applyStringBag.getExpressions().add(
-                            PolicyAttributeValueHelper.build(dataType, ((AttributeValueType) elem)
-                                    .getValue()));
-                }
-            }
-            applyAnyOfAll.getExpressions().add(applyStringBag);
-            applyAnyOfAll.getExpressions().add(
-                    AttributeDesignatorHelper.build(designatorType, attributeList.get(0)));
-        }
-        return applyAnyOfAll;
-    }
-
     private static javax.xml.namespace.QName getDesignator(AttributeType attribute) {
 
         if (AttributeWizard.isSubjectAttribute(attribute))
@@ -178,34 +96,11 @@ public class ExceptionsRule {
         else if (AttributeWizard.isEnvironmentAttribute(attribute))
             return ENVIRONMENT_DESIGNATOR;
         else {
-            log.error("BUG subject designator assigned by default: attributeId="
-                    + attribute.getAttributeID() + " dataType=" + attribute.getDataType());
+            log.warn("Subject designator assigned by default: attributeId=" + attribute.getAttributeID()
+                    + " dataType=" + attribute.getDataType());
             return SUBJECT_DESIGNATOR;
         }
 
-    }
-
-    private static List<List<AttributeType>> getSubLists(List<AttributeType> attributeList) {
-        List<List<AttributeType>> resultList = new ArrayList<List<AttributeType>>();
-
-        if (attributeList == null)
-            return resultList;
-
-        Set<String> idSet = new HashSet<String>();
-        for (AttributeType attribute : attributeList) {
-            idSet.add(attribute.getAttributeID());
-        }
-
-        for (String id : idSet) {
-            List<AttributeType> list = new LinkedList<AttributeType>();
-            for (AttributeType attribute : attributeList) {
-                if (attribute.getAttributeID().equals(id)) {
-                    list.add(attribute);
-                }
-            }
-            resultList.add(list);
-        }
-        return resultList;
     }
 
 }
