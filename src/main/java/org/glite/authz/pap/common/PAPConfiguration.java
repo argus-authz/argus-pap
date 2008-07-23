@@ -47,6 +47,8 @@ public class PAPConfiguration {
     private static final String DEFAULT_PAP_DISTRIBUTION_FILE_NAME = "pap_distribution.ini";
 
     private static final String DEFAULT_PAP_AUTHZ_FILE_NAME = "pap_authorization.ini";
+    
+    private static final String DEFAULT_PAP_POLICY_FILE_NAME = "pap_policy.ini";
 
     final static Logger logger = LoggerFactory
 	    .getLogger(PAPConfiguration.class);
@@ -167,6 +169,11 @@ public class PAPConfiguration {
 
 	return getPAPConfigurationDir() + "/" + DEFAULT_PAP_AUTHZ_FILE_NAME;
     }
+    
+    public String getPapPolicyConfigurationFileName() {
+
+        return getPAPConfigurationDir() + "/" + DEFAULT_PAP_POLICY_FILE_NAME;
+        }
 
     public BigDecimal getBigDecimal(String key, BigDecimal defaultValue) {
 
