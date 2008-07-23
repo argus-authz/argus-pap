@@ -4,6 +4,7 @@ import java.lang.String;
 import org.glite.authz.pap.ui.wizard.*;
 import org.opensaml.xacml.XACMLObject;
 import java.util.List;
+import java.util.Vector;
 
 class BWParser {
 //     public static String main(String args[]) throws ParseException {
@@ -38,7 +39,7 @@ TOKEN:
 |  <FQAN:     "fqan">
 |  <DN:       "dn">
 |  <GA:       "ga">
-|  <RESOURCE: "resource">
+|  <RESOURCE: "resource_uri">
 |  <CERT:     "certificate">
 |  <SERVICE:  "service_class_assignment">
 |  <PILOT:    "pilot">
@@ -72,40 +73,47 @@ TOKEN:
       "'"
 >
 | <ID2: (["a"-"z", "_", "A"-"Z", "0"-"9"])+>
+| <HEX:    "0x" (["0"-"9", "a"-"f", "A"-"F"])+>
+| <NUMBER: (["0"-"9"])+>
 }
 
 
 List<XACMLObject> Text() :
 {
-  Policies policies = null;
+  Policy policy = null;
   Policies allpolicies = new Policies();
   String output = new String();
 }
 { 
-  (policies=Section() { 
-    allpolicies.policies.addAll(policies.policies); 
+  (policy=SectionType() { 
+    allpolicies.policies.add(policy); 
     })*
   { return allpolicies.Output(); }
 }
 
 Policies Section() :
 {
-  Policies policies = null;
+  Policies policies=new Policies();
+  Policy policy=null;
 }
 {
-  "[" policies=SectionType()
+  ( policy=SectionType()
+    {policies.policies.add(policy); }
+  )+
   { return policies; }
 }
 
-Policies SectionType() :
+
+Policy SectionType() :
 {
-  Policies policies = null;
+  Policy policy = null;
 }
 {
-  <BW> "]" policies = BW_Policies()
-  { return policies; }
-| <SERVICE> "]" policies = ServiceClassPolicies()
-  { return policies; }
+        
+  <RESOURCE> policy = BW_Policy()
+  { return policy; }
+| <CLASS> policy = ServiceClassPolicy()
+  { return policy; }
 }
 
 Policies BW_Policies() :
@@ -114,7 +122,7 @@ Policies BW_Policies() :
   Policies policies = new Policies();
 }
 {
-  (policy=BW_Policy() {policies.policies.add(policy);})+
+  (<RESOURCE> policy=BW_Policy() {policies.policies.add(policy);})+
   {
     return policies;
   }
@@ -127,7 +135,7 @@ Policy BW_Policy() :
   Policy policy = new Policy();
 }
 {
-  <RESOURCE> resource=TextString() "{" conds=Conditions() "}"
+  resource=TextString() "{" conds=Conditions() "}"
   {
     policy.name = resource;
     policy.type = Policy.POLICY_TYPE_BW;
@@ -163,7 +171,7 @@ Policy ServiceClassPolicy() :
   Policies policies = null;
 }
 {
-  <CLASS> resource=TextString() "{" policies=BW_Policies() "}"
+  resource=TextString() "{" policies=BW_Policies() "}"
   {
     policy.name = resource;
     policy.type = Policy.POLICY_TYPE_CLASS;
@@ -272,7 +280,7 @@ SingleCondition Item() :
     sc.value1 = s1;
     return sc;
   }
-| <CERT> "=" "(" s1=TextString() ":" s2=TextString() ")"
+| <CERT> "=" "(" s1=TextString() ":" s2=Number() ")"
   {
     sc.type = SingleCondition.TYPE_CERT;
     sc.value1 = s1;
@@ -283,12 +291,6 @@ SingleCondition Item() :
   {
     sc.type = SingleCondition.TYPE_RESOURCE;
     sc.value1 = s1;
-    return sc;
-  }
-| <PILOT> "=" value=YesOrNo()
-  { 
-    sc.type = SingleCondition.TYPE_PILOT;
-    sc.yesorno= value;
     return sc;
   }
 | s1=TextString() "=" s2=TextString()
@@ -309,15 +311,33 @@ boolean YesOrNo() :
   { return false; }
 }
 
-String TextString():
+String Number() :
 {
   Token t = null;
 }
+{ 
+  t = <NUMBER>
+  { return t.toString(); }
+| t = <HEX>
+  { return t.toString(); }
+}
+
+String TextString():
+{
+  Token t = null;
+  String s = null;
+}
 {
   t=<STRING>
-  { return t.toString(); }
+  { 
+    s = t.toString();
+    return s.substring(1, s.length()-1); 
+  }
 | t=<ID>
-  { return t.toString(); }
+  { 
+    s = t.toString();
+    return s.substring(1, s.length()-1); 
+  }
 | t=<ID2>
   { return t.toString(); } 
 }

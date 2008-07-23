@@ -39,7 +39,7 @@ public interface BWParserConstants {
     "\"fqan\"",
     "\"dn\"",
     "\"ga\"",
-    "\"resource\"",
+    "\"resource_uri\"",
     "\"certificate\"",
     "\"service_class_assignment\"",
     "\"pilot\"",

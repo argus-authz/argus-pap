@@ -354,19 +354,15 @@ class BWParser implements BWParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public String TextString() throws ParseException {
+  static final public String Number() throws ParseException {
   Token t = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case STRING:
-      t = jj_consume_token(STRING);
+    case NUMBER:
+      t = jj_consume_token(NUMBER);
     {if (true) return t.toString();}
       break;
-    case ID:
-      t = jj_consume_token(ID);
-    {if (true) return t.toString();}
-      break;
-    case ID2:
-      t = jj_consume_token(ID2);
+    case HEX:
+      t = jj_consume_token(HEX);
     {if (true) return t.toString();}
       break;
     default:
@@ -377,15 +373,22 @@ class BWParser implements BWParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public String Number() throws ParseException {
+  static final public String TextString() throws ParseException {
   Token t = null;
+  String s = null;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case NUMBER:
-      t = jj_consume_token(NUMBER);
-    {if (true) return t.toString();}
+    case STRING:
+      t = jj_consume_token(STRING);
+    s = t.toString();
+    {if (true) return s.substring(1, s.length()-1);}
       break;
-    case HEX:
-      t = jj_consume_token(HEX);
+    case ID:
+      t = jj_consume_token(ID);
+    s = t.toString();
+    {if (true) return s.substring(1, s.length()-1);}
+      break;
+    case ID2:
+      t = jj_consume_token(ID2);
     {if (true) return t.toString();}
       break;
     default:
@@ -408,7 +411,7 @@ class BWParser implements BWParserConstants {
       jj_la1_0();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x40800,0x40800,0x40800,0x800,0xe00000,0x1000c0,0x1000c0,0x80000,0xc0,0xe01b00,0xe01b00,0x18000,0xe00000,0x3000000,};
+      jj_la1_0 = new int[] {0x40800,0x40800,0x40800,0x800,0xe00000,0x1000c0,0x1000c0,0x80000,0xc0,0xe01b00,0xe01b00,0x18000,0x3000000,0xe00000,};
    }
 
   public BWParser(java.io.InputStream stream) {
