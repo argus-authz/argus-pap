@@ -2,7 +2,6 @@ package org.glite.authz.pap.ui.wizard;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 
 import org.glite.authz.pap.common.utils.xacml.ActionsHelper;
 import org.glite.authz.pap.common.utils.xacml.Functions;
@@ -25,7 +24,6 @@ import org.opensaml.xacml.policy.TargetType;
 
 public abstract class PolicyWizard {
 
-    private final static Random generator = new Random();
     private static TargetType createTarget(List<AttributeType> sbjAttr, List<AttributeType> rsrcAttr,
             List<AttributeType> envAttr) {
 
@@ -40,6 +38,26 @@ public abstract class PolicyWizard {
         TargetType target = TargetHelper.build(subjects, actions, resources, null);
 
         return target;
+    }
+
+    private static List<AttributeType> getAttributeList(List<AttributeWizard> list) {
+        List<AttributeType> resultList = new LinkedList<AttributeType>();
+
+        for (AttributeWizard attribute : list) {
+            resultList.add(attribute.getAttributeType());
+        }
+
+        return resultList;
+    }
+
+    private static List<List<AttributeType>> getAttributeListList(List<List<AttributeWizard>> listList) {
+        List<List<AttributeType>> resultList = new LinkedList<List<AttributeType>>();
+
+        for (List<AttributeWizard> list : listList) {
+            resultList.add(getAttributeList(list));
+        }
+
+        return resultList;
     }
 
     private static List<AttributeType> getEnvironmentAttributes(List<AttributeWizard> list) {
@@ -74,30 +92,6 @@ public abstract class PolicyWizard {
 
         return resultList;
     }
-    
-    private static List<AttributeType> getAttributeList(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            resultList.add(attribute.getAttributeType());
-        }
-
-        return resultList;
-    }
-    
-    private static List<List<AttributeType>> getAttributeListList(List<List<AttributeWizard>> listList) {
-        List<List<AttributeType>> resultList = new LinkedList<List<AttributeType>>();
-
-        for (List<AttributeWizard> list:listList) {
-            resultList.add(getAttributeList(list));
-        }
-        
-        return resultList;
-    }
-
-    protected static long generateRandomLong() {
-        return generator.nextLong();
-    }
 
     protected final PolicyType policy;
 
@@ -109,20 +103,15 @@ public abstract class PolicyWizard {
 
         if (orExceptionsAttributeWizardList == null)
             orExceptionsAttributeWizardList = new LinkedList<List<AttributeWizard>>();
-        
-        policy = PolicyHelper.build(policyId, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 
-        // TODO: gestire list exceptions Or e AND
-        List<AttributeWizard> exceptionsAttributeList = new LinkedList<AttributeWizard>();
-        for (List<AttributeWizard> andList : orExceptionsAttributeWizardList) {
-            exceptionsAttributeList.addAll(andList);
-        }
+        policy = PolicyHelper.build(policyId, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 
         TargetType target = createTarget(getSubjectAttributes(targetAttributeWizardList),
                 getResourceAttributes(targetAttributeWizardList),
                 getEnvironmentAttributes(targetAttributeWizardList));
 
-        RuleType rule = ExceptionsRule.build(getAttributeListList(orExceptionsAttributeWizardList), effect);
+        RuleType rule = ExceptionsRule.build(getAttributeListList(orExceptionsAttributeWizardList),
+                effect);
 
         policy.setTarget(target);
         policy.getRules().add(rule);
