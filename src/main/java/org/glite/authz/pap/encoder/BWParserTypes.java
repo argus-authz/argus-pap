@@ -64,6 +64,7 @@ class Conds {
 
 class Policy {
     String name;
+    String serviceClass;
     int type;
     Conds conds;
     Policies policies;
@@ -73,6 +74,7 @@ class Policy {
 
     public Policy() {
         type = POLICY_TYPE_BW;
+        serviceClass = null;
     }
 
     public void Output(BlacklistPolicySet blSet, 
@@ -109,7 +111,9 @@ class Policy {
         Enumeration i = policiesList.elements();
 
         while (i.hasMoreElements()) {
-            ((Policy)i.nextElement()).OutputBW(blSet, scSet, POLICY_TYPE_CLASS);
+            Policy p = (Policy)i.nextElement();
+            p.serviceClass = name;
+            p.OutputBW(blSet, scSet, POLICY_TYPE_CLASS);
         }
     }
 
@@ -147,6 +151,7 @@ class Policy {
             break;
 
         case POLICY_TYPE_CLASS:
+            targetAttributeList.add(new AttributeWizard("service_class", serviceClass));
             policy = new ServiceClassPolicy(targetAttributeList, exceptsAttributes, (fc.allow ? org.opensaml.xacml.policy.EffectType.Permit : org.opensaml.xacml.policy.EffectType.Deny));
             break;
 
