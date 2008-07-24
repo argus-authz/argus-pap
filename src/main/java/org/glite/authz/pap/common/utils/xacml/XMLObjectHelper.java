@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import javax.xml.transform.OutputKeys;
@@ -34,9 +35,9 @@ public class XMLObjectHelper<T extends XMLObject> {
 
     protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
     protected static final MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
+    protected static final BasicParserPool ppMgr = new BasicParserPool();
     protected static final UnmarshallerFactory unmarshallerFactory = Configuration
             .getUnmarshallerFactory();
-    protected static final BasicParserPool ppMgr = new BasicParserPool();
 
     static {
         ppMgr.setNamespaceAware(true);
@@ -54,10 +55,19 @@ public class XMLObjectHelper<T extends XMLObject> {
 
         return xmlObject;
     }
+    
+    public static XMLObject buildXMLObject(InputStream inputStream) {
+        Document doc = readDocument(inputStream);
+        return buildXMLObject(doc.getDocumentElement());
+    }
 
     public static XMLObject buildXMLObjectFromFile(File file) {
-        Document doc = readDocumentFromFile(file);
+        Document doc = readDocument(file);
         return buildXMLObject(doc.getDocumentElement());
+    }
+    
+    public static XMLObject buildXMLObjectFromFile(String fileName) {
+        return buildXMLObjectFromFile(new File(fileName));
     }
 
     public static Element getDOM(XMLObject xmlObject) {
@@ -109,14 +119,23 @@ public class XMLObjectHelper<T extends XMLObject> {
         }
     }
 
-    private static Document readDocumentFromFile(File file) {
+    private static Document readDocument(File file) {
+        FileInputStream fileInputStream;
+        try {
+            fileInputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new XMLObjectException("File not found: " + file.getAbsolutePath(), e);
+        }
+        
+        return readDocument(fileInputStream);
+    }
+    
+    private static Document readDocument(InputStream inputStream) {
         Document doc;
         try {
-            doc = ppMgr.parse(new FileInputStream(file));
+            doc = ppMgr.parse(inputStream);
         } catch (XMLParserException e) {
-            throw new XMLObjectException("Error reading file: " + file.getAbsolutePath(), e);
-        } catch (FileNotFoundException e) {
-            throw new XMLObjectException("Error reading file: " + file.getAbsolutePath(), e);
+            throw new XMLObjectException(e);
         }
 
         return doc;
@@ -131,7 +150,7 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     public T buildFromFile(File file) {
-        Document doc = readDocumentFromFile(file);
+        Document doc = readDocument(file);
         return build(doc.getDocumentElement());
     }
 
