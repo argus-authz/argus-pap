@@ -25,7 +25,7 @@ public class ProvisioningServiceDAO {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
         
         PAP localPAP = PAP.makeLocalPAP();
-        PAPContainer papContainer = RepositoryManager.getPAPManager().get(localPAP);
+        PAPContainer papContainer = RepositoryManager.getPAPManager().getContainer(localPAP);
 
         resultList.addAll(papContainer.getAllPolicySets());
         resultList.addAll(papContainer.getAllPolicies());
@@ -46,7 +46,7 @@ public class ProvisioningServiceDAO {
 
         // Add references to the remote PAPs
         PAPManager papManager = RepositoryManager.getPAPManager();
-        for (PAPContainer papContainer : papManager.getAll()) {
+        for (PAPContainer papContainer : papManager.getContainerAll()) {
             String papId = papContainer.getPAP().getPapId();
             
             if (!papId.equals(PAP.localPAPId))

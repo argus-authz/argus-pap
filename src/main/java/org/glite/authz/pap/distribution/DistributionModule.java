@@ -83,7 +83,7 @@ public class DistributionModule extends Thread {
         log.debug("Storing policies for PAP: " + pap.getPapId());
 
         PAPManager papManager = RepositoryManager.getPAPManager();
-        PAPContainer papContainer = papManager.get(pap);
+        PAPContainer papContainer = papManager.getContainer(pap);
 
         papContainer.deleteAllPolicies();
         papContainer.deleteAllPolicySets();

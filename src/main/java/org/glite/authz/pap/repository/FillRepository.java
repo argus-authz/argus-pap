@@ -26,7 +26,7 @@ public class FillRepository {
         PAPContainer container = null;
         
         if (pm.exists(pap)) {
-            container = pm.get(pap);
+            container = pm.getContainer(pap);
             log.info("Deleting all policies and policy sets for PAP: " + papId);
             container.deleteAllPolicies();
             container.deleteAllPolicySets();

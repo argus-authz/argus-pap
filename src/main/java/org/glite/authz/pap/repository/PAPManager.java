@@ -12,8 +12,8 @@ public interface PAPManager {
 
     public boolean exists(PAP pap);
 
-    public PAPContainer get(PAP pap);
+    public PAPContainer getContainer(PAP pap);
 
-    public List<PAPContainer> getAll();
+    public List<PAPContainer> getContainerAll();
 
 }

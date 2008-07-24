@@ -48,14 +48,14 @@ public class FileSystemPAPManager implements PAPManager {
 	return directory.exists();
     }
 
-    public PAPContainer get(PAP pap) {
+    public PAPContainer getContainer(PAP pap) {
 	if (!exists(pap)) {
 	    throw new NotFoundException();
 	}
 	return new PAPContainer(pap);
     }
 
-    public List<PAPContainer> getAll() {
+    public List<PAPContainer> getContainerAll() {
 	File dir = new File(dbDir);
 	File[] list = dir.listFiles();
 	List<PAPContainer> idList = new ArrayList<PAPContainer>(list.length);

@@ -55,7 +55,7 @@ public abstract class RepositoryManager {
             PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
                     PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
             
-            PAPContainer localPapContainer = papManager.get(localPAP);
+            PAPContainer localPapContainer = papManager.getContainer(localPAP);
             localPapContainer.storePolicySet(localPolicySet);
         }
     }
@@ -79,7 +79,7 @@ public abstract class RepositoryManager {
             throw new RepositoryException(e);
         }
         
-        PAPContainer localPapContainer = getPAPManager().get(PAP.makeLocalPAP());
+        PAPContainer localPapContainer = getPAPManager().getContainer(PAP.makeLocalPAP());
         
         localPapContainer.deleteAllPolicies();
         localPapContainer.deleteAllPolicySets();
