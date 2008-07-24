@@ -9,7 +9,7 @@ import org.opensaml.xacml.policy.AttributeDesignatorType;
 import org.opensaml.xacml.policy.SubjectMatchType;
 import org.opensaml.xml.Configuration;
 
-public class SubjectMatchHelper extends XACMLHelper<SubjectMatchType> {
+public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
 
     private static final SubjectMatchHelper instance = new SubjectMatchHelper();
     private static final javax.xml.namespace.QName elementQName = SubjectMatchType.DEFAULT_ELEMENT_NAME;

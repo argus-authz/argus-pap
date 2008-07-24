@@ -5,7 +5,7 @@ import java.util.List;
 import org.opensaml.xacml.policy.ResourceMatchType;
 import org.opensaml.xacml.policy.ResourceType;
 
-public class ResourceHelper extends XACMLHelper<ResourceType> {
+public class ResourceHelper extends XMLObjectHelper<ResourceType> {
 
     private static final javax.xml.namespace.QName elementQName = ResourceType.DEFAULT_ELEMENT_NAME;
     private static ResourceHelper instance = new ResourceHelper();

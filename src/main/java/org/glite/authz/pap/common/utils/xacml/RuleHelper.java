@@ -3,7 +3,7 @@ package org.glite.authz.pap.common.utils.xacml;
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.RuleType;
 
-public class RuleHelper extends XACMLHelper<RuleType> {
+public class RuleHelper extends XMLObjectHelper<RuleType> {
 
     public static final String RULE_COMBALG_FIRST_APPLICABLE = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable";
     public static final String RULE_COMBALG_DENY_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides";

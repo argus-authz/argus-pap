@@ -8,7 +8,7 @@ import org.opensaml.xacml.policy.AttributeDesignatorType;
 import org.opensaml.xacml.policy.AttributeValueType;
 import org.opensaml.xacml.policy.ResourceMatchType;
 
-public class ResourceMatchHelper extends XACMLHelper<ResourceMatchType> {
+public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
 
     private static final javax.xml.namespace.QName elementQName = ResourceMatchType.DEFAULT_ELEMENT_NAME;
     private static ResourceMatchHelper instance = new ResourceMatchHelper();

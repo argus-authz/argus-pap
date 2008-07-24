@@ -73,7 +73,7 @@ public abstract class PolicySetWizard {
     }
 
     public String toString() {
-        return PolicySetHelper.getInstance().toString(policySet);
+        return PolicySetHelper.toString(policySet);
     }
 
     protected void addPolicyAsReference(PolicyType policy) {

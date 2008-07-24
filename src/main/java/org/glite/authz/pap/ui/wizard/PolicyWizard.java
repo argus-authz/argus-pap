@@ -123,7 +123,7 @@ public abstract class PolicyWizard {
     }
 
     public String toString() {
-        return PolicyHelper.getInstance().toString(policy);
+        return PolicyHelper.toString(policy);
     }
 
 }

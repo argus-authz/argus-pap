@@ -5,7 +5,7 @@ import java.util.List;
 import org.opensaml.xacml.policy.SubjectType;
 import org.opensaml.xacml.policy.SubjectsType;
 
-public class SubjectsHelper extends XACMLHelper<SubjectsType> {
+public class SubjectsHelper extends XMLObjectHelper<SubjectsType> {
 
     private static final javax.xml.namespace.QName elementQName = SubjectsType.DEFAULT_ELEMENT_NAME;
     private static final SubjectsHelper instance = new SubjectsHelper();

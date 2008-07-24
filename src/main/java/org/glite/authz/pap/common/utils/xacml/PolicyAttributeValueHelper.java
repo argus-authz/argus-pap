@@ -2,7 +2,7 @@ package org.glite.authz.pap.common.utils.xacml;
 
 import org.opensaml.xacml.policy.AttributeValueType;
 
-public class PolicyAttributeValueHelper extends XACMLHelper<AttributeValueType> {
+public class PolicyAttributeValueHelper extends XMLObjectHelper<AttributeValueType> {
 
     private static PolicyAttributeValueHelper instance = new PolicyAttributeValueHelper();
     private static final javax.xml.namespace.QName elementQName = AttributeValueType.DEFAULT_ELEMENT_NAME;

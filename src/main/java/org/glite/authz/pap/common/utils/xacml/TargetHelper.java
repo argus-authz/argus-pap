@@ -6,7 +6,7 @@ import org.opensaml.xacml.policy.ResourcesType;
 import org.opensaml.xacml.policy.SubjectsType;
 import org.opensaml.xacml.policy.TargetType;
 
-public class TargetHelper extends XACMLHelper<TargetType> {
+public class TargetHelper extends XMLObjectHelper<TargetType> {
 
     private static final javax.xml.namespace.QName elementQName = TargetType.DEFAULT_ELEMENT_NAME;
     private static TargetHelper instance = new TargetHelper();

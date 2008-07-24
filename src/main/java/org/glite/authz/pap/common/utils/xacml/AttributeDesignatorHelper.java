@@ -6,7 +6,7 @@ import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.policy.AttributeDesignatorType;
 import org.opensaml.xml.Configuration;
 
-public class AttributeDesignatorHelper extends XACMLHelper<AttributeDesignatorType> {
+public class AttributeDesignatorHelper extends XMLObjectHelper<AttributeDesignatorType> {
     
     private static final AttributeDesignatorHelper instance = new AttributeDesignatorHelper();
 

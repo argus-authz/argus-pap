@@ -2,7 +2,7 @@ package org.glite.authz.pap.common.utils.xacml;
 
 import org.opensaml.xacml.policy.IdReferenceType;
 
-public class IdReferenceHelper extends XACMLHelper<IdReferenceType> {
+public class IdReferenceHelper extends XMLObjectHelper<IdReferenceType> {
 
     public static enum Type {
         POLICY_ID_REFERENCE, POLICYSET_ID_REFERENCE;

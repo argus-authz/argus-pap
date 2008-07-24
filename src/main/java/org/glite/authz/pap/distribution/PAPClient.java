@@ -31,8 +31,11 @@ import org.slf4j.LoggerFactory;
 
 public class PAPClient {
 
+    @SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(PAPClient.class);
     private static final ProvisioningServiceClient client;
     private static final XACMLPolicyQueryType xacmlPolicyQuery;
+
     static {
         ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
                 .getProvisioningServiceClientFactory();
@@ -74,9 +77,7 @@ public class PAPClient {
 
         return xacmlPolicyQuery;
     }
-
-    private final Logger log = LoggerFactory.getLogger(PAPClient.class);
-
+    
     private final ProvisioningServicePortType port;
 
     public PAPClient(String url) {

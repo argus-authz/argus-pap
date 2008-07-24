@@ -2,7 +2,7 @@ package org.glite.authz.pap.common.utils.xacml;
 
 import org.opensaml.xacml.ctx.AttributeValueType;
 
-public class CtxAttributeValueHelper extends XACMLHelper<AttributeValueType> {
+public class CtxAttributeValueHelper extends XMLObjectHelper<AttributeValueType> {
 
     private static final javax.xml.namespace.QName elementQName = AttributeValueType.DEFAULT_ELEMENT_NAME;
     private static CtxAttributeValueHelper instance = new CtxAttributeValueHelper();

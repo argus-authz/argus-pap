@@ -2,7 +2,7 @@ package org.glite.authz.pap.common.utils.xacml;
 
 import org.opensaml.xacml.policy.ActionsType;
 
-public class ActionsHelper extends XACMLHelper<ActionsType> {
+public class ActionsHelper extends XMLObjectHelper<ActionsType> {
 
     private static final javax.xml.namespace.QName elementQName = ActionsType.DEFAULT_ELEMENT_NAME;
     private static ActionsHelper instance = new ActionsHelper();
