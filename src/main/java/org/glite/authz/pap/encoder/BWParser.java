@@ -98,9 +98,9 @@ class BWParser implements BWParserConstants {
   Conds conds = null;
   Policy policy = new Policy();
     resource = TextString();
-    jj_consume_token(26);
+    jj_consume_token(29);
     conds = Conditions();
-    jj_consume_token(27);
+    jj_consume_token(30);
     policy.name = resource;
     policy.type = Policy.POLICY_TYPE_BW;
     policy.conds = conds;
@@ -137,9 +137,9 @@ class BWParser implements BWParserConstants {
   Policy policy = new Policy();
   Policies policies = null;
     resource = TextString();
-    jj_consume_token(26);
+    jj_consume_token(29);
     policies = BW_Policies();
-    jj_consume_token(27);
+    jj_consume_token(30);
     policy.name = resource;
     policy.type = Policy.POLICY_TYPE_CLASS;
     policy.conds = null;
@@ -282,7 +282,7 @@ class BWParser implements BWParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case FQAN:
       jj_consume_token(FQAN);
-      jj_consume_token(28);
+      jj_consume_token(31);
       s1 = TextString();
     sc.type = SingleCondition.TYPE_FQAN;
     sc.value1 = s1;
@@ -290,7 +290,7 @@ class BWParser implements BWParserConstants {
       break;
     case DN:
       jj_consume_token(DN);
-      jj_consume_token(28);
+      jj_consume_token(31);
       s1 = TextString();
     sc.type = SingleCondition.TYPE_DN;
     sc.value1 = s1;
@@ -298,12 +298,12 @@ class BWParser implements BWParserConstants {
       break;
     case CERT:
       jj_consume_token(CERT);
-      jj_consume_token(28);
-      jj_consume_token(29);
-      s1 = TextString();
-      jj_consume_token(30);
-      s2 = Number();
       jj_consume_token(31);
+      jj_consume_token(32);
+      s1 = TextString();
+      jj_consume_token(33);
+      s2 = Number();
+      jj_consume_token(34);
     sc.type = SingleCondition.TYPE_CERT;
     sc.value1 = s1;
     sc.value2 = s2;
@@ -311,7 +311,7 @@ class BWParser implements BWParserConstants {
       break;
     case RESOURCE:
       jj_consume_token(RESOURCE);
-      jj_consume_token(28);
+      jj_consume_token(31);
       s1 = TextString();
     sc.type = SingleCondition.TYPE_RESOURCE;
     sc.value1 = s1;
@@ -321,7 +321,7 @@ class BWParser implements BWParserConstants {
     case ID:
     case ID2:
       s1 = TextString();
-      jj_consume_token(28);
+      jj_consume_token(31);
       s2 = TextString();
     sc.type = SingleCondition.TYPE_GA;
     sc.value1 = s1;
@@ -407,11 +407,16 @@ class BWParser implements BWParserConstants {
   static private int jj_gen;
   static final private int[] jj_la1 = new int[14];
   static private int[] jj_la1_0;
+  static private int[] jj_la1_1;
   static {
       jj_la1_0();
+      jj_la1_1();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x40800,0x40800,0x40800,0x800,0xe00000,0x1000c0,0x1000c0,0x80000,0xc0,0xe01b00,0xe01b00,0x18000,0x3000000,0xe00000,};
+      jj_la1_0 = new int[] {0x204000,0x204000,0x204000,0x4000,0x7000000,0x800600,0x800600,0x400000,0x600,0x700d800,0x700d800,0xc0000,0x18000000,0x7000000,};
+   }
+   private static void jj_la1_1() {
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
 
   public BWParser(java.io.InputStream stream) {
@@ -537,8 +542,8 @@ class BWParser implements BWParserConstants {
 
   static public ParseException generateParseException() {
     jj_expentries.removeAllElements();
-    boolean[] la1tokens = new boolean[32];
-    for (int i = 0; i < 32; i++) {
+    boolean[] la1tokens = new boolean[35];
+    for (int i = 0; i < 35; i++) {
       la1tokens[i] = false;
     }
     if (jj_kind >= 0) {
@@ -551,10 +556,13 @@ class BWParser implements BWParserConstants {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
             la1tokens[j] = true;
           }
+          if ((jj_la1_1[i] & (1<<j)) != 0) {
+            la1tokens[32+j] = true;
+          }
         }
       }
     }
-    for (int i = 0; i < 32; i++) {
+    for (int i = 0; i < 35; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

@@ -3,7 +3,8 @@ resource_uri "t1.cnaf.infn.it" {
    deny fqan = "/cms/test"
 }
 
-resource_uri "*" {
+#comment 1
+resource_uri "*" { #comment 2
 
    deny fqan = "/dteam/prd/*"
         funding_agency = none

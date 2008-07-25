@@ -64,7 +64,7 @@ public class PolicyFileEncoder {
 
     private static void print(PolicySetType set) {
         System.out.println("-----------------");
-        System.out.println("SET: " + PolicySetHelper.getInstance().toString(set));
+        //        System.out.println("SET: " + PolicySetHelper.getInstance().toString(set));
         
     }
 
