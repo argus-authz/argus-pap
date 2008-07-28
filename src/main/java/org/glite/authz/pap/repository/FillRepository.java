@@ -1,6 +1,7 @@
 package org.glite.authz.pap.repository;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -50,6 +51,26 @@ public class FillRepository {
             container.storePolicy(policy);
         }
         
+    }
+    
+    public static void fillFromConfiguration() {
+        PAPConfiguration conf = PAPConfiguration.instance();
+        
+        if (!conf.getBoolean("configuration.test", false))
+            return;
+        
+        int psN = conf.getInt("configuration.test.local_policyset_number");
+        int pN = conf.getInt("configuration.test.local_policy_number");
+        
+        fillLocalPAP(psN, pN);
+        
+        int papN = conf.getInt("configuration.test.remote_pap_number");
+        psN = conf.getInt("configuration.test.remote_policyset_number");
+        pN = conf.getInt("configuration.test.remote_policy_number");
+
+        for (int i=0; i< papN; i++) {
+            fillPAP("remote_pap_" + i, psN, pN);
+        }
     }
     
 }

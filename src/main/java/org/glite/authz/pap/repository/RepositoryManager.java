@@ -41,6 +41,8 @@ public abstract class RepositoryManager {
         createLocalPAP();
         
         setLocalPoliciesFromConfigurationFile();
+        
+        FillRepository.fillFromConfiguration();
     }
     
     private void createLocalPAP() {
