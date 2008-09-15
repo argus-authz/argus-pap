@@ -137,5 +137,10 @@
       <artifactId>commons-cli</artifactId>
       <version>1.1</version>
     </dependency>
+    <dependency>
+      <groupId>org.example</groupId>
+      <artifactId>sunxacml</artifactId>
+      <version>boh</version>
+    </dependency>
   </dependencies>
 </project>
