@@ -22,10 +22,17 @@
  
 package org.glite.authz.pap.decision;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
+import org.glite.authz.pap.provisioning.ProvisioningService;
+import org.glite.authz.pap.provisioning.ProvisioningServiceUtils;
 import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
 import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
@@ -58,12 +65,31 @@ import org.opensaml.xacml.profile.saml.XACMLPolicyStatementType;
 import org.opensaml.xacml.profile.saml.impl.XACMLAuthzDecisionStatementTypeImplBuilder;
 import org.opensaml.xacml.profile.saml.impl.XACMLPolicyStatementTypeImplBuilder;
 import org.opensaml.xml.XMLObjectBuilderFactory;
+import org.opensaml.xml.io.Marshaller;
+import org.opensaml.xml.io.MarshallerFactory;
+import org.opensaml.xml.io.MarshallingException;
+import org.opensaml.xml.io.Unmarshaller;
+import org.opensaml.xml.io.UnmarshallerFactory;
+import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.xml.parse.BasicParserPool;
+import org.opensaml.xml.parse.XMLParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.sun.xacml.ParsingException;
+import com.sun.xacml.ctx.RequestCtx;
+import com.sun.xacml.ctx.ResponseCtx;
 
 /**
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
  *
  */
 public class AuthzDecisionServiceUtils {
+
+    private static final Logger logger = 
+	LoggerFactory.getLogger(AuthzDecisionServiceUtils.class);
 
     private static XMLObjectBuilderFactory builderFactory = 
 	    Configuration.getBuilderFactory();
@@ -223,6 +249,59 @@ public class AuthzDecisionServiceUtils {
 	response.setStatus(status);
 
 	return response;
+    }
+
+    public static RequestCtx toRequestCtx(RequestType opensamlRequest) 
+    	throws MarshallingException, ParsingException {
+
+	logger.debug("Converting a RequestType to a RequestCtx object");
+
+	Element queryElement = 	XMLObjectHelper.getDOM(opensamlRequest);
+
+	RequestCtx sunxacmlRequest = RequestCtx.getInstance(queryElement);
+	
+	return sunxacmlRequest;
+	
+    }
+
+    public static ResponseType toRequestType(ResponseCtx sunxacmlResponse) 
+    	throws UnsupportedEncodingException, XMLParserException {
+	
+	logger.debug("Converting a ResponseCtx to a ResponseType object");
+	
+	// ResponseCtx to outputStream
+	
+	ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); 
+	
+	sunxacmlResponse.encode(outputStream, null); 
+	
+	// TODO that's nasty, there must be a way to produce xacml 2.0 responses
+	
+	String sunxacmlResponseAsString = new String(outputStream.toByteArray());
+	
+	String sunxacmlResponseAsStringReplaced = 
+	    sunxacmlResponseAsString.replace("urn:oasis:names:tc:xacml:3.0:schema:os", 
+		    "urn:oasis:names:tc:xacml:2.0:context:schema:os");
+	
+	// bytes to Element
+	
+	InputStream inputStream = 
+	    new ByteArrayInputStream(sunxacmlResponseAsStringReplaced.getBytes());
+	
+	BasicParserPool ppMgr = new BasicParserPool();
+	ppMgr.setNamespaceAware(true);
+
+	Document responseDocument = ppMgr.parse(inputStream);
+
+	Element responseElement = responseDocument.getDocumentElement();
+
+	// Element to ResponseType
+	
+	ResponseType opensamlXacmlResponse = 
+	    (ResponseType) XMLObjectHelper.buildXMLObject(responseElement);
+	
+	return opensamlXacmlResponse;
+	
     }
   
 }
