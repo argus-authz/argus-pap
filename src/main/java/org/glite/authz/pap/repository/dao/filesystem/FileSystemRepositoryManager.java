@@ -5,6 +5,7 @@ import java.io.IOException;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
@@ -67,7 +68,12 @@ public class FileSystemRepositoryManager extends RepositoryManager {
     }
 
     public FileSystemRepositoryManager() {
-        fileSystemDatabaseDir = PAPConfiguration.instance().getPAPRepositoryDir();
+        
+        try {
+            fileSystemDatabaseDir = PAPConfiguration.instance().getPAPRepositoryDir();
+        } catch (PAPConfigurationException e) {
+            fileSystemDatabaseDir = "/var/glite/etc/pap";
+        }
     }
 
     private void createDirectoryPath(File dir) {
@@ -96,7 +102,7 @@ public class FileSystemRepositoryManager extends RepositoryManager {
     protected void initialize() {
         log.info("Initializing filesystem repository...");
 
-        File rootDir = new File(FileSystemRepositoryManager.getFileSystemDatabaseDir());
+        File rootDir = new File(getFileSystemDatabaseDir());
 
         try {
             createDirectoryPath(rootDir);

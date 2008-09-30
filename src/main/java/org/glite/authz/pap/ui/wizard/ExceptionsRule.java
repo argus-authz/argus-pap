@@ -1,11 +1,13 @@
 package org.glite.authz.pap.ui.wizard;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.glite.authz.pap.common.utils.xacml.ApplyHelper;
 import org.glite.authz.pap.common.utils.xacml.AttributeDesignatorHelper;
+import org.glite.authz.pap.common.utils.xacml.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.utils.xacml.FunctionHelper;
 import org.glite.authz.pap.common.utils.xacml.Functions;
 import org.glite.authz.pap.common.utils.xacml.PolicyAttributeValueHelper;
@@ -16,6 +18,7 @@ import org.opensaml.xacml.policy.ApplyType;
 import org.opensaml.xacml.policy.AttributeDesignatorType;
 import org.opensaml.xacml.policy.ConditionType;
 import org.opensaml.xacml.policy.EffectType;
+import org.opensaml.xacml.policy.ExpressionType;
 import org.opensaml.xacml.policy.FunctionType;
 import org.opensaml.xacml.policy.RuleType;
 import org.opensaml.xml.Configuration;
@@ -25,6 +28,7 @@ import org.slf4j.LoggerFactory;
 public class ExceptionsRule {
 
     private static final Logger log = LoggerFactory.getLogger(ExceptionsRule.class);
+    private static final String ruleId = "ExceptionsRule";
     private static final javax.xml.namespace.QName SUBJECT_DESIGNATOR = AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final javax.xml.namespace.QName RESOURCE_DESIGNATOR = AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final javax.xml.namespace.QName ENVIRONMENT_DESIGNATOR = AttributeDesignatorType.ENVIRONMENT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
@@ -59,12 +63,77 @@ public class ExceptionsRule {
                 ConditionType.DEFAULT_ELEMENT_NAME).buildObject(ConditionType.DEFAULT_ELEMENT_NAME);
         condition.setExpression(applyNot);
 
-        RuleType exceptionsRule = RuleHelper.build("ExceptionsRule", effect);
+        RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
         exceptionsRule.setCondition(condition);
 
         return exceptionsRule;
     }
-
+    
+    public static List<List<AttributeWizard>> getAttributeWizardList(RuleType rule) {
+        
+        if (!ruleId.equals(rule.getRuleId()))
+            throw new UnsupportedPolicyException("Unrecognized RuleId");
+        
+        List<List<AttributeWizard>> resultList = new LinkedList<List<AttributeWizard>>();
+        
+        
+        ConditionType condition = rule.getCondition();
+        if (condition == null)
+            throw new UnsupportedPolicyException("Condition not found");
+        
+        ExpressionType expression = condition.getExpression();
+        if (expression == null)
+            throw new UnsupportedPolicyException("Wrong \"Expression\" in \"Condition\"");
+        
+        ApplyType apply;
+        
+        if (expression instanceof ApplyType) {
+            apply = (ApplyType) expression;
+        } else {
+            throw new UnsupportedPolicyException("First expression is not an Apply NOT()");
+        }
+        
+        if (!Functions.NOT.equals(apply.getFunctionId())) 
+            throw new UnsupportedPolicyException("First expression is not an Apply NOT()");
+        
+        if (apply.getExpressions().size() != 1)
+            throw new UnsupportedPolicyException("Second expression is not a single Apply OR()");
+        
+        expression = apply.getExpressions().get(0);
+        if (expression instanceof ApplyType) {
+            apply = (ApplyType) expression;
+        } else {
+            throw new UnsupportedPolicyException("Second expression is not an Apply OR()");
+        }
+        
+        if (!Functions.OR.equals(apply.getFunctionId()))
+            throw new UnsupportedPolicyException("Second expression is not an Apply OR()");
+        
+        List<ExpressionType> expressionList = apply.getExpressions();
+        
+        for (int i=0; i<expressionList.size(); i++) {
+            expression = expressionList.get(i);
+            
+            if (!(expression instanceof ApplyType))
+                throw new UnsupportedPolicyException("Wrong expression inside the Apply OR()");
+            apply = (ApplyType) expression;
+            
+            List<AttributeWizard> andList = new LinkedList<AttributeWizard>();
+            if (Functions.ANY_OF.equals(apply.getFunctionId())) {
+                AttributeType attribute = getAttributeFromApplyAnyOf(apply);
+                andList.add(new AttributeWizard(attribute));
+            } else if (Functions.AND.equals(apply.getFunctionId())) {
+                for (AttributeType attribute:getAttributeFromApplyAnd(apply)) {
+                    andList.add(new AttributeWizard(attribute));
+                }
+            } else
+                throw new UnsupportedPolicyException("Wrong function inside the Apply OR()");
+            resultList.add(andList);
+        }
+        
+        return resultList;
+    }
+    
     private static ApplyType createFunctionAnyOf(AttributeType attribute, QName designatorType) {
 
         FunctionType functionStringEqual = FunctionHelper.build(Functions.STRING_EQUAL);
@@ -85,6 +154,49 @@ public class ExceptionsRule {
         applyAnyOf.getExpressions().add(AttributeDesignatorHelper.build(designatorType, attribute));
 
         return applyAnyOf;
+    }
+    
+    private static List<AttributeType> getAttributeFromApplyAnd(ApplyType apply) {
+        List<AttributeType> resultList = new LinkedList<AttributeType>();
+        for (ExpressionType expression:apply.getExpressions()) {
+            if (!(expression instanceof ApplyType))
+                throw new UnsupportedPolicyException("Wrong expression inside the Apply AND()");
+            
+            apply = (ApplyType) expression;
+            
+            if (!Functions.ANY_OF.equals(apply.getFunctionId()))
+                throw new UnsupportedPolicyException("Wrong function inside the Apply AND()");
+            resultList.add(getAttributeFromApplyAnyOf(apply));
+        }
+        return resultList;
+    }
+
+    private static AttributeType getAttributeFromApplyAnyOf(ApplyType apply) {
+        
+        if (apply.getExpressions().size() != 3)
+            throw new UnsupportedPolicyException("Wrong number of expressions inside the Apply ANY-OF");
+        
+        ExpressionType expression = apply.getExpressions().get(0);
+        if (!(expression instanceof FunctionType))
+            throw new UnsupportedPolicyException("First Expression of Apply ANY-OF is not a function (STRING-EQUAL)");
+        
+        if (!Functions.STRING_EQUAL.equals(((FunctionType)expression).getFunctionId()))
+            throw new UnsupportedPolicyException("First Expression of Apply ANY-OF is not a function (STRING-EQUAL)");
+        
+        expression = apply.getExpressions().get(1);
+        if (!(expression instanceof org.opensaml.xacml.policy.AttributeValueType))
+            throw new UnsupportedPolicyException("Second Expression of Apply ANY-OF is not an AttributeValueType");
+        
+        String value = ((org.opensaml.xacml.policy.AttributeValueType) expression).getValue();
+        
+        expression = apply.getExpressions().get(2);
+        if (!(expression instanceof AttributeDesignatorType))
+            throw new UnsupportedPolicyException("Second Expression of Apply ANY-OF is not an AttributeDesignator");
+    
+        String dataType = ((AttributeDesignatorType) expression).getDataType();
+        String xacmlId = ((AttributeDesignatorType) expression).getAttributeId();
+        
+        return CtxAttributeTypeHelper.build(xacmlId, dataType, value);
     }
 
     private static javax.xml.namespace.QName getDesignator(AttributeType attribute) {

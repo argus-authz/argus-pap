@@ -6,7 +6,6 @@ import java.util.List;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.PAPManager;
-import org.glite.authz.pap.repository.RepositoryManager;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -82,8 +81,8 @@ public class DistributionModule extends Thread {
 
         log.debug("Storing policies for PAP: " + pap.getPapId());
 
-        PAPManager papManager = RepositoryManager.getPAPManager();
-        PAPContainer papContainer = papManager.getContainer(pap);
+        PAPManager papManager = PAPManager.getInstance();
+        PAPContainer papContainer = papManager.getContainer(pap.getPapId());
 
         papContainer.deleteAllPolicies();
         papContainer.deleteAllPolicySets();
@@ -122,11 +121,11 @@ public class DistributionModule extends Thread {
         remotePAPList = configuration.getRemotePAPList();
 
         // Create non-existing PAPs
-        PAPManager papManager = RepositoryManager.getPAPManager();
+        PAPManager papManager = PAPManager.getInstance();
         for (PAP pap : remotePAPList) {
-            if (!papManager.exists(pap)) {
+            if (!papManager.exists(pap.getPapId())) {
                 log.debug("Creating new PAP: " + pap.getPapId());
-                papManager.create(pap);
+                papManager.add(pap);
             }
         }
 
