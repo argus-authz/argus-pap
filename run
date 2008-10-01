@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source ../pap_classpath.txt
-
-java -Dlog4j.configuration=log4j.test.properties -Djava.endorsed.dirs=/home/applications/jdk1.5.0_15/jre/lib/endorsed org.glite.authz.pap.ui.PAPCLI $@
