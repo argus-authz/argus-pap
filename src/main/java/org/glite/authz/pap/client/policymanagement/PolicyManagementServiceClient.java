@@ -14,24 +14,16 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- File : ProvisioningServicePortType.java
+ File : ProvisioningServiceClient.java
 
  Authors: Valerio Venturi <valerio.venturi@cnaf.infn.it>
 
  **************************************************************************/
 
-package org.glite.authz.pap.policymanagement.client;
+package org.glite.authz.pap.client.policymanagement;
 
-import org.glite.authz.pap.policymanagement.PolicyManagementService;
+public interface PolicyManagementServiceClient {
 
-public interface PolicyManagementServicePortType extends PolicyManagementService {
-
-    public void setClientCertificate(String certFile);
-
-    public void setClientPrivateKey(String keyFile);
-
-    public void setClientPrivateKeyPassword(String privateKeyPassword);
-
-    public void setTargetEndpoint(String endpointURL);
+    PolicyManagementServicePortType getPolicyManagementServicePortType(String url);
 
 }

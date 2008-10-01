@@ -10,9 +10,9 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.AxisPortType;
 import org.glite.authz.pap.client.PortType;
+import org.glite.authz.pap.client.papmanagement.PAPManagementServiceClientFactory;
+import org.glite.authz.pap.client.papmanagement.PAPManagementServicePortType;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.client.PAPManagementServiceClientFactory;
-import org.glite.authz.pap.papmanagement.client.PAPManagementServicePortType;
 
 public class PAPManagementServiceCLI extends ServiceCLI {
     

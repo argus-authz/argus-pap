@@ -1,4 +1,4 @@
-package org.glite.authz.pap.papmanagement.client.impl;
+package org.glite.authz.pap.client.papmanagement.impl;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -14,8 +14,8 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.encoding.ser.BeanDeserializerFactory;
 import org.apache.axis.encoding.ser.BeanSerializerFactory;
+import org.glite.authz.pap.client.papmanagement.PAPManagementServicePortType;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.client.PAPManagementServicePortType;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
 
 public class PAPManagementServicePortTypeImpl implements PAPManagementServicePortType {

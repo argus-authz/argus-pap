@@ -1,4 +1,4 @@
-package org.glite.authz.pap.papmanagement.client;
+package org.glite.authz.pap.client.papmanagement;
 
 import org.glite.authz.pap.papmanagement.PAPManagementService;
 

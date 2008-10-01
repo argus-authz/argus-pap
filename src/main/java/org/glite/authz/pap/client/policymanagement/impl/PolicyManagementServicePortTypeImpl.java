@@ -20,7 +20,7 @@
 
  **************************************************************************/
 
-package org.glite.authz.pap.policymanagement.client.impl;
+package org.glite.authz.pap.client.policymanagement.impl;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -33,7 +33,7 @@ import org.apache.axis.client.Service;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.glite.authz.pap.client.AxisPortType;
-import org.glite.authz.pap.policymanagement.client.PolicyManagementServicePortType;
+import org.glite.authz.pap.client.policymanagement.PolicyManagementServicePortType;
 import org.glite.authz.pap.provisioning.axis.DeserializerFactory;
 import org.glite.authz.pap.provisioning.axis.SerializerFactory;
 import org.opensaml.xacml.policy.PolicySetType;

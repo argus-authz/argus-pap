@@ -14,22 +14,21 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- File : ProvisioningServiceClientFactory.java
+ File : ProvisioningClient.java
 
  Authors: Valerio Venturi <valerio.venturi@cnaf.infn.it>
 
  **************************************************************************/
 
-package org.glite.authz.pap.policymanagement.client;
+package org.glite.authz.pap.client.policymanagement.impl;
 
-import org.glite.authz.pap.policymanagement.client.impl.PolicyManagementServiceClientFactoryImpl;
+import org.glite.authz.pap.client.policymanagement.PolicyManagementServiceClient;
+import org.glite.authz.pap.client.policymanagement.PolicyManagementServicePortType;
 
-public abstract class PolicyManagementServiceClientFactory {
+public class PolicyManagementServiceClientImpl implements PolicyManagementServiceClient {
 
-    public static PolicyManagementServiceClientFactory getPolicyManagementServiceClientFactory() {
-        return new PolicyManagementServiceClientFactoryImpl();
+    public PolicyManagementServicePortType getPolicyManagementServicePortType(String url) {
+	return new PolicyManagementServicePortTypeImpl(url);
     }
-
-    public abstract PolicyManagementServiceClient createPolicyManagementServiceClient();
 
 }

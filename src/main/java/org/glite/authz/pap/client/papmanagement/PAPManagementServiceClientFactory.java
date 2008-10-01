@@ -1,6 +1,6 @@
-package org.glite.authz.pap.papmanagement.client;
+package org.glite.authz.pap.client.papmanagement;
 
-import org.glite.authz.pap.papmanagement.client.impl.PAPManagementServiceClientFactoryImpl;
+import org.glite.authz.pap.client.papmanagement.impl.PAPManagementServiceClientFactoryImpl;
 
 public abstract class PAPManagementServiceClientFactory {
     
