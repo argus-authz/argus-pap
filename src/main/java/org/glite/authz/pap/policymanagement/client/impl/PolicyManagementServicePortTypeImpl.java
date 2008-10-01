@@ -24,34 +24,28 @@ package org.glite.authz.pap.policymanagement.client.impl;
 
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
-import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
+import org.glite.authz.pap.client.AxisPortType;
 import org.glite.authz.pap.policymanagement.client.PolicyManagementServicePortType;
 import org.glite.authz.pap.provisioning.axis.DeserializerFactory;
 import org.glite.authz.pap.provisioning.axis.SerializerFactory;
-import org.glite.security.trustmanager.axis.AXISSocketFactory;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 
-public class PolicyManagementServicePortTypeImpl implements PolicyManagementServicePortType {
+public class PolicyManagementServicePortTypeImpl extends AxisPortType implements PolicyManagementServicePortType {
 
-    private String url;
-    private String clientCertificate;
-    private String clientPrivateKey;
-    private String clientPrivateKeyPassword;
     private Service service;
     
     public PolicyManagementServicePortTypeImpl(String url) {
-        this.url = url;
-        init();
+        setTargetEndpoint(url);
+        service = getService();
     }
 
     public PolicyType getPolicy(String policyId) throws RemoteException {
@@ -118,22 +112,6 @@ public class PolicyManagementServicePortTypeImpl implements PolicyManagementServ
         call.invoke(new Object[] { policySetId });
     }
     
-    public void setClientCertificate(String certFile) {
-        clientCertificate = certFile;
-    }
-
-    public void setClientPrivateKey(String keyFile) {
-        clientPrivateKey = keyFile;
-    }
-
-    public void setClientPrivateKeyPassword(String privateKeyPassword) {
-
-    }
-
-    public void setTargetEndpoint(String endpointURL) {
-        url = endpointURL;
-    }
-
     public String storePolicy(String idPrefix, PolicyType policy) throws RemoteException {
         Call call = createCall("storePolicy");
 
@@ -174,41 +152,13 @@ public class PolicyManagementServicePortTypeImpl implements PolicyManagementServ
             throw new RuntimeException("Error", e);
         }
 
-        call.setTargetEndpointAddress(url);
+        call.setTargetEndpointAddress(getTargetEndpoint());
         call.setOperationName(new QName("urn:org:glite:authz:pap:policymanagement", operationName));
 
         call.setOperationStyle(Style.RPC);
         call.setOperationUse(Use.LITERAL);
         
         return call;
-    }
-
-    private void init() {
-        AxisProperties.setProperty("axis.socketSecureFactory",
-        "org.glite.security.trustmanager.axis.AXISSocketFactory");
-
-        // need to pass property to AXISSocketFactory
-        Properties properties = AXISSocketFactory.getCurrentProperties();
-        
-        // TODO will get cert and key form the configuration, with those as
-        // default
-        
-        if (clientCertificate == null)
-            properties.setProperty("sslCertFile", "/etc/grid-security/hostcert.pem");
-        else
-            properties.setProperty("sslCertFile", clientCertificate);
-        
-        if (clientPrivateKey == null)
-            properties.setProperty("sslKey", "/etc/grid-security/hostkey.pem");
-        else
-            properties.setProperty("sslKey", clientPrivateKey);
-        
-        if (clientPrivateKeyPassword != null)
-            properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
-        
-        AXISSocketFactory.setCurrentProperties(properties);
-        
-        service = new Service();
     }
 
 }

@@ -6,10 +6,12 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.client.AxisPortType;
+import org.glite.authz.pap.client.PortType;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
@@ -17,19 +19,17 @@ import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLConfigurator;
 
 public class PAPCLI {
-    private static final char OPT_POLICYMGMT_ADD_POLICY = 'a';
-    private static final char OPT_POLICYMGMT_ADD_POLICY_FILE = 'A';
-    private static final char OPT_POLICYMGMT_REMOVE_POLICY = 'r';
-    private static final char OPT_POLICYMGMT_UPDATE_POLICY = 'u';
-    private static final char OPT_POLICYMGMT_LIST = 'l';
-    private static final String OPT_POLICYMGMT_XACML= "xacml";
     
-    private static final char OPT_PAPMGMT_PING = 'p';
-    private static final char OPT_PAPMGMT_ADD_PAP = 'P';
-    
+    private static final String OPT_URL = "url"; 
+    private static final String OPT_CERT = "cert";
+    private static final String OPT_KEY = "key";
+    private static final String OPT_PASSWORD = "password";
+
     protected static final Options options = new Options();
     protected static final CommandLineParser parser = new GnuParser(); 
     protected static final HelpFormatter helpFormatter = new HelpFormatter();
+    
+    protected static String endpoint;
     
     public static void main(String[] args) throws ConfigurationException, RemoteException {
         
@@ -43,20 +43,30 @@ public class PAPCLI {
     
     @SuppressWarnings("static-access")
     private static void defineCommandLineOptions() {
-        // General
+
         options.addOption("h", "help", false, "print this message");
+
+        options.addOption(OptionBuilder.hasArg().withLongOpt("url").withDescription(
+                "Specifies the target PAP endpoint to be contacted.").create(OPT_URL));
+
+        options.addOption(OptionBuilder.hasArg().withLongOpt("cert").withDescription(
+                "Specifies non-standard user certificate.").create(OPT_CERT));
+
+        options.addOption(OptionBuilder.hasArg().withLongOpt("key").withDescription(
+                "Specifies non-standard user private key.").create(OPT_KEY));
+
+        options.addOption(OptionBuilder.hasArg().withLongOpt("password").withDescription(
+                "Specifies a password that is used to decrypt the user's private key.").create(
+                OPT_PASSWORD));
         
-        // PolicyManagement
-        options.addOption(OptionBuilder.hasOptionalArgs().withLongOpt("add-policy").withDescription("Add policy").create(OPT_POLICYMGMT_ADD_POLICY));
-        options.addOption(OptionBuilder.hasArgs().withLongOpt("add-policy-file").withDescription("Add policies from file").create(OPT_POLICYMGMT_ADD_POLICY_FILE));
-        options.addOption(OptionBuilder.hasArgs().withLongOpt("remove").withDescription("Remove policy").create(OPT_POLICYMGMT_REMOVE_POLICY));
-        options.addOption(OptionBuilder.hasArgs().withLongOpt("update").withDescription("Update policy").create(OPT_POLICYMGMT_UPDATE_POLICY));
-        options.addOption(OptionBuilder.hasOptionalArgs().withLongOpt("list").withDescription("List policies").create(OPT_POLICYMGMT_LIST));
-        options.addOption(OptionBuilder.withLongOpt(OPT_POLICYMGMT_XACML).withDescription("Show XACML when listing policies").create());
+        for (Option opt:PolicyManagementServiceCLI.getOptions()) {
+            options.addOption(opt);
+        }
         
-        // PAPManagement
-        options.addOption(OptionBuilder.hasOptionalArgs().withLongOpt("ping").withDescription("Ping a PAP").create(OPT_PAPMGMT_PING));
-        options.addOption(OptionBuilder.hasArgs().withLongOpt("add-pap").withDescription("Update policy").create(OPT_PAPMGMT_ADD_PAP));
+        for (Option opt:PAPManagementServiceCLI.getOptions()) {
+            options.addOption(opt);
+        }
+        
     }
 
     private static void init() throws ConfigurationException {
@@ -67,9 +77,6 @@ public class PAPCLI {
         // when opensaml is updated
         xmlConfigurator.load(Configuration.class
             .getResourceAsStream("/opensaml_bugfix.xml"));
-        
-        //RepositoryManager.getInstance().bootstrap();
-        
     }
 
     private static void printHelpAndExit(int statusCode) {
@@ -85,23 +92,26 @@ public class PAPCLI {
             
             CommandLine commandLine = parser.parse( options, args );
             
+            PortType portType = new AxisPortType();
+            if (commandLine.hasOption(OPT_URL))
+                portType.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
+            if (commandLine.hasOption(OPT_CERT))
+                portType.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
+            if (commandLine.hasOption(OPT_KEY))
+                portType.setClientPrivateKey(OPT_KEY);
+            if (commandLine.hasOption(OPT_PASSWORD))
+                portType.setClientPrivateKeyPassword(OPT_PASSWORD);
+            
+            PolicyManagementServiceCLI policyMgmtCLI = new PolicyManagementServiceCLI(portType);
+            PAPManagementServiceCLI papMgmtCLI = new PAPManagementServiceCLI(portType);
+            
             if (commandLine.hasOption('h'))
                 printHelpAndExit(0);
-            // PolicyManagementService
-            else if (commandLine.hasOption(OPT_POLICYMGMT_LIST))
-                PolicyManagementServiceCLI.list(commandLine.hasOption(OPT_POLICYMGMT_XACML));
-            else if (commandLine.hasOption(OPT_POLICYMGMT_ADD_POLICY))
-                PolicyManagementServiceCLI.addPolicy(commandLine.getOptionValues(OPT_POLICYMGMT_ADD_POLICY));
-            else if (commandLine.hasOption(OPT_POLICYMGMT_REMOVE_POLICY))
-                PolicyManagementServiceCLI.removePolicy(commandLine.getOptionValues(OPT_POLICYMGMT_REMOVE_POLICY));
-            // PAPManagementService
-            else if (commandLine.hasOption(OPT_PAPMGMT_PING))
-                PAPManagementServiceCLI.ping();
-            else if (commandLine.hasOption(OPT_PAPMGMT_ADD_PAP)) {
-                PAPManagementServiceCLI.addTrustedPAP(commandLine.getOptionValues(OPT_PAPMGMT_ADD_PAP));
-            }
+            else if (policyMgmtCLI.execute(commandLine))
+                return;
+            else if (papMgmtCLI.execute(commandLine))
+                return;
             else {
-                System.out.println("NIENTE");
                 printHelpAndExit(1);
             }
             
@@ -113,29 +123,29 @@ public class PAPCLI {
 
     }
     
-    private static void prova(String[] args) {
-        Options opt = new Options();
-        OptionGroup groupOpt = new OptionGroup();
-        
-        groupOpt.addOption(OptionBuilder.hasArgs().withDescription("Update policy").create('a'));
-        groupOpt.addOption(OptionBuilder.withDescription("Update policy").create('b'));
-        opt.addOption(OptionBuilder.hasArgs().withDescription("Update policy").create('c'));
-        opt.addOption(OptionBuilder.withLongOpt("xacml").withDescription("Update policy").create());
-        opt.addOptionGroup(groupOpt);
-        try {
-            CommandLine commandLine = parser.parse( opt, args );
-            
-            if (commandLine.hasOption('a'))
-                System.out.println("Option 'a'");
-            if (commandLine.hasOption('b'))
-                System.out.println("Option 'b'");
-            if (commandLine.hasOption('c'))
-                System.out.println("Option 'c'");
-            if (commandLine.hasOption("xacml"))
-                System.out.println("Option 'XACML'");
-        } catch (ParseException e) {
-            System.err.println( "Parsing failed.  Reason: " + e.getMessage() );
-        }
-        System.exit(0);
-    }
+//    private static void prova(String[] args) {
+//        Options opt = new Options();
+//        OptionGroup groupOpt = new OptionGroup();
+//        
+//        groupOpt.addOption(OptionBuilder.hasArgs().withDescription("Update policy").create('a'));
+//        groupOpt.addOption(OptionBuilder.withDescription("Update policy").create('b'));
+//        opt.addOption(OptionBuilder.hasArgs().withDescription("Update policy").create('c'));
+//        opt.addOption(OptionBuilder.withLongOpt("xacml").withDescription("Update policy").create());
+//        opt.addOptionGroup(groupOpt);
+//        try {
+//            CommandLine commandLine = parser.parse( opt, args );
+//            
+//            if (commandLine.hasOption('a'))
+//                System.out.println("Option 'a'");
+//            if (commandLine.hasOption('b'))
+//                System.out.println("Option 'b'");
+//            if (commandLine.hasOption('c'))
+//                System.out.println("Option 'c'");
+//            if (commandLine.hasOption("xacml"))
+//                System.out.println("Option 'XACML'");
+//        } catch (ParseException e) {
+//            System.err.println( "Parsing failed.  Reason: " + e.getMessage() );
+//        }
+//        System.exit(0);
+//    }
 }
