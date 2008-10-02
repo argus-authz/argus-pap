@@ -10,6 +10,7 @@ public class PAP {
     private String endpoint;
     private String dn;
     private String alias;
+    private boolean isPublic;
     
     public PAP() {
         papId = "";
@@ -18,11 +19,11 @@ public class PAP {
         alias = "";
     }
 
-    public PAP(String papId) {
-        this(null, null, papId);
-    }
-    
     public PAP(String alias, String endpoint, String dn) {
+        this(alias, endpoint, dn, true);
+    }
+
+    public PAP(String alias, String endpoint, String dn, boolean isPublic) {
         papId = dn.replace('/', '_').replace('@', '-');
         
         this.dn = dn;
@@ -41,7 +42,7 @@ public class PAP {
     public String getAlias() {
         return alias;
     }
-
+    
     public String getDn() {
         return dn;
     }
@@ -52,6 +53,10 @@ public class PAP {
 
     public String getPapId() {
         return papId;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
     }
 
     public void setAlias(String alias) {
@@ -70,7 +75,18 @@ public class PAP {
         this.papId = papId;
     }
 
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     public String toString() {
+        String visibility = "visibility=";
+        
+        if (isPublic)
+            visibility += "PUBLIC";
+        else
+            visibility += "PRIVATE";
+        
         return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
     }
 
