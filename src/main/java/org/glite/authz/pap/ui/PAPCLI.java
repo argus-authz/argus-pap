@@ -24,13 +24,11 @@ public class PAPCLI {
     private static final String OPT_CERT = "cert";
     private static final String OPT_KEY = "key";
     private static final String OPT_PASSWORD = "password";
-    protected static final String DEFAULT_SERVICE_URL = "https://localhost:8443/pap/services/";
+    private static final String DEFAULT_SERVICE_URL = "https://localhost:8443/pap/services/";
 
     protected static final Options options = new Options();
     protected static final CommandLineParser parser = new GnuParser(); 
     protected static final HelpFormatter helpFormatter = new HelpFormatter();
-    
-    protected static String endpoint;
     
     public static void main(String[] args) throws ConfigurationException, RemoteException {
         
