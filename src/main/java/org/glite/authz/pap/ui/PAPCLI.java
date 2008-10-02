@@ -24,6 +24,7 @@ public class PAPCLI {
     private static final String OPT_CERT = "cert";
     private static final String OPT_KEY = "key";
     private static final String OPT_PASSWORD = "password";
+    protected static final String DEFAULT_SERVICE_URL = "https://localhost:8443/";
 
     protected static final Options options = new Options();
     protected static final CommandLineParser parser = new GnuParser(); 
@@ -97,6 +98,8 @@ public class PAPCLI {
             
             if (commandLine.hasOption(OPT_URL))
                 serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
+            else
+                serviceClient.setTargetEndpoint(DEFAULT_SERVICE_URL);
             if (commandLine.hasOption(OPT_CERT))
                 serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
             if (commandLine.hasOption(OPT_KEY))
