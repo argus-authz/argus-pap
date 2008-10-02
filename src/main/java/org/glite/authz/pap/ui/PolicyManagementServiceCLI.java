@@ -34,7 +34,7 @@ public class PolicyManagementServiceCLI {
     private static final char OPT_LIST = 'l';
     private static final String LOPT_XACML= "xacml";
     
-    private static final String SERVICE_NAME = "pap/services/PolicyManagementService";
+    private static final String SERVICE_NAME = "PolicyManagementService";
     private static PolicyManagementService policyMgmtClient;
     protected static Options options = new Options();
     

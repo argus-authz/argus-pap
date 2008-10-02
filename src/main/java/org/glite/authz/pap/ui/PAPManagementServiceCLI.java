@@ -17,7 +17,7 @@ public class PAPManagementServiceCLI {
     private static final char OPT_PING = 'p';
     private static final char OPT_ADD_PAP = 'P';
     
-    private static final String SERVICE_NAME = "pap/services/PAPManagementService";
+    private static final String SERVICE_NAME = "PAPManagementService";
     private static PAPManagementService papMgmtClient;
     
     protected static Options options = new Options();
