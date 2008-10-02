@@ -20,7 +20,7 @@
 
  **************************************************************************/
 
-package org.glite.authz.pap.client.policymanagement.impl;
+package org.glite.authz.pap.client.impl;
 
 import java.rmi.RemoteException;
 import java.util.List;

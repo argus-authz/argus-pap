@@ -5,7 +5,6 @@ import java.util.Properties;
 import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Service;
 import org.glite.authz.pap.client.ServiceClient;
-import org.glite.authz.pap.client.policymanagement.impl.PolicyManagementServiceClientImpl;
 import org.glite.authz.pap.papmanagement.PAPManagementService;
 import org.glite.authz.pap.policymanagement.PolicyManagementService;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
