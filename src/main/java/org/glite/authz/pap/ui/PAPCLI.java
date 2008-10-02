@@ -10,8 +10,8 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.client.AxisPortType;
-import org.glite.authz.pap.client.PortType;
+import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
@@ -92,24 +92,23 @@ public class PAPCLI {
             
             CommandLine commandLine = parser.parse( options, args );
             
-            PortType portType = new AxisPortType();
-            if (commandLine.hasOption(OPT_URL))
-                portType.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
-            if (commandLine.hasOption(OPT_CERT))
-                portType.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
-            if (commandLine.hasOption(OPT_KEY))
-                portType.setClientPrivateKey(OPT_KEY);
-            if (commandLine.hasOption(OPT_PASSWORD))
-                portType.setClientPrivateKeyPassword(OPT_PASSWORD);
+            ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
+            ServiceClient serviceClient = serviceClientFactory.createServiceClient();
             
-            PolicyManagementServiceCLI policyMgmtCLI = new PolicyManagementServiceCLI(portType);
-            PAPManagementServiceCLI papMgmtCLI = new PAPManagementServiceCLI(portType);
+            if (commandLine.hasOption(OPT_URL))
+                serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
+            if (commandLine.hasOption(OPT_CERT))
+                serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
+            if (commandLine.hasOption(OPT_KEY))
+                serviceClient.setClientPrivateKey(OPT_KEY);
+            if (commandLine.hasOption(OPT_PASSWORD))
+                serviceClient.setClientPrivateKeyPassword(OPT_PASSWORD);
             
             if (commandLine.hasOption('h'))
                 printHelpAndExit(0);
-            else if (policyMgmtCLI.execute(commandLine))
+            else if (PolicyManagementServiceCLI.execute(commandLine, serviceClient))
                 return;
-            else if (papMgmtCLI.execute(commandLine))
+            else if (PAPManagementServiceCLI.execute(commandLine, serviceClient))
                 return;
             else {
                 printHelpAndExit(1);

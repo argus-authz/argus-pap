@@ -1,33 +1,27 @@
-package org.glite.authz.pap.client.papmanagement.impl;
+package org.glite.authz.pap.client.impl;
 
 import java.rmi.RemoteException;
 import java.util.List;
-import java.util.Properties;
 
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
-import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.encoding.ser.BeanDeserializerFactory;
 import org.apache.axis.encoding.ser.BeanSerializerFactory;
-import org.glite.authz.pap.client.papmanagement.PAPManagementServicePortType;
 import org.glite.authz.pap.common.PAP;
-import org.glite.security.trustmanager.axis.AXISSocketFactory;
+import org.glite.authz.pap.papmanagement.PAPManagementService;
 
-public class PAPManagementServicePortTypeImpl implements PAPManagementServicePortType {
+public class PAPManagementServiceClientImpl implements PAPManagementService {
     
     private static final QName PAP_QNAME;
     private static final BeanSerializerFactory serializerFactory;
     private static final BeanDeserializerFactory deserializerFactory;
-    private String url;
-    private String clientCertificate;
-    private String clientPrivateKey;
-    private String clientPrivateKeyPassword;
-    private Service service;
+    private final Service service;
+    private final String serviceURL;
     
     static {
         PAP_QNAME = new QName("http://common.pap.authz.glite.org", "PAP");
@@ -35,9 +29,9 @@ public class PAPManagementServicePortTypeImpl implements PAPManagementServicePor
         deserializerFactory = new BeanDeserializerFactory(PAP.class, PAP_QNAME);
     }
     
-    public PAPManagementServicePortTypeImpl(String url) {
-        this.url = url;
-        init();
+    public PAPManagementServiceClientImpl(String serviceURL, Service service) {
+        this.service = service;
+        this.serviceURL = serviceURL;
     }
 
     public void addTrustedPAP(PAP pap) throws RemoteException {
@@ -72,26 +66,6 @@ public class PAPManagementServicePortTypeImpl implements PAPManagementServicePor
         call.invoke(new Object[] { papId } );
     }
 
-    public void setClientCertificate(String certFile) {
-    // TODO Auto-generated method stub
-
-    }
-    
-    public void setClientPrivateKey(String keyFile) {
-    // TODO Auto-generated method stub
-
-    }
-
-    public void setClientPrivateKeyPassword(String privateKeyPassword) {
-    // TODO Auto-generated method stub
-
-    }
-
-    public void setTargetEndpoint(String endpointURL) {
-    // TODO Auto-generated method stub
-
-    }
-
     public void updateTrustedPAP(PAP pap) throws RemoteException {
         
     }
@@ -110,41 +84,13 @@ public class PAPManagementServicePortTypeImpl implements PAPManagementServicePor
             throw new RuntimeException("Error", e);
         }
 
-        call.setTargetEndpointAddress(url);
+        call.setTargetEndpointAddress(serviceURL);
         call.setOperationName(new QName("urn:org:glite:authz:pap:papmanagement", operationName));
 
         call.setOperationStyle(Style.RPC);
         call.setOperationUse(Use.LITERAL);
         
         return call;
-    }
-
-    private void init() {
-        AxisProperties.setProperty("axis.socketSecureFactory",
-        "org.glite.security.trustmanager.axis.AXISSocketFactory");
-
-        // need to pass property to AXISSocketFactory
-        Properties properties = AXISSocketFactory.getCurrentProperties();
-        
-        // TODO will get cert and key form the configuration, with those as
-        // default
-        
-        if (clientCertificate == null)
-            properties.setProperty("sslCertFile", "/etc/grid-security/hostcert.pem");
-        else
-            properties.setProperty("sslCertFile", clientCertificate);
-        
-        if (clientPrivateKey == null)
-            properties.setProperty("sslKey", "/etc/grid-security/hostkey.pem");
-        else
-            properties.setProperty("sslKey", clientPrivateKey);
-        
-        if (clientPrivateKeyPassword != null)
-            properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
-        
-        AXISSocketFactory.setCurrentProperties(properties);
-        
-        service = new Service();
     }
 
 }

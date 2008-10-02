@@ -1,12 +1,16 @@
-package org.glite.authz.pap.client;
+package org.glite.authz.pap.client.impl;
 
 import java.util.Properties;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Service;
+import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.client.policymanagement.impl.PolicyManagementServiceClientImpl;
+import org.glite.authz.pap.papmanagement.PAPManagementService;
+import org.glite.authz.pap.policymanagement.PolicyManagementService;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
 
-public class AxisPortType implements PortType {
+public class ServiceClientImplAxis implements ServiceClient {
     
     private static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
     private static final String DEFAULT_SSL_KEY = "/etc/grid-security/hostkey.pem";
@@ -15,9 +19,9 @@ public class AxisPortType implements PortType {
     private String clientPrivateKey = null;
     private String clientPrivateKeyPassword = null;
     
-    public AxisPortType() { }
+    public ServiceClientImplAxis() { }
     
-    public AxisPortType(String serviceURL) {
+    public ServiceClientImplAxis(String serviceURL) {
         this.serviceURL = serviceURL;
     }
 
@@ -31,6 +35,14 @@ public class AxisPortType implements PortType {
 
     public String getClientPrivateKeyPassword() {
         return clientPrivateKeyPassword;
+    }
+
+    public PAPManagementService getPAPManagementService(String url) {
+        return new PAPManagementServiceClientImpl(url, getService());
+    }
+
+    public PolicyManagementService getPolicyManagementService(String url) {
+        return new PolicyManagementServiceClientImpl(url, getService());
     }
 
     public Service getService() {
@@ -64,7 +76,7 @@ public class AxisPortType implements PortType {
     public String getTargetEndpoint() {
         return serviceURL;
     }
-
+    
     public void setClientCertificate(String certFile) {
         clientCertificate = certFile;
     }
@@ -76,7 +88,7 @@ public class AxisPortType implements PortType {
     public void setClientPrivateKeyPassword(String privateKeyPassword) {
         clientPrivateKeyPassword = privateKeyPassword;
     }
-    
+
     public void setTargetEndpoint(String endpointURL) {
         serviceURL = endpointURL;
     }

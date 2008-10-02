@@ -4,22 +4,22 @@ import java.rmi.RemoteException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.client.AxisPortType;
-import org.glite.authz.pap.client.PortType;
+import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.client.impl.ServiceClientImplAxis;
 
 public abstract class ServiceCLI {
     protected static final String DEFAULT_SERVICE_URL = "https://localhost:8443/";
     
-    protected PortType portType;
+    protected ServiceClient serviceLocator;
     
     public ServiceCLI() {
-        portType = new AxisPortType();
+        serviceLocator = new ServiceClientImplAxis();
     }
     
-    public ServiceCLI(PortType portType) {
-        this.portType = portType;
+    public ServiceCLI(ServiceClient serviceLocator) {
+        this.serviceLocator = serviceLocator;
     }
     
-    public abstract boolean execute(CommandLine commandLine) throws ParseException, RemoteException;
+    public abstract boolean execute(CommandLine commandLine, ServiceClient serviceClient) throws ParseException, RemoteException;
     
 }

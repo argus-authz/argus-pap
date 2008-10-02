@@ -8,49 +8,27 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.client.AxisPortType;
-import org.glite.authz.pap.client.PortType;
-import org.glite.authz.pap.client.papmanagement.PAPManagementServiceClientFactory;
-import org.glite.authz.pap.client.papmanagement.PAPManagementServicePortType;
+import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.papmanagement.PAPManagementService;
 
-public class PAPManagementServiceCLI extends ServiceCLI {
+public class PAPManagementServiceCLI {
     
     private static final char OPT_PING = 'p';
     private static final char OPT_ADD_PAP = 'P';
     
     private static final String SERVICE_NAME = "pap/services/PAPManagementService";
+    private static PAPManagementService papMgmtClient;
+    
     protected static Options options = new Options();
     
     static {
         defineCommandLineOptions();
     }
     
-    @SuppressWarnings("unchecked")
-    public static Collection<Option> getOptions() {
-        return options.getOptions();
-    }
-    
-    @SuppressWarnings("static-access")
-    private static void defineCommandLineOptions() {
-        options.addOption(OptionBuilder.hasOptionalArgs().withLongOpt("ping").withDescription("Ping a PAP").create(OPT_PING));
-        options.addOption(OptionBuilder.hasArgs().withLongOpt("add-pap").withDescription("Update policy").create(OPT_ADD_PAP));
-    }
-    
-    private PAPManagementServicePortType papMgmtClient;
-    
-    public PAPManagementServiceCLI() {
-        this(new AxisPortType(DEFAULT_SERVICE_URL + SERVICE_NAME));
-    }
-    
-    public PAPManagementServiceCLI(PortType portType) {
-        super(portType);
-        PAPManagementServiceClientFactory papMgmtFactory = PAPManagementServiceClientFactory.getPAPManagementServiceClientFactory();
-        papMgmtClient = papMgmtFactory.createPAPManagementServiceClient().getPAPManagementServicePortType(this.portType.getTargetEndpoint());
-    }
-    
-    @Override
-    public boolean execute(CommandLine commandLine) throws ParseException, RemoteException {
+    public static boolean execute(CommandLine commandLine, ServiceClient serviceClient) throws ParseException, RemoteException {
+        
+        papMgmtClient = serviceClient.getPAPManagementService(serviceClient.getTargetEndpoint() + SERVICE_NAME);
         
         if (commandLine.hasOption(OPT_PING))
             ping();
@@ -61,17 +39,30 @@ public class PAPManagementServiceCLI extends ServiceCLI {
         
         return true;
     }
-
-    protected void addTrustedPAP(String[] args) throws RemoteException {
+    
+    @SuppressWarnings("unchecked")
+    public static Collection<Option> getOptions() {
+        return options.getOptions();
+    }
+    
+    private static void addTrustedPAP(String[] args) throws RemoteException {
         for (String s:args) {
             System.out.println("Inserted: " + s);
         }
         PAP pap = new PAP("alias_prova1", "endpoint_prova1", "dn_prova1");
         papMgmtClient.addTrustedPAP(pap);
     }
+    
+    @SuppressWarnings("static-access")
+    private static void defineCommandLineOptions() {
+        options.addOption(OptionBuilder.hasOptionalArgs().withLongOpt("ping").withDescription("Ping a PAP").create(OPT_PING));
+        options.addOption(OptionBuilder.hasArgs().withLongOpt("add-pap").withDescription("Update policy").create(OPT_ADD_PAP));
+    }
 
-    protected void ping() throws RemoteException {
+    private static void ping() throws RemoteException {
         System.out.println(papMgmtClient.ping());
     }
+
+    private PAPManagementServiceCLI() { }
 
 }

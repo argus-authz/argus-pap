@@ -1,12 +1,19 @@
 package org.glite.authz.pap.client;
 
-public interface PortType {
+import org.glite.authz.pap.papmanagement.PAPManagementService;
+import org.glite.authz.pap.policymanagement.PolicyManagementService;
+
+public interface ServiceClient {
     
     public String getClientCertificate();
     
     public String getClientPrivateKey();
-
+    
     public String getClientPrivateKeyPassword();
+    
+    public PAPManagementService getPAPManagementService(String url);
+
+    public PolicyManagementService getPolicyManagementService(String url);
     
     public String getTargetEndpoint();
 

@@ -14,7 +14,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- File : ProvisioningClient.java
+ File : ProvisioningServicePortTypeImpl.java
 
  Authors: Valerio Venturi <valerio.venturi@cnaf.infn.it>
 
@@ -22,13 +22,143 @@
 
 package org.glite.authz.pap.client.policymanagement.impl;
 
-import org.glite.authz.pap.client.policymanagement.PolicyManagementServiceClient;
-import org.glite.authz.pap.client.policymanagement.PolicyManagementServicePortType;
+import java.rmi.RemoteException;
+import java.util.List;
 
-public class PolicyManagementServiceClientImpl implements PolicyManagementServiceClient {
+import javax.xml.namespace.QName;
+import javax.xml.rpc.ServiceException;
 
-    public PolicyManagementServicePortType getPolicyManagementServicePortType(String url) {
-	return new PolicyManagementServicePortTypeImpl(url);
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
+import org.apache.axis.constants.Style;
+import org.apache.axis.constants.Use;
+import org.glite.authz.pap.policymanagement.PolicyManagementService;
+import org.glite.authz.pap.provisioning.axis.DeserializerFactory;
+import org.glite.authz.pap.provisioning.axis.SerializerFactory;
+import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
+
+public class PolicyManagementServiceClientImpl implements PolicyManagementService {
+
+    private final Service service;
+    private final String serviceURL;
+    
+    public PolicyManagementServiceClientImpl(String serviceURL, Service service) {
+        this.serviceURL = serviceURL;
+        this.service = service;
+    }
+
+    public PolicyType getPolicy(String policyId) throws RemoteException {
+        Call call = createCall("getPolicy");
+
+        call.registerTypeMapping(PolicyType.class, PolicyType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        PolicyType policy = (PolicyType) call.invoke(new Object[] { policyId });
+        
+        return policy;
+    }
+    
+    public PolicySetType getPolicySet(String policySetId) throws RemoteException {
+        Call call = createCall("getPolicySet");
+
+        call.registerTypeMapping(PolicySetType.class, PolicySetType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+        
+        return (PolicySetType) call.invoke(new Object[] { policySetId });
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<PolicyType> listPolicies() throws RemoteException {
+        Call call = createCall("listPolicies");
+
+        call.registerTypeMapping(PolicyType.class, PolicyType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        return (List<PolicyType>) call.invoke(new Object[] {});
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PolicyType> listPolicies(String papId) throws RemoteException {
+        Call call = createCall("listPolicies");
+
+        call.registerTypeMapping(PolicyType.class, PolicyType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        return (List<PolicyType>) call.invoke(new Object[] { papId });
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PolicySetType> listPolicySets() throws RemoteException {
+        Call call = createCall("listPolicySets");
+
+        call.registerTypeMapping(PolicySetType.class, PolicySetType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        return (List<PolicySetType>) call.invoke(new Object[] {});
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<PolicySetType> listPolicySets(String papId) throws RemoteException {
+        Call call = createCall("listPolicySets");
+
+        call.registerTypeMapping(PolicySetType.class, PolicySetType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        return (List<PolicySetType>) call.invoke(new Object[] { papId });
+    }
+
+    public void removePolicy(String policyId) throws RemoteException {
+        Call call = createCall("removePolicy");
+        call.invoke(new Object[] { policyId });
+    }
+
+    public void removePolicySet(String policySetId) throws RemoteException {
+        Call call = createCall("removePolicySet");
+        call.invoke(new Object[] { policySetId });
+    }
+    
+    public String storePolicy(String idPrefix, PolicyType policy) throws RemoteException {
+        Call call = createCall("storePolicy");
+
+        call.registerTypeMapping(PolicyType.class, PolicyType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        return (String) call.invoke(new Object[] { idPrefix, policy });
+    }
+
+    public String storePolicySet(String idPrefix, PolicySetType policySet) throws RemoteException {
+        Call call = createCall("storePolicySet");
+
+        call.registerTypeMapping(PolicySetType.class, PolicySetType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        return (String) call.invoke(new Object[] { idPrefix, policySet });
+    }
+
+    public void updatePolicy(PolicyType policy) throws RemoteException {
+        Call call = createCall("updatePolicy");
+
+        call.registerTypeMapping(PolicyType.class, PolicyType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+        
+        call.invoke(new Object[] { policy } );
+    }
+
+    public void updatePolicySet(PolicySetType policySet) throws RemoteException {
+        Call call = createCall("updatePolicySet");
+
+        call.registerTypeMapping(PolicySetType.class, PolicySetType.DEFAULT_ELEMENT_NAME, new SerializerFactory(), new DeserializerFactory());
+
+        call.invoke(new Object[] { policySet });
+    }
+
+    private Call createCall(String operationName) {
+        Call call;
+        try {
+            call = (Call) service.createCall();
+        } catch (ServiceException e) {
+            throw new RuntimeException("Error", e);
+        }
+
+        call.setTargetEndpointAddress(serviceURL);
+        call.setOperationName(new QName("urn:org:glite:authz:pap:policymanagement", operationName));
+
+        call.setOperationStyle(Style.RPC);
+        call.setOperationUse(Use.LITERAL);
+        
+        return call;
     }
 
 }
