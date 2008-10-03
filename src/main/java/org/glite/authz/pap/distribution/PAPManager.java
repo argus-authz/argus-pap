@@ -5,7 +5,6 @@ import java.util.List;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.repository.PAPContainer;
-import org.glite.authz.pap.repository.dao.filesystem.FileSystemPAPManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.opensaml.xacml.policy.PolicySetType;
 
@@ -18,7 +17,7 @@ public abstract class PAPManager {
     
     public static PAPManager getInstance() {
         if (instance == null)
-            instance = new FileSystemPAPManager();
+            instance = new PAPManagerImpl();
         return instance;
     }
     

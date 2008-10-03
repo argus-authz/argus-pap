@@ -40,7 +40,8 @@ public class PAPManagementServiceImpl implements PAPManagementService {
     }
 
     public void updateTrustedPAP(String papId, PAP pap) throws RemoteException {
-        
+        papManager.update(papId, pap);
+        log.info("Updated PAP: " + pap.toString());
     }
 
 }

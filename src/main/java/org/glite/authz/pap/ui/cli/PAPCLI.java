@@ -1,6 +1,8 @@
-package org.glite.authz.pap.ui;
+package org.glite.authz.pap.ui.cli;
 
 import java.rmi.RemoteException;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -13,6 +15,8 @@ import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
+import org.glite.authz.pap.ui.cli.papmanagement.AddPAP;
+import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
@@ -30,6 +34,8 @@ public class PAPCLI {
     protected static final CommandLineParser parser = new GnuParser(); 
     protected static final HelpFormatter helpFormatter = new HelpFormatter();
     
+    private static final List<ServiceCLI> serviceCommandList = new LinkedList<ServiceCLI>();
+    
     public static void main(String[] args) throws ConfigurationException, RemoteException {
         
         try {
@@ -40,26 +46,10 @@ public class PAPCLI {
         new PAPCLI(args);
     }
     
-//    private static void prova2() {
-//        try {
-//            INIConfiguration conf = new INIConfiguration(new File("prova.ini"));
-//            System.out.println("found pluto: " + conf.getString("stanza1.pluto"));
-//            System.out.println("found s1v1: " + conf.getString("stanza1.s1v1"));
-//            
-//            conf.addProperty("stanza2.pluto", "plutoVALUE22222222222222222222222");
-//            
-//            conf.save();
-//            
-//            
-//            System.out.println("bye");
-//            
-//        } catch (org.apache.commons.configuration.ConfigurationException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//            return;
-//        }
-//        
-//    }
+    private static void defineCommands() {
+        serviceCommandList.add(new AddPAP());
+        serviceCommandList.add(new RemovePAP());
+    }
     
     @SuppressWarnings("static-access")
     private static void defineCommandLineOptions() {
@@ -105,7 +95,11 @@ public class PAPCLI {
     }
 
     public PAPCLI(String[] args) throws RemoteException {
-        
+        defineCommands();
+        for (ServiceCLI s:serviceCommandList) {
+            System.out.println(s.getCommandName());
+        }
+        System.exit(0);
         defineCommandLineOptions();
         
         try {
@@ -144,29 +138,4 @@ public class PAPCLI {
 
     }
     
-//    private static void prova(String[] args) {
-//        Options opt = new Options();
-//        OptionGroup groupOpt = new OptionGroup();
-//        
-//        groupOpt.addOption(OptionBuilder.hasArgs().withDescription("Update policy").create('a'));
-//        groupOpt.addOption(OptionBuilder.withDescription("Update policy").create('b'));
-//        opt.addOption(OptionBuilder.hasArgs().withDescription("Update policy").create('c'));
-//        opt.addOption(OptionBuilder.withLongOpt("xacml").withDescription("Update policy").create());
-//        opt.addOptionGroup(groupOpt);
-//        try {
-//            CommandLine commandLine = parser.parse( opt, args );
-//            
-//            if (commandLine.hasOption('a'))
-//                System.out.println("Option 'a'");
-//            if (commandLine.hasOption('b'))
-//                System.out.println("Option 'b'");
-//            if (commandLine.hasOption('c'))
-//                System.out.println("Option 'c'");
-//            if (commandLine.hasOption("xacml"))
-//                System.out.println("Option 'XACML'");
-//        } catch (ParseException e) {
-//            System.err.println( "Parsing failed.  Reason: " + e.getMessage() );
-//        }
-//        System.exit(0);
-//    }
 }

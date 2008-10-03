@@ -1,4 +1,4 @@
-package org.glite.authz.pap.ui;
+package org.glite.authz.pap.ui.cli;
 
 import java.rmi.RemoteException;
 import java.util.Collection;

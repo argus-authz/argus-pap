@@ -1,4 +1,4 @@
-package org.glite.authz.pap.ui;
+package org.glite.authz.pap.ui.cli;
 
 import java.io.File;
 import java.io.FileInputStream;
