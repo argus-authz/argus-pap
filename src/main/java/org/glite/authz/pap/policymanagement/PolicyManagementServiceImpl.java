@@ -3,9 +3,8 @@ package org.glite.authz.pap.policymanagement;
 import java.util.List;
 
 import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
-import org.glite.authz.pap.repository.PAPManager;
-import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.opensaml.xacml.policy.PolicySetType;

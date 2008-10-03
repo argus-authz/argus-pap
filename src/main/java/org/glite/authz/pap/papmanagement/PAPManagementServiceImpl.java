@@ -4,7 +4,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.repository.PAPManager;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

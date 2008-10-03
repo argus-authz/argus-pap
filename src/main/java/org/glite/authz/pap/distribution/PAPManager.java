@@ -1,10 +1,10 @@
-package org.glite.authz.pap.repository;
+package org.glite.authz.pap.distribution;
 
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
-import org.glite.authz.pap.distribution.DistributionConfiguration;
+import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemPAPManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.opensaml.xacml.policy.PolicySetType;

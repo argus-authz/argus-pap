@@ -1,9 +1,10 @@
-package org.glite.authz.pap.repository;
+package org.glite.authz.pap.distribution;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
