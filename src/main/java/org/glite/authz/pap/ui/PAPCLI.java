@@ -40,6 +40,27 @@ public class PAPCLI {
         new PAPCLI(args);
     }
     
+//    private static void prova2() {
+//        try {
+//            INIConfiguration conf = new INIConfiguration(new File("prova.ini"));
+//            System.out.println("found pluto: " + conf.getString("stanza1.pluto"));
+//            System.out.println("found s1v1: " + conf.getString("stanza1.s1v1"));
+//            
+//            conf.addProperty("stanza2.pluto", "plutoVALUE22222222222222222222222");
+//            
+//            conf.save();
+//            
+//            
+//            System.out.println("bye");
+//            
+//        } catch (org.apache.commons.configuration.ConfigurationException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//            return;
+//        }
+//        
+//    }
+    
     @SuppressWarnings("static-access")
     private static void defineCommandLineOptions() {
 

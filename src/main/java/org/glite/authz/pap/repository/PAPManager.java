@@ -14,6 +14,7 @@ public abstract class PAPManager {
     private static PAPManager instance = null;
     protected List<PAP> papList;
     protected static PAP localPAP = PAP.makeLocalPAP();
+    protected DistributionConfiguration distributionConfiguration;
     
     public static PAPManager getInstance() {
         if (instance == null)
@@ -22,7 +23,8 @@ public abstract class PAPManager {
     }
     
     protected PAPManager() {
-        papList = DistributionConfiguration.getInstance().getRemotePAPList();
+        distributionConfiguration = DistributionConfiguration.getInstance();
+        papList = distributionConfiguration.getRemotePAPList();
     }
 
     public abstract PAPContainer add(PAP pap);

@@ -6,6 +6,7 @@ public class PAP {
     public static PAP makeLocalPAP() {
         return new PAP("local_pap", "localhost", localPAPId);
     }
+    
     private String papId;
     private String endpoint;
     private String dn;

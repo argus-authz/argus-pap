@@ -8,11 +8,7 @@ public interface PAPDAO {
 
     public void add(PAP pap);
 
-    public void add(PAP pap, int index);
-
     public void delete(String papId);
-
-    public void deleteAll();
 
     public boolean exists(String papId);
 

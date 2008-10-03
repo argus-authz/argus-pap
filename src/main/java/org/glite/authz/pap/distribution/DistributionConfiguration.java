@@ -9,7 +9,6 @@ import java.util.Set;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.distribution.exceptions.DistributionConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,4 +128,19 @@ public class DistributionConfiguration {
 
         return papList;
     }
+    
+    public void removePAP(String papId) {
+        // TODO
+        save();
+    }
+    
+    public void setPAP(PAP pap) {
+        // TODO
+        save();
+    }
+    
+    private void save() {
+        // TODO
+    }
+    
 }
