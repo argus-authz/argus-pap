@@ -14,6 +14,7 @@ public class PAPManagementServiceImpl implements PAPManagementService {
     private static final PAPManager papManager = PAPManager.getInstance();
 
     public void addTrustedPAP(PAP pap) throws RemoteException {
+        log.info("Received request");
         papManager.add(pap);
         log.info("Added PAP: " + pap.toString());
     }

@@ -7,18 +7,13 @@ public class PAP {
         return new PAP("local_pap", "localhost", localPAPId);
     }
     
-    private String papId;
-    private String endpoint;
-    private String dn;
-    private String alias;
-    private boolean isPublic;
+    private String papId = "";
+    private String endpoint = "";
+    private String dn = "";
+    private String alias = "";
+    private boolean isPublic = false;
     
-    public PAP() {
-        papId = "";
-        endpoint = "";
-        dn = "";
-        alias = "";
-    }
+    public PAP() { }
 
     public PAP(String alias, String endpoint, String dn) {
         this(alias, endpoint, dn, true);

@@ -1,6 +1,7 @@
 package org.glite.authz.pap.client.impl;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -53,6 +54,11 @@ public class PAPManagementServiceClientImpl implements PAPManagementService {
         Call call = createCall("listTrustedPAP");
         call.registerTypeMapping(PAP.class, PAP_QNAME , serializerFactory, deserializerFactory);
         return (List<PAP>) call.invoke(new Object[] { } );
+//        PAP[] papArray = (PAP[]) call.invoke(new Object[] { } );
+//        List<PAP> papList = new ArrayList<PAP>(papArray.length);
+//        for (PAP pap:papArray)
+//            papList.add(pap);
+//        return papList;
     }
 
     public String ping() throws RemoteException {

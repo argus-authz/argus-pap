@@ -1,6 +1,8 @@
 package org.glite.authz.pap.ui.cli;
 
+import java.io.PrintWriter;
 import java.rmi.RemoteException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,14 +10,11 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.client.ServiceClient;
-import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.ui.cli.papmanagement.AddPAP;
+import org.glite.authz.pap.ui.cli.papmanagement.ListPAPs;
 import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
@@ -23,60 +22,81 @@ import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLConfigurator;
 
 public class PAPCLI {
-    
-    private static final String OPT_URL = "url"; 
-    private static final String OPT_CERT = "cert";
-    private static final String OPT_KEY = "key";
-    private static final String OPT_PASSWORD = "password";
-    private static final String DEFAULT_SERVICE_URL = "https://localhost:8443/pap/services/";
 
+    private static final List<ServiceCLI> serviceCLIList = new LinkedList<ServiceCLI>();
+
+    protected static int hfWidth = 80;
     protected static final Options options = new Options();
-    protected static final CommandLineParser parser = new GnuParser(); 
+    protected static final CommandLineParser parser = new GnuParser();
+
     protected static final HelpFormatter helpFormatter = new HelpFormatter();
-    
-    private static final List<ServiceCLI> serviceCommandList = new LinkedList<ServiceCLI>();
-    
-    public static void main(String[] args) throws ConfigurationException, RemoteException {
-        
+
+    public static void main(String[] args) throws ConfigurationException {
         try {
             init();
-        } catch(PAPConfigurationException e) {
+        } catch (PAPConfigurationException e) {
             System.out.println("Ignoring configuration exception...");
         }
         new PAPCLI(args);
     }
-    
+
     private static void defineCommands() {
-        serviceCommandList.add(new AddPAP());
-        serviceCommandList.add(new RemovePAP());
+
+        serviceCLIList.add(new AddPAP());
+        serviceCLIList.add(new RemovePAP());
+        serviceCLIList.add(new ListPAPs());
+
     }
-    
-    @SuppressWarnings("static-access")
-    private static void defineCommandLineOptions() {
 
-        options.addOption("h", "help", false, "print this message");
+    private static void defineOptions() {
+        options.addOption("h", "help", false, "Print this message");
+    }
 
-        options.addOption(OptionBuilder.hasArg().withLongOpt("url").withDescription(
-                "Specifies the target PAP endpoint to be contacted.").create(OPT_URL));
+    private static String getCommand(String[] args) throws ParseException {
+        for (String arg : args) {
+            if (!arg.startsWith("-"))
+                return arg;
+        }
+        throw new ParseException("Missing command");
+    }
 
-        options.addOption(OptionBuilder.hasArg().withLongOpt("cert").withDescription(
-                "Specifies non-standard user certificate.").create(OPT_CERT));
-
-        options.addOption(OptionBuilder.hasArg().withLongOpt("key").withDescription(
-                "Specifies non-standard user private key.").create(OPT_KEY));
-
-        options.addOption(OptionBuilder.hasArg().withLongOpt("password").withDescription(
-                "Specifies a password that is used to decrypt the user's private key.").create(
-                OPT_PASSWORD));
+    private static String getCommandStringHelpMessage(String[] commandNameValues, int maxCommandLen) {
         
-        for (Option opt:PolicyManagementServiceCLI.getOptions()) {
-            options.addOption(opt);
+        int currCommandLen = commandNameValues[0].length();
+        String commandString = "    " + commandNameValues[0];
+        String padding = getPadding(maxCommandLen - currCommandLen);
+        
+        if (commandNameValues.length > 1) {
+            
+            commandString +=  " (";
+            
+            for (int i = 1; i < commandNameValues.length; i++) {
+                commandString += commandNameValues[i];
+                if (i < commandNameValues.length - 1)
+                    commandString += ", ";
+            }
+            
+            commandString += ")";
         }
         
-        for (Option opt:PAPManagementServiceCLI.getOptions()) {
-            options.addOption(opt);
+        return commandString;
+    }
+
+    private static int getMaximumCommandLength(List<ServiceCLI> serviceCLIList) {
+        int maxLen = 0;
+        for (ServiceCLI serviceCLI : serviceCLIList) {
+            String command = serviceCLI.getCommandNameValues()[0];
+            if (command.length() > maxLen)
+                maxLen = command.length();
         }
-        
+        return maxLen;
+    }
+
+    private static String getPadding(int paddingLen) {
+        String padding = new String(" ");
+        for (int i = 0; i < paddingLen; i++)
+            padding += " ";
+        return padding;
     }
 
     private static void init() throws ConfigurationException {
@@ -85,57 +105,96 @@ public class PAPCLI {
 
         // Needed because of a "bug" in opensaml 2.1.0... can be removed
         // when opensaml is updated
-        xmlConfigurator.load(Configuration.class
-            .getResourceAsStream("/opensaml_bugfix.xml"));
+        xmlConfigurator.load(Configuration.class.getResourceAsStream("/opensaml_bugfix.xml"));
     }
 
-    private static void printHelpAndExit(int statusCode) {
-        helpFormatter.printHelp("CLI <option>", options);
+    private static void printCommandHelpAndExit(ServiceCLI serviceCLI, int statusCode) {
+
+        PrintWriter pw = new PrintWriter(System.out);
+
+        serviceCLI.printHelpMessage(pw);
+
+        pw.println();
+        pw.flush();
+
         System.exit(statusCode);
     }
 
-    public PAPCLI(String[] args) throws RemoteException {
+    private static void printGeneralHelpAndExit(int statusCode) {
+        PrintWriter pw = new PrintWriter(System.out);
+
+        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap <subcommand> [options]");
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP command-line client.");
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(),
+                "Type 'pap <subcommand> -h' for help on a specific subcommand.");
+        pw.println();
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Global options:");
+        helpFormatter.printOptions(pw, helpFormatter.getWidth(), options,
+                helpFormatter.getLeftPadding(), helpFormatter.getDescPadding());
+        pw.println();
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Available subcommands:");
+
+        int maxCommandLen = getMaximumCommandLength(serviceCLIList);
+
+        for (ServiceCLI serviceCLI : serviceCLIList) {
+            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI
+                    .getCommandNameValues(), maxCommandLen));
+        }
+
+        pw.println();
+        pw.flush();
+
+        System.exit(statusCode);
+    }
+
+    public PAPCLI(String[] args) {
+
         defineCommands();
-        for (ServiceCLI s:serviceCommandList) {
-            System.out.println(s.getCommandName());
-        }
-        System.exit(0);
-        defineCommandLineOptions();
-        
+        defineOptions();
+
+        ServiceCLI serviceCLI = null;
+        String command = null;
+
         try {
-            
-            CommandLine commandLine = parser.parse( options, args );
-            
-            ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
-            ServiceClient serviceClient = serviceClientFactory.createServiceClient();
-            
-            if (commandLine.hasOption(OPT_URL))
-                serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
-            else
-                serviceClient.setTargetEndpoint(DEFAULT_SERVICE_URL);
-            if (commandLine.hasOption(OPT_CERT))
-                serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
-            if (commandLine.hasOption(OPT_KEY))
-                serviceClient.setClientPrivateKey(OPT_KEY);
-            if (commandLine.hasOption(OPT_PASSWORD))
-                serviceClient.setClientPrivateKeyPassword(OPT_PASSWORD);
-            
+
+            CommandLine commandLine = parser.parse(options, args, true);
+
             if (commandLine.hasOption('h'))
-                printHelpAndExit(0);
-            else if (PolicyManagementServiceCLI.execute(commandLine, serviceClient))
-                return;
-            else if (PAPManagementServiceCLI.execute(commandLine, serviceClient))
-                return;
-            else {
-                printHelpAndExit(1);
-            }
-            
+                printGeneralHelpAndExit(0);
+
+            command = getCommand(args);
+
+        } catch (ParseException e) {
+            System.err.println("Parsing failed.  Reason: " + e.getMessage());
+            printGeneralHelpAndExit(1);
         }
-        catch( ParseException e ) {
-            System.err.println( "Parsing failed.  Reason: " + e.getMessage() );
-            printHelpAndExit(1);
+
+        boolean commandFound = false;
+
+        try {
+
+            Iterator<ServiceCLI> serviceCLIIterator = serviceCLIList.iterator();
+            while (serviceCLIIterator.hasNext()) {
+                serviceCLI = serviceCLIIterator.next();
+                if (serviceCLI.commandMatch(command)) {
+                    commandFound = serviceCLI.execute(args);
+                    break;
+                }
+            }
+
+            if (!commandFound)
+                System.out.println("Unknown command: " + command);
+
+        } catch (ParseException e) {
+            System.err.println("\nParsing failed.  Reason: " + e.getMessage() + "\n");
+            printCommandHelpAndExit(serviceCLI, 1);
+        } catch (HelpMessageException e) {
+            printCommandHelpAndExit(serviceCLI, 1);
+        } catch (RemoteException e) {
+            System.err
+                    .println("Cannot conncet to: " + serviceCLI.getServiceClient().getTargetEndpoint());
         }
 
     }
-    
+
 }
