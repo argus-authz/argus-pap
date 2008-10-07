@@ -3,24 +3,42 @@ package org.glite.authz.pap.common;
 public class PAP {
     public static final String localPAPId = "Local";
 
-    private String papId;
-    private String endpoint;
-    private String dn;
-
-    public PAP(String papId) {
-        this(null, papId);
-    }
-
-    public PAP(String endpoint, String dn) {
-        this.papId = dn.replace('/', '_').replace('@', '-');
-        this.endpoint = endpoint;
-        this.dn = dn;
+    public static PAP makeLocalPAP() {
+        return new PAP("local_pap", "localhost", localPAPId);
     }
     
-    public static PAP makeLocalPAP() {
-        return new PAP("localhost", localPAPId);
+    private String papId = "";
+    private String endpoint = "";
+    private String dn = "";
+    private String alias = "";
+    private boolean isPublic = false;
+    
+    public PAP() { }
+
+    public PAP(String alias, String endpoint, String dn) {
+        this(alias, endpoint, dn, true);
     }
 
+    public PAP(String alias, String endpoint, String dn, boolean isPublic) {
+        papId = dn.replace('/', '_').replace('@', '-');
+        
+        this.dn = dn;
+        
+        if (alias == null)
+            this.alias = papId;
+        else
+            this.alias = alias;
+        
+        if (endpoint == null)
+            this.endpoint = "NULL";
+        else
+            this.endpoint = endpoint;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+    
     public String getDn() {
         return dn;
     }
@@ -31,6 +49,14 @@ public class PAP {
 
     public String getPapId() {
         return papId;
+    }
+
+    public boolean isPublic() {
+        return isPublic;
+    }
+
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
 
     public void setDn(String dn) {
@@ -45,8 +71,19 @@ public class PAP {
         this.papId = papId;
     }
 
+    public void setPublic(boolean isPublic) {
+        this.isPublic = isPublic;
+    }
+
     public String toString() {
-        return "dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
+        String visibility = "visibility=";
+        
+        if (isPublic)
+            visibility += "PUBLIC";
+        else
+            visibility += "PRIVATE";
+        
+        return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
     }
 
 }

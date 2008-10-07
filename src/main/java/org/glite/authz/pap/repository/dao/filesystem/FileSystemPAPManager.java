@@ -5,69 +5,112 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
-import org.glite.authz.pap.repository.PAPManager;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 
-public class FileSystemPAPManager implements PAPManager {
-
-    public static FileSystemPAPManager getInstance() {
-	return new FileSystemPAPManager();
-    }
-
+public class FileSystemPAPManager extends PAPManager {
+    
     private final String dbDir;
 
-    private FileSystemPAPManager() {
-	dbDir = FileSystemRepositoryManager.getFileSystemDatabaseDir();
+    public FileSystemPAPManager() {
+        dbDir = FileSystemRepositoryManager.getFileSystemDatabaseDir();
     }
 
-    public PAPContainer create(PAP pap) {
-	if (exists(pap)) {
-	    throw new AlreadyExistsException();
-	}
-	File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
-	if (!directory.mkdir()) {
-	    throw new RepositoryException("Cannot create directory for PAP: "
-		    + pap.getPapId());
-	}
-	return new PAPContainer(pap);
+    @Override
+    public PAPContainer add(PAP pap) {
+        if (exists(pap.getPapId())) {
+            throw new AlreadyExistsException();
+        }
+        File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
+        if (!directory.mkdir()) {
+            throw new RepositoryException("Cannot create directory for PAP: " + pap.getPapId());
+        }
+        papList.add(pap);
+        return new PAPContainer(pap);
     }
 
-    public void delete(PAP pap) {
-	File papDir = new File(getPAPDirAbsolutePath(pap.getPapId()));
-	for (File file : papDir.listFiles()) {
-	    file.delete();
-	}
-	papDir.delete();
+    @Override
+    public PAP delete(String papId) {
+        if (!exists(papId))
+            throw new NotFoundException("PAP id not found: " + papId);
+        File papDir = new File(getPAPDirAbsolutePath(papId));
+        for (File file : papDir.listFiles()) {
+            file.delete();
+        }
+        papDir.delete();
+        for (PAP papElem:papList) {
+            if (papElem.getPapId().equals(papId)) {
+                papList.remove(papElem);
+                return papElem;
+            }
+        }
+        throw new NotFoundException("BUG! PAP id not found: " + papId);
     }
 
-    public boolean exists(PAP pap) {
-	File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
-	return directory.exists();
+    @Override
+    public boolean exists(String papId) {
+        // TODO: use papList
+        File directory = new File(getPAPDirAbsolutePath(papId));
+        return directory.exists();
     }
 
-    public PAPContainer getContainer(PAP pap) {
-	if (!exists(pap)) {
-	    throw new NotFoundException();
-	}
-	return new PAPContainer(pap);
+    @Override
+    public PAP get(String papId) {
+        for (PAP pap:papList) {
+            if (pap.getPapId().equals(papId)) {
+                return pap;
+            }
+        }
+        throw new NotFoundException("PAP not found: " + papId);
     }
 
+    @Override
+    public List<PAP> getAll() {
+        return papList;
+    }
+
+    @Override
+    public PAPContainer getContainer(String papId) {
+        return new PAPContainer(get(papId));
+    }
+
+    @Override
     public List<PAPContainer> getContainerAll() {
-	File dir = new File(dbDir);
-	File[] list = dir.listFiles();
-	List<PAPContainer> idList = new ArrayList<PAPContainer>(list.length);
-	for (File file : list) {
-	    if (file.isDirectory()) {
-		idList.add(new PAPContainer(new PAP(file.getName())));
-	    }
-	}
-	return idList;
+        List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(papList.size());
+        for (PAP pap:papList) {
+            papContainerList.add(new PAPContainer(pap));
+        }
+        return papContainerList;
+//        File dir = new File(dbDir);
+//        File[] list = dir.listFiles();
+//        for (File file : list) {
+//            if (file.isDirectory()) {
+//                papContainerList.add(new PAPContainer(new PAP(file.getName())));
+//            }
+//        }
+    }
+
+    @Override
+    public void setPAPOrder(List<String> papIdList) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void update(String papId, PAP newpap) {
+        for (int i=0; i<papList.size(); i++) {
+            PAP pap = papList.get(i);
+            if (pap.getPapId().equals(papId)) {
+                papList.set(i, newpap);
+                break;
+            }
+        }
     }
 
     private String getPAPDirAbsolutePath(String papId) {
-	return dbDir + File.separator + papId;
+        return dbDir + File.separator + papId;
     }
 }

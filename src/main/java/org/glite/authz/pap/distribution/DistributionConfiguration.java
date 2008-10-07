@@ -19,9 +19,11 @@ public class DistributionConfiguration {
     private static final String CONFIGURATION_STANZA = "configuration";
 
     private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
-    private static final DistributionConfiguration instance = new DistributionConfiguration();
+    private static DistributionConfiguration instance = null;
 
     public static DistributionConfiguration getInstance() {
+        if (instance == null)
+            instance = new DistributionConfiguration();
         return instance;
     }
 
@@ -49,10 +51,12 @@ public class DistributionConfiguration {
         return CONFIGURATION_STANZA + "." + "poll-interval";
     }
 
-    private final PAPConfiguration papConfiguration = PAPConfiguration.instance();
+    private PAPConfiguration papConfiguration;
 
-    private DistributionConfiguration() {}
-
+    public DistributionConfiguration() {
+        papConfiguration = PAPConfiguration.instance();
+    }
+    
     public long getPollIntervallInMillis() {
 
         long pollIntervalInSecs = papConfiguration.getLong(pollIntervallKey());
@@ -113,7 +117,7 @@ public class DistributionConfiguration {
                         + papAlias + "\"");
             }
 
-            PAP pap = new PAP(endpoint, dn);
+            PAP pap = new PAP(papAlias, endpoint, dn);
 
             log.info("Adding remote PAP: " + pap);
             papList.add(pap);
@@ -124,4 +128,19 @@ public class DistributionConfiguration {
 
         return papList;
     }
+    
+    public void removePAP(String papId) {
+        // TODO
+        save();
+    }
+    
+    public void setPAP(PAP pap) {
+        // TODO
+        save();
+    }
+    
+    private void save() {
+        // TODO
+    }
+    
 }

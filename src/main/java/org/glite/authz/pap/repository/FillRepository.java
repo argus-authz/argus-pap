@@ -2,8 +2,10 @@ package org.glite.authz.pap.repository;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
@@ -21,19 +23,19 @@ public class FillRepository {
     
     public static void fillPAP(String papId, int numberOfPolicySets, int numberOfPolicies) {
         
-        PAP pap = new PAP(papId);
-        PAPManager pm = RepositoryManager.getPAPManager();
+        PAP pap = new PAP(null, null, papId);
+        PAPManager pm = PAPManager.getInstance();
         
         PAPContainer container = null;
         
-        if (pm.exists(pap)) {
-            container = pm.getContainer(pap);
+        if (pm.exists(pap.getPapId())) {
+            container = pm.getContainer(pap.getPapId());
             log.info("Deleting all policies and policy sets for PAP: " + papId);
             container.deleteAllPolicies();
             container.deleteAllPolicySets();
         } else {
             log.info("Creating pap: " + papId);
-            container = pm.create(pap);
+            container = pm.add(pap);
         }
         
         PolicySetType policySet = PolicySetHelper.buildWithAnyTarget(papId, PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
@@ -54,7 +56,14 @@ public class FillRepository {
     }
     
     public static void fillFromConfiguration() {
-        PAPConfiguration conf = PAPConfiguration.instance();
+        
+        PAPConfiguration conf;
+        
+        try {
+            conf = PAPConfiguration.instance();
+        } catch (PAPConfigurationException e) {
+            return;
+        }
         
         if (!conf.getBoolean("configuration.test", false))
             return;

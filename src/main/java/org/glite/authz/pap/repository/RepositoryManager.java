@@ -3,13 +3,12 @@ package org.glite.authz.pap.repository;
 import java.io.File;
 import java.util.List;
 
-import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
 import org.glite.authz.pap.repository.dao.DAOFactory;
-import org.glite.authz.pap.repository.dao.filesystem.FileSystemPAPManager;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.XACMLObject;
@@ -30,43 +29,28 @@ public abstract class RepositoryManager {
         return new FileSystemRepositoryManager();
     }
 
-    public static PAPManager getPAPManager() {
-        return FileSystemPAPManager.getInstance();
-    }
-
     public void bootstrap() {
         
         initialize();
         
-        createLocalPAP();
+        PAPManager.getInstance().createLocalPAPIfNotExists();
         
         setLocalPoliciesFromConfigurationFile();
         
         FillRepository.fillFromConfiguration();
     }
     
-    private void createLocalPAP() {
-        
-        PAPManager papManager = getPAPManager();
-        PAP localPAP = PAP.makeLocalPAP();
-        
-        if (!papManager.exists(localPAP)) {
-            
-            papManager.create(localPAP);
-            
-            PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
-                    PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
-            
-            PAPContainer localPapContainer = papManager.getContainer(localPAP);
-            localPapContainer.storePolicySet(localPolicySet);
-        }
-    }
-    
     // Temporary method for initializing the repository
     private void setLocalPoliciesFromConfigurationFile() {
         PolicyFileEncoder pse = new PolicyFileEncoder();
 
-        File policyConfigurationFile = new File(PAPConfiguration.instance().getPapPolicyConfigurationFileName());
+        File policyConfigurationFile;
+        try {
+            policyConfigurationFile = new File(PAPConfiguration.instance().getPapPolicyConfigurationFileName());
+        } catch (PAPConfigurationException e) {
+            policyConfigurationFile = new File("/opt/glite/etc/pap/pap_policy.ini");
+        }
+        
         log.info("Reading policy configuration file: " + policyConfigurationFile.getAbsolutePath());
         
         if (!policyConfigurationFile.exists()) {
@@ -81,7 +65,7 @@ public abstract class RepositoryManager {
             throw new RepositoryException(e);
         }
         
-        PAPContainer localPapContainer = getPAPManager().getContainer(PAP.makeLocalPAP());
+        PAPContainer localPapContainer = PAPManager.getInstance().getLocalPAPContainer();
         
         localPapContainer.deleteAllPolicies();
         localPapContainer.deleteAllPolicySets();

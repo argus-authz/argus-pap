@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.repository.dao.DAOFactory;
+import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -15,12 +16,14 @@ public class PAPContainer {
     private final String papId;
     private final PolicySetDAO policySetDAO;
     private final PolicyDAO policyDAO;
+    private final PAPDAO papDAO;
 
     public PAPContainer(PAP pap) {
         this.pap = pap;
         papId = pap.getPapId();
         policySetDAO = DAOFactory.getDAOFactory().getPolicySetDAO();
         policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
+        papDAO = DAOFactory.getDAOFactory().getPAPDAO();
     }
 
     public void deleteAllPolicies() {
@@ -72,6 +75,12 @@ public class PAPContainer {
 
     public PolicySetType getPolicySet(String id) {
         return policySetDAO.getById(papId, id);
+    }
+    
+    public void erasePAP() {
+        deleteAllPolicies();
+        deleteAllPolicySets();
+        papDAO.delete(papId);
     }
 
     public boolean hasPolicy(String id) {

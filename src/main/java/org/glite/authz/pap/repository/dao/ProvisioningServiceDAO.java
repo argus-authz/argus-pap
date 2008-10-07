@@ -5,9 +5,8 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
-import org.glite.authz.pap.repository.PAPManager;
-import org.glite.authz.pap.repository.RepositoryManager;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -31,8 +30,7 @@ public class ProvisioningServiceDAO {
         
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        PAP localPAP = PAP.makeLocalPAP();
-        PAPContainer papContainer = RepositoryManager.getPAPManager().getContainer(localPAP);
+        PAPContainer papContainer = PAPManager.getInstance().getLocalPAPContainer();
 
         resultList.addAll(papContainer.getAllPolicySets());
         resultList.addAll(papContainer.getAllPolicies());
@@ -57,7 +55,7 @@ public class ProvisioningServiceDAO {
         PolicySetHelper.addPolicySetReference(rootPolicySet, PAP.localPAPId);
 
         // Add references to the remote PAPs
-        PAPManager papManager = RepositoryManager.getPAPManager();
+        PAPManager papManager = PAPManager.getInstance();
         for (PAPContainer papContainer : papManager.getContainerAll()) {
             String papId = papContainer.getPAP().getPapId();
 
