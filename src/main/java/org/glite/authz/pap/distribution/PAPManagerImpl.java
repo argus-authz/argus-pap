@@ -5,18 +5,26 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.RepositoryManager;
+import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 public class PAPManagerImpl extends PAPManager {
-
+    
+    private PAPDAO papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
+    
     @Override
     public PAPContainer add(PAP pap) {
+        
         if (exists(pap.getPapId()))
             throw new AlreadyExistsException();
+        
         distributionConfiguration.setPAP(pap);
         papList.add(pap);
-        return null;
+        papDAO.add(pap);
+        
+        return new PAPContainer(pap);
     }
 
     @Override
