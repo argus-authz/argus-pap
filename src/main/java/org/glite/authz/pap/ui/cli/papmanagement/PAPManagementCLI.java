@@ -13,10 +13,7 @@ public abstract class PAPManagementCLI extends ServiceCLI {
     protected static final String SERVICE_NAME = "PAPManagementService";
     protected static PAPManagementService papMgmtClient;
 
-    public PAPManagementCLI(String[] commandNameValues, String usageText, String descriptionText) {
-        super(commandNameValues, usageText, descriptionText);
-    }
-
+    @Override
     public boolean executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
             throws ParseException, RemoteException {
 

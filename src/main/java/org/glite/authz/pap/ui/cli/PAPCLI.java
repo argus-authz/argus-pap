@@ -12,14 +12,10 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.ui.cli.papmanagement.AddPAP;
 import org.glite.authz.pap.ui.cli.papmanagement.ListPAPs;
 import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLConfigurator;
+import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 
 public class PAPCLI {
 
@@ -31,17 +27,17 @@ public class PAPCLI {
 
     protected static final HelpFormatter helpFormatter = new HelpFormatter();
 
-    public static void main(String[] args) throws ConfigurationException {
-        try {
-            init();
-        } catch (PAPConfigurationException e) {
-            System.out.println("Ignoring configuration exception...");
-        }
+    public static void main(String[] args) {
+        
         new PAPCLI(args);
     }
 
     private static void defineCommands() {
 
+        // Policy Management
+        serviceCLIList.add(new ListPolicies());
+
+        // PAP Management
         serviceCLIList.add(new AddPAP());
         serviceCLIList.add(new RemovePAP());
         serviceCLIList.add(new ListPAPs());
@@ -60,52 +56,24 @@ public class PAPCLI {
         throw new ParseException("Missing command");
     }
 
-    private static String getCommandStringHelpMessage(String[] commandNameValues, int maxCommandLen) {
-        
-        int currCommandLen = commandNameValues[0].length();
+    private static String getCommandStringHelpMessage(String[] commandNameValues) {
+
         String commandString = "    " + commandNameValues[0];
-        String padding = getPadding(maxCommandLen - currCommandLen);
-        
+
         if (commandNameValues.length > 1) {
-            
-            commandString +=  " (";
-            
+
+            commandString += " (";
+
             for (int i = 1; i < commandNameValues.length; i++) {
                 commandString += commandNameValues[i];
                 if (i < commandNameValues.length - 1)
                     commandString += ", ";
             }
-            
+
             commandString += ")";
         }
-        
+
         return commandString;
-    }
-
-    private static int getMaximumCommandLength(List<ServiceCLI> serviceCLIList) {
-        int maxLen = 0;
-        for (ServiceCLI serviceCLI : serviceCLIList) {
-            String command = serviceCLI.getCommandNameValues()[0];
-            if (command.length() > maxLen)
-                maxLen = command.length();
-        }
-        return maxLen;
-    }
-
-    private static String getPadding(int paddingLen) {
-        String padding = new String(" ");
-        for (int i = 0; i < paddingLen; i++)
-            padding += " ";
-        return padding;
-    }
-
-    private static void init() throws ConfigurationException {
-        DefaultBootstrap.bootstrap();
-        XMLConfigurator xmlConfigurator = new XMLConfigurator();
-
-        // Needed because of a "bug" in opensaml 2.1.0... can be removed
-        // when opensaml is updated
-        xmlConfigurator.load(Configuration.class.getResourceAsStream("/opensaml_bugfix.xml"));
     }
 
     private static void printCommandHelpAndExit(ServiceCLI serviceCLI, int statusCode) {
@@ -134,11 +102,9 @@ public class PAPCLI {
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Available subcommands:");
 
-        int maxCommandLen = getMaximumCommandLength(serviceCLIList);
-
         for (ServiceCLI serviceCLI : serviceCLIList) {
             helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI
-                    .getCommandNameValues(), maxCommandLen));
+                    .getCommandNameValues()));
         }
 
         pw.println();

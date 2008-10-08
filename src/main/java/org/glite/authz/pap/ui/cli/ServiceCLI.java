@@ -33,15 +33,19 @@ public abstract class ServiceCLI {
     private Options globalOptions = new Options();
     private String[] commandNameValues;
     private String descriptionText;
+    private String longDescriptionText;
     private final ServiceClient serviceClient;
     
     @SuppressWarnings({ "static-access", "unchecked" })
-    public ServiceCLI(String[] commandNameValues, String usageText, String descriptionText) {
-        this();
+    public ServiceCLI() {
         
-        this.commandNameValues = commandNameValues;
-        this.usageText = usageText;
-        this.descriptionText = descriptionText;
+        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
+        serviceClient = serviceClientFactory.createServiceClient();
+        
+        commandNameValues = defineCommandNameValues();
+        usageText = defineUsage();
+        descriptionText = defineDescription();
+        longDescriptionText = defineLongDescription();
         
         commandOptions = defineCommandOptions();
         if (commandOptions == null)
@@ -68,11 +72,6 @@ public abstract class ServiceCLI {
         for (Option opt:optionsList) {
             options.addOption(opt);
         }
-    }
-    
-    private ServiceCLI() {
-        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
-        serviceClient = serviceClientFactory.createServiceClient();
     }
     
     public boolean commandMatch(String command) {
@@ -117,9 +116,18 @@ public abstract class ServiceCLI {
     
     public void printHelpMessage(PrintWriter pw) {
         String syntax = commandNameValues[0] + " " + usageText;
+        
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), syntax);
-        pw.println();
-        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), descriptionText);
+        
+        if (descriptionText != null) {
+            pw.println();
+            helpFormatter.printWrapped(pw, helpFormatter.getWidth(), descriptionText);
+        }
+        
+        if (longDescriptionText != null) {
+            pw.println();
+            helpFormatter.printWrapped(pw, helpFormatter.getWidth(), longDescriptionText);
+        }
         
         // command specific options
         pw.println();
@@ -132,7 +140,15 @@ public abstract class ServiceCLI {
         helpFormatter.printOptions(pw, helpFormatter.getWidth(), globalOptions, helpFormatter.getLeftPadding(), helpFormatter.getDescPadding());
     }
     
+    protected abstract String[] defineCommandNameValues();
+    
     protected abstract Options defineCommandOptions();
+    
+    protected abstract String defineDescription();
+    
+    protected abstract String defineLongDescription();
+    
+    protected abstract String defineUsage();
     
     protected abstract boolean executeCommandService(CommandLine commandLine, ServiceClient serviceClient) throws ParseException, RemoteException;
     
