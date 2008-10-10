@@ -66,6 +66,18 @@ public class PolicyManagementServiceClientImpl implements PolicyManagementServic
         return (PolicySetType) call.invoke(new Object[] { policySetId });
     }
     
+    public boolean hasPolicy(String policyId) throws RemoteException {
+        Call call = createCall("hasPolicy");
+        String dirtyTrick = (String) call.invoke(new Object[] { policyId });
+        return Boolean.getBoolean(dirtyTrick); 
+    }
+
+    public boolean hasPolicySet(String policySetId) throws RemoteException {
+        Call call = createCall("hasPolicySet");
+        String dirtyTrick = (String) call.invoke(new Object[] { policySetId });
+        return Boolean.getBoolean(dirtyTrick);
+    }
+
     @SuppressWarnings("unchecked")
     public List<PolicyType> listPolicies() throws RemoteException {
         Call call = createCall("listPolicies");
@@ -101,7 +113,7 @@ public class PolicyManagementServiceClientImpl implements PolicyManagementServic
 
         return (List<PolicySetType>) call.invoke(new Object[] { papId });
     }
-
+    
     public void removePolicy(String policyId) throws RemoteException {
         Call call = createCall("removePolicy");
         call.invoke(new Object[] { policyId });
@@ -111,7 +123,7 @@ public class PolicyManagementServiceClientImpl implements PolicyManagementServic
         Call call = createCall("removePolicySet");
         call.invoke(new Object[] { policySetId });
     }
-    
+
     public String storePolicy(String idPrefix, PolicyType policy) throws RemoteException {
         Call call = createCall("storePolicy");
 

@@ -14,6 +14,15 @@ public class ListPAPs extends PAPManagementCLI {
     private static final String[] commandNameValues = { "list-paps", "lpaps" };
     private static final String DESCRIPTION = "List trusted PAPs.";
     
+    public ListPAPs() {
+        super(commandNameValues, USAGE, DESCRIPTION, null);
+    }
+    
+    @Override
+    protected Options defineCommandOptions() {
+        return null;
+    }
+
     @Override
     protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         
@@ -24,30 +33,4 @@ public class ListPAPs extends PAPManagementCLI {
         }
         return true;
     }
-
-    @Override
-    protected Options defineCommandOptions() {
-        return null;
-    }
-
-    @Override
-    protected String[] defineCommandNameValues() {
-        return commandNameValues;
-    }
-
-    @Override
-    protected String defineDescription() {
-        return DESCRIPTION;
-    }
-
-    @Override
-    protected String defineLongDescription() {
-        return null;
-    }
-
-    @Override
-    protected String defineUsage() {
-        return USAGE;
-    }
-
 }

@@ -95,6 +95,11 @@ public class AttributeWizard {
         if (notFound)
             throw new UnsupportedAttributeException("Attribute not supported: " + xacmlId);
     }
+    
+    public AttributeWizard(AttributeWizardType attributeWizardType, String value) {
+        this.attributeWizardType = attributeWizardType;
+        this.value = value;
+    }
 
     public AttributeWizard(String identifier, String value) {
         boolean found = false;

@@ -51,13 +51,6 @@ public class PolicyWizard {
     private PolicyWizardType policyWizardType;
     private final List<AttributeWizard> targetAttributeWizardList;
 
-    public PolicyWizard(List<AttributeWizard> targetAttributeWizardList,
-            List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
-
-        this(null, targetAttributeWizardList, orExceptionsAttributeWizardList, effect);
-
-    }
-
     public PolicyWizard(PolicyType policy) throws UnsupportedPolicyException {
         
         decomposePolicyId(policy.getPolicyId());
@@ -77,8 +70,7 @@ public class PolicyWizard {
         this.policy = policy;
     }
 
-    @Deprecated
-    public PolicyWizard(String policyId, List<AttributeWizard> targetAttributeWizardList,
+    public PolicyWizard(List<AttributeWizard> targetAttributeWizardList,
             List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
 
         if (targetAttributeWizardList == null)
@@ -91,10 +83,7 @@ public class PolicyWizard {
             orExceptionsAttributeWizardList = new LinkedList<List<AttributeWizard>>();
         this.orExceptionsAttributeWizardList = orExceptionsAttributeWizardList;
 
-        if (policyId == null)
-            policyId = generateId();
-
-        policy = PolicyHelper.build(policyId, PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
+        policy = PolicyHelper.build(generateId(), PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
 
         TargetType target = TargetWizard.createTarget(targetAttributeWizardList);
 
@@ -110,14 +99,7 @@ public class PolicyWizard {
     }
 
     public String getPolicyIdPrefix() {
-        
-        if (isBlacklistPolicy())
-            return BLACKLIST_POLICY_ID_PREFIX;
-        
-        else if (isServiceClassPolicy())
-            return SERVICECLASS_POLICY_ID_PREFIX;
-        
-        return "";
+        return policyIdVisibilityPrefix + "_" + policyIdPrefix;
     }
 
     public PolicyType getPolicyType() {
@@ -237,10 +219,14 @@ public class PolicyWizard {
         if (idComponents.length != 3)
             throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
         
-        if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0]))
-            setPrivate(true);
-        else
-            setPrivate(false);
+        
+        if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0])) {
+            this.isPrivate = true;
+            setPolicyIdVisibilityPrefix(true);
+        } else {
+            this.isPrivate = false;
+            setPolicyIdVisibilityPrefix(false);
+        }
         
         if (BLACKLIST_POLICY_ID_PREFIX.equals(idComponents[1]))
             setPolicyIdPrefix(PolicyWizardType.BLACKLIST);

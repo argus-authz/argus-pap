@@ -12,6 +12,15 @@ public class RemovePAP extends PAPManagementCLI {
     private static final String[] commandNameValues = { "remove-pap", "rpap" };
     private static final String DESCRIPTION = "Remove a trusted PAP and delete the cached policies.";
     
+    public RemovePAP() {
+        super(commandNameValues, USAGE, DESCRIPTION, null);
+    }
+    
+    @Override
+    protected Options defineCommandOptions() {
+        return null;
+    }
+
     @Override
     protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
@@ -24,31 +33,6 @@ public class RemovePAP extends PAPManagementCLI {
         papMgmtClient.removeTrustedPAP(papId);
         
         return true;
-    }
-
-    @Override
-    protected Options defineCommandOptions() {
-        return null;
-    }
-
-    @Override
-    protected String[] defineCommandNameValues() {
-        return commandNameValues;
-    }
-
-    @Override
-    protected String defineDescription() {
-        return DESCRIPTION;
-    }
-
-    @Override
-    protected String defineLongDescription() {
-        return null;
-    }
-
-    @Override
-    protected String defineUsage() {
-        return USAGE;
     }
 
 }

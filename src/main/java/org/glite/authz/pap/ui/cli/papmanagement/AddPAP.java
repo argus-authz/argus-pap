@@ -12,14 +12,12 @@ public class AddPAP extends PAPManagementCLI {
 
     private static final String LOPT_PUBLIC = "public";
     private static final String LOPT_PRIVATE = "private";
-
     private static final String USAGE = "<alias> <endpoint> <dn> [options]";
     private static final String[] commandNameValues = { "add-pap", "apap" };
     private static final String DESCRIPTION = "Add a trusted PAP to get policies from.";
-
-    @Override
-    protected String[] defineCommandNameValues() {
-        return commandNameValues;
+    
+    public AddPAP() {
+        super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 
     @SuppressWarnings("static-access")
@@ -32,21 +30,6 @@ public class AddPAP extends PAPManagementCLI {
         options.addOption(OptionBuilder.hasArg(false).withDescription(
                 "Set the remote PAP as private (default)").withLongOpt(LOPT_PRIVATE).create());
         return options;
-    }
-
-    @Override
-    protected String defineDescription() {
-        return DESCRIPTION;
-    }
-
-    @Override
-    protected String defineLongDescription() {
-        return null;
-    }
-
-    @Override
-    protected String defineUsage() {
-        return USAGE;
     }
 
     @Override

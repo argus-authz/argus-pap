@@ -27,7 +27,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
     private FileSystemPolicyDAO() {}
 
-    public void delete(String papId, String policyId) {
+    public void delete(String papId, String policyId) throws NotFoundException, RepositoryException {
         String policyFileName = FileSystemRepositoryManager.getPolicyAbsolutePath(papId, policyId);
 
         if (exists(papId, policyId)) {
