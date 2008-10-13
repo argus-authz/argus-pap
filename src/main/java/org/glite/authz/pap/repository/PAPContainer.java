@@ -11,8 +11,13 @@ import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PAPContainer {
+	
+	@SuppressWarnings("unused")
+	private static final Logger log = LoggerFactory.getLogger(PAPContainer.class);
 
     private final PAP pap;
     private final String papId;

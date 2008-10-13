@@ -24,100 +24,102 @@ import org.opensaml.xml.XMLConfigurator;
 
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
-    protected static final String SERVICE_NAME = "PolicyManagementService";
+	protected static final String SERVICE_NAME = "PolicyManagementService";
+	protected PolicyManagementService policyMgmtClient;
 
-    protected PolicyManagementService policyMgmtClient;
+	public PolicyManagementCLI(String[] commandNameValues, String usage,
+			String description, String longDescription) {
+		super(commandNameValues, usage, description, longDescription);
+	}
 
-    public PolicyManagementCLI(String[] commandNameValues, String usage, String description,
-            String longDescription) {
-        super(commandNameValues, usage, description, longDescription);
-    }
+	protected void addPolicy(PolicyWizard policy) throws CLIException,
+			RemoteException {
 
-    protected void addPolicy(PolicyWizard policy) throws CLIException, RemoteException {
+		PolicySetType policySet;
+		
+		if (policy.isBlacklistPolicy())
+			policySet = (new BlacklistPolicySet()).getPolicySetType();
+		else
+			policySet = (new ServiceClassPolicySet()).getPolicySetType();
 
-        PolicySetType policySet;
-        String policySetId;
+		String policySetId = policySet.getPolicySetId();
+		
+		boolean updateOperation = false;
 
-        if (policy.isBlacklistPolicy())
-            policySetId = BlacklistPolicySet.POLICY_SET_ID;
-        else
-            policySetId = ServiceClassPolicySet.POLICY_SET_ID;
+		if (policyMgmtClient.hasPolicySet(policySetId)) {
+			updateOperation = true;
+			policySet = policyMgmtClient.getPolicySet(policySetId);
+		}
+		
+		String policyId = policyMgmtClient.storePolicy(policy
+				.getPolicyIdPrefix(), policy.getPolicyType());
 
-        boolean updateOperation;
+		PolicySetHelper.addPolicyReference(policySet, policyId);
 
-        try {
-            policySet = policyMgmtClient.getPolicySet(policySetId);
-            updateOperation = true;
-        } catch (NotFoundException e) {
+		if (updateOperation)
+			policyMgmtClient.updatePolicySet(policySet);
+		else {
+			policyMgmtClient.storePolicySet(null, policySet);
 
-            if (policy.isBlacklistPolicy())
-                policySet = (new BlacklistPolicySet()).getPolicySetType();
-            else
-                policySet = (new ServiceClassPolicySet()).getPolicySetType();
+			PolicySetType localPolicySet = policyMgmtClient.getPolicySet(PAP.localPAPId);
+			
+			PolicySetHelper.addPolicySetReference(localPolicySet, policySetId);
+			
+			policyMgmtClient.updatePolicySet(localPolicySet);
+		}
 
-            updateOperation = false;
-        }
+	}
 
-        String policyId = policyMgmtClient.storePolicy(policy.getPolicyIdPrefix(), policy
-                .getPolicyType());
+	protected void removePolicy(PolicyWizard policy) throws NotFoundException,
+			RepositoryException, RemoteException {
+		
+		PolicySetType policySet;
+		String policySetId;
 
-        PolicySetHelper.addPolicyReference(policySet, policyId);
+		if (policy.isBlacklistPolicy())
+			policySetId = BlacklistPolicySet.POLICY_SET_ID;
+		else
+			policySetId = ServiceClassPolicySet.POLICY_SET_ID;
 
-        if (updateOperation)
-            policyMgmtClient.updatePolicySet(policySet);
-        else
-            policyMgmtClient.storePolicySet(null, policySet);
+		policySet = policyMgmtClient.getPolicySet(policySetId);
+		
+		String policyId = policy.getPolicyType().getPolicyId();
+		PolicySetHelper.deletePolicyReference(policySet, policyId);
+		
+		policyMgmtClient.updatePolicySet(policySet);
+		
+		policyMgmtClient.removePolicy(policyId);
 
-        try {
-            policySet = policyMgmtClient.getPolicySet(PAP.localPAPId);
-            
-            PolicySetHelper.addPolicySetReference(policySet, policySetId);
-            
-            policyMgmtClient.updatePolicySet(policySet);
-            
-        } catch (NotFoundException e) {
-            throw new CLIException("Critical error local PolicySet does not exists... probably a BUG", e);
-        } 
-        
-    }
-    
-    protected void removePolicy(PolicyWizard policy) throws NotFoundException, RepositoryException, RemoteException {
-        PolicySetType policySet;
-        String policySetId;
+	}
 
-        if (policy.isBlacklistPolicy())
-            policySetId = BlacklistPolicySet.POLICY_SET_ID;
-        else
-            policySetId = ServiceClassPolicySet.POLICY_SET_ID;
+	protected abstract boolean executeCommand(CommandLine commandLine)
+			throws CLIException, ParseException, RemoteException;
 
-            policySet = policyMgmtClient.getPolicySet(policySetId);
-            
-    }
+	@Override
+	protected boolean executeCommandService(CommandLine commandLine,
+			ServiceClient serviceClient) throws CLIException, ParseException,
+			RemoteException {
 
-    protected abstract boolean executeCommand(CommandLine commandLine) throws CLIException,
-            ParseException, RemoteException;
+		policyMgmtClient = serviceClient
+				.getPolicyManagementService(serviceClient.getTargetEndpoint()
+						+ SERVICE_NAME);
 
-    @Override
-    protected boolean executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
-            throws CLIException, ParseException, RemoteException {
+		return executeCommand(commandLine);
+	}
 
-        policyMgmtClient = serviceClient.getPolicyManagementService(serviceClient.getTargetEndpoint()
-                + SERVICE_NAME);
+	protected void initOpenSAML() {
+		try {
+			DefaultBootstrap.bootstrap();
+			XMLConfigurator xmlConfigurator = new XMLConfigurator();
 
-        return executeCommand(commandLine);
-    }
-
-    protected void initOpenSAML() {
-        try {
-            DefaultBootstrap.bootstrap();
-            XMLConfigurator xmlConfigurator = new XMLConfigurator();
-
-            // Needed because of a "bug" in opensaml 2.1.0... can be removed
-            // when opensaml is updated
-            xmlConfigurator.load(Configuration.class.getResourceAsStream("/opensaml_bugfix.xml"));
-        } catch (ConfigurationException e) {
-            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
-        }
-    }
+			// Needed because of a "bug" in opensaml 2.1.0... can be removed
+			// when opensaml is updated
+			xmlConfigurator.load(Configuration.class
+					.getResourceAsStream("/opensaml_bugfix.xml"));
+		} catch (ConfigurationException e) {
+			throw new PAPConfigurationException(
+					"Error initializing OpenSAML library", e);
+		}
+	}
 
 }

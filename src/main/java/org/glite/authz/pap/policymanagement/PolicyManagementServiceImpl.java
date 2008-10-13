@@ -26,7 +26,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#getPolicy(java.lang.String)
      */
     public PolicyType getPolicy(String policyId) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request getPolicy()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -44,7 +44,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#getPolicySet(java.lang.String)
      */
     public PolicySetType getPolicySet(String policySetId) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request getPolicySet()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -62,18 +62,22 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
     * @see org.glite.authz.pap.policymanagement.PolicyManagementService#listPolicies()
     */
     public boolean hasPolicy(String policyId) throws RemoteException {
-        log.debug("Received request");
+        log.debug("Received request hasPolicy()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
-        return localPAP.hasPolicy(policyId);
+        boolean result = localPAP.hasPolicy(policyId);
+        
+        log.debug("Sending result hasPolicy=" + result);
+        
+        return result; 
     }
     
     /* (non-Javadoc)
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#listPolicies()
      */
     public boolean hasPolicySet(String policySetId) throws RemoteException {
-        log.debug("Received request");
+        log.debug("Received request hasPolicySet");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -84,11 +88,19 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#listPolicies()
      */
     public List<PolicyType> listPolicies() throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request: listPolicies()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
-        return localPAP.getAllPolicies();
+        List<PolicyType> policyList = localPAP.getAllPolicies();
+        
+        log.debug("Sending policies: " + policyList.size());
+        
+        if (log.isDebugEnabled())
+        	for (PolicyType policy:policyList)
+        		log.debug(XMLObjectHelper.toString(policy));
+        
+        return policyList;
         
     }
     
@@ -96,7 +108,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#listPolicies(java.lang.String)
      */
     public List<PolicyType> listPolicies(String papId) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request listPolicies(papId");
         
         PAPContainer pap = PAPManager.getInstance().getContainer(papId);
         
@@ -107,7 +119,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#listPolicySets()
      */
     public List<PolicySetType> listPolicySets() throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request listPolicySets()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -119,7 +131,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#listPolicySets(java.lang.String)
      */
     public List<PolicySetType> listPolicySets(String papId) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request listPolicySets(papId)");
         
         PAPContainer pap = PAPManager.getInstance().getContainer(papId);
         
@@ -130,7 +142,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#removePolicy(java.lang.String)
      */
     public void removePolicy(String policyId) throws NotFoundException, RepositoryException, java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request removePolicy()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -141,7 +153,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#removePolicySet(java.lang.String)
      */
     public void removePolicySet(String policySetId) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request removePolicySet()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -152,7 +164,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#storePolicy(org.opensaml.xacml.policy.PolicyType)
      */
     public String storePolicy(String idPrefix, PolicyType policy) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request storePolicy()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -168,7 +180,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#storePolicySet(org.opensaml.xacml.policy.PolicySetType)
      */
     public String storePolicySet(String idPrefix, PolicySetType policySet) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request storePolicySet");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
@@ -183,22 +195,26 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#updatePolicy(org.opensaml.xacml.policy.PolicyType)
      */
     public void updatePolicy(PolicyType policy) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request updatePolicy()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
         localPAP.storePolicy(policy);
+        
+        log.debug("Done request updatePolicy()");
     }
 
     /* (non-Javadoc)
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#updatePolicySet(org.opensaml.xacml.policy.PolicySetType)
      */
     public void updatePolicySet(PolicySetType policySet) throws java.rmi.RemoteException {
-        log.debug("Received request");
+        log.debug("Received request updatePolicySet()");
         
         PAPContainer localPAP = getLocalPAPContainer();
         
         localPAP.storePolicySet(policySet);
+        
+        log.debug("Done request updatePolicySet()");
     }
     
 }

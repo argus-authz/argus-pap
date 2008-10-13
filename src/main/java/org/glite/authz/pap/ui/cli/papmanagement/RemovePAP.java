@@ -29,6 +29,11 @@ public class RemovePAP extends PAPManagementCLI {
             throw new ParseException("Wrong number of arguments");
         
         String papId = args[1];
+
+        if (!papMgmtClient.exists(papId)) {
+        	System.out.println("PAP not found: " + papId);
+        	return true;
+        }
         
         papMgmtClient.removeTrustedPAP(papId);
         

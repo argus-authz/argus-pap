@@ -28,9 +28,15 @@ public class ListPAPs extends PAPManagementCLI {
         
         List<PAP> papList = papMgmtClient.listTrustedPAPs();
         
-        for (PAP pap:papList) {
-            System.out.println(pap.toString());
+        if (papList.isEmpty()) {
+        	System.out.println("No remote PAPs found.");
+        	return true;
         }
+        	
+        for (PAP pap:papList) {
+            System.out.println(pap.toFormattedString());
+        }
+        
         return true;
     }
 }

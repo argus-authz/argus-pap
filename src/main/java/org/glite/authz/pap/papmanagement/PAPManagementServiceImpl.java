@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.distribution.PAPManager;
+import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,6 +19,13 @@ public class PAPManagementServiceImpl implements PAPManagementService {
         papManager.add(pap);
         log.info("Added PAP: " + pap.toString());
     }
+
+    public boolean exists(String papId) throws RemoteException {
+    	log.info("Received request exists for papId=" + papId);
+    	boolean result = papManager.exists(papId);
+    	log.info("Sent papId=" + papId + " exists: " + result);
+    	return result;
+	}
 
     public PAP getTrustedPAP(String papId) throws RemoteException {
         PAP pap = papManager.get(papId);
@@ -35,12 +43,18 @@ public class PAPManagementServiceImpl implements PAPManagementService {
         return "PAP v0.1";
     }
 
-    public void removeTrustedPAP(String papId) throws RemoteException {
-        PAP pap = papManager.delete(papId);
-        log.info("Removed PAP: " + pap.toString());
+    public void removeTrustedPAP(String papId) throws NotFoundException, RemoteException {
+    	log.info("Requested to remove pap: " + papId);
+    	
+    	try {
+    		PAP pap = papManager.delete(papId);
+    		log.info("Removed PAP: " + pap.toString());
+    	} catch (NotFoundException e) {
+    		throw new RemoteException(e.getMessage(), e);
+    	}
     }
 
-    public void updateTrustedPAP(String papId, PAP pap) throws RemoteException {
+	public void updateTrustedPAP(String papId, PAP pap) throws RemoteException {
         papManager.update(papId, pap);
         log.info("Updated PAP: " + pap.toString());
     }

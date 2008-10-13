@@ -166,6 +166,11 @@
            <parameter qname="papmgmt:addTrustedPAP_pap" type="papns:PAP"/>
       </operation>
       
+      <operation name="exists" qname="papmgmt:exists"
+                 returnQName="papmgmt:existsResponse" returnType="tns:boolean">
+           <parameter qname="papmgmt:exists_papId" type="tns:string"/>
+      </operation>
+      
       <operation name="getTrustedPAP" qname="papmgmt:getTrustedPAP"
                  returnQName="papmgmt:getTrustedPAPResponse" returnType="papns:PAP">
            <parameter qname="papmgmt:getTrustedPAP_papId" type="tns:string"/>

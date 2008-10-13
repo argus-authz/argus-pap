@@ -5,14 +5,14 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.repository.PAPContainer;
-import org.glite.authz.pap.repository.RepositoryManager;
-import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PAPManagerImpl extends PAPManager {
-    
-    private PAPDAO papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
+	
+	private static final Logger log = LoggerFactory.getLogger(PAPManagerImpl.class);
     
     @Override
     public PAPContainer add(PAP pap) {
@@ -28,10 +28,11 @@ public class PAPManagerImpl extends PAPManager {
     }
 
     @Override
-    public PAP delete(String papId) {
+    public PAP delete(String papId) throws NotFoundException {
         PAP pap = get(papId);
         papList.remove(pap);
-        getContainer(papId).erasePAP();
+        PAPContainer papContainer = new PAPContainer(pap);
+        papContainer.erasePAP();
         return pap;
     }
 
@@ -45,13 +46,16 @@ public class PAPManagerImpl extends PAPManager {
     }
 
     @Override
-    public PAP get(String papId) {
+    public PAP get(String papId) throws NotFoundException {
         
         for (PAP pap : papList) {
-            if (pap.getPapId().equals(papId))
-                return pap;
+            if (pap.getPapId().equals(papId)) {
+            	log.debug("Found PAP: " + papId);
+            	return pap;
+            }
         }
         
+        log.debug("Requested PAP not found:" + papId);
         throw new NotFoundException("PAP not found: " + papId);
     }
 

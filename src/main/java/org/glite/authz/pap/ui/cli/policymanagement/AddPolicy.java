@@ -19,7 +19,7 @@ public class AddPolicy extends PolicyManagementCLI {
 
     private static final String USAGE = "<file> [[file] ...]";
     private static final String[] commandNameValues = { "add-policy", "ap" };
-    private static final String DESCRIPTION = "Add policies defined by <file>";
+    private static final String DESCRIPTION = "Add policies defined in <file>";
     
     public AddPolicy() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
@@ -58,14 +58,21 @@ public class AddPolicy extends PolicyManagementCLI {
         
         List<XACMLObject> policyList = policyFileEncoder.parse(file);
         
+        policyFileEncoder = null;
+        file = null;
+        
+        System.out.println("Adding policies: " + policyList.size());
+        int idx=0;
         for (XACMLObject xacmlObject:policyList) {
             
+        	System.out.println("idx:" + ++idx);
+        	
             if (xacmlObject instanceof PolicySetType)
                 continue;
             
             PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
 
-            System.out.println("Adding policy:");
+            System.out.println("Adding policy:" + idx);
             System.out.println(pw.toFormattedString());
             
             addPolicy(pw);

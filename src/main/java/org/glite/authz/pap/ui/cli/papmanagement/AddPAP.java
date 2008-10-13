@@ -43,11 +43,16 @@ public class AddPAP extends PAPManagementCLI {
             System.out.println(("PUBLIC"));
 
         String alias = args[1];
-        String dn = args[2];
-        String endpoint = args[3];
+        String endpoint = args[2];
+        String dn = args[3];
 
         PAP pap = new PAP(alias, endpoint, dn);
 
+        if (papMgmtClient.exists(pap.getPapId())) {
+        	System.out.println("PAP already exists.");
+        	return true;
+        }
+        
         papMgmtClient.addTrustedPAP(pap);
 
         return true;

@@ -21,9 +21,9 @@ public abstract class ServiceCLI {
     private static final String OPT_CERT = "cert";
     private static final String OPT_KEY = "key";
     private static final String OPT_PASSWORD = "password";
-    private static final String DEFAULT_SERVICE_URL = "https://localhost:8443/pap/services/";
     private static final HelpFormatter helpFormatter = new HelpFormatter();
 
+    protected static final String DEFAULT_SERVICE_URL = "https://localhost:8443/pap/services/";
     protected static final String LOPT_PUBLIC = "public";
     protected static final String LOPT_PRIVATE = "private";
     protected static final String OPT_HELP = "h";
@@ -45,6 +45,8 @@ public abstract class ServiceCLI {
 
         ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
         serviceClient = serviceClientFactory.createServiceClient();
+        
+        helpFormatter.setWidth(100);
 
         this.commandNameValues = commandNameValues;
         this.usageText = usage;
@@ -58,13 +60,13 @@ public abstract class ServiceCLI {
         commandOptions.addOption(OPT_HELP, LOPT_HELP, false, "Print this message");
 
         globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("url").withDescription(
-                "Specifies the target PAP endpoint to be contacted.").create(OPT_URL));
+                "Specifies the target PAP endpoint (default: " + DEFAULT_SERVICE_URL + ").").create(OPT_URL));
         globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("cert").withDescription(
                 "Specifies non-standard user certificate.").create(OPT_CERT));
         globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("key").withDescription(
                 "Specifies non-standard user private key.").create(OPT_KEY));
         globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("password").withDescription(
-                "Specifies a password that is used to decrypt the user's private key.").create(
+                "Specifies the password used to decrypt the user's private key.").create(
                 OPT_PASSWORD));
 
         Collection<Option> optionsList = commandOptions.getOptions();

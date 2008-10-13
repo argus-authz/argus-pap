@@ -15,7 +15,7 @@ public class ListPolicies extends PolicyManagementCLI {
 
     private static final String LOPT_SHOW_XACML = "show-xacml";
 
-    private static final String USAGE = "<alias> <endpoint> <dn> [options]";
+    private static final String USAGE = "[options]";
     private static final String[] commandNameValues = { "list-policies", "lp" };
     private static final String DESCRIPTION = "List policies authored by the PAP";
 
@@ -53,6 +53,12 @@ public class ListPolicies extends PolicyManagementCLI {
         initOpenSAML();
 
         List<PolicyType> policyList = policyMgmtClient.listPolicies();
+        
+        if (policyList.isEmpty()) {
+        	System.out.println("No policies found.");
+        	return true;
+        }
+        	
 
         for (PolicyType policy : policyList) {
             PolicyWizard pw = new PolicyWizard(policy);

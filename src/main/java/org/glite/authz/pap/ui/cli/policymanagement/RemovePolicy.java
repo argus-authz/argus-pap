@@ -5,15 +5,15 @@ import java.rmi.RemoteException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.glite.authz.pap.ui.cli.CLIException;
+import org.glite.authz.pap.ui.wizard.PolicyWizard;
+import org.opensaml.xacml.policy.PolicyType;
 
 public class RemovePolicy extends PolicyManagementCLI {
     
-    private static final String USAGE = "<file> [[file] ...]";
+    private static final String USAGE = "<policyId> [[policyId] ...]";
     private static final String[] commandNameValues = { "remove-policy", "rp" };
-    private static final String DESCRIPTION = "Add policies defined by <file>";
+    private static final String DESCRIPTION = "Remove policies.";
 
     public RemovePolicy() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
@@ -26,22 +26,35 @@ public class RemovePolicy extends PolicyManagementCLI {
         String[] args = commandLine.getArgs();
         
         if (args.length < 2)
-            throw new ParseException("Missing policyId");
+            throw new ParseException("Missing argument <policyId>");
         
-        for (int i=1; i<args.length; i++) {
-            String policyId = args[i];
-            System.out.print("Removing policy '" + policyId + "'... ");
-            
-            try {
-                //policyMgmtClient.removePolicy(policyId);
-                System.out.print(policyMgmtClient.hasPolicy(policyId));
-                System.out.println("... success.");
-            } catch (NotFoundException e) {
-                System.out.println("NOT FOUND!");
-            } catch (RepositoryException e) {
-                System.out.println("ERROR: " + e.getMessage());
-            }
+        initOpenSAML();
+        
+        try {
+        	
+	        for (int i=1; i<args.length; i++) {
+	            String policyId = args[i];
+	            System.out.print("Removing policy \"" + policyId + "\"... ");
+	            
+	            if (!policyMgmtClient.hasPolicy(policyId)) {
+	            	System.out.println("NOT FOUND.");
+	            	continue;
+	            }
+	            
+	            PolicyType policy = policyMgmtClient.getPolicy(policyId);
+	            
+	            PolicyWizard policyWizard = new PolicyWizard(policy);
+	            
+	            removePolicy(policyWizard);
+	            
+	            System.out.println("ok.");
+	        }
+        } catch (RemoteException e) {
+        	System.out.println("ERROR.");
+        	e.printStackTrace();
+        	throw e;
         }
+        
         return true;
     }
 
