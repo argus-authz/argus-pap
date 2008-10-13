@@ -111,8 +111,10 @@ public class PolicyWizard {
     }
 
     public boolean isBlacklistPolicy() {
+    	
         if (policyWizardType.equals(PolicyWizardType.BLACKLIST))
             return true;
+        
         return false;
     }
 
@@ -133,8 +135,10 @@ public class PolicyWizard {
     }
 
     public boolean isServiceClassPolicy() {
+    	
         if (policyWizardType.equals(PolicyWizardType.SERVICECLASS))
             return true;
+        
         return false;
     }
 
@@ -173,6 +177,56 @@ public class PolicyWizard {
 
             for (int i = 1; i < andList.size(); i++) {
                 formattedString += "           " + andList.get(i).toFormattedString() + "\n";
+            }
+        }
+
+        return formattedString;
+    }
+    
+    public String toNormalizedFormattedString(int indent) {
+    	int firstPadding = 4;
+    	
+    	String firstLevelIndentString = fillwithSpaces(indent);
+
+        String formattedString = firstLevelIndentString + "id=" + policy.getPolicyId() + "\n";
+        
+        String secondLevelIndent = fillwithSpaces(indent + firstPadding);
+
+        String effectString;
+        
+        if (EffectType.Deny.equals(policy.getRules().get(0).getEffect()))
+        	effectString = "deny ";
+        else
+            effectString = "allow ";
+
+        String thirdLevelIndent = fillwithSpaces(indent + firstPadding + effectString.length());
+        formattedString += secondLevelIndent + effectString;
+
+        for (int i = 0; i < targetAttributeWizardList.size(); i++) {
+        	
+        	AttributeWizard attributeWizard = targetAttributeWizardList.get(i);
+        	
+        	if ((!AttributeWizardType.RESOURCE_URI.equals(attributeWizard.getAttributeWizardType())
+        			&& (!AttributeWizardType.SERVICE_CLASS.equals(attributeWizard)))) {
+
+        		if (i > 0)
+            		formattedString += thirdLevelIndent;
+        		
+        		formattedString += targetAttributeWizardList.get(i).toFormattedString() + "\n";
+        		
+        	}
+        }
+        
+        thirdLevelIndent = fillwithSpaces(indent + firstPadding + "except".length() + 1);
+
+        for (List<AttributeWizard> andList : orExceptionsAttributeWizardList) {
+            if (andList.isEmpty())
+                continue;
+
+            formattedString += secondLevelIndent + "except " + andList.get(0).toFormattedString() + "\n";
+
+            for (int i = 1; i < andList.size(); i++) {
+                formattedString += thirdLevelIndent + andList.get(i).toFormattedString() + "\n";
             }
         }
 
@@ -235,6 +289,15 @@ public class PolicyWizard {
         
         policyIdUniqueNumber = idComponents[2];
                 
+    }
+    
+    private String fillwithSpaces(int n) {
+    	String s = "";
+    	
+    	for (int i=0; i<n; i++)
+    		s += " ";
+    	
+    	return s;
     }
 
 }

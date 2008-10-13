@@ -61,18 +61,13 @@ public class AddPolicy extends PolicyManagementCLI {
         policyFileEncoder = null;
         file = null;
         
-        System.out.println("Adding policies: " + policyList.size());
-        int idx=0;
         for (XACMLObject xacmlObject:policyList) {
             
-        	System.out.println("idx:" + ++idx);
-        	
             if (xacmlObject instanceof PolicySetType)
                 continue;
             
             PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
 
-            System.out.println("Adding policy:" + idx);
             System.out.println(pw.toFormattedString());
             
             addPolicy(pw);

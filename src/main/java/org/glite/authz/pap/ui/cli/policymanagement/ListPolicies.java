@@ -8,6 +8,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
+import org.glite.authz.pap.ui.wizard.LocalPolicySetWizard;
 import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.opensaml.xacml.policy.PolicyType;
 
@@ -60,8 +61,15 @@ public class ListPolicies extends PolicyManagementCLI {
         }
         	
 
+        LocalPolicySetWizard localPolicySetWizard = new LocalPolicySetWizard();
+        
         for (PolicyType policy : policyList) {
+        	
             PolicyWizard pw = new PolicyWizard(policy);
+            
+            localPolicySetWizard.addPolicy(pw);
+            
+            
             if (showPrivate == pw.isPrivate()) {
                 if (xacmlOutput)
                     System.out.println(XMLObjectHelper.toString(pw.getPolicyType()));
@@ -69,6 +77,10 @@ public class ListPolicies extends PolicyManagementCLI {
                     System.out.println(pw.toFormattedString());
             }
         }
+        System.out.println("*******************************************************");
+        localPolicySetWizard.printFormattedBlacklistPolicies(System.out);
+        
+        localPolicySetWizard.printFormattedServiceClassPolicies(System.out);
 
         return true;
     }
