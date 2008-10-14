@@ -24,19 +24,18 @@ public class ListPAPs extends PAPManagementCLI {
     }
 
     @Override
-    protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         
         List<PAP> papList = papMgmtClient.listTrustedPAPs();
         
         if (papList.isEmpty()) {
         	System.out.println("No remote PAPs found.");
-        	return true;
+        	return;
         }
         	
         for (PAP pap:papList) {
             System.out.println(pap.toFormattedString());
         }
         
-        return true;
     }
 }

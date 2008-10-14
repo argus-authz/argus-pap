@@ -19,6 +19,7 @@ import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
 import org.glite.authz.pap.ui.cli.policymanagement.AddPolicy;
 import org.glite.authz.pap.ui.cli.policymanagement.BanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.JobPriority;
+import org.glite.authz.pap.ui.cli.policymanagement.ListPAPPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.RemovePolicy;
 
@@ -33,7 +34,6 @@ public class PAPCLI {
     protected static final HelpFormatter helpFormatter = new HelpFormatter();
 
     public static void main(String[] args) {
-        
         new PAPCLI(args);
     }
 
@@ -47,6 +47,7 @@ public class PAPCLI {
         serviceCLIList.add(new AddPolicy());
         serviceCLIList.add(new RemovePolicy());
         serviceCLIList.add(new ListPolicies());
+        serviceCLIList.add(new ListPAPPolicies());
 
         // PAP Management
         serviceCLIList.add(new Ping());
@@ -155,7 +156,8 @@ public class PAPCLI {
             while (serviceCLIIterator.hasNext()) {
                 serviceCLI = serviceCLIIterator.next();
                 if (serviceCLI.commandMatch(command)) {
-                    commandFound = serviceCLI.execute(args);
+                    serviceCLI.execute(args);
+                    commandFound = true;
                     break;
                 }
             }

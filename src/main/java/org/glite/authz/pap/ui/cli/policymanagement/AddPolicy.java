@@ -26,7 +26,7 @@ public class AddPolicy extends PolicyManagementCLI {
     }
 
     @Override
-    protected boolean executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
+    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
         String[] args = commandLine.getArgs();
         
         if (args.length < 2)
@@ -43,7 +43,6 @@ public class AddPolicy extends PolicyManagementCLI {
         }
         
         System.out.println("SUCCESS: policies has been added.");
-        return true;
     }
     
     private void addPolicy(String fileName) throws EncodingException, ParseException, RemoteException {

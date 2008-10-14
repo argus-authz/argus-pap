@@ -33,7 +33,7 @@ public class AddPAP extends PAPManagementCLI {
     }
 
     @Override
-    protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
         if (args.length != 4)
@@ -50,12 +50,11 @@ public class AddPAP extends PAPManagementCLI {
 
         if (papMgmtClient.exists(pap.getPapId())) {
         	System.out.println("PAP already exists.");
-        	return true;
+        	return;
         }
         
         papMgmtClient.addTrustedPAP(pap);
 
-        return true;
     }
 
 }

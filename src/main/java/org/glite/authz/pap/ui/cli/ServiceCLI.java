@@ -88,7 +88,7 @@ public abstract class ServiceCLI {
         return false;
     }
 
-    public boolean execute(String[] args) throws ParseException, HelpMessageException, RemoteException {
+    public void execute(String[] args) throws ParseException, HelpMessageException, RemoteException {
 
         CommandLine commandLine = parser.parse(options, args);
 
@@ -108,7 +108,7 @@ public abstract class ServiceCLI {
         if (commandLine.hasOption(OPT_PASSWORD))
             serviceClient.setClientPrivateKeyPassword(OPT_PASSWORD);
 
-        return executeCommandService(commandLine, serviceClient);
+        executeCommandService(commandLine, serviceClient);
 
     }
 
@@ -150,7 +150,7 @@ public abstract class ServiceCLI {
 
     protected abstract Options defineCommandOptions();
 
-    protected abstract boolean executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
+    protected abstract void executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
             throws CLIException, ParseException, RemoteException;
 
 }

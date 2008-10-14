@@ -20,16 +20,16 @@ public abstract class PAPManagementCLI extends ServiceCLI {
     protected PAPManagementService papMgmtClient;
 
     @Override
-    public boolean executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
+    public void executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
             throws CLIException, ParseException, RemoteException {
 
         papMgmtClient = serviceClient.getPAPManagementService(serviceClient.getTargetEndpoint()
                 + SERVICE_NAME);
 
-        return executeCommand(commandLine);
+        executeCommand(commandLine);
     }
 
-    protected abstract boolean executeCommand(CommandLine commandLine) throws CLIException,
+    protected abstract void executeCommand(CommandLine commandLine) throws CLIException,
             ParseException, RemoteException;
 
 }

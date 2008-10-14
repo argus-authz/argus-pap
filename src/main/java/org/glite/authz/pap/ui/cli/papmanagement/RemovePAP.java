@@ -22,7 +22,7 @@ public class RemovePAP extends PAPManagementCLI {
     }
 
     @Override
-    protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
         if (args.length != 2)
@@ -32,12 +32,11 @@ public class RemovePAP extends PAPManagementCLI {
 
         if (!papMgmtClient.exists(papId)) {
         	System.out.println("PAP not found: " + papId);
-        	return true;
+        	return;
         }
         
         papMgmtClient.removeTrustedPAP(papId);
         
-        return true;
     }
 
 }

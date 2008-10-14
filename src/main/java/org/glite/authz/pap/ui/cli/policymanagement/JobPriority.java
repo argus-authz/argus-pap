@@ -54,7 +54,7 @@ public class JobPriority extends PolicyManagementCLI {
     }
 
     @Override
-    protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
         if (args.length != 3)
@@ -79,8 +79,6 @@ public class JobPriority extends PolicyManagementCLI {
         addPolicy(pw);
 
         System.out.println("SUCCESS: policy has been added.");
-
-        return true;
     }
 
 }

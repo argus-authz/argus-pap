@@ -20,7 +20,7 @@ public class RemovePolicy extends PolicyManagementCLI {
     }
 
     @Override
-    protected boolean executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException,
             RemoteException {
         
         String[] args = commandLine.getArgs();
@@ -54,13 +54,10 @@ public class RemovePolicy extends PolicyManagementCLI {
         	e.printStackTrace();
         	throw e;
         }
-        
-        return true;
     }
 
     @Override
     protected Options defineCommandOptions() {
-        // TODO Auto-generated method stub
         return null;
     }
 

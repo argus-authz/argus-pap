@@ -14,8 +14,6 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class ListPolicies extends PolicyManagementCLI {
 
-    private static final String LOPT_SHOW_XACML = "show-xacml";
-
     private static final String USAGE = "[options]";
     private static final String[] commandNameValues = { "list-policies", "lp" };
     private static final String DESCRIPTION = "List policies authored by the PAP";
@@ -34,14 +32,14 @@ public class ListPolicies extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(false).withDescription(
                 "Set the policy as private (it won't be distributed)").withLongOpt(LOPT_PRIVATE)
                 .create());
-        options.addOption(OptionBuilder.hasArg(false).withDescription("XACML ").withLongOpt(
+        options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_XACML_DESCRIPTION).withLongOpt(
                 LOPT_SHOW_XACML).create());
 
         return options;
     }
 
     @Override
-    protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         boolean showPrivate = false;
         boolean xacmlOutput = false;
 
@@ -57,7 +55,7 @@ public class ListPolicies extends PolicyManagementCLI {
         
         if (policyList.isEmpty()) {
         	System.out.println("No policies found.");
-        	return true;
+        	return;
         }
         	
 
@@ -82,7 +80,6 @@ public class ListPolicies extends PolicyManagementCLI {
         
         localPolicySetWizard.printFormattedServiceClassPolicies(System.out);
 
-        return true;
     }
 
 }
