@@ -75,6 +75,10 @@ public class PAPPermission {
 	return PAPPermission.fromString("ALL");
     }
 
+    public static PAPPermission getEmptyPermission(){
+        
+        return new PAPPermission();
+    }
     public static PAPPermission of(PermissionFlags p) {
 
 	PAPPermission papPerm = new PAPPermission();

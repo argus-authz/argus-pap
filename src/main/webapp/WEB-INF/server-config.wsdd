@@ -193,6 +193,74 @@
       />
       
    </service>
+   
+   <service name="AuthorizationManagementService" provider="java:RPC" style="rpc" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://org.glite.authz/wsdl/pap/services/authz_management"/>
+      <parameter name="wsdlServiceElement" value="PAPAuthorizationManagement"/>
+      <parameter name="schemaUnqualified" value="http://org.glite.authz/wsdl/pap/services/authz_management"/>
+      <parameter name="wsdlServicePort" value="PAPAuthorizationManagementSOAP"/>
+      <parameter name="className" value="org.glite.authz.pap.services.authz_management.PAPAuthzManagementService"/>
+      <parameter name="wsdlPortType" value="PAPAuthorizationManagement"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <parameter name="allowedMethods" value="addACE, removeACE, setACL, getACL"/>
+
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPException"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPACEType"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACEType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPACEListType"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACEListType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPPermission"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPPermission"
+        serializer="org.apache.axis.encoding.ser.SimpleSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.SimpleDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPAdminType"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAdminType"
+        serializer="org.apache.axis.encoding.ser.EnumSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.EnumDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPPermissionList"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPPermissionList"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPPrincipalType"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPPrincipalType"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+  </service>
   
   <handler
     name="URLMapper"
