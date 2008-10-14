@@ -34,7 +34,7 @@
                       
             <xsd:complexType name="PAPACEList">
                 <xsd:sequence>
-                    <xsd:element minOccurs="0" maxOccurs="unbounded" type="tns:PAPACE"/>
+                    <xsd:element minOccurs="0" maxOccurs="unbounded" type="tns:PAPACE" name="item"/>
                 </xsd:sequence>
             </xsd:complexType> 
             
@@ -108,13 +108,6 @@
     </wsdl:message>
     <wsdl:message
         name="addACEResponse">
-    </wsdl:message>
-    <wsdl:message
-        name="setACL_faultMsg">
-        <wsdl:part
-            name="papException"
-            type="tns:PAPException">
-        </wsdl:part>
     </wsdl:message>
     
     <wsdl:message
