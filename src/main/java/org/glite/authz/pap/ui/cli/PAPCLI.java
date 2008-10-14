@@ -15,6 +15,7 @@ import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.ui.cli.papmanagement.AddPAP;
 import org.glite.authz.pap.ui.cli.papmanagement.ListPAPs;
 import org.glite.authz.pap.ui.cli.papmanagement.Ping;
+import org.glite.authz.pap.ui.cli.papmanagement.RefreshCache;
 import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
 import org.glite.authz.pap.ui.cli.policymanagement.AddPolicy;
 import org.glite.authz.pap.ui.cli.policymanagement.BanAttribute;
@@ -54,6 +55,7 @@ public class PAPCLI {
         serviceCLIList.add(new AddPAP());
         serviceCLIList.add(new RemovePAP());
         serviceCLIList.add(new ListPAPs());
+        serviceCLIList.add(new RefreshCache());
 
     }
 

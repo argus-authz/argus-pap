@@ -13,10 +13,12 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
 
-    private static DistributionModule instance = new DistributionModule();
+    private static DistributionModule instance = null;
     private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
 
     public static DistributionModule getInstance() {
+    	if (instance == null)
+    		instance= new DistributionModule();
         return instance;
     }
 
@@ -69,7 +71,6 @@ public class DistributionModule extends Thread {
                     log.error("Invalid object (not a Policy or PolicySet) received from PAP: "
                             + pap.getDn());
                 }
-
             }
         } else {
             log.error("Not a PolicySet the root of the policy tree received from PAP: " + pap.getDn());
