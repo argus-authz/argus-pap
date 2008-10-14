@@ -13,21 +13,14 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
 
-    private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
     private static DistributionModule instance = new DistributionModule();
+    private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
 
     public static DistributionModule getInstance() {
         return instance;
     }
 
-    private List<PAP> remotePAPList;
-    private long sleepTime;
-
-    private DistributionModule() {
-        initialize();
-    }
-
-    public List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
+    public static List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
 
         List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 
@@ -38,40 +31,12 @@ public class DistributionModule extends Thread {
 
         return papPolicies;
     }
-
-    public void run() {
-
-        try {
-            while (!this.isInterrupted()) {
-                for (PAP pap : remotePAPList) {
-
-                    if (this.isInterrupted())
-                        break;
-
-                    List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
-                    storePAPPolicies(pap, papPolicies);
-                }
-                sleep(sleepTime);
-            }
-        } catch (InterruptedException e) {
-        }
+    public static void refreshCache(PAP pap) {
+    	List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
+        storePAPPolicies(pap, papPolicies);
     }
 
-    public void startDistributionModule() {
-        this.start();
-    }
-
-    public void stopDistributionModule() {
-
-        log.info("Shutting down distribution module...");
-        this.interrupt();
-
-        while (this.isAlive());
-
-        log.info("Distribution module stopped");
-    }
-
-    private void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
+    private static synchronized void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
 
         if (papPolicies.isEmpty()) {
             log.debug("Empty list retrieved from PAP: " + pap.getDn());
@@ -109,6 +74,46 @@ public class DistributionModule extends Thread {
         } else {
             log.error("Not a PolicySet the root of the policy tree received from PAP: " + pap.getDn());
         }
+    }
+
+    private List<PAP> remotePAPList;
+
+    private long sleepTime;
+
+    private DistributionModule() {
+        initialize();
+    }
+
+    public void run() {
+
+        try {
+            while (!this.isInterrupted()) {
+                for (PAP pap : remotePAPList) {
+
+                    if (this.isInterrupted())
+                        break;
+
+                    refreshCache(pap);
+                    
+                }
+                sleep(sleepTime);
+            }
+        } catch (InterruptedException e) {
+        }
+    }
+    
+    public void startDistributionModule() {
+        this.start();
+    }
+
+    public void stopDistributionModule() {
+
+        log.info("Shutting down distribution module...");
+        this.interrupt();
+
+        while (this.isAlive());
+
+        log.info("Distribution module stopped");
     }
 
     protected void initialize() {

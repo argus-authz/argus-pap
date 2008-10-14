@@ -18,9 +18,9 @@ import org.glite.authz.pap.papmanagement.PAPManagementService;
 
 public class PAPManagementServiceClientImpl implements PAPManagementService {
     
+    private static final BeanDeserializerFactory deserializerFactory;
     private static final QName PAP_QNAME;
     private static final BeanSerializerFactory serializerFactory;
-    private static final BeanDeserializerFactory deserializerFactory;
     static {
         PAP_QNAME = new QName("http://common.pap.authz.glite.org", "PAP");
         serializerFactory = new BeanSerializerFactory(PAP.class, PAP_QNAME);
@@ -40,23 +40,6 @@ public class PAPManagementServiceClientImpl implements PAPManagementService {
         call.registerTypeMapping(PAP.class, PAP_QNAME , serializerFactory, deserializerFactory);
         
         call.invoke(new Object[] { pap } );
-    }
-
-    private Call createCall(String operationName) {
-        Call call;
-        try {
-            call = (Call) service.createCall();
-        } catch (ServiceException e) {
-            throw new RuntimeException("Error", e);
-        }
-
-        call.setTargetEndpointAddress(serviceURL);
-        call.setOperationName(new QName("urn:org:glite:authz:pap:papmanagement", operationName));
-
-        call.setOperationStyle(Style.RPC);
-        call.setOperationUse(Use.LITERAL);
-        
-        return call;
     }
 
     public boolean exists(String papId) throws RemoteException {
@@ -97,6 +80,11 @@ public class PAPManagementServiceClientImpl implements PAPManagementService {
         return (String) call.invoke(new Object[] { } );
     }
 
+    public void refreshCache(String papId) throws RemoteException {
+    	Call call = createCall("refreshCache");
+        call.invoke(new Object[] { papId } );
+	}
+
     public void removeTrustedPAP(String papId) throws RemoteException {
         Call call = createCall("removeTrustedPAP");
         call.invoke(new Object[] { papId } );
@@ -110,6 +98,23 @@ public class PAPManagementServiceClientImpl implements PAPManagementService {
         Call call = createCall("updateTrustedPAP");
         call.registerTypeMapping(PAP.class, PAP_QNAME , serializerFactory, deserializerFactory);
         call.invoke(new Object[] { papId, newpap } );
+    }
+
+	private Call createCall(String operationName) {
+        Call call;
+        try {
+            call = (Call) service.createCall();
+        } catch (ServiceException e) {
+            throw new RuntimeException("Error", e);
+        }
+
+        call.setTargetEndpointAddress(serviceURL);
+        call.setOperationName(new QName("urn:org:glite:authz:pap:papmanagement", operationName));
+
+        call.setOperationStyle(Style.RPC);
+        call.setOperationUse(Use.LITERAL);
+        
+        return call;
     }
 
 }

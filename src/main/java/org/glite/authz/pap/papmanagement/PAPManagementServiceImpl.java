@@ -4,6 +4,7 @@ import java.rmi.RemoteException;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.slf4j.Logger;
@@ -35,15 +36,35 @@ public class PAPManagementServiceImpl implements PAPManagementService {
 
     public List<PAP> listTrustedPAPs() throws RemoteException {
         List<PAP> papList = papManager.getAll();
-        log.info("Sent list of PAPs");
+        log.info("Sending list of PAPs...");
         return papList;
     }
 
     public String ping() throws RemoteException {
+    	log.info("Requested ping()");
         return "PAP v0.1";
     }
 
-    public void removeTrustedPAP(String papId) throws NotFoundException, RemoteException {
+    public void refreshCache(String papId) throws RemoteException {
+    	log.info("Requested refreshCache for PAP: " + papId);
+    	
+    	PAPManager papManager = PAPManager.getInstance();
+    	
+    	PAP pap;
+    	
+    	try {
+    		pap = papManager.get(papId);
+    	} catch (NotFoundException e) {
+    		log.error("Unable to refresh cache, PAP not found: " + papId);
+    		throw e;
+    	}
+    	
+    	DistributionModule.refreshCache(pap);
+    	
+    	log.info("Cache for PAP \"" + papId + "\" has been refreshed");
+	}
+
+	public void removeTrustedPAP(String papId) throws NotFoundException, RemoteException {
     	log.info("Requested to remove pap: " + papId);
     	
     	try {

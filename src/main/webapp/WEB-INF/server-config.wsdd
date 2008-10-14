@@ -184,6 +184,10 @@
                  returnQName="papmgmt:pingResponse" returnType="tns:string">
       </operation>
       
+      <operation name="refreshCache" qname="papmgmt:refreshCache">
+           <parameter qname="papmgmt:refreshCache_papId" type="tns:string"/>
+      </operation>
+      
       <operation name="removeTrustedPAP" qname="papmgmt:removeTrustedPAP">
            <parameter qname="papmgmt:removeTrustedPAP_papId" type="tns:string"/>
       </operation>

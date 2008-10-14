@@ -16,6 +16,8 @@ public interface PAPManagementService {
     
     public abstract String ping() throws java.rmi.RemoteException;
     
+    public abstract void refreshCache(String papId) throws java.rmi.RemoteException;
+    
     public abstract void removeTrustedPAP(String papId) throws java.rmi.RemoteException;
     
     public abstract void updateTrustedPAP(String papId, PAP newpap) throws java.rmi.RemoteException;
