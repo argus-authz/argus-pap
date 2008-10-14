@@ -15,7 +15,8 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemPolicyDAO implements PolicyDAO {
 
-    private static final Logger log = LoggerFactory.getLogger(FileSystemPolicyDAO.class);
+    @SuppressWarnings("unused")
+	private static final Logger log = LoggerFactory.getLogger(FileSystemPolicyDAO.class);
     private static final PolicyHelper policyHelper = PolicyHelper.getInstance();
     private static final String policyFileNamePrefix = FileSystemRepositoryManager
             .getPolicyFileNamePrefix();
@@ -65,10 +66,6 @@ public class FileSystemPolicyDAO implements PolicyDAO {
     	String policyFilePath = FileSystemRepositoryManager.getPolicyAbsolutePath(papId, policyId);
     	
         File policyFile = new File(policyFilePath);
-        
-        boolean result = policyFile.exists();
-        
-        log.debug("File exists=" + result + ": " + policyFilePath);
         
         return policyFile.exists();
     }
