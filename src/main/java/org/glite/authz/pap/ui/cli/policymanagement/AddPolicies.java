@@ -15,13 +15,13 @@ import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 
-public class AddPolicy extends PolicyManagementCLI {
+public class AddPolicies extends PolicyManagementCLI {
 
     private static final String USAGE = "<file> [[file] ...]";
     private static final String[] commandNameValues = { "add-policy", "ap" };
     private static final String DESCRIPTION = "Add policies defined in <file>";
     
-    public AddPolicy() {
+    public AddPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 

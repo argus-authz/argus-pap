@@ -17,7 +17,7 @@ import org.glite.authz.pap.ui.cli.papmanagement.ListPAPs;
 import org.glite.authz.pap.ui.cli.papmanagement.Ping;
 import org.glite.authz.pap.ui.cli.papmanagement.RefreshCache;
 import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
-import org.glite.authz.pap.ui.cli.policymanagement.AddPolicy;
+import org.glite.authz.pap.ui.cli.policymanagement.AddPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.BanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.JobPriority;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPAPPolicies;
@@ -45,7 +45,7 @@ public class PAPCLI {
         serviceCLIList.add(BanAttribute.fqan());
         serviceCLIList.add(JobPriority.dn());
         serviceCLIList.add(JobPriority.fqan());
-        serviceCLIList.add(new AddPolicy());
+        serviceCLIList.add(new AddPolicies());
         serviceCLIList.add(new RemovePolicy());
         serviceCLIList.add(new ListPolicies());
         serviceCLIList.add(new ListPAPPolicies());
