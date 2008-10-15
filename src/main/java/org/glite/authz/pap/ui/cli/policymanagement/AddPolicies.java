@@ -66,6 +66,8 @@ public class AddPolicies extends PolicyManagementCLI {
                 continue;
             PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
             
+            pw.setPrivate(true);
+            
 //            policyTypeList.add(pw.getPolicyType());
 //            idPrefixList.add(pw.getPolicyIdPrefix());
 

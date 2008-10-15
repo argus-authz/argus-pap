@@ -17,6 +17,9 @@ public class PolicyWizard {
         BLACKLIST, SERVICECLASS
     }
 
+    private static final String DENY_KEYWORD = "deny";
+    private static final String ALLOW_KEYWORD = "allow";
+    private static final String EXCEPTY_KEYWORD = "except";
     private static final String BLACKLIST_POLICY_ID_PREFIX = "BlacklistPolicy";
     private static final String SERVICECLASS_POLICY_ID_PREFIX = "ServiceClassPolicy";
     private static final String VISIBILITY_PRIVATE_PREFIX = "PRIVATE";
@@ -151,56 +154,85 @@ public class PolicyWizard {
     }
 
     public String toFormattedString() {
+        return toFormattedString(0, 4);
+    }
+    
+    public String toFormattedString(int policyIndent, int attributeIndent) {
+        
+        String policyIndentString = fillwithSpaces(policyIndent);
 
-        String formattedString = "id=" + policy.getPolicyId() + "\n";
+        String formattedString = policyIndentString + "id=" + policy.getPolicyId() + "\n";
 
-        String identation;
-        if (EffectType.Deny.equals(policy.getRules().get(0).getEffect())) {
-            formattedString += "    deny ";
-            identation = "         ";
-        } else {
-            formattedString += "    allow ";
-            identation = "          ";
+        String effectIndentString = fillwithSpaces(policyIndent + attributeIndent);
+        
+        if (isPrivate())
+            formattedString += effectIndentString + "private\n";
+        
+        String effectString;
+        
+        if (EffectType.Deny.equals(policy.getRules().get(0).getEffect()))
+            effectString = DENY_KEYWORD + " ";
+        else
+            effectString = ALLOW_KEYWORD + " ";
+        
+        if (EffectType.Deny.equals(policy.getRules().get(0).getEffect()))
+            effectString = DENY_KEYWORD + " ";
+        else
+            effectString = ALLOW_KEYWORD + " ";
+
+        String attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + effectString.length());
+        formattedString += effectIndentString + effectString;
+        
+        
+        for (int i = 0 ; i < targetAttributeWizardList.size(); i++) {
+            
+            if (i > 0)
+                formattedString += attributeIndentString;
+            
+            formattedString += targetAttributeWizardList.get(i).toFormattedString() + "\n";
         }
-
-        formattedString += targetAttributeWizardList.get(0).toFormattedString() + "\n";
-
-        for (int i = 1; i < targetAttributeWizardList.size(); i++) {
-            formattedString += identation + targetAttributeWizardList.get(i).toFormattedString() + "\n";
-        }
+        
+        String exceptKeyString = EXCEPTY_KEYWORD + " ";
+        attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + exceptKeyString.length());
 
         for (List<AttributeWizard> andList : orExceptionsAttributeWizardList) {
             if (andList.isEmpty())
                 continue;
 
-            formattedString += "    except " + andList.get(0).toFormattedString() + "\n";
+            formattedString += effectIndentString + exceptKeyString + andList.get(0).toFormattedString() + "\n";
 
             for (int i = 1; i < andList.size(); i++) {
-                formattedString += "           " + andList.get(i).toFormattedString() + "\n";
+                formattedString += attributeIndentString + andList.get(i).toFormattedString() + "\n";
             }
         }
 
         return formattedString;
     }
     
-    public String toNormalizedFormattedString(int indent) {
-    	int firstPadding = 4;
+    public String toNormalizedFormattedString(int policyIndent) {
+        return toNormalizedFormattedString(policyIndent, 4);
+    }
+    
+    public String toNormalizedFormattedString(int policyIndent, int attributeIndent) {
     	
-    	String firstLevelIndentString = fillwithSpaces(indent);
+    	String policyIndentString = fillwithSpaces(policyIndent);
 
-        String formattedString = firstLevelIndentString + "id=" + policy.getPolicyId() + "\n";
+        String formattedString = policyIndentString + "id=" + policy.getPolicyId() + "\n";
         
-        String secondLevelIndent = fillwithSpaces(indent + firstPadding);
+        String effectIndentString = fillwithSpaces(policyIndent + attributeIndent);
+        
+        if (isPrivate())
+            formattedString += effectIndentString + "private\n";
 
         String effectString;
         
         if (EffectType.Deny.equals(policy.getRules().get(0).getEffect()))
-        	effectString = "deny ";
+        	effectString = DENY_KEYWORD + " ";
         else
-            effectString = "allow ";
+            effectString = ALLOW_KEYWORD + " ";
 
-        String thirdLevelIndent = fillwithSpaces(indent + firstPadding + effectString.length());
-        formattedString += secondLevelIndent + effectString;
+        String attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + effectString.length());
+        formattedString += effectIndentString + effectString;
 
         for (int i = 0; i < targetAttributeWizardList.size(); i++) {
         	
@@ -210,23 +242,24 @@ public class PolicyWizard {
         			&& (!AttributeWizardType.SERVICE_CLASS.equals(attributeWizard)))) {
 
         		if (i > 0)
-            		formattedString += thirdLevelIndent;
+            		formattedString += attributeIndentString;
         		
         		formattedString += targetAttributeWizardList.get(i).toFormattedString() + "\n";
         		
         	}
         }
         
-        thirdLevelIndent = fillwithSpaces(indent + firstPadding + "except".length() + 1);
+        String exceptKeyString = EXCEPTY_KEYWORD + " ";
+        attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + exceptKeyString.length());
 
         for (List<AttributeWizard> andList : orExceptionsAttributeWizardList) {
             if (andList.isEmpty())
                 continue;
 
-            formattedString += secondLevelIndent + "except " + andList.get(0).toFormattedString() + "\n";
+            formattedString += effectIndentString + exceptKeyString + andList.get(0).toFormattedString() + "\n";
 
             for (int i = 1; i < andList.size(); i++) {
-                formattedString += thirdLevelIndent + andList.get(i).toFormattedString() + "\n";
+                formattedString += attributeIndentString + andList.get(i).toFormattedString() + "\n";
             }
         }
 

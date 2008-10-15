@@ -17,7 +17,7 @@ public class ListPolicies extends PolicyManagementCLI {
     
     private static final String USAGE = "[options]";
     private static final String[] commandNameValues = { "list-policies", "lp" };
-    private static final String DESCRIPTION = "List policies authored by the PAP.";
+    private static final String DESCRIPTION = "List policies authored by the PAP."; 
     
     public ListPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

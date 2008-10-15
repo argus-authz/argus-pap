@@ -19,8 +19,8 @@ public class BanAttribute extends PolicyManagementCLI {
     private static String USAGE_FQAN = "<fqan> [options]";
     private static String[] COMMAND_NAME_VALUES_DN = { "ban-user", "bu" };
     private static String[] COMMAND_NAME_VALUES_FQAN = { "ban-fqan", "bf" };
-    private static String DESCRIPTION_DN = "Blacklist a DN.";
-    private static String DESCRIPTION_FQAN = "Blacklist a FQAN.";
+    private static String DESCRIPTION_DN = "Blacklist a DN on all the resources.";
+    private static String DESCRIPTION_FQAN = "Blacklist an FQAN on all the resources.";
 
     public static BanAttribute dn() {
         return new BanAttribute(COMMAND_NAME_VALUES_DN, USAGE_DN, DESCRIPTION_DN, null, AttributeWizardType.DN);
@@ -66,6 +66,7 @@ public class BanAttribute extends PolicyManagementCLI {
 
         List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
         targetList.add(new AttributeWizard(attributeToDeny, args[1]));
+        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_URI, "*"));
 
         initOpenSAML();
 
