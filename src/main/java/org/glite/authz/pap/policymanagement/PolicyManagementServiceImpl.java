@@ -1,6 +1,7 @@
 package org.glite.authz.pap.policymanagement;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
@@ -160,6 +161,24 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
         localPAP.deletePolicySet(policySetId);
     }
     
+    public List<String> storePolicies(List<String> idPrefixList, List<PolicyType> policyList)
+            throws RemoteException {
+        log.debug("Received request storePolicies()");
+
+        List<String> idList = new ArrayList<String>(policyList.size());
+        
+        for (String idPrefix:idPrefixList) {
+            log.info(idPrefix);
+        }
+        
+        for (PolicyType policy:policyList) {
+            log.info(policy.getPolicyId());
+            idList.add(policy.getPolicyId());
+        }
+        
+        return idList;
+    }
+    
     /* (non-Javadoc)
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#storePolicy(org.opensaml.xacml.policy.PolicyType)
      */
@@ -175,7 +194,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
         
         return policyId;
     }
-    
+
     /* (non-Javadoc)
      * @see org.glite.authz.pap.policymanagement.PolicyManagementService#storePolicySet(org.opensaml.xacml.policy.PolicySetType)
      */

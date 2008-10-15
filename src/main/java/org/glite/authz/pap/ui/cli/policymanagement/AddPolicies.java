@@ -17,9 +17,10 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class AddPolicies extends PolicyManagementCLI {
 
-    private static final String USAGE = "<file> [[file] ...]";
+    private static final String USAGE = "<file> [[file] ...] [options]";
     private static final String[] commandNameValues = { "add-policy", "ap" };
-    private static final String DESCRIPTION = "Add policies defined in <file>";
+    private static final String DESCRIPTION = "Add policies defined in the files.";
+    private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
     
     public AddPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
@@ -33,7 +34,9 @@ public class AddPolicies extends PolicyManagementCLI {
             throw new ParseException("No input files defined.");
         
         for (int i=1; i<args.length; i++) {
+            
             String fileName = args[i];
+            
             try {
                 addPolicy(fileName);
             } catch (EncodingException e) {
@@ -53,24 +56,25 @@ public class AddPolicies extends PolicyManagementCLI {
         
         initOpenSAML();
         
-        PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
-        
         List<XACMLObject> policyList = policyFileEncoder.parse(file);
         
-        policyFileEncoder = null;
-        file = null;
-        
+//        List<PolicyType> policyTypeList = new LinkedList<PolicyType>();
+//        List<String> idPrefixList = new LinkedList<String>();
         for (XACMLObject xacmlObject:policyList) {
             
             if (xacmlObject instanceof PolicySetType)
                 continue;
-            
             PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
+            
+//            policyTypeList.add(pw.getPolicyType());
+//            idPrefixList.add(pw.getPolicyIdPrefix());
 
             System.out.println(pw.toFormattedString());
             
             addPolicy(pw);
         }
+//        List<String> idList = policyMgmtClient.storePolicies(idPrefixList, policyTypeList);
+        
     }
 
     @Override
