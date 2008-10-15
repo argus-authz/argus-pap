@@ -25,9 +25,12 @@ import org.opensaml.xml.XMLConfigurator;
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
 	protected static final String LOPT_SHOW_XACML = "show-xacml";
-	protected static final String OPT_SHOW_XACML_DESCRIPTION = "Show policies in XACML";
+	protected static final String OPT_SHOW_XACML_DESCRIPTION = "XACML output.";
 	protected static final String LOPT_PLAIN_FORMAT = "plain-format";
-	protected static final String OPT_PLAIN_FORMAT_DESCRIPTION = "Do not group policies by \"resource_uri\" and \"service_class\"";
+	protected static final String OPT_PLAIN_FORMAT_DESCRIPTION = "Do not group policies by \"resource_uri\" and \"service_class\".";
+	
+	protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"
+        + LOPT_SHOW_XACML + ".";
 
 	protected static final String SERVICE_NAME = "PolicyManagementService";
 	protected PolicyManagementService policyMgmtClient;
