@@ -9,13 +9,13 @@ import org.glite.authz.pap.ui.cli.CLIException;
 import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.opensaml.xacml.policy.PolicyType;
 
-public class RemovePolicy extends PolicyManagementCLI {
+public class RemovePolicies extends PolicyManagementCLI {
     
     private static final String USAGE = "<policyId> [[policyId] ...]";
     private static final String[] commandNameValues = { "remove-policy", "rp" };
     private static final String DESCRIPTION = "Remove policies.";
 
-    public RemovePolicy() {
+    public RemovePolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 

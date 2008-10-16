@@ -27,15 +27,10 @@ public class Ping extends PAPManagementCLI {
 		if (args.length > 1)
 			throw new ParseException("Wrong number of arguments");
 		
-		for (int i=0; i<20; i++) {
-			System.out.println("Start pinging iter: " + i);
-			String papVersion = papMgmtClient.ping();
-			System.out.println("Done pinging iter: " + i);
-			
-			System.out.println("PAP successfully contacted: version=" + papVersion);
-		}
+		String papVersion = papMgmtClient.ping();
 		
-	}
+		System.out.println("PAP successfully contacted: version=" + papVersion);
+  	}
 
 	@Override
 	protected Options defineCommandOptions() {
