@@ -20,7 +20,8 @@ public class PAP {
     }
 
     public PAP(String alias, String endpoint, String dn, boolean isPublic) {
-        papId = dn.replace('/', '_').replace('@', '-');
+        //papId = dn.replace('/', '_').replace('@', '-');
+        papId = alias;
         
         this.dn = dn;
         
@@ -99,8 +100,7 @@ public class PAP {
     	String indentString = fillWithSpaces(indent);
     	String paddingString = fillWithSpaces(indent + padding);
     	
-    	String idString = indentString + "id=\"" + papId + "\"\n";
-    	String aliasString = paddingString + "alias=\"" + alias + "\"\n";
+    	String aliasString = indentString + "alias=\"" + alias + "\"\n";
     	String dnString = paddingString + "dn=\"" + dn + "\"\n";
     	String endpointString = paddingString + "endpoint=\"" + endpoint + "\"\n";
         String visibilityString = paddingString + "visibility=";
@@ -110,7 +110,7 @@ public class PAP {
             visibilityString += "PRIVATE\n";
         
         
-        return idString + aliasString + dnString + endpointString + visibilityString;
+        return aliasString + dnString + endpointString + visibilityString;
     }
     
     private String fillWithSpaces(int n) {

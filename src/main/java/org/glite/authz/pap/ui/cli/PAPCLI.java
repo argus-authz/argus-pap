@@ -173,8 +173,8 @@ public class PAPCLI {
         } catch (HelpMessageException e) {
             printCommandHelpAndExit(serviceCLI, 1);
         } catch (RemoteException e) {
-            System.err
-                    .println("Cannot conncet to: " + serviceCLI.getServiceClient().getTargetEndpoint());
+            System.out.println("Found problems trying to connect to: " + serviceCLI.getServiceClient().getTargetEndpoint());
+            System.out.println("Reason: " + e.getMessage());
         }
 
     }

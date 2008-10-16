@@ -10,6 +10,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
@@ -19,18 +20,23 @@ public abstract class ServiceCLI {
     
     private static final HelpFormatter helpFormatter = new HelpFormatter();
     private static final String LOPT_CERT = "cert";
+    private static final String LOPT_HOST = "host";
     private static final String LOPT_KEY = "key";
     private static final String LOPT_PASSWORD = "password";
     private static final String LOPT_URL = "url";
     private static final String OPT_CERT = "cert";
     private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
     private static final String OPT_KEY = "key";
+    private static final String OPT_HOST = "host";
+    private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). " +
+    		"This option defines the PAP endpoint to be contacted as follows: https://hostname:8443/pap/services";
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
     private static final String OPT_PASSWORD = "password";
     private static final String OPT_PASSWORD_DESCRIPTION = "Specifies the password used to decrypt the user's private key.";
     private static final String OPT_URL = "url";
     
-    protected static final String DEFAULT_SERVICE_URL = "https://localhost:8443/pap/services/";
+    protected static final String DEFAULT_HOST = "localhost";
+    protected static final String DEFAULT_SERVICE_URL = "https://%s:8443/pap/services/";
     protected static final String LOPT_HELP = "help";
     protected static final String LOPT_PRIVATE = "private";
     protected static final String LOPT_PUBLIC = "public";
@@ -66,10 +72,17 @@ public abstract class ServiceCLI {
             commandOptions = new Options();
         
         commandOptions.addOption(OPT_HELP, LOPT_HELP, false, OPT_HELP_DESCRIPTION);
+
+        OptionGroup mutuallyExclusiveOptions = new OptionGroup();
         
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
+        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
                 .withDescription("Specifies the target PAP endpoint (default: "
-                        + DEFAULT_SERVICE_URL + ").").create(OPT_URL));
+                        + String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST) + ").").create(OPT_URL));
+        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
+                .withDescription(OPT_HOST_DESCRIPTION).create(OPT_HOST));
+        
+        globalOptions.addOptionGroup(mutuallyExclusiveOptions);
+        
         globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_CERT)
                 .withDescription(OPT_CERT_DESCRIPTION).create(OPT_CERT));
         globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_KEY)
@@ -105,14 +118,19 @@ public abstract class ServiceCLI {
         
         if (commandLine.hasOption(OPT_URL))
             serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
+        else if (commandLine.hasOption(OPT_HOST))
+            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, commandLine.getOptionValue(OPT_HOST)));
         else
-            serviceClient.setTargetEndpoint(DEFAULT_SERVICE_URL);
+            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST));
+        
         if (commandLine.hasOption(OPT_CERT)) {
             serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
             System.out.println("Settato cert");
         }
+        
         if (commandLine.hasOption(OPT_KEY))
             serviceClient.setClientPrivateKey(OPT_KEY);
+        
         if (commandLine.hasOption(OPT_PASSWORD))
             serviceClient.setClientPrivateKeyPassword(OPT_PASSWORD);
         

@@ -68,15 +68,12 @@ public class BanAttribute extends PolicyManagementCLI {
         targetList.add(new AttributeWizard(attributeToDeny, args[1]));
         targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_URI, "*"));
 
-        System.out.print("init openSAML... ");
         initOpenSAML();
-        System.out.println("ok");
 
         PolicyWizard pw = new PolicyWizard(targetList, null, EffectType.Deny);
-        pw.setPrivate(isPrivate);
 
-        System.out.println("Adding policy:");
-        System.out.println(pw.toFormattedString());
+        System.out.print("Adding policy: ");
+        System.out.println(pw.toFormattedString(0, 15));
 
         addPolicy(pw);
 
