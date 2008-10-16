@@ -71,7 +71,8 @@ public class AddPolicies extends PolicyManagementCLI {
 //            policyTypeList.add(pw.getPolicyType());
 //            idPrefixList.add(pw.getPolicyIdPrefix());
 
-            System.out.println(pw.toFormattedString());
+            System.out.println("Adding policy: ");
+            System.out.println(pw.toFormattedString(15, 4));
             
             addPolicy(pw);
         }

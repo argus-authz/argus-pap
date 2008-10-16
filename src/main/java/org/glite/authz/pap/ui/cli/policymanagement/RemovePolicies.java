@@ -11,7 +11,7 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class RemovePolicies extends PolicyManagementCLI {
     
-    private static final String USAGE = "<policyId> [[policyId] ...]";
+    private static final String USAGE = "<policyId> [[policyId] ...] [options]";
     private static final String[] commandNameValues = { "remove-policy", "rp" };
     private static final String DESCRIPTION = "Remove policies.";
 

@@ -80,14 +80,14 @@
            <parameter qname="pm:storePolicy_idPrefix" type="tns:string"/>
            <parameter qname="pm:storePolicy_xacmlPolicy" type="xacml:PolicyType"/>
       </operation>
-
+<!--
       <operation name="storePolicies" qname="pm:storePolicies"
                  returnQName="pm:storePoliciesResponse" returnType="pm:ArrayOfString" returnItemType="tns:string"
                  soapAction="http://www.example.org/PolicyManagementService/storePolicies" >
            <parameter qname="pm:storePolicies_idPrefixList" type="pm:ArrayOfString" itemType="tns:string"/>
            <parameter qname="pm:storePolicies_xacmlPolicyList" type="pm:ArrayOf_xacml_PolicyType" itemType="xacml:PolicyType"/>
       </operation>
-      
+-->
       <operation name="storePolicySet" qname="pm:storePolicySet"
                  returnQName="pm:storePolicySetResponse" returnType="tns:string"
                  soapAction="http://www.example.org/PolicyManagementService/storePolicySet" >

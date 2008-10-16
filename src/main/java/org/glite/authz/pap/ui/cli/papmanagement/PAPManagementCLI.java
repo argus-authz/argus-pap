@@ -11,13 +11,13 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 
 public abstract class PAPManagementCLI extends ServiceCLI {
 
+    protected static final String SERVICE_NAME = "PAPManagementService";
+    protected PAPManagementService papMgmtClient;
+    
     public PAPManagementCLI(String[] commandNameValues, String usage, String description,
             String longDescription) {
         super(commandNameValues, usage, description, longDescription);
     }
-
-    protected static final String SERVICE_NAME = "PAPManagementService";
-    protected PAPManagementService papMgmtClient;
 
     @Override
     public void executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
