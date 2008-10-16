@@ -4,7 +4,7 @@ public class PAP {
     public static final String localPAPId = "Local";
 
     public static PAP makeLocalPAP() {
-        return new PAP("local_pap", "localhost", localPAPId);
+        return new PAP(localPAPId, "localhost", localPAPId);
     }
     
     private String papId = "";

@@ -73,7 +73,7 @@ public class BanAttribute extends PolicyManagementCLI {
         PolicyWizard pw = new PolicyWizard(targetList, null, EffectType.Deny);
 
         System.out.print("Adding policy: ");
-        System.out.println(pw.toFormattedString(0, 15));
+        System.out.println(pw.toFormattedString(0, 19));
 
         addPolicy(pw);
 
