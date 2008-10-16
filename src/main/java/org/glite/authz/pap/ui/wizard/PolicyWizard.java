@@ -239,7 +239,7 @@ public class PolicyWizard {
         	AttributeWizard attributeWizard = targetAttributeWizardList.get(i);
         	
         	if ((!AttributeWizardType.RESOURCE_URI.equals(attributeWizard.getAttributeWizardType())
-        			&& (!AttributeWizardType.SERVICE_CLASS.equals(attributeWizard)))) {
+        			&& (!AttributeWizardType.SERVICE_CLASS.equals(attributeWizard.getAttributeType())))) {
 
         		if (i > 0)
             		formattedString += attributeIndentString;
