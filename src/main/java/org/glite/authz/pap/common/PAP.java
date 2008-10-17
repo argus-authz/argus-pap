@@ -4,7 +4,7 @@ public class PAP {
     public static final String localPAPId = "Local";
 
     public static PAP makeLocalPAP() {
-        return new PAP("local_pap", "localhost", localPAPId);
+        return new PAP(localPAPId, "localhost", localPAPId);
     }
     
     private String papId = "";
@@ -20,7 +20,8 @@ public class PAP {
     }
 
     public PAP(String alias, String endpoint, String dn, boolean isPublic) {
-        papId = dn.replace('/', '_').replace('@', '-');
+        //papId = dn.replace('/', '_').replace('@', '-');
+        papId = alias;
         
         this.dn = dn;
         
@@ -84,6 +85,42 @@ public class PAP {
             visibility += "PRIVATE";
         
         return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
+    }
+    
+    public String toFormattedString() {
+    	return toFormattedString(0, 4);
+    }
+    
+    public String toFormattedString(int indent) {
+    	return toFormattedString(indent, 4);
+    }
+    
+    public String toFormattedString(int indent, int padding) {
+    	
+    	String indentString = fillWithSpaces(indent);
+    	String paddingString = fillWithSpaces(indent + padding);
+    	
+    	String aliasString = indentString + "alias=\"" + alias + "\"\n";
+    	String dnString = paddingString + "dn=\"" + dn + "\"\n";
+    	String endpointString = paddingString + "endpoint=\"" + endpoint + "\"\n";
+        String visibilityString = paddingString + "visibility=";
+        if (isPublic)
+            visibilityString += "PUBLIC\n";
+        else
+            visibilityString += "PRIVATE\n";
+        
+        
+        return aliasString + dnString + endpointString + visibilityString;
+    }
+    
+    private String fillWithSpaces(int n) {
+    	String s = "";
+    	
+    	for (int i=0; i<n; i++) {
+    		s += " ";
+    	}
+    	
+    	return s;
     }
 
 }

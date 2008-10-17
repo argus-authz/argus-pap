@@ -14,20 +14,15 @@ import org.slf4j.LoggerFactory;
 public class DistributionModule extends Thread {
 
     private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
-    private static DistributionModule instance = new DistributionModule();
+    private static DistributionModule instance = null;
 
     public static DistributionModule getInstance() {
+    	if (instance == null)
+    		instance= new DistributionModule();
         return instance;
     }
 
-    private List<PAP> remotePAPList;
-    private long sleepTime;
-
-    private DistributionModule() {
-        initialize();
-    }
-
-    public List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
+    public static List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
 
         List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 
@@ -38,43 +33,18 @@ public class DistributionModule extends Thread {
 
         return papPolicies;
     }
-
-    public void run() {
-
-        try {
-            while (!this.isInterrupted()) {
-                for (PAP pap : remotePAPList) {
-
-                    if (this.isInterrupted())
-                        break;
-
-                    List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
-                    storePAPPolicies(pap, papPolicies);
-                }
-                sleep(sleepTime);
-            }
-        } catch (InterruptedException e) {
-        }
+    
+    public static void refreshCache(PAP pap) {
+        log.info("Refreshing cache for pap: " + pap.getAlias() + "...");
+    	List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
+    	log.debug("Received " + papPolicies.size() + " XACML elemenst from PAP \"" + pap.getAlias() + "\"");
+        storePAPPolicies(pap, papPolicies);
     }
 
-    public void startDistributionModule() {
-        this.start();
-    }
-
-    public void stopDistributionModule() {
-
-        log.info("Shutting down distribution module...");
-        this.interrupt();
-
-        while (this.isAlive());
-
-        log.info("Distribution module stopped");
-    }
-
-    private void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
+    private static synchronized void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
 
         if (papPolicies.isEmpty()) {
-            log.debug("Empty list retrieved from PAP: " + pap.getDn());
+            log.debug("Empty list retrieved from PAP: " + pap.getAlias());
             return;
         }
 
@@ -104,29 +74,54 @@ public class DistributionModule extends Thread {
                     log.error("Invalid object (not a Policy or PolicySet) received from PAP: "
                             + pap.getDn());
                 }
-
             }
         } else {
             log.error("Not a PolicySet the root of the policy tree received from PAP: " + pap.getDn());
         }
     }
 
+    private long sleepTime;
+
+    private DistributionModule() {
+        initialize();
+    }
+
+    public void run() {
+
+        try {
+            while (!this.isInterrupted()) {
+                
+                for (PAP pap : PAPManager.getInstance().getAll()) {
+
+                    if (this.isInterrupted())
+                        break;
+
+                    refreshCache(pap);
+                    
+                }
+                sleep(sleepTime);
+            }
+        } catch (InterruptedException e) {
+        }
+    }
+    
+    public void startDistributionModule() {
+        this.start();
+    }
+
+    public void stopDistributionModule() {
+
+        log.info("Shutting down distribution module...");
+        this.interrupt();
+
+        while (this.isAlive());
+
+        log.info("Distribution module stopped");
+    }
+
     protected void initialize() {
         log.info("Initilizing distribution module...");
 
-        DistributionConfiguration configuration = DistributionConfiguration.getInstance();
-
-        sleepTime = configuration.getPollIntervallInMillis();
-        remotePAPList = configuration.getRemotePAPList();
-
-        // Create non-existing PAPs
-        PAPManager papManager = PAPManager.getInstance();
-        for (PAP pap : remotePAPList) {
-            if (!papManager.exists(pap.getPapId())) {
-                log.debug("Creating new PAP: " + pap.getPapId());
-                papManager.add(pap);
-            }
-        }
-
+        sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMillis();
     }
 }

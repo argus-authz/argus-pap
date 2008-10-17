@@ -62,13 +62,32 @@
            <parameter qname="pm:getPolicySet_PolicySetId" type="tns:string"/>
       </operation>
       
+      <operation name="hasPolicy" qname="pm:hasPolicy"
+                 returnQName="pm:hasPolicyResponse" returnType="tns:boolean"
+                 soapAction="http://www.example.org/PolicyManagementService/hasPolicy" >
+           <parameter qname="pm:hasPolicy_PolicyId" type="tns:string"/>
+      </operation>
+      
+      <operation name="hasPolicySet" qname="pm:hasPolicySet"
+                 returnQName="pm:hasPolicySetResponse" returnType="tns:boolean"
+                 soapAction="http://www.example.org/PolicyManagementService/hasPolicySet" >
+           <parameter qname="pm:hasPolicySet_PolicySetId" type="tns:string"/>
+      </operation>
+      
       <operation name="storePolicy" qname="pm:storePolicy"
                  returnQName="pm:storePolicyResponse" returnType="tns:string"
                  soapAction="http://www.example.org/PolicyManagementService/storePolicy" >
-           <parameter qname="pm:storePolicy_idPrefix" type="tns:String"/>
+           <parameter qname="pm:storePolicy_idPrefix" type="tns:string"/>
            <parameter qname="pm:storePolicy_xacmlPolicy" type="xacml:PolicyType"/>
       </operation>
-      
+<!--
+      <operation name="storePolicies" qname="pm:storePolicies"
+                 returnQName="pm:storePoliciesResponse" returnType="pm:ArrayOfString" returnItemType="tns:string"
+                 soapAction="http://www.example.org/PolicyManagementService/storePolicies" >
+           <parameter qname="pm:storePolicies_idPrefixList" type="pm:ArrayOfString" itemType="tns:string"/>
+           <parameter qname="pm:storePolicies_xacmlPolicyList" type="pm:ArrayOf_xacml_PolicyType" itemType="xacml:PolicyType"/>
+      </operation>
+-->
       <operation name="storePolicySet" qname="pm:storePolicySet"
                  returnQName="pm:storePolicySetResponse" returnType="tns:string"
                  soapAction="http://www.example.org/PolicyManagementService/storePolicySet" >
@@ -133,6 +152,11 @@
           encodingStyle=""
       />
       
+      <arrayMapping qname="pm:ArrayOfString"
+          type="java:java.lang.String[]" innerType="tns:string"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      
       <arrayMapping qname="pm:ArrayOf_xacml_PolicyType"
           type="java:org.opensaml.xacml.policy.PolicyType[]" innerType="xacml:PolicyType"
           encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
@@ -154,6 +178,11 @@
            <parameter qname="papmgmt:addTrustedPAP_pap" type="papns:PAP"/>
       </operation>
       
+      <operation name="exists" qname="papmgmt:exists"
+                 returnQName="papmgmt:existsResponse" returnType="tns:boolean">
+           <parameter qname="papmgmt:exists_papId" type="tns:string"/>
+      </operation>
+      
       <operation name="getTrustedPAP" qname="papmgmt:getTrustedPAP"
                  returnQName="papmgmt:getTrustedPAPResponse" returnType="papns:PAP">
            <parameter qname="papmgmt:getTrustedPAP_papId" type="tns:string"/>
@@ -165,6 +194,10 @@
       
       <operation name="ping" qname="papmgmt:ping"
                  returnQName="papmgmt:pingResponse" returnType="tns:string">
+      </operation>
+      
+      <operation name="refreshCache" qname="papmgmt:refreshCache">
+           <parameter qname="papmgmt:refreshCache_papId" type="tns:string"/>
       </operation>
       
       <operation name="removeTrustedPAP" qname="papmgmt:removeTrustedPAP">

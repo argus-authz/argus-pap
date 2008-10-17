@@ -47,11 +47,13 @@ public class ServiceClientImplAxis implements ServiceClient {
     public Service getService() {
         AxisProperties.setProperty("axis.socketSecureFactory",
         "org.glite.security.trustmanager.axis.AXISSocketFactory");
+    	
+        System.setProperty("crlUpdateInterval", "0s");
 
         // need to pass property to AXISSocketFactory
         Properties properties = AXISSocketFactory.getCurrentProperties();
         
-        // TODO will get cert and key form the configuration, with those as
+        // TODO will get cert and key from the configuration, with those as
         // default
         
         if (clientCertificate == null)

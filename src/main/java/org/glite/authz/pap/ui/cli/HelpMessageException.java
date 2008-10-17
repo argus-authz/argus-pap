@@ -1,6 +1,6 @@
 package org.glite.authz.pap.ui.cli;
 
-public class HelpMessageException extends RuntimeException {
+public class HelpMessageException extends CLIException {
 
     private static final long serialVersionUID = 1L;
 

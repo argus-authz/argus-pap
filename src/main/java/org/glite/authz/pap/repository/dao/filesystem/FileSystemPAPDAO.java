@@ -1,6 +1,7 @@
 package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
@@ -13,11 +14,11 @@ public class FileSystemPAPDAO implements PAPDAO {
     
     private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
     
-    private FileSystemPAPDAO() { }
-    
     public static FileSystemPAPDAO getInstance() {
         return new FileSystemPAPDAO();
     }
+    
+    private FileSystemPAPDAO() { }
 
     public void add(PAP pap) {
         
@@ -51,6 +52,23 @@ public class FileSystemPAPDAO implements PAPDAO {
         return null;
     }
 
+    public List<String> getAllIds() {
+        List<String> idList = new LinkedList<String>();
+        
+        File dbDir = new File(dbPath);
+        
+        for (File file:dbDir.listFiles()) {
+            
+            if (file.isDirectory()) {
+                String dirName = file.getName();
+                if (PAP.localPAPId.equals(dirName))
+                    continue;
+                idList.add(dirName);
+            }
+        }
+        return idList;
+    }
+
     public PAP getById(String papId) {
         // TODO Auto-generated method stub
         return null;
@@ -60,12 +78,12 @@ public class FileSystemPAPDAO implements PAPDAO {
     // TODO Auto-generated method stub
 
     }
-
+    
     public void update(PAP pap) {
     // TODO Auto-generated method stub
 
     }
-    
+
     private String getPAPDirAbsolutePath(String papId) {
         return dbPath + File.separator + papId;
     }

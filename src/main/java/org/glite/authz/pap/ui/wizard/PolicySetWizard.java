@@ -11,7 +11,7 @@ import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.policy.TargetType;
 
 public abstract class PolicySetWizard {
-
+    
     protected enum InsertionType {
         WHOLE_OBJECT, AS_REFERENCE
     }
@@ -71,7 +71,7 @@ public abstract class PolicySetWizard {
 
         return resultList;
     }
-
+    
     public String toString() {
         return PolicySetHelper.toString(policySet);
     }

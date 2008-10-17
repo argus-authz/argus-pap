@@ -8,11 +8,15 @@ public interface PAPManagementService {
     
     public abstract void addTrustedPAP(PAP pap) throws java.rmi.RemoteException;
     
+    public abstract boolean exists(String papId) throws java.rmi.RemoteException;
+    
     public abstract PAP getTrustedPAP(String papId) throws java.rmi.RemoteException;
     
     public abstract List<PAP> listTrustedPAPs() throws java.rmi.RemoteException;
     
     public abstract String ping() throws java.rmi.RemoteException;
+    
+    public abstract void refreshCache(String papId) throws java.rmi.RemoteException;
     
     public abstract void removeTrustedPAP(String papId) throws java.rmi.RemoteException;
     

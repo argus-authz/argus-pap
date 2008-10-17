@@ -10,6 +10,7 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
+import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
@@ -17,62 +18,87 @@ import org.glite.authz.pap.client.ServiceClientFactory;
 
 public abstract class ServiceCLI {
     
-    private static final String OPT_URL = "url";
-    private static final String OPT_CERT = "cert";
-    private static final String OPT_KEY = "key"; 
-    private static final String OPT_PASSWORD = "password";
-    private static final String DEFAULT_SERVICE_URL = "https://localhost:8443/pap/services/";
     private static final HelpFormatter helpFormatter = new HelpFormatter();
-    protected static final String OPT_HELP = "h";
+    private static final String LOPT_CERT = "cert";
+    private static final String LOPT_HOST = "host";
+    private static final String LOPT_KEY = "key";
+    private static final String LOPT_PASSWORD = "password";
+    private static final String LOPT_URL = "url";
+    private static final String OPT_CERT = "cert";
+    private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
+    private static final String OPT_KEY = "key";
+    private static final String OPT_HOST = "host";
+    private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). " +
+    		"This option defines the PAP endpoint to be contacted as follows: https://hostname:8443/pap/services";
+    private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
+    private static final String OPT_PASSWORD = "password";
+    private static final String OPT_PASSWORD_DESCRIPTION = "Specifies the password used to decrypt the user's private key.";
+    private static final String OPT_URL = "url";
     
+    protected static final String DEFAULT_HOST = "localhost";
+    protected static final String DEFAULT_SERVICE_URL = "https://%s:8443/pap/services/";
     protected static final String LOPT_HELP = "help";
-    protected static final CommandLineParser parser = new GnuParser();
-    private String usageText;
-    private Options options = new Options();
-    private Options commandOptions;
-    private Options globalOptions = new Options();
-    private String[] commandNameValues;
-    private String descriptionText;
-    private final ServiceClient serviceClient;
+    protected static final String LOPT_PRIVATE = "private";
+    protected static final String LOPT_PUBLIC = "public";
+    protected static final String OPT_HELP = "h";
+    protected static final String OPT_HELP_DESCRIPTION = "Print this message.";
     
-    @SuppressWarnings({ "static-access", "unchecked" })
-    public ServiceCLI(String[] commandNameValues, String usageText, String descriptionText) {
-        this();
+    protected static final CommandLineParser parser = new GnuParser();
+    private String[] commandNameValues;
+    private Options commandOptions;
+    private String descriptionText;
+    private Options globalOptions = new Options();
+    private String longDescriptionText;
+    private Options options = new Options();
+    private final ServiceClient serviceClient;
+    private String usageText;
+    
+    @SuppressWarnings( { "static-access", "unchecked" })
+    public ServiceCLI(String[] commandNameValues, String usage, String description,
+            String longDescription) {
+        
+        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
+        serviceClient = serviceClientFactory.createServiceClient();
+        
+        helpFormatter.setWidth(100);
         
         this.commandNameValues = commandNameValues;
-        this.usageText = usageText;
-        this.descriptionText = descriptionText;
+        this.usageText = usage;
+        this.descriptionText = description;
+        this.longDescriptionText = longDescription;
         
         commandOptions = defineCommandOptions();
         if (commandOptions == null)
             commandOptions = new Options();
         
-        commandOptions.addOption(OPT_HELP, LOPT_HELP, false, "Print this message");
+        commandOptions.addOption(OPT_HELP, LOPT_HELP, false, OPT_HELP_DESCRIPTION);
+
+        OptionGroup mutuallyExclusiveOptions = new OptionGroup();
         
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("url").withDescription(
-                "Specifies the target PAP endpoint to be contacted.").create(OPT_URL));
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("cert").withDescription(
-                "Specifies non-standard user certificate.").create(OPT_CERT));
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("key").withDescription(
-                "Specifies non-standard user private key.").create(OPT_KEY));
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt("password").withDescription(
-                "Specifies a password that is used to decrypt the user's private key.").create(
-                OPT_PASSWORD));
+        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
+                .withDescription("Specifies the target PAP endpoint (default: "
+                        + String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST) + ").").create(OPT_URL));
+        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
+                .withDescription(OPT_HOST_DESCRIPTION).create(OPT_HOST));
+        
+        globalOptions.addOptionGroup(mutuallyExclusiveOptions);
+        
+        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_CERT)
+                .withDescription(OPT_CERT_DESCRIPTION).create(OPT_CERT));
+        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_KEY)
+                .withDescription(OPT_KEY_DESCRIPTION).create(OPT_KEY));
+        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_PASSWORD)
+                .withDescription(OPT_PASSWORD_DESCRIPTION).create(OPT_PASSWORD));
         
         Collection<Option> optionsList = commandOptions.getOptions();
-        for (Option opt:optionsList) {
+        for (Option opt : optionsList) {
             options.addOption(opt);
         }
         
         optionsList = globalOptions.getOptions();
-        for (Option opt:optionsList) {
+        for (Option opt : optionsList) {
             options.addOption(opt);
         }
-    }
-    
-    private ServiceCLI() {
-        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
-        serviceClient = serviceClientFactory.createServiceClient();
     }
     
     public boolean commandMatch(String command) {
@@ -83,7 +109,7 @@ public abstract class ServiceCLI {
         return false;
     }
     
-    public boolean execute(String[] args) throws ParseException, HelpMessageException, RemoteException {
+    public void execute(String[] args) throws ParseException, HelpMessageException, RemoteException {
         
         CommandLine commandLine = parser.parse(options, args);
         
@@ -92,18 +118,23 @@ public abstract class ServiceCLI {
         
         if (commandLine.hasOption(OPT_URL))
             serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
+        else if (commandLine.hasOption(OPT_HOST))
+            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, commandLine.getOptionValue(OPT_HOST)));
         else
-            serviceClient.setTargetEndpoint(DEFAULT_SERVICE_URL);
+            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST));
+        
         if (commandLine.hasOption(OPT_CERT)) {
             serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
             System.out.println("Settato cert");
         }
+        
         if (commandLine.hasOption(OPT_KEY))
             serviceClient.setClientPrivateKey(OPT_KEY);
+        
         if (commandLine.hasOption(OPT_PASSWORD))
             serviceClient.setClientPrivateKeyPassword(OPT_PASSWORD);
         
-        return executeCommandService(commandLine, serviceClient);
+        executeCommandService(commandLine, serviceClient);
         
     }
     
@@ -117,23 +148,35 @@ public abstract class ServiceCLI {
     
     public void printHelpMessage(PrintWriter pw) {
         String syntax = commandNameValues[0] + " " + usageText;
+        
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), syntax);
-        pw.println();
-        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), descriptionText);
+        
+        if (descriptionText != null) {
+            pw.println();
+            helpFormatter.printWrapped(pw, helpFormatter.getWidth(), descriptionText);
+        }
+        
+        if (longDescriptionText != null) {
+            pw.println();
+            helpFormatter.printWrapped(pw, helpFormatter.getWidth(), longDescriptionText);
+        }
         
         // command specific options
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Valid options:");
-        helpFormatter.printOptions(pw, helpFormatter.getWidth(), commandOptions, helpFormatter.getLeftPadding(), helpFormatter.getDescPadding());
+        helpFormatter.printOptions(pw, helpFormatter.getWidth(), commandOptions, helpFormatter
+                .getLeftPadding(), helpFormatter.getDescPadding());
         
         // global options
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Global options:");
-        helpFormatter.printOptions(pw, helpFormatter.getWidth(), globalOptions, helpFormatter.getLeftPadding(), helpFormatter.getDescPadding());
+        helpFormatter.printOptions(pw, helpFormatter.getWidth(), globalOptions, helpFormatter
+                .getLeftPadding(), helpFormatter.getDescPadding());
     }
     
     protected abstract Options defineCommandOptions();
     
-    protected abstract boolean executeCommandService(CommandLine commandLine, ServiceClient serviceClient) throws ParseException, RemoteException;
+    protected abstract void executeCommandService(CommandLine commandLine,
+            ServiceClient serviceClient) throws CLIException, ParseException, RemoteException;
     
 }

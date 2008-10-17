@@ -11,28 +11,31 @@ import org.glite.authz.pap.common.PAP;
 public class ListPAPs extends PAPManagementCLI {
     
     private static final String USAGE = "";
-    private static final String[] commandNameValues = { "list-trusted-paps", "list-paps", "ltp" };
+    private static final String[] commandNameValues = { "list-paps", "lpaps" };
     private static final String DESCRIPTION = "List trusted PAPs.";
     
     public ListPAPs() {
-        super(commandNameValues, USAGE, DESCRIPTION);
+        super(commandNameValues, USAGE, DESCRIPTION, null);
     }
-
-    @Override
-    protected boolean executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
-        
-        List<PAP> papList = papMgmtClient.listTrustedPAPs();
-        
-        for (PAP pap:papList) {
-            System.out.println(pap.toString());
-        }
-        return true;
-    }
-
+    
     @Override
     protected Options defineCommandOptions() {
-        // TODO Auto-generated method stub
         return null;
     }
 
+    @Override
+    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+        
+        List<PAP> papList = papMgmtClient.listTrustedPAPs();
+        
+        if (papList.isEmpty()) {
+        	System.out.println("No remote PAPs found.");
+        	return;
+        }
+        	
+        for (PAP pap:papList) {
+            System.out.println(pap.toFormattedString());
+        }
+        
+    }
 }

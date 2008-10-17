@@ -81,6 +81,9 @@ public class PAPClient {
     private final ProvisioningServicePortType port;
 
     public PAPClient(String url) {
+        if (!url.endsWith("/"))
+            url += "/";
+        url += "ProvisioningService";
         port = client.getProvisioningServicePortType(url);
     }
 

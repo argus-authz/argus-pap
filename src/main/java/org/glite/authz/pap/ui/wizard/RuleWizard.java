@@ -25,15 +25,17 @@ import org.opensaml.xml.Configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ExceptionsRule {
+public class RuleWizard {
 
-    private static final Logger log = LoggerFactory.getLogger(ExceptionsRule.class);
+    private static final Logger log = LoggerFactory.getLogger(RuleWizard.class);
     private static final String ruleId = "ExceptionsRule";
     private static final javax.xml.namespace.QName SUBJECT_DESIGNATOR = AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final javax.xml.namespace.QName RESOURCE_DESIGNATOR = AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final javax.xml.namespace.QName ENVIRONMENT_DESIGNATOR = AttributeDesignatorType.ENVIRONMENT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
 
-    public static RuleType build(List<List<AttributeType>> orAttributeList, EffectType effect) {
+    public static RuleType build(List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
+        
+        List<List<AttributeType>> orAttributeList = getAttributeTypeListList(orExceptionsAttributeWizardList);
 
         ApplyType applyOr = ApplyHelper.buildFunctionOr();
 
@@ -213,6 +215,27 @@ public class ExceptionsRule {
             return SUBJECT_DESIGNATOR;
         }
 
+    }
+    
+    private static List<AttributeType> getAttributeTypeList(List<AttributeWizard> list) {
+        List<AttributeType> resultList = new LinkedList<AttributeType>();
+
+        for (AttributeWizard attribute : list) {
+            resultList.add(attribute.getAttributeType());
+        }
+
+        return resultList;
+    }
+
+    private static List<List<AttributeType>> getAttributeTypeListList(
+            List<List<AttributeWizard>> listList) {
+        List<List<AttributeType>> resultList = new LinkedList<List<AttributeType>>();
+
+        for (List<AttributeWizard> list : listList) {
+            resultList.add(getAttributeTypeList(list));
+        }
+
+        return resultList;
     }
 
 }
