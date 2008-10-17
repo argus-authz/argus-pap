@@ -34,14 +34,16 @@ public class DistributionModule extends Thread {
         return papPolicies;
     }
     public static void refreshCache(PAP pap) {
+        log.info("Refreshing cache for pap: " + pap.getAlias() + "...");
     	List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
+    	log.debug("Received " + papPolicies.size() + " XACML elemenst from PAP \"" + pap.getAlias() + "\"");
         storePAPPolicies(pap, papPolicies);
     }
 
     private static synchronized void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
 
         if (papPolicies.isEmpty()) {
-            log.debug("Empty list retrieved from PAP: " + pap.getDn());
+            log.debug("Empty list retrieved from PAP: " + pap.getAlias());
             return;
         }
 

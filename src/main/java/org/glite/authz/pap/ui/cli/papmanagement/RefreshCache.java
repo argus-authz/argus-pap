@@ -46,7 +46,7 @@ public class RefreshCache extends PAPManagementCLI {
         for (String papId : papIdList) {
             System.out.print("Refreshing cache for pap \"" + papId + "\"...");
             papMgmtClient.refreshCache(papId);
-            System.out.print(" ok.");
+            System.out.println(" ok.");
         }
     }
     
