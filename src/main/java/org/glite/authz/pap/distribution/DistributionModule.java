@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
 
-    private static DistributionModule instance = null;
     private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
+    private static DistributionModule instance = null;
 
     public static DistributionModule getInstance() {
     	if (instance == null)
@@ -33,6 +33,7 @@ public class DistributionModule extends Thread {
 
         return papPolicies;
     }
+    
     public static void refreshCache(PAP pap) {
         log.info("Refreshing cache for pap: " + pap.getAlias() + "...");
     	List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
@@ -79,8 +80,6 @@ public class DistributionModule extends Thread {
         }
     }
 
-    private List<PAP> remotePAPList;
-
     private long sleepTime;
 
     private DistributionModule() {
@@ -91,7 +90,8 @@ public class DistributionModule extends Thread {
 
         try {
             while (!this.isInterrupted()) {
-                for (PAP pap : remotePAPList) {
+                
+                for (PAP pap : PAPManager.getInstance().getAll()) {
 
                     if (this.isInterrupted())
                         break;
@@ -122,19 +122,6 @@ public class DistributionModule extends Thread {
     protected void initialize() {
         log.info("Initilizing distribution module...");
 
-        DistributionConfiguration configuration = DistributionConfiguration.getInstance();
-
-        sleepTime = configuration.getPollIntervallInMillis();
-        remotePAPList = configuration.getRemotePAPList();
-
-        // Create non-existing PAPs
-        PAPManager papManager = PAPManager.getInstance();
-        for (PAP pap : remotePAPList) {
-            if (!papManager.exists(pap.getPapId())) {
-                log.debug("Creating new PAP: " + pap.getPapId());
-                papManager.add(pap);
-            }
-        }
-
+        sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMillis();
     }
 }

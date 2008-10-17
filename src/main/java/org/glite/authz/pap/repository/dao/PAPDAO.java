@@ -14,6 +14,8 @@ public interface PAPDAO {
 
     public List<PAP> getAll();
     
+    public List<String> getAllIds();
+    
     public PAP getById(String papId);
     
     public void setOrder(List<String> papId);

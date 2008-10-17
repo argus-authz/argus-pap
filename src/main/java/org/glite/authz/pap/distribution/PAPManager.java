@@ -14,7 +14,6 @@ public abstract class PAPManager {
     
     private static PAPManager instance = null;
     protected static PAP localPAP = PAP.makeLocalPAP();
-    protected PAPDAO papDAO; 
     
     public static PAPManager getInstance() {
         if (instance == null)
@@ -22,15 +21,16 @@ public abstract class PAPManager {
         return instance;
     }
     
-    protected List<PAP> papList;
     protected DistributionConfiguration distributionConfiguration;
+    protected PAPDAO papDAO;
+    protected List<PAP> papList;
     
     protected PAPManager() {
         distributionConfiguration = DistributionConfiguration.getInstance();
-        papList = distributionConfiguration.getRemotePAPList();
         papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
+        initPAPList();
     }
-
+    
     public abstract PAPContainer add(PAP pap);
     
     public void createLocalPAPIfNotExists() {
@@ -49,13 +49,13 @@ public abstract class PAPManager {
     public abstract PAP delete(String papId) throws NotFoundException;
     
     public abstract boolean exists(String papId);
-
+    
     public abstract PAP get(String papId) throws NotFoundException;
-
+    
     public abstract List<PAP> getAll();
-
+    
     public abstract PAPContainer getContainer(String papId);
-
+    
     public abstract List<PAPContainer> getContainerAll();
     
     public PAP getLocalPAP() {
@@ -68,12 +68,32 @@ public abstract class PAPManager {
         return new PAPContainer(localPAP);
     }
     
+    public abstract void setPAPOrder(List<String> papIdList);
+    
+    public abstract void update(String papId, PAP newpap);
+    
     private boolean localPAPExists() {
         return RepositoryManager.getDAOFactory().getPAPDAO().exists(localPAP.getPapId());
     }
     
-    public abstract void setPAPOrder(List<String> papIdList);
+    private void initPAPList() {
+        papList = DistributionConfiguration.getInstance().getRemotePAPList();
+        
+        // Add PAPs defined in the configuration file
+        for (PAP pap:papList) {
+            
+            if (papDAO.exists(pap.getPapId()))
+                continue;
+            
+            papDAO.add(pap);
+        }
+        
+        // If the configuration was modified off-line then remove unwanted PAPs still in the DB
+        for (String papId:papDAO.getAllIds()) {
+            if (exists(papId))
+                continue;
+            papDAO.delete(papId);
+        }
+    }
     
-    public abstract void update(String papId, PAP newpap);
-
 }
