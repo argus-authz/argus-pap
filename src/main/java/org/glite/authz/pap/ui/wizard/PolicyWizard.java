@@ -12,11 +12,11 @@ import org.opensaml.xacml.policy.RuleType;
 import org.opensaml.xacml.policy.TargetType;
 
 public class PolicyWizard {
-
+    
     private enum PolicyWizardType {
         BLACKLIST, SERVICECLASS
     }
-
+    
     private static final String DENY_KEYWORD = "deny";
     private static final String ALLOW_KEYWORD = "allow";
     private static final String EXCEPTY_KEYWORD = "except";
@@ -24,16 +24,17 @@ public class PolicyWizard {
     private static final String SERVICECLASS_POLICY_ID_PREFIX = "ServiceClassPolicy";
     private static final String VISIBILITY_PRIVATE_PREFIX = "PRIVATE";
     private static final String VISIBILITY_PUBLIC_PREFIX = "PUBLIC";
-
+    
     public static String generateId(String prefix) {
         return prefix + "_" + generateUUID();
     }
-
+    
     private static String generateUUID() {
         return UUID.randomUUID().toString();
     }
-
-    private static PolicyWizardType getPolicyWizardType(List<AttributeWizard> targetAttributeWizardList) {
+    
+    private static PolicyWizardType getPolicyWizardType(
+            List<AttributeWizard> targetAttributeWizardList) {
         AttributeWizardType serviceClassWizardType = AttributeWizardType.SERVICE_CLASS;
         
         for (AttributeWizard attribute : targetAttributeWizardList) {
@@ -44,7 +45,7 @@ public class PolicyWizard {
         
         return PolicyWizardType.BLACKLIST;
     }
-
+    
     private boolean isPrivate = false;
     private final List<List<AttributeWizard>> orExceptionsAttributeWizardList;
     private final PolicyType policy;
@@ -53,74 +54,76 @@ public class PolicyWizard {
     private String policyIdVisibilityPrefix;
     private PolicyWizardType policyWizardType;
     private final List<AttributeWizard> targetAttributeWizardList;
-
+    
     public PolicyWizard(PolicyType policy) throws UnsupportedPolicyException {
         
         decomposePolicyId(policy.getPolicyId());
-
+        
         if (policy.getRules().size() != 1)
             throw new UnsupportedPolicyException("Wrong number of rules");
-
-        targetAttributeWizardList = TargetWizard.extractTargetAttributeWizardList(policy.getTarget());
+        
+        targetAttributeWizardList = TargetWizard.extractTargetAttributeWizardList(policy
+                .getTarget());
         
         if (targetAttributeWizardList.isEmpty())
             throw new UnsupportedPolicyException("ANY TARGET not supported");
-
+        
         policyWizardType = getPolicyWizardType(targetAttributeWizardList);
-
-        orExceptionsAttributeWizardList = RuleWizard.getAttributeWizardList(policy.getRules().get(0));
-
+        
+        orExceptionsAttributeWizardList = RuleWizard.getAttributeWizardList(policy.getRules()
+                .get(0));
+        
         this.policy = policy;
     }
-
+    
     public PolicyWizard(List<AttributeWizard> targetAttributeWizardList,
             List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
-
+        
         if (targetAttributeWizardList == null)
             targetAttributeWizardList = new LinkedList<AttributeWizard>();
         this.targetAttributeWizardList = targetAttributeWizardList;
-
+        
         policyWizardType = getPolicyWizardType(targetAttributeWizardList);
-
+        
         if (orExceptionsAttributeWizardList == null)
             orExceptionsAttributeWizardList = new LinkedList<List<AttributeWizard>>();
         this.orExceptionsAttributeWizardList = orExceptionsAttributeWizardList;
-
+        
         policy = PolicyHelper.build(generateId(), PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
-
+        
         TargetType target = TargetWizard.createTarget(targetAttributeWizardList);
-
+        
         RuleType rule = RuleWizard.build(orExceptionsAttributeWizardList, effect);
-
+        
         policy.setTarget(target);
         policy.getRules().add(rule);
-
+        
     }
-
+    
     public List<List<AttributeWizard>> getOrExceptionsAttributeWizardList() {
         return orExceptionsAttributeWizardList;
     }
-
+    
     public String getPolicyIdPrefix() {
         return policyIdVisibilityPrefix + "_" + policyIdPrefix;
     }
-
+    
     public PolicyType getPolicyType() {
         return policy;
     }
-
+    
     public List<AttributeWizard> getTargetAttributeList() {
         return targetAttributeWizardList;
     }
-
+    
     public boolean isBlacklistPolicy() {
-    	
+        
         if (policyWizardType.equals(PolicyWizardType.BLACKLIST))
             return true;
         
         return false;
     }
-
+    
     public boolean isPrivate() {
         return isPrivate;
     }
@@ -136,15 +139,15 @@ public class PolicyWizard {
         
         return false;
     }
-
+    
     public boolean isServiceClassPolicy() {
-    	
+        
         if (policyWizardType.equals(PolicyWizardType.SERVICECLASS))
             return true;
         
         return false;
     }
-
+    
     public void setPrivate(boolean isPrivate) {
         this.isPrivate = isPrivate;
         
@@ -152,7 +155,7 @@ public class PolicyWizard {
         
         policy.setPolicyId(composeId());
     }
-
+    
     public String toFormattedString() {
         return toFormattedString(0, 4);
     }
@@ -160,9 +163,9 @@ public class PolicyWizard {
     public String toFormattedString(int policyIndent, int attributeIndent) {
         
         String policyIndentString = fillwithSpaces(policyIndent);
-
+        
         String formattedString = policyIndentString + "id=" + policy.getPolicyId() + "\n";
-
+        
         String effectIndentString = fillwithSpaces(policyIndent + attributeIndent);
         
         if (isPrivate())
@@ -179,12 +182,12 @@ public class PolicyWizard {
             effectString = DENY_KEYWORD + " ";
         else
             effectString = ALLOW_KEYWORD + " ";
-
-        String attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + effectString.length());
+        
+        String attributeIndentString = fillwithSpaces(policyIndent + attributeIndent
+                + effectString.length());
         formattedString += effectIndentString + effectString;
         
-        
-        for (int i = 0 ; i < targetAttributeWizardList.size(); i++) {
+        for (int i = 0; i < targetAttributeWizardList.size(); i++) {
             
             if (i > 0)
                 formattedString += attributeIndentString;
@@ -193,19 +196,22 @@ public class PolicyWizard {
         }
         
         String exceptKeyString = EXCEPTY_KEYWORD + " ";
-        attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + exceptKeyString.length());
-
+        attributeIndentString = fillwithSpaces(policyIndent + attributeIndent
+                + exceptKeyString.length());
+        
         for (List<AttributeWizard> andList : orExceptionsAttributeWizardList) {
             if (andList.isEmpty())
                 continue;
-
-            formattedString += effectIndentString + exceptKeyString + andList.get(0).toFormattedString() + "\n";
-
+            
+            formattedString += effectIndentString + exceptKeyString
+                    + andList.get(0).toFormattedString() + "\n";
+            
             for (int i = 1; i < andList.size(); i++) {
-                formattedString += attributeIndentString + andList.get(i).toFormattedString() + "\n";
+                formattedString += attributeIndentString + andList.get(i).toFormattedString()
+                        + "\n";
             }
         }
-
+        
         return formattedString;
     }
     
@@ -214,70 +220,75 @@ public class PolicyWizard {
     }
     
     public String toNormalizedFormattedString(int policyIndent, int attributeIndent) {
-    	
-    	String policyIndentString = fillwithSpaces(policyIndent);
-
+        
+        String policyIndentString = fillwithSpaces(policyIndent);
+        
         String formattedString = policyIndentString + "id=" + policy.getPolicyId() + "\n";
         
         String effectIndentString = fillwithSpaces(policyIndent + attributeIndent);
         
         if (isPrivate())
             formattedString += effectIndentString + "private\n";
-
+        
         String effectString;
         
         if (EffectType.Deny.equals(policy.getRules().get(0).getEffect()))
-        	effectString = DENY_KEYWORD + " ";
+            effectString = DENY_KEYWORD + " ";
         else
             effectString = ALLOW_KEYWORD + " ";
-
-        String attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + effectString.length());
+        
+        String attributeIndentString = fillwithSpaces(policyIndent + attributeIndent
+                + effectString.length());
         formattedString += effectIndentString + effectString;
-
+        
         for (int i = 0; i < targetAttributeWizardList.size(); i++) {
-        	
-        	AttributeWizard attributeWizard = targetAttributeWizardList.get(i);
-        	
-        	if ((!AttributeWizardType.RESOURCE_URI.equals(attributeWizard.getAttributeWizardType())
-        			&& (!AttributeWizardType.SERVICE_CLASS.equals(attributeWizard.getAttributeType())))) {
-
-        		if (i > 0)
-            		formattedString += attributeIndentString;
-        		
-        		formattedString += targetAttributeWizardList.get(i).toFormattedString() + "\n";
-        		
-        	}
+            
+            AttributeWizard attributeWizard = targetAttributeWizardList.get(i);
+            AttributeWizardType awt = attributeWizard.getAttributeWizardType();
+            
+            if (AttributeWizardType.RESOURCE_URI.equals(awt)
+                    || AttributeWizardType.SERVICE_CLASS.equals(awt))
+                continue;
+            
+            if (i > 0)
+                formattedString += attributeIndentString;
+            
+            formattedString += targetAttributeWizardList.get(i).toFormattedString() + "\n";
+            
         }
         
         String exceptKeyString = EXCEPTY_KEYWORD + " ";
-        attributeIndentString = fillwithSpaces(policyIndent + attributeIndent + exceptKeyString.length());
-
+        attributeIndentString = fillwithSpaces(policyIndent + attributeIndent
+                + exceptKeyString.length());
+        
         for (List<AttributeWizard> andList : orExceptionsAttributeWizardList) {
             if (andList.isEmpty())
                 continue;
-
-            formattedString += effectIndentString + exceptKeyString + andList.get(0).toFormattedString() + "\n";
-
+            
+            formattedString += effectIndentString + exceptKeyString
+                    + andList.get(0).toFormattedString() + "\n";
+            
             for (int i = 1; i < andList.size(); i++) {
-                formattedString += attributeIndentString + andList.get(i).toFormattedString() + "\n";
+                formattedString += attributeIndentString + andList.get(i).toFormattedString()
+                        + "\n";
             }
         }
-
+        
         return formattedString;
     }
-
+    
     public String toString() {
         return PolicyHelper.toString(policy);
     }
-
+    
     private String generateId() {
         
         setPolicyIdVisibilityPrefix(isPrivate);
-
+        
         setPolicyIdPrefix(policyWizardType);
         
         policyIdUniqueNumber = generateUUID();
-
+        
         return composeId();
     }
     
@@ -306,7 +317,6 @@ public class PolicyWizard {
         if (idComponents.length != 3)
             throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
         
-        
         if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0])) {
             this.isPrivate = true;
             setPolicyIdVisibilityPrefix(true);
@@ -321,16 +331,16 @@ public class PolicyWizard {
             setPolicyIdPrefix(PolicyWizardType.SERVICECLASS);
         
         policyIdUniqueNumber = idComponents[2];
-                
+        
     }
     
     private String fillwithSpaces(int n) {
-    	String s = "";
-    	
-    	for (int i=0; i<n; i++)
-    		s += " ";
-    	
-    	return s;
+        String s = "";
+        
+        for (int i = 0; i < n; i++)
+            s += " ";
+        
+        return s;
     }
-
+    
 }

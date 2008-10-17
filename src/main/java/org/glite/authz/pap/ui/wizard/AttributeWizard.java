@@ -199,7 +199,7 @@ public class AttributeWizard {
     }
     
     public String toFormattedString() {
-        return getId() + "=" + getValue();
+        return getId() + "=\"" + getValue() + "\"";
     }
 
 }
