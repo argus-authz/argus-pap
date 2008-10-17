@@ -71,6 +71,8 @@ public class ProvisioningServicePortTypeImpl implements
 
 	AxisProperties.setProperty("axis.socketSecureFactory",
 		"org.glite.security.trustmanager.axis.AXISSocketFactory");
+	
+	System.setProperty("crlUpdateInterval", "0s");
 
 	// need to pass property to AXISSocketFactory
 	Properties properties = AXISSocketFactory.getCurrentProperties();
