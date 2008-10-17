@@ -36,7 +36,7 @@
                 <xsd:sequence>
                     <xsd:element minOccurs="0" maxOccurs="unbounded" type="tns:PAPACE" name="item"/>
                 </xsd:sequence>
-            </xsd:complexType> 
+            </xsd:complexType>
             
             <xsd:complexType
                 name="PAPPrincipal">
@@ -56,13 +56,6 @@
                 name="PAPException">
                 <xsd:sequence/>
             </xsd:complexType>
-            
-            
-            <xsd:simpleType name="ListOfStrings">
-                <xsd:list itemType="xsd:string"/>
-            </xsd:simpleType>
-            
-            
         </xsd:schema>
     </wsdl:types>
     <wsdl:message
@@ -103,7 +96,7 @@
         
         <wsdl:part
             name="permissions"
-            type="tns:ListOfStrings">
+            type="tns:PAPPermissionList">
         </wsdl:part>
     </wsdl:message>
     <wsdl:message
@@ -166,86 +159,104 @@
             <wsdl:fault name="fault" message="tns:PAPException"></wsdl:fault>
         </wsdl:operation>
     </wsdl:portType>
+    
     <wsdl:binding
         name="PAPAuthorizationManagement"
         type="tns:PAPAuthorizationManagement">
         <soap:binding
             style="rpc"
-            transport="http://schemas.xmlsoap.org/soap/http" />
+            transport="http://schemas.xmlsoap.org/soap/http">
+        </soap:binding>
         <wsdl:operation name="setACL">
             <soap:operation
-                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/setACL" />
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/setACL">
+            </soap:operation>
             <wsdl:input>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:input>
             <wsdl:output>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:output>
             <wsdl:fault name="fault">
                 <soap:fault
                     use="literal"
-                    name="fault" />
+                    name="fault">
+                </soap:fault>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="getACL">
             <soap:operation
-                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/getACL" />
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/getACL">
+            </soap:operation>
             <wsdl:input>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:input>
             <wsdl:output>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:output>
             <wsdl:fault name="fault">
                 <soap:fault
                     use="literal"
-                    name="fault" />
+                    name="fault">
+                </soap:fault>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="addACE">
             <soap:operation
-                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/addACE" />
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/addACE">
+            </soap:operation>
             <wsdl:input>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:input>
             <wsdl:output>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:output>
             <wsdl:fault name="fault">
                 <soap:fault
                     use="literal"
-                    name="fault" />
+                    name="fault">
+                </soap:fault>
             </wsdl:fault>
         </wsdl:operation>
         <wsdl:operation name="removeACE">
             <soap:operation
-                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/removeACE" />
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/removeACE">
+            </soap:operation>
             <wsdl:input>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:input>
             <wsdl:output>
                 <soap:body
                     use="literal"
-                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management" />
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
             </wsdl:output>
             <wsdl:fault name="fault">
                 <soap:fault
                     use="literal"
-                    name="fault" />
+                    name="fault">
+                </soap:fault>
             </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>

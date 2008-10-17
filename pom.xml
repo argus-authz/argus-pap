@@ -58,6 +58,7 @@
                             <skeletonDeploy>true</skeletonDeploy>
                             <helperGen>true</helperGen>
                             <useEmitter>true</useEmitter>
+                            <wrapArrays>false</wrapArrays>
                         </configuration>
                     </execution>
                 </executions>
