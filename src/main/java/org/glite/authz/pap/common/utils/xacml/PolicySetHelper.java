@@ -123,11 +123,11 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
         return list;
     }
 
-    public static boolean policyReferenceIdExists(PolicySetType policySet, String id) {
+    public static boolean hasPolicyReferenceId(PolicySetType policySet, String id) {
         return idIsContainedInList(id, policySet.getPolicyIdReferences());
     }
 
-    public static boolean policySetReferenceIdExists(PolicySetType policySet, String id) {
+    public static boolean hasPolicySetReferenceId(PolicySetType policySet, String id) {
         return idIsContainedInList(id, policySet.getPolicySetIdReferences());
     }
 
