@@ -1,5 +1,6 @@
 package org.glite.authz.pap.distribution;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
@@ -53,6 +54,18 @@ public abstract class PAPManager {
     public abstract PAP get(String papId) throws NotFoundException;
     
     public abstract List<PAP> getAll();
+    
+    public List<PAP> getPublic() {
+        
+        List<PAP> resultList = new LinkedList<PAP>();
+        
+        for (PAP pap:papList) {
+            if (pap.isPublic())
+                resultList.add(pap);
+        }
+        
+        return resultList;
+    }
     
     public abstract PAPContainer getContainer(String papId);
     
