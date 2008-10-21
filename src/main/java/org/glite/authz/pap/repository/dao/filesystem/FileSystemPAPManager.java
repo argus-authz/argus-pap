@@ -20,7 +20,7 @@ public class FileSystemPAPManager extends PAPManager {
     }
 
     @Override
-    public PAPContainer add(PAP pap) {
+    public PAPContainer addTrustedPAP(PAP pap) {
         if (exists(pap.getPapId())) {
             throw new AlreadyExistsException();
         }
@@ -33,7 +33,7 @@ public class FileSystemPAPManager extends PAPManager {
     }
 
     @Override
-    public PAP delete(String papId) {
+    public PAP deleteTrustedPAP(String papId) {
         if (!exists(papId))
             throw new NotFoundException("PAP id not found: " + papId);
         File papDir = new File(getPAPDirAbsolutePath(papId));
@@ -58,7 +58,7 @@ public class FileSystemPAPManager extends PAPManager {
     }
 
     @Override
-    public PAP get(String papId) {
+    public PAP getPAP(String papId) {
         for (PAP pap:papList) {
             if (pap.getPapId().equals(papId)) {
                 return pap;
@@ -68,17 +68,17 @@ public class FileSystemPAPManager extends PAPManager {
     }
 
     @Override
-    public List<PAP> getAll() {
+    public List<PAP> getAllTrustedPAPs() {
         return papList;
     }
 
     @Override
-    public PAPContainer getContainer(String papId) {
-        return new PAPContainer(get(papId));
+    public PAPContainer getTrustedPAPContainer(String papId) {
+        return new PAPContainer(getPAP(papId));
     }
 
     @Override
-    public List<PAPContainer> getContainerAll() {
+    public List<PAPContainer> getTrustedPAPContainerAll() {
         List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(papList.size());
         for (PAP pap:papList) {
             papContainerList.add(new PAPContainer(pap));
@@ -94,13 +94,13 @@ public class FileSystemPAPManager extends PAPManager {
     }
 
     @Override
-    public void setPAPOrder(List<String> papIdList) {
+    public void setTrustedPAPOrder(List<String> papIdList) {
         // TODO Auto-generated method stub
         
     }
 
     @Override
-    public void update(String papId, PAP newpap) {
+    public void updateTrustedPAP(String papId, PAP newpap) {
         for (int i=0; i<papList.size(); i++) {
             PAP pap = papList.get(i);
             if (pap.getPapId().equals(papId)) {

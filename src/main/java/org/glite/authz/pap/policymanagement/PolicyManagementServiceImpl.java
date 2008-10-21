@@ -111,7 +111,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
     public List<PolicyType> listPolicies(String papId) throws java.rmi.RemoteException {
         log.debug("Received request listPolicies(papId");
         
-        PAPContainer pap = PAPManager.getInstance().getContainer(papId);
+        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
         
         return pap.getAllPolicies();
     }
@@ -134,7 +134,7 @@ public class PolicyManagementServiceImpl implements PolicyManagementService {
     public List<PolicySetType> listPolicySets(String papId) throws java.rmi.RemoteException {
         log.debug("Received request listPolicySets(papId)");
         
-        PAPContainer pap = PAPManager.getInstance().getContainer(papId);
+        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
         
         return pap.getAllPolicySets();
     }

@@ -51,7 +51,7 @@ public class DistributionModule extends Thread {
         log.debug("Storing policies for PAP: " + pap.getPapId());
 
         PAPManager papManager = PAPManager.getInstance();
-        PAPContainer papContainer = papManager.getContainer(pap.getPapId());
+        PAPContainer papContainer = papManager.getTrustedPAPContainer(pap.getPapId());
 
         papContainer.deleteAllPolicies();
         papContainer.deleteAllPolicySets();
@@ -91,7 +91,7 @@ public class DistributionModule extends Thread {
         try {
             while (!this.isInterrupted()) {
                 
-                for (PAP pap : PAPManager.getInstance().getAll()) {
+                for (PAP pap : PAPManager.getInstance().getAllTrustedPAPs()) {
 
                     if (this.isInterrupted())
                         break;

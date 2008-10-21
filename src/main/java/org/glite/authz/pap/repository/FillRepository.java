@@ -29,13 +29,13 @@ public class FillRepository {
         PAPContainer container = null;
         
         if (pm.exists(pap.getPapId())) {
-            container = pm.getContainer(pap.getPapId());
+            container = pm.getTrustedPAPContainer(pap.getPapId());
             log.info("Deleting all policies and policy sets for PAP: " + papId);
             container.deleteAllPolicies();
             container.deleteAllPolicySets();
         } else {
             log.info("Creating pap: " + papId);
-            container = pm.add(pap);
+            container = pm.addTrustedPAP(pap);
         }
         
         PolicySetType policySet = PolicySetHelper.buildWithAnyTarget(papId, PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);

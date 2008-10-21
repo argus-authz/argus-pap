@@ -17,7 +17,7 @@ public class PAPManagementServiceImpl implements PAPManagementService {
 
     public void addTrustedPAP(PAP pap) throws RemoteException {
         log.info("Received request");
-        papManager.add(pap);
+        papManager.addTrustedPAP(pap);
         log.info("Added PAP: " + pap.toString());
     }
 
@@ -29,13 +29,13 @@ public class PAPManagementServiceImpl implements PAPManagementService {
 	}
 
     public PAP getTrustedPAP(String papId) throws RemoteException {
-        PAP pap = papManager.get(papId);
+        PAP pap = papManager.getPAP(papId);
         log.info("Retrieved information about PAP: " + pap.toString());
         return null;
     }
 
     public List<PAP> listTrustedPAPs() throws RemoteException {
-        List<PAP> papList = papManager.getAll();
+        List<PAP> papList = papManager.getAllTrustedPAPs();
         log.info("Sending list of PAPs...");
         return papList;
     }
@@ -53,7 +53,7 @@ public class PAPManagementServiceImpl implements PAPManagementService {
     	PAP pap;
     	
     	try {
-    		pap = papManager.get(papId);
+    		pap = papManager.getPAP(papId);
     	} catch (NotFoundException e) {
     		log.error("Unable to refresh cache, PAP not found: " + papId);
     		throw e;
@@ -68,7 +68,7 @@ public class PAPManagementServiceImpl implements PAPManagementService {
     	log.info("Requested to remove pap: " + papId);
     	
     	try {
-    		PAP pap = papManager.delete(papId);
+    		PAP pap = papManager.deleteTrustedPAP(papId);
     		log.info("Removed PAP: " + pap.toString());
     	} catch (NotFoundException e) {
     		throw new RemoteException(e.getMessage(), e);
@@ -76,7 +76,7 @@ public class PAPManagementServiceImpl implements PAPManagementService {
     }
 
 	public void updateTrustedPAP(String papId, PAP pap) throws RemoteException {
-        papManager.update(papId, pap);
+        papManager.updateTrustedPAP(papId, pap);
         log.info("Updated PAP: " + pap.toString());
     }
 

@@ -13,6 +13,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
 import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
@@ -72,7 +73,7 @@ public class PAPAxisClient {
     private void setupDefaults() {
 
         papMode = false;
-        url = "https://localhost:8443/org.glite.security.authz.pap-0.1/services/ProvisioningService";
+        url = "https://localhost:8443/pap/services/ProvisioningService";
 
     }
 
@@ -199,7 +200,7 @@ public class PAPAxisClient {
         MarshallerFactory mf = Configuration.getMarshallerFactory();
         Marshaller marshaller = mf.getMarshaller(o);
         log.info(prefix + " " + XMLHelper.nodeToString(marshaller.marshall(o)));
-
+        System.out.println(XMLObjectHelper.toString(o));
     }
 
     public PAPAxisClient(String[] args) throws RemoteException, ServiceException, MarshallingException,

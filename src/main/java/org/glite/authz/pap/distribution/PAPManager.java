@@ -1,5 +1,6 @@
 package org.glite.authz.pap.distribution;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -8,17 +9,21 @@ import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
+import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public abstract class PAPManager {
+public class PAPManager {
     
+    private static final Logger log = LoggerFactory.getLogger(PAPManager.class);
     private static PAPManager instance = null;
     protected static PAP localPAP = PAP.makeLocalPAP();
     
     public static PAPManager getInstance() {
         if (instance == null)
-            instance = new PAPManagerImpl();
+            instance = new PAPManager();
         return instance;
     }
     
@@ -32,7 +37,16 @@ public abstract class PAPManager {
         initPAPList();
     }
     
-    public abstract PAPContainer add(PAP pap);
+    public PAPContainer addTrustedPAP(PAP pap) {
+        if (exists(pap.getPapId()))
+            throw new AlreadyExistsException();
+        
+        distributionConfiguration.setPAP(pap);
+        papList.add(pap);
+        papDAO.add(pap);
+        
+        return new PAPContainer(pap);
+    }
     
     public void createLocalPAPIfNotExists() {
         
@@ -47,29 +61,25 @@ public abstract class PAPManager {
         getLocalPAPContainer().storePolicySet(localPolicySet);
     }
     
-    public abstract PAP delete(String papId) throws NotFoundException;
-    
-    public abstract boolean exists(String papId);
-    
-    public abstract PAP get(String papId) throws NotFoundException;
-    
-    public abstract List<PAP> getAll();
-    
-    public List<PAP> getPublic() {
-        
-        List<PAP> resultList = new LinkedList<PAP>();
-        
-        for (PAP pap:papList) {
-            if (pap.isPublic())
-                resultList.add(pap);
-        }
-        
-        return resultList;
+    public PAP deleteTrustedPAP(String papId) throws NotFoundException {
+        PAP pap = getPAP(papId);
+        papList.remove(pap);
+        PAPContainer papContainer = new PAPContainer(pap);
+        papContainer.erasePAP();
+        return pap;
     }
     
-    public abstract PAPContainer getContainer(String papId);
+    public boolean exists(String papId) {
+        for (PAP pap:papList) {
+            if (pap.getPapId().equals(papId))
+                return true;
+        }
+        return false;
+    }
     
-    public abstract List<PAPContainer> getContainerAll();
+    public List<PAP> getAllTrustedPAPs() {
+        return new ArrayList<PAP>(papList);
+    }
     
     public PAP getLocalPAP() {
         return localPAP;
@@ -81,12 +91,61 @@ public abstract class PAPManager {
         return new PAPContainer(localPAP);
     }
     
-    public abstract void setPAPOrder(List<String> papIdList);
+    public PAP getPAP(String papId) throws NotFoundException {
+        for (PAP pap : papList) {
+            if (pap.getPapId().equals(papId))
+                return pap;
+        }
+        
+        log.debug("Requested PAP not found:" + papId);
+        throw new NotFoundException("PAP not found: " + papId);
+    }
     
-    public abstract void update(String papId, PAP newpap);
+    public List<PAP> getPublicTrustedPAPs() {
+        
+        List<PAP> resultList = new LinkedList<PAP>();
+        
+        for (PAP pap:papList) {
+            if (pap.isPublic())
+                resultList.add(pap);
+        }
+        
+        return resultList;
+    }
     
-    private boolean localPAPExists() {
-        return RepositoryManager.getDAOFactory().getPAPDAO().exists(localPAP.getPapId());
+    public PAPContainer getTrustedPAPContainer(String papId) {
+        return new PAPContainer(getPAP(papId));
+    }
+    
+    public List<PAPContainer> getTrustedPAPContainerAll() {
+        List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(papList.size());
+        for (PAP pap:papList) {
+            papContainerList.add(new PAPContainer(pap));
+        }
+        return papContainerList;
+    }
+    
+    public List<PAPContainer> getTrustedPAPContainerPublic() {
+        List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
+        for (PAP pap:papList) {
+            if (pap.isPublic())
+                papContainerList.add(new PAPContainer(pap));
+        }
+        return papContainerList;
+    }
+    
+    public void setTrustedPAPOrder(List<String> papIdList) {
+        // TODO
+    }
+    
+    public void updateTrustedPAP(String papId, PAP newpap) {
+        for (int i=0; i<papList.size(); i++) {
+            PAP pap = papList.get(i);
+            if (pap.getPapId().equals(papId)) {
+                papList.set(i, newpap);
+                break;
+            }
+        }
     }
     
     private void initPAPList() {
@@ -107,6 +166,10 @@ public abstract class PAPManager {
                 continue;
             papDAO.delete(papId);
         }
+    }
+    
+    private boolean localPAPExists() {
+        return RepositoryManager.getDAOFactory().getPAPDAO().exists(localPAP.getPapId());
     }
     
 }
