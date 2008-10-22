@@ -24,6 +24,11 @@ import org.opensaml.xml.XMLConfigurator;
 
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
+    protected static final String OPT_BLACKLIST = "bl";
+    protected static final String LOPT_BLACKLIST = "blacklist";
+    protected static final String OPT_BLACKLIST_DESCRIPTION = "List only \"blacklist\" policies.";
+    protected static final String OPT_SERVICECLASS = "sc";
+    protected static final String LOPT_SERVICECLASS = "serviceclass";
 	protected static final String LOPT_SHOW_XACML = "show-xacml";
 	protected static final String OPT_SHOW_XACML_DESCRIPTION = "XACML output.";
 	protected static final String LOPT_PLAIN_FORMAT = "plain-format";

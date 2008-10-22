@@ -31,12 +31,20 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         
         boolean xacmlOutput = false;
         boolean plainFormat = false;
+        boolean showBlacklist = true;
+        boolean showServiceclass = true;
         
         if (commandLine.hasOption(LOPT_SHOW_XACML))
             xacmlOutput = true;
         
         if (commandLine.hasOption(LOPT_PLAIN_FORMAT))
             plainFormat = true;
+        
+        if (commandLine.hasOption(OPT_BLACKLIST))
+            showServiceclass = false;
+        
+        if (commandLine.hasOption(OPT_SERVICECLASS))
+            showBlacklist = false;
         
         initOpenSAML();
         
@@ -47,10 +55,15 @@ public class ListPAPPolicies extends PolicyManagementCLI {
             return;
         }
         
+        boolean policiesFound;
+        
         if (xacmlOutput || plainFormat)
-            ListPolicies.listUsingPlaingFormat(policyList, xacmlOutput, true, true);
+            policiesFound = ListPolicies.listUsingPlaingFormat(policyList, xacmlOutput, true, true, showBlacklist, showServiceclass);
         else
-            ListPolicies.listUsingGroupedFormat(policyList, true, true);
+            policiesFound = ListPolicies.listUsingGroupedFormat(policyList, true, true, showBlacklist, showServiceclass);
+        
+        if (!policiesFound)
+            System.out.println(ListPolicies.noPoliciesFoundMessage(true, true, showBlacklist, showServiceclass));
         
     }
     
