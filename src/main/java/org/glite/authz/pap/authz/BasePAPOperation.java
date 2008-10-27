@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 public abstract class BasePAPOperation<T> implements PAPOperation<T> {
 
-    Logger log = LoggerFactory.getLogger(BasePAPOperation.class);
+    protected Logger log = LoggerFactory.getLogger(BasePAPOperation.class);
 
     protected Map<PAPContext, PAPPermission> requiredPermission;
 

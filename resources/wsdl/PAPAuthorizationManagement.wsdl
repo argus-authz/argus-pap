@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://org.glite.authz/wsdl/pap/services/authz_management"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    name="PAPAuthorizationManagement"
+    targetNamespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+    
+    <wsdl:types>
+        <xsd:schema
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+            
+                       
+            <xsd:complexType name="PAPPermissionList">
+                <xsd:sequence>
+                    <xsd:element name="item" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+                        
+            <xsd:complexType
+                name="PAPACE">
+                <xsd:sequence>
+                    <xsd:element
+                        name="principal"
+                        type="tns:PAPPrincipal" />
+      
+                    <xsd:element
+                        name="permissions"
+                        type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+                      
+            <xsd:complexType name="PAPACEList">
+                <xsd:sequence>
+                    <xsd:element minOccurs="0" maxOccurs="unbounded" type="tns:PAPACE" name="item"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:complexType
+                name="PAPPrincipal">
+                <xsd:sequence>
+                    <xsd:element
+                        name="type"
+                        type="xsd:string">
+                    </xsd:element>
+                    <xsd:element
+                        name="name"
+                        type="xsd:string">
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            
+            <xsd:complexType
+                name="PAPException">
+                <xsd:sequence/>
+            </xsd:complexType>
+        </xsd:schema>
+    </wsdl:types>
+    <wsdl:message
+        name="setACLRequest">
+        <wsdl:part
+            name="context"
+            type="xsd:string" />
+            
+       <wsdl:part name="acl" type="tns:PAPACEList"/>
+    </wsdl:message>
+    <wsdl:message
+        name="setACLResponse">
+    </wsdl:message>
+    <wsdl:message
+        name="getACLRequest">
+        <wsdl:part
+            name="context"
+            type="xsd:string">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message
+        name="getACLResponse">
+        <wsdl:part
+            name="entries"
+            type="tns:PAPACEList">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message
+        name="addACERequest">
+        <wsdl:part
+            name="context"
+            type="xsd:string">
+        </wsdl:part>
+        <wsdl:part
+            name="principal"
+            type="tns:PAPPrincipal">
+        </wsdl:part>
+        
+        <wsdl:part
+            name="permissions"
+            type="tns:PAPPermissionList">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message
+        name="addACEResponse">
+    </wsdl:message>
+    
+    <wsdl:message
+        name="removeACERequest">
+        <wsdl:part
+            name="context"
+            type="xsd:string">
+        </wsdl:part>
+        <wsdl:part
+            name="principal"
+            type="tns:PAPPrincipal">
+        </wsdl:part>
+    </wsdl:message>
+    <wsdl:message
+        name="removeACEResponse">
+    </wsdl:message>
+    
+    
+    <wsdl:message name="PAPException">
+        <wsdl:part name="fault" type="tns:PAPException"/>
+    </wsdl:message>
+    
+    
+    <wsdl:portType
+        name="PAPAuthorizationManagement">
+        <wsdl:operation
+            name="setACL">
+            <wsdl:input
+                message="tns:setACLRequest" />
+            <wsdl:output
+                message="tns:setACLResponse" />
+            <wsdl:fault name="fault" message="tns:PAPException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation
+            name="getACL">
+            <wsdl:input
+                message="tns:getACLRequest"></wsdl:input>
+            <wsdl:output
+                message="tns:getACLResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="tns:PAPException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation
+            name="addACE">
+            <wsdl:input
+                message="tns:addACERequest"></wsdl:input>
+            <wsdl:output
+                message="tns:addACEResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="tns:PAPException"></wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation
+            name="removeACE">
+            <wsdl:input
+                message="tns:removeACERequest"></wsdl:input>
+            <wsdl:output
+                message="tns:removeACEResponse"></wsdl:output>
+            <wsdl:fault name="fault" message="tns:PAPException"></wsdl:fault>
+        </wsdl:operation>
+    </wsdl:portType>
+    
+    <wsdl:binding
+        name="PAPAuthorizationManagement"
+        type="tns:PAPAuthorizationManagement">
+        <soap:binding
+            style="rpc"
+            transport="http://schemas.xmlsoap.org/soap/http">
+        </soap:binding>
+        <wsdl:operation name="setACL">
+            <soap:operation
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/setACL">
+            </soap:operation>
+            <wsdl:input>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:output>
+            <wsdl:fault name="fault">
+                <soap:fault
+                    use="literal"
+                    name="fault">
+                </soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="getACL">
+            <soap:operation
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/getACL">
+            </soap:operation>
+            <wsdl:input>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:output>
+            <wsdl:fault name="fault">
+                <soap:fault
+                    use="literal"
+                    name="fault">
+                </soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="addACE">
+            <soap:operation
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/addACE">
+            </soap:operation>
+            <wsdl:input>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:output>
+            <wsdl:fault name="fault">
+                <soap:fault
+                    use="literal"
+                    name="fault">
+                </soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+        <wsdl:operation name="removeACE">
+            <soap:operation
+                soapAction="http://org.glite.authz/wsdl/pap/services/authz_management/removeACE">
+            </soap:operation>
+            <wsdl:input>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body
+                    use="literal"
+                    namespace="http://org.glite.authz/wsdl/pap/services/authz_management">
+                </soap:body>
+            </wsdl:output>
+            <wsdl:fault name="fault">
+                <soap:fault
+                    use="literal"
+                    name="fault">
+                </soap:fault>
+            </wsdl:fault>
+        </wsdl:operation>
+    </wsdl:binding>
+
+    <wsdl:service
+        name="PAPAuthorizationManagementService">
+        <wsdl:port
+            binding="tns:PAPAuthorizationManagement"
+            name="PAPAuthorizationManagement">
+            <soap:address
+                location="https://localhost:8443/pap" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>

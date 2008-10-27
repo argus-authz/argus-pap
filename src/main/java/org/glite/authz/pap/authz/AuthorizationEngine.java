@@ -50,6 +50,17 @@ public class AuthorizationEngine {
 
 	return instance;
     }
+    
+    
+    public void saveConfiguration(){
+        
+        String confFileName = PAPConfiguration.instance().getPapAuthzConfigurationFileName();
+        
+        AuthzConfigurationParser confParser = AuthzConfigurationParser
+            .instance();
+        
+        confParser.save( new File(confFileName), getGlobalContext().getAcl());
+    }
 
     public boolean isInitialized() {
 

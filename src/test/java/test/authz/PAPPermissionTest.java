@@ -4,6 +4,8 @@ import java.util.EnumSet;
 
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
+
 import junit.framework.TestCase;
 
 
@@ -34,7 +36,8 @@ public class PAPPermissionTest extends TestCase {
         
         try{
             PAPPermission perm = PAPPermission.fromString( permission );
-        }catch (IllegalArgumentException e) {
+        
+        }catch (PAPAuthzException e) {
             caughtException = true;
         }
         
@@ -66,7 +69,7 @@ public class PAPPermissionTest extends TestCase {
             
             PAPPermission perm = PAPPermission.fromString( permissionList );
         
-        }catch (IllegalArgumentException e) {
+        }catch (PAPAuthzException e) {
             caughtException = true;
         }
         
