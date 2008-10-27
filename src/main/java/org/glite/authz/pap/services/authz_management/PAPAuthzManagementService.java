@@ -93,6 +93,8 @@ public class PAPAuthzManagementService implements PAPAuthorizationManagement{
 
 		AddACEOperation.instance(org.glite.authz.pap.authz.PAPACE.instance(papContext, admin, perms))
 				.execute();
+		
+		AuthorizationEngine.instance().saveConfiguration();
 
 	}
 
@@ -114,6 +116,8 @@ public class PAPAuthzManagementService implements PAPAuthorizationManagement{
 
 		RemoveACEOperation.instance(org.glite.authz.pap.authz.PAPACE.instance(papContext, admin))
 				.execute();
+		
+		AuthorizationEngine.instance().saveConfiguration();
 
 	}
 
@@ -140,6 +144,7 @@ public class PAPAuthzManagementService implements PAPAuthorizationManagement{
         
         SetACLOperation.instance( context, convertACL( acl )).execute();
         
+        AuthorizationEngine.instance().saveConfiguration();
         return;
 
                 

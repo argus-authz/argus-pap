@@ -72,6 +72,9 @@ public class PAPPermission {
 
     @Override
     public String toString() {
+        
+        if (this.permissions.containsAll( EnumSet.allOf( PermissionFlags.class ) ))
+            return "ALL";
 
         return StringUtils.join( permissions.iterator(), "|" );
 
