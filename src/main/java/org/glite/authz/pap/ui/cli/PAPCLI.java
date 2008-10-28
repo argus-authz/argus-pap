@@ -73,7 +73,7 @@ public class PAPCLI {
 
     private static String getCommandStringHelpMessage(String[] commandNameValues) {
 
-        String commandString = "    " + commandNameValues[0];
+        String commandString = fillWithSpaces(helpFormatter.getLeftPadding()) + commandNameValues[0];
 
         if (commandNameValues.length > 1) {
 
@@ -177,6 +177,13 @@ public class PAPCLI {
             System.out.println("Reason: " + e.getMessage());
         }
 
+    }
+    
+    private static String fillWithSpaces(int n) {
+        String s = "";
+        for (int i=0; i<n; i++)
+            s += " ";
+        return s;
     }
 
 }
