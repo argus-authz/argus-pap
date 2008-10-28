@@ -1,6 +1,6 @@
 #/bin/bash
 
-SCRIPT_NAME="prova-pap-admin"
+SCRIPT_NAME="pap-admin"
 
 STR=`mvn dependency:build-classpath | grep -A 1 "\[INFO\] Dependencies classpath:"`
 
