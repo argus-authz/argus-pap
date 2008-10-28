@@ -58,25 +58,17 @@ public class AddPolicies extends PolicyManagementCLI {
         
         List<XACMLObject> policyList = policyFileEncoder.parse(file);
         
-//        List<PolicyType> policyTypeList = new LinkedList<PolicyType>();
-//        List<String> idPrefixList = new LinkedList<String>();
         for (XACMLObject xacmlObject:policyList) {
             
             if (xacmlObject instanceof PolicySetType)
                 continue;
             PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
             
-            pw.setPrivate(true);
-            
-//            policyTypeList.add(pw.getPolicyType());
-//            idPrefixList.add(pw.getPolicyIdPrefix());
-
             System.out.println("Adding policy: ");
             System.out.println(pw.toFormattedString(15, 4));
             
             addPolicy(pw);
         }
-//        List<String> idList = policyMgmtClient.storePolicies(idPrefixList, policyTypeList);
         
     }
 

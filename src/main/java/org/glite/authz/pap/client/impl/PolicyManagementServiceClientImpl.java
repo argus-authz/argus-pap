@@ -152,19 +152,6 @@ public class PolicyManagementServiceClientImpl implements
 		call.invoke(new Object[] { policySetId });
 	}
 
-	public List<String> storePolicies(List<String> idPrefixList, List<PolicyType> policyList)
-            throws RemoteException {
-	    Call call = createCall("storePolicies");
-
-        call.registerTypeMapping(PolicyType.class,
-                PolicyType.DEFAULT_ELEMENT_NAME, new SerializerFactory(),
-                new DeserializerFactory());
-
-        List<String> idList = (List<String>) call.invoke(new Object[] { idPrefixList, policyList });
-        
-        return idList;
-    }
-
 	public String storePolicy(String idPrefix, PolicyType policy)
 			throws RemoteException {
 		Call call = createCall("storePolicy");

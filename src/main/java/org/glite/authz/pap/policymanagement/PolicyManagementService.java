@@ -34,9 +34,6 @@ public interface PolicyManagementService {
     public abstract String storePolicy(String idPrefix, PolicyType policy)
             throws java.rmi.RemoteException;
     
-    public abstract List<String> storePolicies(List<String> idPrefix, List<PolicyType> policy)
-    throws java.rmi.RemoteException;
-    
     public abstract String storePolicySet(String idPrefix, PolicySetType policySet)
             throws java.rmi.RemoteException;
     
