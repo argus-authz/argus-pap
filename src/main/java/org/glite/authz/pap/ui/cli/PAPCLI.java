@@ -107,6 +107,7 @@ public class PAPCLI {
         PrintWriter pw = new PrintWriter(System.out);
 
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap <subcommand> [options]");
+        pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP command-line client.");
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(),
                 "Type 'pap <subcommand> -h' for help on a specific subcommand.");
@@ -129,6 +130,8 @@ public class PAPCLI {
     }
 
     public PAPCLI(String[] args) {
+        
+        helpFormatter.setLeftPadding(4);
 
         defineCommands();
         defineOptions();
@@ -142,13 +145,19 @@ public class PAPCLI {
 
             if (commandLine.hasOption('h'))
                 printGeneralHelpAndExit(0);
-
-            command = getCommand(args);
-
+            
         } catch (ParseException e) {
             System.err.println("Parsing failed.  Reason: " + e.getMessage());
             printGeneralHelpAndExit(1);
         }
+
+        try {
+            command = getCommand(args);
+        } catch (ParseException e) {
+            System.out.println("You must specify a command, available commands are listed below.");
+            printGeneralHelpAndExit(1);
+        }
+
 
         boolean commandFound = false;
 
@@ -169,11 +178,11 @@ public class PAPCLI {
 
         } catch (ParseException e) {
             System.err.println("\nParsing failed.  Reason: " + e.getMessage() + "\n");
-            printCommandHelpAndExit(serviceCLI, 1);
+            printCommandHelpAndExit(serviceCLI, 4);
         } catch (HelpMessageException e) {
-            printCommandHelpAndExit(serviceCLI, 1);
+            printCommandHelpAndExit(serviceCLI, 4);
         } catch (RemoteException e) {
-            System.out.println("Found problems trying to connect to: " + serviceCLI.getServiceClient().getTargetEndpoint());
+            System.out.println("An error occured contacting PAP: " + serviceCLI.getServiceClient().getTargetEndpoint());
             System.out.println("Reason: " + e.getMessage());
         }
 

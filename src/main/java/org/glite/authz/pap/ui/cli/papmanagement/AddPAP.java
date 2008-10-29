@@ -39,14 +39,16 @@ public class AddPAP extends PAPManagementCLI {
         if (args.length != 4)
             throw new ParseException("Wrong number of arguments");
 
+        boolean isPublic = false;
+        
         if (commandLine.hasOption(LOPT_PUBLIC))
-            System.out.println(("PUBLIC"));
+            isPublic = true;
 
         String alias = args[1];
         String endpoint = args[2];
         String dn = args[3];
 
-        PAP pap = new PAP(alias, endpoint, dn);
+        PAP pap = new PAP(alias, endpoint, dn, isPublic);
 
         String msg = "Adding trusted PAP: ";
         
