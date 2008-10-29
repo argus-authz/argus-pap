@@ -16,7 +16,7 @@ public class PAP {
     public PAP() { }
 
     public PAP(String alias, String endpoint, String dn) {
-        this(alias, endpoint, dn, true);
+        this(alias, endpoint, dn, false);
     }
 
     public PAP(String alias, String endpoint, String dn, boolean isPublic) {
@@ -34,6 +34,8 @@ public class PAP {
             this.endpoint = "NULL";
         else
             this.endpoint = endpoint;
+        
+        this.isPublic = isPublic;
     }
 
     public String getAlias() {
