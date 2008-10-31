@@ -13,13 +13,18 @@ public class PAP {
     private String alias = "";
     private boolean isPublic = false;
     
+    private void buildEndpoint(String hostname){
+        
+        endpoint = "https://"+hostname+":8443/pap/services";
+        
+    }
     public PAP() { }
 
     public PAP(String alias, String endpoint, String dn) {
         this(alias, endpoint, dn, false);
     }
 
-    public PAP(String alias, String endpoint, String dn, boolean isPublic) {
+    public PAP(String alias, String hostname, String dn, boolean isPublic) {
         //papId = dn.replace('/', '_').replace('@', '-');
         papId = alias;
         
@@ -30,10 +35,10 @@ public class PAP {
         else
             this.alias = alias;
         
-        if (endpoint == null)
+        if (hostname == null)
             this.endpoint = "NULL";
         else
-            this.endpoint = endpoint;
+            buildEndpoint( hostname );
         
         this.isPublic = isPublic;
     }

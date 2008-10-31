@@ -93,7 +93,7 @@ public class PAPClient {
 
     public List<XACMLObject> getLocalPolicies() throws RemoteException, ServiceException {
         
-        log.info("Requesting policies to: " + url);
+        log.info("Requesting policies from remote PAP endpoint: " + url);
         
         Response response = port.xacmlPolicyQuery(xacmlPolicyQuery);
         

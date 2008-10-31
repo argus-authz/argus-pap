@@ -121,11 +121,11 @@ public class PAPCLI {
     private static void printGeneralHelpAndExit(int statusCode) {
         PrintWriter pw = new PrintWriter(System.out);
 
-        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap <subcommand> [options]");
+        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin <subcommand> [options]");
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP command-line client.");
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(),
-                "Type 'pap <subcommand> -h' for help on a specific subcommand.");
+                "Type 'pap-admin <subcommand> -h' for help on a specific subcommand.");
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Global options:");
         helpFormatter.printOptions(pw, helpFormatter.getWidth(), options,

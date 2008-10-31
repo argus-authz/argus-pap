@@ -51,7 +51,6 @@ public class RemovePolicies extends PolicyManagementCLI {
 	        }
         } catch (RemoteException e) {
         	System.out.println("ERROR.");
-        	e.printStackTrace();
         	throw e;
         }
     }

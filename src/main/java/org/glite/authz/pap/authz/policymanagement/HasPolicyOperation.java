@@ -17,6 +17,12 @@ public class HasPolicyOperation extends BasePAPOperation <Boolean> {
 
     }
 
+    public static HasPolicyOperation instance(String policyId) {
+
+        return new HasPolicyOperation(policyId);
+    }
+    
+    
     @Override
     protected Boolean doExecute() {
         

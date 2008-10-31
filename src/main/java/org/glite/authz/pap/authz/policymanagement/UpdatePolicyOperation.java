@@ -8,18 +8,18 @@ import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicyType;
 
 
-public class UpdatePolicy extends BasePAPOperation {
+public class UpdatePolicyOperation extends BasePAPOperation {
 
     PolicyType policy;
     
-    private UpdatePolicy(PolicyType policy) {
+    private UpdatePolicyOperation(PolicyType policy) {
 
         this.policy = policy;
     }
     
-    public static UpdatePolicy instance(PolicyType policy) {
+    public static UpdatePolicyOperation instance(PolicyType policy) {
 
-        return new UpdatePolicy(policy);
+        return new UpdatePolicyOperation(policy);
     }
     
     @Override

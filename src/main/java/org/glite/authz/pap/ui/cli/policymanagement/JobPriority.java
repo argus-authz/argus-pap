@@ -17,8 +17,8 @@ public class JobPriority extends PolicyManagementCLI {
     
     private static String USAGE_DN = "<dn> <service_class> [options]";
     private static String USAGE_FQAN = "<fqan> <service_class> [options]";
-    private static String[] COMMAND_NAME_VALUES_DN = { "user-job-prority", "ujb" };
-    private static String[] COMMAND_NAME_VALUES_FQAN = { "fqan-job-priority", "fjb" };
+    private static String[] COMMAND_NAME_VALUES_DN = { "user-job-prority", "ujp" };
+    private static String[] COMMAND_NAME_VALUES_FQAN = { "fqan-job-priority", "fjp" };
     private static String DESCRIPTION_DN = "Assign a user to a service class.";
     private static String DESCRIPTION_FQAN = "Assign an fqan to a service class";
 
@@ -66,6 +66,7 @@ public class JobPriority extends PolicyManagementCLI {
 
         List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
         targetList.add(new AttributeWizard(attributeToDeny, args[1]));
+        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_URI, "*"));
         targetList.add(new AttributeWizard(AttributeWizardType.SERVICE_CLASS, args[2]));
 
         initOpenSAML();
