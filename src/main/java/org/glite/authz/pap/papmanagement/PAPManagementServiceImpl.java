@@ -3,6 +3,8 @@ package org.glite.authz.pap.papmanagement;
 import java.rmi.RemoteException;
 import java.util.List;
 
+import javax.xml.rpc.ServiceException;
+
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.distribution.PAPManager;
@@ -59,7 +61,11 @@ public class PAPManagementServiceImpl implements PAPManagementService {
     		throw e;
     	}
     	
-    	DistributionModule.refreshCache(pap);
+    	try {
+            DistributionModule.refreshCache(pap);
+        } catch (ServiceException e) {
+            throw new RemoteException("Cannot build the service call", e);
+        }
     	
     	log.info("Cache for PAP \"" + papId + "\" has been refreshed");
 	}

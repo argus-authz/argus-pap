@@ -1,7 +1,10 @@
 package org.glite.authz.pap.distribution;
 
+import java.rmi.RemoteException;
 import java.util.LinkedList;
 import java.util.List;
+
+import javax.xml.rpc.ServiceException;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.repository.PAPContainer;
@@ -22,7 +25,7 @@ public class DistributionModule extends Thread {
         return instance;
     }
 
-    public static List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) {
+    public static List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) throws RemoteException, ServiceException {
 
         List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 
@@ -34,7 +37,7 @@ public class DistributionModule extends Thread {
         return papPolicies;
     }
     
-    public static void refreshCache(PAP pap) {
+    public static void refreshCache(PAP pap) throws RemoteException, ServiceException {
         log.info("Refreshing cache for pap: " + pap.getAlias() + "...");
     	List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
     	log.debug("Received " + papPolicies.size() + " XACML elemenst from PAP \"" + pap.getAlias() + "\"");
@@ -91,14 +94,25 @@ public class DistributionModule extends Thread {
         try {
             while (!this.isInterrupted()) {
                 
+                log.info("Starting refreshing cache process...");
+                
                 for (PAP pap : PAPManager.getInstance().getAllTrustedPAPs()) {
 
                     if (this.isInterrupted())
                         break;
 
-                    refreshCache(pap);
+                    try {
+                        refreshCache(pap);
+                    } catch (RemoteException e) {
+                        log.error("Cannot connect to: " + pap.getPapId());
+                    } catch (ServiceException e) {
+                        log.error("Cannot connect to: " + pap.getPapId());
+                    }
                     
                 }
+                
+                log.info("Refreshing cache process has finished");
+                
                 sleep(sleepTime);
             }
         } catch (InterruptedException e) {
