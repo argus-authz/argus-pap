@@ -12,6 +12,10 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.apache.log4j.Logger;
+import org.glite.authz.pap.ui.cli.authzmanagement.AddACE;
+import org.glite.authz.pap.ui.cli.authzmanagement.ListACL;
+import org.glite.authz.pap.ui.cli.authzmanagement.RemoveACE;
 import org.glite.authz.pap.ui.cli.papmanagement.AddPAP;
 import org.glite.authz.pap.ui.cli.papmanagement.ListPAPs;
 import org.glite.authz.pap.ui.cli.papmanagement.Ping;
@@ -24,8 +28,11 @@ import org.glite.authz.pap.ui.cli.policymanagement.ListPAPPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.RemovePolicies;
 
+
 public class PAPCLI {
 
+    public static final Logger log = Logger.getLogger( PAPCLI.class );
+    
     private static final List<ServiceCLI> serviceCLIList = new LinkedList<ServiceCLI>();
 
     protected static int hfWidth = 80;
@@ -56,6 +63,12 @@ public class PAPCLI {
         serviceCLIList.add(new RemovePAP());
         serviceCLIList.add(new ListPAPs());
         serviceCLIList.add(new RefreshCache());
+        
+        // PAP Authz Management
+        serviceCLIList.add(new ListACL());
+        serviceCLIList.add(new AddACE());
+        serviceCLIList.add(new RemoveACE());
+       
 
     }
 
@@ -167,7 +180,12 @@ public class PAPCLI {
             while (serviceCLIIterator.hasNext()) {
                 serviceCLI = serviceCLIIterator.next();
                 if (serviceCLI.commandMatch(command)) {
-                    serviceCLI.execute(args);
+                    
+                    if (System.getProperty( "enablePapCliProfiling")!=null)
+                        profileCommandExecution( serviceCLI, args );
+                    else
+                        serviceCLI.execute(args);
+                    
                     commandFound = true;
                     break;
                 }
@@ -182,10 +200,37 @@ public class PAPCLI {
         } catch (HelpMessageException e) {
             printCommandHelpAndExit(serviceCLI, 4);
         } catch (RemoteException e) {
-            System.out.println("An error occured contacting PAP: " + serviceCLI.getServiceClient().getTargetEndpoint());
+            System.out.println("Error invoking the '"+serviceCLI.getClass().getSimpleName()+"' method on remote endpoint: " + serviceCLI.getServiceClient().getTargetEndpoint());
             System.out.println("Reason: " + e.getMessage());
         }
 
+    }
+
+    protected void profileCommandExecution(ServiceCLI serviceCLI, String[] args) throws HelpMessageException, RemoteException, ParseException{
+        
+        int numSamples = 10; 
+        
+        long[] samples = new long[numSamples];
+        
+        for (int i=0; i < numSamples ; i++){
+            long cmdFoundTime = System.currentTimeMillis();
+            serviceCLI.execute(args);
+            samples[i] = System.currentTimeMillis() - cmdFoundTime;
+        }
+        
+        log.debug( "Avg '"+serviceCLI.getClass().getSimpleName()+"'cmd execution time: " + computeAvg( samples )+" msecs." );
+        log.debug( "Fist '"+serviceCLI.getClass().getSimpleName()+"' execution (bootstrap) time: "+samples[0]+" msecs.");
+        
+    }
+    protected long computeAvg(long[] values){
+        
+        long avg = 0;
+        
+        for (int i=1; i < values.length; i++)
+            avg = (values[i]+avg)/2;
+        
+        return avg;
+        
     }
     
     private static String fillWithSpaces(int n) {
@@ -194,5 +239,6 @@ public class PAPCLI {
             s += " ";
         return s;
     }
+
 
 }

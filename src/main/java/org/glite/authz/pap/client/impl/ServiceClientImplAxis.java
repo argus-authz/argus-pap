@@ -1,12 +1,19 @@
 package org.glite.authz.pap.client.impl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
+
+import javax.xml.rpc.ServiceException;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Service;
 import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.papmanagement.PAPManagementService;
 import org.glite.authz.pap.policymanagement.PolicyManagementService;
+import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
+import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagementServiceLocator;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
 
 public class ServiceClientImplAxis implements ServiceClient {
@@ -43,11 +50,12 @@ public class ServiceClientImplAxis implements ServiceClient {
     public PolicyManagementService getPolicyManagementService(String url) {
         return new PolicyManagementServiceClientImpl(url, getService());
     }
-
-    public Service getService() {
+    
+    protected void initializeAxisProperties(){
+        
         AxisProperties.setProperty("axis.socketSecureFactory",
         "org.glite.security.trustmanager.axis.AXISSocketFactory");
-    	
+        
         System.setProperty("crlUpdateInterval", "0s");
 
         // need to pass property to AXISSocketFactory
@@ -70,7 +78,12 @@ public class ServiceClientImplAxis implements ServiceClient {
             properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
         
         AXISSocketFactory.setCurrentProperties(properties);
+        System.setProperties( properties );
         
+    }
+
+    public Service getService() {
+        initializeAxisProperties();
         return new Service();
     }
 
@@ -93,5 +106,26 @@ public class ServiceClientImplAxis implements ServiceClient {
     public void setTargetEndpoint(String endpointURL) {
         serviceURL = endpointURL;
     }
+
+    public PAPAuthorizationManagement getPAPAuthorizationManagementService(
+            String url ) {
+
+        initializeAxisProperties();
+        PAPAuthorizationManagementServiceLocator loc = new PAPAuthorizationManagementServiceLocator();
+        
+        
+        try {
+            return loc.getPAPAuthorizationManagement( new URL(url) );
+        
+        } catch ( MalformedURLException e ) {
+            throw new PAPException("Error contacting PAP Authorization management service: "+e.getMessage(),e);
+            
+        } catch ( ServiceException e ) {
+            throw new PAPException("Error contacting PAP Authorization management service: "+e.getMessage(),e);
+            
+        } 
+    }
+    
+    
 
 }

@@ -2,6 +2,7 @@ package org.glite.authz.pap.client;
 
 import org.glite.authz.pap.papmanagement.PAPManagementService;
 import org.glite.authz.pap.policymanagement.PolicyManagementService;
+import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
 
 public interface ServiceClient {
     
@@ -14,6 +15,8 @@ public interface ServiceClient {
     public PAPManagementService getPAPManagementService(String url);
 
     public PolicyManagementService getPolicyManagementService(String url);
+    
+    public PAPAuthorizationManagement getPAPAuthorizationManagementService(String url);
     
     public String getTargetEndpoint();
 

@@ -124,10 +124,9 @@ public abstract class ServiceCLI {
         else
             serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST));
         
-        if (commandLine.hasOption(OPT_CERT)) {
+        if (commandLine.hasOption(OPT_CERT)) 
             serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
-            System.out.println("Settato cert");
-        }
+        
         
         if (commandLine.hasOption(OPT_KEY))
             serviceClient.setClientPrivateKey(OPT_KEY);
