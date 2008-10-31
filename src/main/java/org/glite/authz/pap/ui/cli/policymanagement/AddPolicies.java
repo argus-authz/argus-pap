@@ -19,7 +19,7 @@ public class AddPolicies extends PolicyManagementCLI {
 
     private static final String USAGE = "<file> [[file] ...] [options]";
     private static final String[] commandNameValues = { "add-policy", "ap" };
-    private static final String DESCRIPTION = "Add policies defined in the files.";
+    private static final String DESCRIPTION = "Add policies defined in the given files.";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
     
     public AddPolicies() {
@@ -42,10 +42,11 @@ public class AddPolicies extends PolicyManagementCLI {
             } catch (EncodingException e) {
                 System.out.println("Syntax error. Skipping file:" + fileName);
                 System.out.println(e.getMessage());
+                continue;
             }
+            System.out.println("Success: policies has been added from file " + fileName);
         }
         
-        System.out.println("SUCCESS: policies has been added.");
     }
     
     private void addPolicy(String fileName) throws EncodingException, ParseException, RemoteException {
