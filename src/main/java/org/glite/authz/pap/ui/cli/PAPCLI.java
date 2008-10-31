@@ -27,6 +27,7 @@ import org.glite.authz.pap.ui.cli.policymanagement.JobPriority;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPAPPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.RemovePolicies;
+import org.glite.authz.pap.ui.cli.policymanagement.UpdatePolicy;
 
 
 public class PAPCLI {
@@ -53,6 +54,7 @@ public class PAPCLI {
         serviceCLIList.add(JobPriority.dn());
         serviceCLIList.add(JobPriority.fqan());
         serviceCLIList.add(new AddPolicies());
+        serviceCLIList.add(new UpdatePolicy());
         serviceCLIList.add(new RemovePolicies());
         serviceCLIList.add(new ListPolicies());
         serviceCLIList.add(new ListPAPPolicies());
