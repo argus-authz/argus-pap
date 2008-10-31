@@ -159,6 +159,8 @@ class Policy {
             break;
         }
 
+        policy.setPrivate(fc.isprivate);
+            
         return policy;
     }
 
