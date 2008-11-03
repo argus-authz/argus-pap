@@ -35,9 +35,9 @@ public abstract class RepositoryManager {
         
         PAPManager.getInstance().createLocalPAPIfNotExists();
         
-        setLocalPoliciesFromConfigurationFile();
+        //setLocalPoliciesFromConfigurationFile();
         
-        FillRepository.fillFromConfiguration();
+        //FillRepository.fillFromConfiguration();
     }
     
     // Temporary method for initializing the repository
