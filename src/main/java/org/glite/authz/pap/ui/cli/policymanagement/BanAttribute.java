@@ -71,13 +71,16 @@ public class BanAttribute extends PolicyManagementCLI {
         initOpenSAML();
 
         PolicyWizard pw = new PolicyWizard(targetList, null, EffectType.Deny);
+        
+        if (isPrivate)
+            pw.setPrivate(true);
 
         System.out.print("Adding policy: ");
         System.out.println(pw.toFormattedString(0, 19));
 
         addPolicy(pw);
 
-        System.out.println("SUCCESS: policy has been added.");
+        System.out.println("Success: policy has been added.");
     }
 
 }
