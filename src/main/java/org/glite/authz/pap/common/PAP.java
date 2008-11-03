@@ -2,7 +2,7 @@ package org.glite.authz.pap.common;
 
 import java.io.Serializable;
 
-public class PAP implements Serializable {
+public class PAP  {
     public static final String localPAPId = "Local";
 
     public static PAP makeLocalPAP() {
@@ -15,6 +15,8 @@ public class PAP implements Serializable {
     private String hostname = "";
     private boolean isPublic = false;
     private String papId = "";
+    
+    public PAP() {}
     
     public PAP(String alias, String hostname, String dn) {
         this(alias, hostname, dn, false);

@@ -29,6 +29,7 @@ public class DistributionModule extends Thread {
 
         List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 
+        log.info("Contacting: " + remotePAP.getEndpoint());
         PAPClient client = new PAPClient(remotePAP.getEndpoint());
         papPolicies = client.getLocalPolicies();
 
