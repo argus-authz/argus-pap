@@ -1,30 +1,28 @@
 package org.glite.authz.pap.common;
 
-public class PAP {
+import java.io.Serializable;
+
+public class PAP implements Serializable {
     public static final String localPAPId = "Local";
 
     public static PAP makeLocalPAP() {
         return new PAP(localPAPId, "localhost", localPAPId);
     }
     
-    private String papId = "";
-    private String endpoint = "";
-    private String dn = "";
     private String alias = "";
+    private String dn = "";
+    private String endpoint = "";
+    private String hostname = "";
     private boolean isPublic = false;
+    private String papId = "";
     
-    private void buildEndpoint(String hostname){
-        
-        endpoint = "https://"+hostname+":8443/pap/services";
-        
+    public PAP(String alias, String hostname, String dn) {
+        this(alias, hostname, dn, false);
     }
-    public PAP() { }
-
-    public PAP(String alias, String endpoint, String dn) {
-        this(alias, endpoint, dn, false);
-    }
-
+    
     public PAP(String alias, String hostname, String dn, boolean isPublic) {
+        // TODO: use assert.
+        
         //papId = dn.replace('/', '_').replace('@', '-');
         papId = alias;
         
@@ -35,10 +33,9 @@ public class PAP {
         else
             this.alias = alias;
         
-        if (hostname == null)
-            this.endpoint = "NULL";
-        else
-            buildEndpoint( hostname );
+        this.hostname = hostname;
+        
+        buildEndpoint();
         
         this.isPublic = isPublic;
     }
@@ -46,15 +43,19 @@ public class PAP {
     public String getAlias() {
         return alias;
     }
-    
+
     public String getDn() {
         return dn;
     }
-
+    
     public String getEndpoint() {
         return endpoint;
     }
 
+    public String getHostname() {
+        return hostname;
+    }
+    
     public String getPapId() {
         return papId;
     }
@@ -75,6 +76,10 @@ public class PAP {
         this.endpoint = endpoint;
     }
 
+    public void setHostname(String hostname) {
+        this.hostname = hostname;
+    }
+
     public void setPapId(String papId) {
         this.papId = papId;
     }
@@ -83,21 +88,10 @@ public class PAP {
         this.isPublic = isPublic;
     }
 
-    public String toString() {
-        String visibility = "visibility=";
-        
-        if (isPublic)
-            visibility += "PUBLIC";
-        else
-            visibility += "PRIVATE";
-        
-        return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
-    }
-    
     public String toFormattedString() {
     	return toFormattedString(0, 4);
     }
-    
+
     public String toFormattedString(int indent) {
     	return toFormattedString(indent, 4);
     }
@@ -118,6 +112,23 @@ public class PAP {
         
         
         return aliasString + dnString + endpointString + visibilityString;
+    }
+    
+    public String toString() {
+        String visibility = "visibility=";
+        
+        if (isPublic)
+            visibility += "PUBLIC";
+        else
+            visibility += "PRIVATE";
+        
+        return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
+    }
+    
+    private void buildEndpoint() {
+    
+        endpoint = "https://" + hostname + ":8443/pap/services";
+        
     }
     
     private String fillWithSpaces(int n) {

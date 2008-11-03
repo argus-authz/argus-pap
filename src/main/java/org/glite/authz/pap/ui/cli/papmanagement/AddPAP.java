@@ -49,6 +49,8 @@ public class AddPAP extends PAPManagementCLI {
         String dn = args[3];
 
         PAP pap = new PAP(alias, endpoint, dn, isPublic);
+        
+        System.out.println("QQQQQQQQQQQQQ " + pap.getHostname());
 
         String msg = "Adding trusted PAP: ";
         

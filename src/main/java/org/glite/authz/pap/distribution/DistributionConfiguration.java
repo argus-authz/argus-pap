@@ -84,7 +84,7 @@ public class DistributionConfiguration {
 
         // Get an ordered list of PAP aliases
         List<String> papAliasList = new ArrayList<String>(papAliasSet.size());
-        String[] papOrder = papConfiguration.getStringArray(papOrderKey());
+        String[] papOrder = getPAPOrderArray();
 
         if (papOrder != null) {
             for (String papAlias : papOrder) {
@@ -129,18 +129,53 @@ public class DistributionConfiguration {
         return papList;
     }
     
-    public void removePAP(String papId) {
-        // TODO
-        save();
+    public void removePAP(String papAlias) {
+        papConfiguration.clearDistributionProperty(dnKey(papAlias));
+        papConfiguration.clearDistributionProperty(endpointKey(papAlias));
+        
+        String[] papOrderArrayOld = getPAPOrderArray();
+        List<String> papOrderList = new ArrayList<String>(papOrderArrayOld.length);
+        for (String pap:papOrderArrayOld) {
+            if (!(pap.equals(papAlias)))
+                papOrderList.add(pap);
+        }
+        String[] papOrderArrayNew = (String[]) papOrderList.toArray();
+        
+        setPAPOrder(papOrderArrayNew);
+        
+        papConfiguration.saveDistributionConfiguration();
     }
     
     public void setPAP(PAP pap) {
-        // TODO
-        save();
+        String papAlias = pap.getAlias();
+        
+        papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
+        papConfiguration.setDistributionProperty(endpointKey(papAlias), pap.getHostname());
+        
+        papConfiguration.saveDistributionConfiguration();
     }
     
-    private void save() {
-        // TODO
+    public String[] getPAPOrderArray() {
+        return papConfiguration.getStringArray(papOrderKey());
+    }
+    
+    public void setPAPOrder(String[] papArray) {
+        papConfiguration.clearDistributionProperty(papOrderKey());
+
+        if (papArray == null)
+            return;
+        
+        if (papArray.length == 0)
+            return;
+        
+        StringBuilder sb = new StringBuilder(papArray[0]);
+        
+        for (int i=0; i<papArray.length; i++) {
+            sb.append(", " + papArray[i]);
+        }
+        
+        papConfiguration.setDistributionProperty(papOrderKey(), sb.toString());
+        
     }
     
 }
