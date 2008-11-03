@@ -33,6 +33,7 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.slf4j.Logger;
@@ -56,6 +57,8 @@ public class PAPConfiguration {
     private static PAPConfiguration instance;
 
     private CompositeConfiguration configuration;
+    
+    private INIConfiguration distributionConfiguration;
 
     private PAPConfiguration(String papConfigurationDir, String papRepositoryDir) {
 
@@ -138,8 +141,10 @@ public class PAPConfiguration {
 
 	try {
 
-	    configuration
-		    .addConfiguration(new INIConfiguration(papDistConfFile));
+		distributionConfiguration = new INIConfiguration(papDistConfFile);
+	    
+		configuration
+		    .addConfiguration(distributionConfiguration);
 
 	} catch (org.apache.commons.configuration.ConfigurationException e) {
 
@@ -348,6 +353,29 @@ public class PAPConfiguration {
     public String[] getStringArray(String key) {
 
 	return configuration.getStringArray(key);
+    }
+    
+    public void clearDistributionProperty(String key){
+    	
+    	configuration.clearProperty(key);
+    }
+    
+    public void setDistributionProperty(String key, String value){
+    	
+    	distributionConfiguration.setProperty(key, value);
+    }
+    
+    public void saveDistributionConfiguration(){
+    	
+    	try {
+			
+    		distributionConfiguration.save();
+		
+    	} catch (ConfigurationException e) {
+			
+    		throw new PAPConfigurationException("Error saving policy distribution configuration: "+e.getMessage(), e);
+		}
+    	
     }
 
 }
