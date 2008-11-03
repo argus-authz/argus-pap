@@ -3,11 +3,14 @@ package org.glite.authz.pap.papmanagement;
 import java.rmi.RemoteException;
 import java.util.List;
 
-import javax.xml.rpc.ServiceException;
-
+import org.glite.authz.pap.authz.papmanagement.AddTrustedPAPOperation;
+import org.glite.authz.pap.authz.papmanagement.GetTrustedPAPOperation;
+import org.glite.authz.pap.authz.papmanagement.ListTrustedPAPsOperation;
+import org.glite.authz.pap.authz.papmanagement.RefreshPolicyCacheOperation;
+import org.glite.authz.pap.authz.papmanagement.RemoveTrustedPAPOperation;
+import org.glite.authz.pap.authz.papmanagement.TrustedPAPExistsOperation;
+import org.glite.authz.pap.authz.papmanagement.UpdateTrustedPAPOperation;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.distribution.DistributionModule;
-import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,31 +18,26 @@ import org.slf4j.LoggerFactory;
 public class PAPManagementServiceImpl implements PAPManagementService {
     
     private static final Logger log = LoggerFactory.getLogger(PAPManagementServiceImpl.class);
-    private static final PAPManager papManager = PAPManager.getInstance();
-
+    
     public void addTrustedPAP(PAP pap) throws RemoteException {
-        log.info("Received request");
-        papManager.addTrustedPAP(pap);
-        log.info("Added PAP: " + pap.toString());
+        log.info( "addTrustedPAP(" + pap + ");" );
+        AddTrustedPAPOperation.instance( pap ).execute();        
     }
 
     public boolean exists(String papId) throws RemoteException {
-    	log.info("Received request exists for papId=" + papId);
-    	boolean result = papManager.exists(papId);
-    	log.info("Sent papId=" + papId + " exists: " + result);
-    	return result;
+    	
+        log.info( "exists(" + papId + ");" );
+        return TrustedPAPExistsOperation.instance( papId ).execute();
 	}
 
     public PAP getTrustedPAP(String papId) throws RemoteException {
-        PAP pap = papManager.getPAP(papId);
-        log.info("Retrieved information about PAP: " + pap.toString());
-        return null;
+        log.info( "getTrustedPAP(" + papId + ");" );
+        return GetTrustedPAPOperation.instance( papId ).execute();
     }
 
     public List<PAP> listTrustedPAPs() throws RemoteException {
-        List<PAP> papList = papManager.getAllTrustedPAPs();
-        log.info("Sending list of PAPs...");
-        return papList;
+        log.info( "listTrustedPAPs();" );
+        return ListTrustedPAPsOperation.instance().execute();
     }
 
     public String ping() throws RemoteException {
@@ -48,42 +46,22 @@ public class PAPManagementServiceImpl implements PAPManagementService {
     }
 
     public void refreshCache(String papId) throws RemoteException {
-    	log.info("Requested refreshCache for PAP: " + papId);
-    	
-    	PAPManager papManager = PAPManager.getInstance();
-    	
-    	PAP pap;
-    	
-    	try {
-    		pap = papManager.getPAP(papId);
-    	} catch (NotFoundException e) {
-    		log.error("Unable to refresh cache, PAP not found: " + papId);
-    		throw e;
-    	}
-    	
-    	try {
-            DistributionModule.refreshCache(pap);
-        } catch (ServiceException e) {
-            throw new RemoteException("Cannot build the service call", e);
-        }
-    	
-    	log.info("Cache for PAP \"" + papId + "\" has been refreshed");
+        
+        log.info( "refreshCache(" + papId + ");" );
+        RefreshPolicyCacheOperation.instance( papId ).execute();
 	}
 
 	public void removeTrustedPAP(String papId) throws NotFoundException, RemoteException {
-    	log.info("Requested to remove pap: " + papId);
     	
-    	try {
-    		PAP pap = papManager.deleteTrustedPAP(papId);
-    		log.info("Removed PAP: " + pap.toString());
-    	} catch (NotFoundException e) {
-    		throw new RemoteException(e.getMessage(), e);
-    	}
+	    log.info( "removeTrustedPAP(" + papId + ");" );
+	    RemoveTrustedPAPOperation.instance( papId ).execute();
+	    
     }
 
 	public void updateTrustedPAP(String papId, PAP pap) throws RemoteException {
-        papManager.updateTrustedPAP(papId, pap);
-        log.info("Updated PAP: " + pap.toString());
+	    log.info( "updateTrustedPAP(" + papId+","+ pap + ");" );
+	    UpdateTrustedPAPOperation.instance( papId, pap ).execute();
+        
     }
 
 }
