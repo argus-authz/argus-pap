@@ -72,6 +72,14 @@ public class AttributeWizard {
             this.targetElement = category;
         }
         
+        public String getId() {
+            return id;
+        }
+        
+        public String getXACMLID() {
+            return xacmlId;
+        }
+        
     }
 
     @SuppressWarnings("unused")

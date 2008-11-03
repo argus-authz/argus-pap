@@ -17,16 +17,28 @@ public class PolicyWizard {
         BLACKLIST, SERVICECLASS
     }
     
-    private static final String DENY_KEYWORD = "deny";
     private static final String ALLOW_KEYWORD = "allow";
-    private static final String EXCEPTY_KEYWORD = "except";
     private static final String BLACKLIST_POLICY_ID_PREFIX = "BlacklistPolicy";
+    private static final String DENY_KEYWORD = "deny";
+    private static final String EXCEPTY_KEYWORD = "except";
     private static final String SERVICECLASS_POLICY_ID_PREFIX = "ServiceClassPolicy";
     private static final String VISIBILITY_PRIVATE_PREFIX = "PRIVATE";
     private static final String VISIBILITY_PUBLIC_PREFIX = "PUBLIC";
     
     public static String generateId(String prefix) {
         return prefix + "_" + generateUUID();
+    }
+    
+    public static boolean isPrivate(String policyId) {
+        String[] idComponents = policyId.split("_");
+        
+        if (idComponents.length != 3)
+            return false;
+        
+        if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0]))
+            return true;
+        
+        return false;
     }
     
     private static String generateUUID() {
@@ -45,7 +57,6 @@ public class PolicyWizard {
         
         return PolicyWizardType.BLACKLIST;
     }
-    
     private boolean isPrivate = false;
     private final List<List<AttributeWizard>> orExceptionsAttributeWizardList;
     private final PolicyType policy;
@@ -53,28 +64,8 @@ public class PolicyWizard {
     private String policyIdUniqueNumber;
     private String policyIdVisibilityPrefix;
     private PolicyWizardType policyWizardType;
-    private final List<AttributeWizard> targetAttributeWizardList;
     
-    public PolicyWizard(PolicyType policy) throws UnsupportedPolicyException {
-        
-        decomposePolicyId(policy.getPolicyId());
-        
-        if (policy.getRules().size() != 1)
-            throw new UnsupportedPolicyException("Wrong number of rules");
-        
-        targetAttributeWizardList = TargetWizard.extractTargetAttributeWizardList(policy
-                .getTarget());
-        
-        if (targetAttributeWizardList.isEmpty())
-            throw new UnsupportedPolicyException("ANY TARGET not supported");
-        
-        policyWizardType = getPolicyWizardType(targetAttributeWizardList);
-        
-        orExceptionsAttributeWizardList = RuleWizard.getAttributeWizardList(policy.getRules()
-                .get(0));
-        
-        this.policy = policy;
-    }
+    private final List<AttributeWizard> targetAttributeWizardList;
     
     public PolicyWizard(List<AttributeWizard> targetAttributeWizardList,
             List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
@@ -100,6 +91,27 @@ public class PolicyWizard {
         
     }
     
+    public PolicyWizard(PolicyType policy) throws UnsupportedPolicyException {
+        
+        decomposePolicyId(policy.getPolicyId());
+        
+        if (policy.getRules().size() != 1)
+            throw new UnsupportedPolicyException("Wrong number of rules");
+        
+        targetAttributeWizardList = TargetWizard.extractTargetAttributeWizardList(policy
+                .getTarget());
+        
+        if (targetAttributeWizardList.isEmpty())
+            throw new UnsupportedPolicyException("ANY TARGET not supported");
+        
+        policyWizardType = getPolicyWizardType(targetAttributeWizardList);
+        
+        orExceptionsAttributeWizardList = RuleWizard.getAttributeWizardList(policy.getRules()
+                .get(0));
+        
+        this.policy = policy;
+    }
+    
     public List<List<AttributeWizard>> getOrExceptionsAttributeWizardList() {
         return orExceptionsAttributeWizardList;
     }
@@ -116,6 +128,38 @@ public class PolicyWizard {
         return targetAttributeWizardList;
     }
     
+    public boolean isBanPolicy(String attributeValue, AttributeWizardType bannedAttribute) {
+        
+        if (isServiceClassPolicy())
+            return false;
+        
+        if (targetAttributeWizardList.size() != 2)
+            return false;
+        
+        for (AttributeWizard attribute:targetAttributeWizardList) {
+            
+            if (AttributeWizardType.RESOURCE_URI.equals(attribute.getAttributeWizardType())) {
+                if (!("*".equals(attribute.getValue())))
+                    return false;
+            } else if (bannedAttribute.equals(attribute.getAttributeWizardType())) {
+                if (!(attribute.getValue().equals(attributeValue)))
+                    return false;
+            } else
+                return false;
+        }
+        
+        return true;
+    }
+    
+    public boolean isBanPolicyForDN(String dn) {
+        return isBanPolicy(dn, AttributeWizardType.DN);
+    }
+    
+    public boolean isBanPolicyForFQAN(String dn) {
+        return isBanPolicy(dn, AttributeWizardType.FQAN);
+    }
+    
+    
     public boolean isBlacklistPolicy() {
         
         if (policyWizardType.equals(PolicyWizardType.BLACKLIST))
@@ -126,18 +170,6 @@ public class PolicyWizard {
     
     public boolean isPrivate() {
         return isPrivate;
-    }
-    
-    public static boolean isPrivate(String policyId) {
-        String[] idComponents = policyId.split("_");
-        
-        if (idComponents.length != 3)
-            return false;
-        
-        if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0]))
-            return true;
-        
-        return false;
     }
     
     public boolean isServiceClassPolicy() {
@@ -281,31 +313,6 @@ public class PolicyWizard {
         return PolicyHelper.toString(policy);
     }
     
-    private String generateId() {
-        
-        setPolicyIdVisibilityPrefix(isPrivate);
-        
-        setPolicyIdPrefix(policyWizardType);
-        
-        policyIdUniqueNumber = generateUUID();
-        
-        return composeId();
-    }
-    
-    private void setPolicyIdVisibilityPrefix(boolean isPrivate) {
-        if (isPrivate)
-            policyIdVisibilityPrefix = VISIBILITY_PRIVATE_PREFIX;
-        else
-            policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
-    }
-    
-    private void setPolicyIdPrefix(PolicyWizardType wizardType) {
-        if (wizardType.equals(PolicyWizardType.BLACKLIST))
-            policyIdPrefix = BLACKLIST_POLICY_ID_PREFIX;
-        else
-            policyIdPrefix = SERVICECLASS_POLICY_ID_PREFIX;
-    }
-    
     private String composeId() {
         return policyIdVisibilityPrefix + "_" + policyIdPrefix + "_" + policyIdUniqueNumber;
     }
@@ -341,6 +348,31 @@ public class PolicyWizard {
             s += " ";
         
         return s;
+    }
+    
+    private String generateId() {
+        
+        setPolicyIdVisibilityPrefix(isPrivate);
+        
+        setPolicyIdPrefix(policyWizardType);
+        
+        policyIdUniqueNumber = generateUUID();
+        
+        return composeId();
+    }
+    
+    private void setPolicyIdPrefix(PolicyWizardType wizardType) {
+        if (wizardType.equals(PolicyWizardType.BLACKLIST))
+            policyIdPrefix = BLACKLIST_POLICY_ID_PREFIX;
+        else
+            policyIdPrefix = SERVICECLASS_POLICY_ID_PREFIX;
+    }
+    
+    private void setPolicyIdVisibilityPrefix(boolean isPrivate) {
+        if (isPrivate)
+            policyIdVisibilityPrefix = VISIBILITY_PRIVATE_PREFIX;
+        else
+            policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
     }
     
 }
