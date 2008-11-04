@@ -129,10 +129,10 @@ public abstract class ServiceCLI {
         
         
         if (commandLine.hasOption(OPT_KEY))
-            serviceClient.setClientPrivateKey(OPT_KEY);
+            serviceClient.setClientPrivateKey(commandLine.getOptionValue(OPT_KEY));
         
         if (commandLine.hasOption(OPT_PASSWORD))
-            serviceClient.setClientPrivateKeyPassword(OPT_PASSWORD);
+            serviceClient.setClientPrivateKeyPassword(commandLine.getOptionValue(OPT_PASSWORD));
         
         executeCommandService(commandLine, serviceClient);
         
