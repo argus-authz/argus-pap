@@ -60,7 +60,7 @@ public abstract class ServiceCLI {
         ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
         serviceClient = serviceClientFactory.createServiceClient();
         
-        helpFormatter.setWidth(100);
+        helpFormatter.setWidth(80);
         helpFormatter.setLeftPadding(4);
         
         this.commandNameValues = commandNameValues;
