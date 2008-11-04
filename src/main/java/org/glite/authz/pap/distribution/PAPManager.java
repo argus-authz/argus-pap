@@ -41,7 +41,7 @@ public class PAPManager {
         if (exists(pap.getPapId()))
             throw new AlreadyExistsException();
         
-        //distributionConfiguration.setPAP(pap);
+        distributionConfiguration.setPAP(pap);
         papList.add(pap);
         papDAO.add(pap);
         
@@ -63,7 +63,7 @@ public class PAPManager {
     
     public PAP deleteTrustedPAP(String papId) throws NotFoundException {
         PAP pap = getPAP(papId);
-        //distributionConfiguration.removePAP(pap.getAlias());
+        distributionConfiguration.removePAP(pap.getAlias());
         papList.remove(pap);
         PAPContainer papContainer = new PAPContainer(pap);
         papContainer.erasePAP();
