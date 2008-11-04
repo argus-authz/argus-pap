@@ -18,7 +18,8 @@ public class ListACL extends AuthZManagementCLI {
     private static final String LONG_DESCRIPTION = "Lists the ACL for a given PAP authz context. Currently only " +
     		"the context 'global-context' is supported. If no context is passed as argument the default one will " +
     		"be used.";
-
+    private static final String ANY_AUTHENTICATED_USER_DN = "/O=PAP/OU=Internal/CN=Any authenticated user";
+    
     public ListACL() {
         super( commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
     }
@@ -40,12 +41,25 @@ public class ListACL extends AuthZManagementCLI {
     protected void printACE(PAPACE ace){
         String formatString; 
         
-        if (ace.getPrincipal().getType().equals( "x509-dn" ))
-            formatString = "\n\"%s\" :\n\t%s\n";
-        else
-            formatString = "\n%s :\n\t%s\n";
+        String principalName = null;
         
-        System.out.format(formatString, ace.getPrincipal().getName(), StringUtils.join( ace.getPermissions(),"|" ));
+        if (ace.getPrincipal().getType().equals( "x509-dn" )){
+        	if (ace.getPrincipal().getName().equals(ANY_AUTHENTICATED_USER_DN)){
+        		principalName = "ANYONE";
+        		formatString = "\n%s :\n\t%s\n";
+        		
+        	}else{
+        		principalName = ace.getPrincipal().getName();	
+        		formatString = "\n\"%s\" :\n\t%s\n";
+        	}
+        }else{
+        	principalName = ace.getPrincipal().getName();
+        	formatString = "\n%s :\n\t%s\n";
+        }
+            
+              	
+        
+        System.out.format(formatString, principalName, StringUtils.join( ace.getPermissions(),"|" ));
         
     }
     @Override
