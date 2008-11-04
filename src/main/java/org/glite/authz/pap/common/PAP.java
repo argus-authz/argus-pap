@@ -1,6 +1,5 @@
 package org.glite.authz.pap.common;
 
-import java.io.Serializable;
 
 public class PAP  {
     public static final String localPAPId = "Local";
