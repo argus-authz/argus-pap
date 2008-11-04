@@ -16,7 +16,7 @@ import org.opensaml.xacml.policy.PolicyType;
 public class UpdatePolicy extends PolicyManagementCLI {
     
     private static final String USAGE = "<policyId> <file> [options]";
-    private static final String[] commandNameValues = { "update-policy", "up" };
+    private static final String[] commandNameValues = { "update-policy-from-file", "up" };
     private static final String DESCRIPTION = "Update the policy identified by \"policyId\" with the new policy " +
     		"defined in \"file\"";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
@@ -79,6 +79,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
             return;
         }
         
+        policy.setPolicyId(policyId);
         policyMgmtClient.updatePolicy(policy);
         
         System.out.println("Success: policy has been updated.");
