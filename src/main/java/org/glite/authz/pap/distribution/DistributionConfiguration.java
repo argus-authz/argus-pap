@@ -133,15 +133,16 @@ public class DistributionConfiguration {
         papConfiguration.clearDistributionProperty(dnKey(papAlias));
         papConfiguration.clearDistributionProperty(endpointKey(papAlias));
         
-        String[] papOrderArrayOld = getPAPOrderArray();
-        List<String> papOrderList = new ArrayList<String>(papOrderArrayOld.length);
-        for (String pap:papOrderArrayOld) {
-            if (!(pap.equals(papAlias)))
-                papOrderList.add(pap);
-        }
-        String[] papOrderArrayNew = (String[]) papOrderList.toArray();
-        
-        setPAPOrder(papOrderArrayNew);
+        // TODO: remove PAP from pap-order
+//        String[] papOrderArrayOld = getPAPOrderArray();
+//        List<String> papOrderList = new ArrayList<String>(papOrderArrayOld.length);
+//        for (String pap:papOrderArrayOld) {
+//            if (!(pap.equals(papAlias)))
+//                papOrderList.add(pap);
+//        }
+//        String[] papOrderArrayNew = (String[]) papOrderList.toArray();
+//        
+//        setPAPOrder(papOrderArrayNew);
         
         papConfiguration.saveDistributionConfiguration();
     }
