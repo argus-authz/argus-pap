@@ -74,12 +74,12 @@ public class JobPriority extends PolicyManagementCLI {
         PolicyWizard pw = new PolicyWizard(targetList, null, EffectType.Permit);
         pw.setPrivate(isPrivate);
 
-        System.out.println("Adding policy:");
-        System.out.println(pw.toFormattedString());
+        System.out.print("Adding policy: ");
+        System.out.println(pw.toFormattedString(0, 19));
 
         addPolicy(pw);
 
-        System.out.println("SUCCESS: policy has been added.");
+        System.out.println("Success: policy has been added.");
     }
 
 }
