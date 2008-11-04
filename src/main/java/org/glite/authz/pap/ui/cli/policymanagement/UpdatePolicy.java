@@ -75,7 +75,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         }
         
         if (npolicies > 1) {
-            System.out.println("Error: more than one policy has been defined i file " + fileName);
+            System.out.println("Error: more than one policy has been defined in file " + fileName);
             return;
         }
         
