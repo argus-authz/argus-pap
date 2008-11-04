@@ -18,7 +18,7 @@ import org.opensaml.xacml.policy.PolicyType;
 public class AddPolicies extends PolicyManagementCLI {
 
     private static final String USAGE = "<file> [[file] ...] [options]";
-    private static final String[] commandNameValues = { "add-policy", "ap" };
+    private static final String[] commandNameValues = { "add-policies-from-file", "ap" };
     private static final String DESCRIPTION = "Add policies defined in the given files.";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
     
