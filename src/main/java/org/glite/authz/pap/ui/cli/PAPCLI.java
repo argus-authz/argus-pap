@@ -34,8 +34,11 @@ import org.glite.authz.pap.ui.cli.policymanagement.UpdatePolicy;
 public class PAPCLI {
 
     public static final Logger log = Logger.getLogger( PAPCLI.class );
-    
+
     private static final List<ServiceCLI> serviceCLIList = new LinkedList<ServiceCLI>();
+    private static final List<ServiceCLI> policyMgmtCommandList = new LinkedList<ServiceCLI>();
+    private static final List<ServiceCLI> papMgmtCommandList = new LinkedList<ServiceCLI>();
+    private static final List<ServiceCLI> authzMgmtCommandList = new LinkedList<ServiceCLI>();
 
     protected static int hfWidth = 80;
     protected static final Options options = new Options();
@@ -50,30 +53,33 @@ public class PAPCLI {
     private static void defineCommands() {
 
         // Policy Management
-        serviceCLIList.add(BanAttribute.dn());
-        serviceCLIList.add(BanAttribute.fqan());
-        serviceCLIList.add(UnBanAttribute.dn());
-        serviceCLIList.add(UnBanAttribute.fqan());
-        serviceCLIList.add(JobPriority.dn());
-        serviceCLIList.add(JobPriority.fqan());
-        serviceCLIList.add(new AddPolicies());
-        serviceCLIList.add(new UpdatePolicy());
-        serviceCLIList.add(new RemovePolicies());
-        serviceCLIList.add(new ListPolicies());
-        serviceCLIList.add(new ListPAPPolicies());
+    	policyMgmtCommandList.add(BanAttribute.dn());
+    	policyMgmtCommandList.add(BanAttribute.fqan());
+    	policyMgmtCommandList.add(UnBanAttribute.dn());
+    	policyMgmtCommandList.add(UnBanAttribute.fqan());
+    	policyMgmtCommandList.add(JobPriority.dn());
+    	policyMgmtCommandList.add(JobPriority.fqan());
+    	policyMgmtCommandList.add(new AddPolicies());
+    	policyMgmtCommandList.add(new UpdatePolicy());
+    	policyMgmtCommandList.add(new RemovePolicies());
+    	policyMgmtCommandList.add(new ListPolicies());
+    	policyMgmtCommandList.add(new ListPAPPolicies());
 
         // PAP Management
-        serviceCLIList.add(new Ping());
-        serviceCLIList.add(new AddPAP());
-        serviceCLIList.add(new RemovePAP());
-        serviceCLIList.add(new ListPAPs());
-        serviceCLIList.add(new RefreshCache());
+        papMgmtCommandList.add(new Ping());
+        papMgmtCommandList.add(new AddPAP());
+        papMgmtCommandList.add(new RemovePAP());
+        papMgmtCommandList.add(new ListPAPs());
+        papMgmtCommandList.add(new RefreshCache());
         
         // PAP Authz Management
-        serviceCLIList.add(new ListACL());
-        serviceCLIList.add(new AddACE());
-        serviceCLIList.add(new RemoveACE());
-       
+        authzMgmtCommandList.add(new ListACL());
+        authzMgmtCommandList.add(new AddACE());
+        authzMgmtCommandList.add(new RemoveACE());
+        
+        serviceCLIList.addAll(policyMgmtCommandList);
+        serviceCLIList.addAll(papMgmtCommandList);
+        serviceCLIList.addAll(authzMgmtCommandList);
 
     }
 
@@ -134,9 +140,26 @@ public class PAPCLI {
         helpFormatter.printOptions(pw, helpFormatter.getWidth(), options,
                 helpFormatter.getLeftPadding(), helpFormatter.getDescPadding());
         pw.println();
-        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Available subcommands:");
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "List of available subcommands grouped by " +
+        		"category.");
+        pw.println();
 
-        for (ServiceCLI serviceCLI : serviceCLIList) {
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Policy management:");
+        for (ServiceCLI serviceCLI : policyMgmtCommandList) {
+            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI
+                    .getCommandNameValues()));
+        }
+        pw.println();
+        
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP configuration management (distribution):");
+        for (ServiceCLI serviceCLI : papMgmtCommandList) {
+            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI
+                    .getCommandNameValues()));
+        }
+        pw.println();
+        
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Authorization configuration management:");
+        for (ServiceCLI serviceCLI : authzMgmtCommandList) {
             helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI
                     .getCommandNameValues()));
         }
