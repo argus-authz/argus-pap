@@ -224,9 +224,9 @@ public final class AuthzConfigurationParser {
                     if (p.equals( PAPAdminFactory.getAnyAuthenticatedUserAdmin() ))
                         dn = "ANYONE";
                     else
-                        dn = p.getDn();
+                        dn = "\""+p.getDn()+"\"";
                         
-                    writer.println("\""+dn+"\" : "+entry.getValue().toString());
+                    writer.println(dn+" : "+entry.getValue().toString());
                     
                 }
             }
