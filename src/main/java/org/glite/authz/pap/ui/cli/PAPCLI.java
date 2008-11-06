@@ -151,14 +151,14 @@ public class PAPCLI {
         }
         pw.println();
         
-        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP configuration management (distribution):");
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Distribution management:");
         for (ServiceCLI serviceCLI : papMgmtCommandList) {
             helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI
                     .getCommandNameValues()));
         }
         pw.println();
         
-        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Authorization configuration management:");
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Authorization management:");
         for (ServiceCLI serviceCLI : authzMgmtCommandList) {
             helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI
                     .getCommandNameValues()));
