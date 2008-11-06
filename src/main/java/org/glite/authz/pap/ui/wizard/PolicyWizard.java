@@ -136,6 +136,9 @@ public class PolicyWizard {
         if (targetAttributeWizardList.size() != 2)
             return false;
         
+        if (orExceptionsAttributeWizardList.size() != 0)
+        	return false;
+        
         for (AttributeWizard attribute:targetAttributeWizardList) {
             
             if (AttributeWizardType.RESOURCE_URI.equals(attribute.getAttributeWizardType())) {
