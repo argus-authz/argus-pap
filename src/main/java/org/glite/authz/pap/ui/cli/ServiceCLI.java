@@ -24,16 +24,19 @@ public abstract class ServiceCLI {
     private static final String LOPT_KEY = "key";
     private static final String LOPT_PASSWORD = "password";
     private static final String LOPT_URL = "url";
+    private static final String LOPT_VERBOSE = "verbose";
     private static final String OPT_CERT = "cert";
     private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
-    private static final String OPT_KEY = "key";
     private static final String OPT_HOST = "host";
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). " +
     		"This option defines the PAP endpoint to be contacted as follows: https://hostname:8443/pap/services";
+    private static final String OPT_KEY = "key";
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
     private static final String OPT_PASSWORD = "password";
     private static final String OPT_PASSWORD_DESCRIPTION = "Specifies the password used to decrypt the user's private key.";
+    private static final String OPT_VERBOSE_DESCRIPTION = "Verbose mode.";
     private static final String OPT_URL = "url";
+    private static final String OPT_VERBOSE = "v";
     
     protected static final String DEFAULT_HOST = "localhost";
     protected static final String DEFAULT_SERVICE_URL = "https://%s:8443/pap/services/";
@@ -47,13 +50,14 @@ public abstract class ServiceCLI {
     private String[] commandNameValues;
     private Options commandOptions;
     private String descriptionText;
-    private Options globalOptions = new Options();
+    private Options globalOptions;
     private String longDescriptionText;
-    private Options options = new Options();
+    private Options options;
     private final ServiceClient serviceClient;
     private String usageText;
+    protected boolean verboseMode = false;
     
-    @SuppressWarnings( { "static-access", "unchecked" })
+    @SuppressWarnings( "unchecked" )
     public ServiceCLI(String[] commandNameValues, String usage, String description,
             String longDescription) {
         
@@ -74,23 +78,9 @@ public abstract class ServiceCLI {
         
         commandOptions.addOption(OPT_HELP, LOPT_HELP, false, OPT_HELP_DESCRIPTION);
 
-        OptionGroup mutuallyExclusiveOptions = new OptionGroup();
+        globalOptions = defineGlobalOptions();
         
-        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
-                .withDescription("Specifies the target PAP endpoint (default: "
-                        + String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST) + ").").create(OPT_URL));
-        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
-                .withDescription(OPT_HOST_DESCRIPTION).create(OPT_HOST));
-        
-        globalOptions.addOptionGroup(mutuallyExclusiveOptions);
-        
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_CERT)
-                .withDescription(OPT_CERT_DESCRIPTION).create(OPT_CERT));
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_KEY)
-                .withDescription(OPT_KEY_DESCRIPTION).create(OPT_KEY));
-        globalOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_PASSWORD)
-                .withDescription(OPT_PASSWORD_DESCRIPTION).create(OPT_PASSWORD));
-        
+        options = new Options();
         Collection<Option> optionsList = commandOptions.getOptions();
         for (Option opt : optionsList) {
             options.addOption(opt);
@@ -134,6 +124,9 @@ public abstract class ServiceCLI {
         if (commandLine.hasOption(OPT_PASSWORD))
             serviceClient.setClientPrivateKeyPassword(commandLine.getOptionValue(OPT_PASSWORD));
         
+        if (commandLine.hasOption(OPT_VERBOSE))
+            verboseMode = true;
+        
         executeCommandService(commandLine, serviceClient);
         
     }
@@ -172,6 +165,32 @@ public abstract class ServiceCLI {
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Global options:");
         helpFormatter.printOptions(pw, helpFormatter.getWidth(), globalOptions, helpFormatter
                 .getLeftPadding(), helpFormatter.getDescPadding());
+    }
+    
+    @SuppressWarnings("static-access")
+    private Options defineGlobalOptions() {
+        
+        Options options = new Options();
+        OptionGroup mutuallyExclusiveOptions = new OptionGroup();
+        
+        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
+                .withDescription("Specifies the target PAP endpoint (default: "
+                        + String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST) + ").").create(OPT_URL));
+        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
+                .withDescription(OPT_HOST_DESCRIPTION).create(OPT_HOST));
+        
+        options.addOptionGroup(mutuallyExclusiveOptions);
+        
+        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_CERT)
+                .withDescription(OPT_CERT_DESCRIPTION).create(OPT_CERT));
+        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_KEY)
+                .withDescription(OPT_KEY_DESCRIPTION).create(OPT_KEY));
+        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_PASSWORD)
+                .withDescription(OPT_PASSWORD_DESCRIPTION).create(OPT_PASSWORD));
+        options.addOption(OptionBuilder.withLongOpt(LOPT_VERBOSE)
+                .withDescription(OPT_VERBOSE_DESCRIPTION).create(OPT_VERBOSE));
+        
+        return options;
     }
     
     protected abstract Options defineCommandOptions();

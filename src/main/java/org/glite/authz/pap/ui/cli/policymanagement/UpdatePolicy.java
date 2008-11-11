@@ -82,13 +82,13 @@ public class UpdatePolicy extends PolicyManagementCLI {
         policy.setPolicyId(policyId);
         policyMgmtClient.updatePolicy(policy);
         
-        System.out.println("Success: policy has been updated.");
+        if (verboseMode)
+            System.out.println("Success: policy has been updated.");
         
     }
     
     @Override
     protected Options defineCommandOptions() {
-        // TODO Auto-generated method stub
         return null;
     }
     

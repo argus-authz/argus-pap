@@ -52,7 +52,8 @@ public class AddPAP extends PAPManagementCLI {
         
         String msg = "Adding trusted PAP: ";
         
-        System.out.println(msg + pap.toFormattedString(0, msg.length() + 4));
+        if (verboseMode)
+            System.out.println(msg + pap.toFormattedString(0, msg.length() + 4));
         
         if (papMgmtClient.exists(pap.getPapId())) {
         	System.out.println("PAP already exists.");
@@ -61,7 +62,8 @@ public class AddPAP extends PAPManagementCLI {
         
         papMgmtClient.addTrustedPAP(pap);
         
-        System.out.println("Success: new trusted PAP has been added.");
+        if (verboseMode)
+            System.out.println("Success: new trusted PAP has been added.");
 
     }
 

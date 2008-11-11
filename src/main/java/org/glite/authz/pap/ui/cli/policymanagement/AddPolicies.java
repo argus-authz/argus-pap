@@ -44,7 +44,9 @@ public class AddPolicies extends PolicyManagementCLI {
                 System.out.println(e.getMessage());
                 continue;
             }
-            System.out.println("Success: policies has been added from file " + fileName);
+            
+            if (verboseMode)
+                System.out.println("Success: policies has been added from file " + fileName);
         }
         
     }
@@ -65,8 +67,10 @@ public class AddPolicies extends PolicyManagementCLI {
                 continue;
             PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
             
-            System.out.print("Adding policy: ");
-            System.out.println(pw.toFormattedString(0, 19));
+            if (verboseMode) {
+                System.out.print("Adding policy: ");
+                System.out.println(pw.toFormattedString(0, 19));
+            }
             
             addPolicy(pw);
         }
