@@ -20,7 +20,7 @@ public class PolicyWizard {
     private static final String ALLOW_KEYWORD = "allow";
     private static final String BLACKLIST_POLICY_ID_PREFIX = "BlacklistPolicy";
     private static final String DENY_KEYWORD = "deny";
-    private static final String EXCEPTY_KEYWORD = "except";
+    private static final String EXCEPT_KEYWORD = "    except";
     private static final String SERVICECLASS_POLICY_ID_PREFIX = "ServiceClassPolicy";
     private static final String VISIBILITY_PRIVATE_PREFIX = "PRIVATE";
     private static final String VISIBILITY_PUBLIC_PREFIX = "PUBLIC";
@@ -230,7 +230,7 @@ public class PolicyWizard {
             formattedString += targetAttributeWizardList.get(i).toFormattedString() + "\n";
         }
         
-        String exceptKeyString = EXCEPTY_KEYWORD + " ";
+        String exceptKeyString = EXCEPT_KEYWORD + " ";
         attributeIndentString = fillwithSpaces(policyIndent + attributeIndent
                 + exceptKeyString.length());
         
@@ -250,15 +250,20 @@ public class PolicyWizard {
         return formattedString;
     }
     
-    public String toNormalizedFormattedString(int policyIndent) {
-        return toNormalizedFormattedString(policyIndent, 4);
+    public String toNormalizedFormattedString(int policyIndent, boolean noId) {
+        return toNormalizedFormattedString(policyIndent, 4, noId);
     }
     
-    public String toNormalizedFormattedString(int policyIndent, int attributeIndent) {
+    public String toNormalizedFormattedString(int policyIndent, int attributeIndent, boolean noId) {
         
         String policyIndentString = fillwithSpaces(policyIndent);
         
-        String formattedString = policyIndentString + "id=" + policy.getPolicyId() + "\n";
+        String formattedString;
+        
+        if (!noId)
+            formattedString = policyIndentString + "id=" + policy.getPolicyId() + "\n";
+        else
+            formattedString = new String();
         
         String effectIndentString = fillwithSpaces(policyIndent + attributeIndent);
         
@@ -292,7 +297,7 @@ public class PolicyWizard {
             
         }
         
-        String exceptKeyString = EXCEPTY_KEYWORD + " ";
+        String exceptKeyString = EXCEPT_KEYWORD + " ";
         attributeIndentString = fillwithSpaces(policyIndent + attributeIndent
                 + exceptKeyString.length());
         

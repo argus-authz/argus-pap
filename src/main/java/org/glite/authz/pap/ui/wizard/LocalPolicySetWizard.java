@@ -1,7 +1,6 @@
 package org.glite.authz.pap.ui.wizard;
 
 import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,23 +30,29 @@ public class LocalPolicySetWizard {
 	}
 	
 	public void printFormattedBlacklistPolicies(PrintStream printStream) {
-		printFormattedResourceGroup(printStream, 0, resourceGroupMap);
+	    printFormattedBlacklistPolicies(printStream, false);
 	}
 	
+	public void printFormattedBlacklistPolicies(PrintStream printStream, boolean noId) {
+        printFormattedResourceGroup(printStream, 0, resourceGroupMap, noId);
+    }
+	
 	public void printFormattedServiceClassPolicies(PrintStream printStream) {
-		
-		Set<String> keySet = serviceClassGroupMap.keySet();
-		
-		for (String serviceClassValue:keySet) {
-			
-			printStream.println("service_class \"" + serviceClassValue + "\" {");
-			
-			printFormattedResourceGroup(printStream, 4, serviceClassGroupMap.get(serviceClassValue));
-			
-			printStream.println("}");
-			
-		}
-		
+	    printFormattedServiceClassPolicies(printStream, false);
+	}
+	
+	public void printFormattedServiceClassPolicies(PrintStream printStream, boolean noId) {
+	    Set<String> keySet = serviceClassGroupMap.keySet();
+        
+        for (String serviceClassValue:keySet) {
+            
+            printStream.println("service_class \"" + serviceClassValue + "\" {");
+            
+            printFormattedResourceGroup(printStream, 4, serviceClassGroupMap.get(serviceClassValue), noId);
+            
+            printStream.println("}");
+            
+        }
 	}
 	
 	private void addBlackListPolicy(PolicyWizard policy) {
@@ -92,6 +97,15 @@ public class LocalPolicySetWizard {
 		
 	}
 	
+	private String fillwithSpaces(int n) {
+    	String s = "";
+    	
+    	for (int i=0; i<n; i++)
+    		s += " ";
+    	
+    	return s;
+    }
+	
 	private String getAttributeValue(List<AttributeWizard> targetAttributeList, AttributeWizardType attributeType) {
 		
 		for (AttributeWizard attribute:targetAttributeList) {
@@ -102,7 +116,7 @@ public class LocalPolicySetWizard {
 		return "BUG";
 	}
 	
-	private void printFormattedResourceGroup(PrintStream printStream, int indent, Map<String, List<PolicyWizard>> resourceGroupMap) {
+	private void printFormattedResourceGroup(PrintStream printStream, int indent, Map<String, List<PolicyWizard>> resourceGroupMap, boolean noId) {
 
 		String indentString = fillwithSpaces(indent);
 		Set<String> keySet = resourceGroupMap.keySet();
@@ -110,22 +124,13 @@ public class LocalPolicySetWizard {
 		for (String resourceValue:keySet) {
 			printStream.println(indentString + "resource_uri \"" + resourceValue + "\" {");
 			
-			List<PolicyWizard> policyList = resourceGroupMap.get(resourceValue);
-			for (PolicyWizard policy:policyList) {
-				printStream.println(policy.toNormalizedFormattedString(indent + 4));
+			List<PolicyWizard> policyWizardList = resourceGroupMap.get(resourceValue);
+			for (PolicyWizard policyWizard:policyWizardList) {
+				printStream.println(policyWizard.toNormalizedFormattedString(indent + 4, noId));
 			}
 			
 			printStream.println(indentString + "}");
 		}
 	}
-	
-	private String fillwithSpaces(int n) {
-    	String s = "";
-    	
-    	for (int i=0; i<n; i++)
-    		s += " ";
-    	
-    	return s;
-    }
 
 }

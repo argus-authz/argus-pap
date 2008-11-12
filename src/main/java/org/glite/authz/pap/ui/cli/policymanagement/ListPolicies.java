@@ -15,6 +15,10 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class ListPolicies extends PolicyManagementCLI {
     
+    private static final String LOPT_BACKUP = "backup";
+    private static final String OPT_BACKUP_DESCRIPTION = "The output format is the same as the one used for the " +
+    		"simplified policy language. Policy ids are not written, therefore the output can be saved to a file and " +
+    		"given in input to the \"add-policies-from-file\" option.";
     private static final String OPT_SERVICECLASS_DESCRIPTION = "List only \"serviceclass\" policies.";
     
     private static final String USAGE = "[options]";
@@ -44,6 +48,8 @@ public class ListPolicies extends PolicyManagementCLI {
                 .withLongOpt(LOPT_SHOW_XACML).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_PLAIN_FORMAT_DESCRIPTION)
                 .withLongOpt(LOPT_PLAIN_FORMAT).create());
+        options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_BACKUP_DESCRIPTION)
+                .withLongOpt(LOPT_BACKUP).create());
         
         return options;
     }
@@ -56,6 +62,7 @@ public class ListPolicies extends PolicyManagementCLI {
         boolean showServiceclass = true;
         boolean xacmlOutput = false;
         boolean plainFormat = false;
+        boolean backupMode = false;
         
         if (commandLine.hasOption(LOPT_PRIVATE))
             showPublic = false;
@@ -75,12 +82,21 @@ public class ListPolicies extends PolicyManagementCLI {
         if (commandLine.hasOption(LOPT_PLAIN_FORMAT))
             plainFormat = true;
         
+        if (commandLine.hasOption(LOPT_BACKUP))
+            backupMode = true;
+        
+        if (backupMode && plainFormat) {
+            printErrorMessage("Conflicting options specified: --" + LOPT_BACKUP + " and --" + LOPT_PLAIN_FORMAT + ".");
+            return;
+        }
+            
+        
         initOpenSAML();
         
         List<PolicyType> policyList = policyMgmtClient.listPolicies();
         
         if (policyList.isEmpty()) {
-            System.out.println("No policies has been found.");
+            printOutputMessage("No policies has been found.");
             return;
         }
         
@@ -98,15 +114,16 @@ public class ListPolicies extends PolicyManagementCLI {
                     showPrivate,
                     showPublic,
                     showBlacklist,
-                    showServiceclass);
+                    showServiceclass,
+                    backupMode);
         
         if (!policiesFound)
-            System.out.println(noPoliciesFoundMessage(showPrivate, showPublic, showBlacklist, showServiceclass));
+            printOutputMessage(noPoliciesFoundMessage(showPrivate, showPublic, showBlacklist, showServiceclass));
         
     }
     
     protected static boolean listUsingGroupedFormat(List<PolicyType> policyList,
-            boolean showPrivate, boolean showPublic, boolean showBlacklist, boolean showServiceclass) {
+            boolean showPrivate, boolean showPublic, boolean showBlacklist, boolean showServiceclass, boolean noId) {
         
         boolean somethingHasBeenSelected = false;
         
@@ -134,8 +151,8 @@ public class ListPolicies extends PolicyManagementCLI {
             
         }
         
-        localPolicySetWizard.printFormattedBlacklistPolicies(System.out);
-        localPolicySetWizard.printFormattedServiceClassPolicies(System.out);
+        localPolicySetWizard.printFormattedBlacklistPolicies(System.out, noId);
+        localPolicySetWizard.printFormattedServiceClassPolicies(System.out, noId);
         
         return somethingHasBeenSelected;
     }

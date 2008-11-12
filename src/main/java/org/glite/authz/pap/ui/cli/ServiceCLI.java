@@ -197,5 +197,18 @@ public abstract class ServiceCLI {
     
     protected abstract void executeCommandService(CommandLine commandLine,
             ServiceClient serviceClient) throws CLIException, ParseException, RemoteException;
+
+    protected void printVerboseMessage(String msg) {
+        if (verboseMode)
+            System.out.println(msg);
+    }
+    
+    protected void printOutputMessage(String msg) {
+        System.out.println(msg);
+    }
+    
+    protected void printErrorMessage(String msg) {
+        System.out.println(msg);
+    }
     
 }

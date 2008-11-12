@@ -60,7 +60,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         if (xacmlOutput || plainFormat)
             policiesFound = ListPolicies.listUsingPlaingFormat(policyList, xacmlOutput, true, true, showBlacklist, showServiceclass);
         else
-            policiesFound = ListPolicies.listUsingGroupedFormat(policyList, true, true, showBlacklist, showServiceclass);
+            policiesFound = ListPolicies.listUsingGroupedFormat(policyList, true, true, showBlacklist, showServiceclass, false);
         
         if (!policiesFound)
             System.out.println(ListPolicies.noPoliciesFoundMessage(true, true, showBlacklist, showServiceclass));
