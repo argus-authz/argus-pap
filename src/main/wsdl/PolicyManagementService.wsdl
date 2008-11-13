@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://org.glite.authz/wsdl/pap/services/prova_policy_management"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    name="PolicyManagementService"
+    targetNamespace="http://org.glite.authz/wsdl/pap/services/prova_policy_management"
+    xmlns:xsd1="urn:oasis:names:tc:xacml:2.0:policy:schema:os">
+
+    <wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://org.glite.authz/wsdl/pap/services/prova_policy_management">
+            <xsd:import schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd" namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"></xsd:import>
+            <xsd:complexType name="StringList">
+                <xsd:sequence>
+                    <xsd:element name="stringItem" type="xsd:string" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="PolicyList">
+                <xsd:sequence>
+                    <xsd:element name="policyItem"
+                        type="xsd1:PolicyType" maxOccurs="unbounded" minOccurs="0">
+                    </xsd:element>
+                </xsd:sequence>
+            </xsd:complexType>
+        </xsd:schema>
+
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+            <xsd:import namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+                schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd">
+            </xsd:import>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="getPolicyRequest">
+        <wsdl:part name="getPolicyRequest" type="xsd:string" />
+    </wsdl:message>
+    <wsdl:message name="getPolicyResponse">
+        <wsdl:part name="getPolicyResponse" type="xsd1:PolicyType" />
+    </wsdl:message>
+
+    <wsdl:message name="storePoliciesRequest">
+        <wsdl:part name="idPrefixList" type="tns:StringList"></wsdl:part>
+        <wsdl:part name="policyList" type="tns:PolicyList"></wsdl:part>
+    </wsdl:message>
+    <wsdl:message name="storePoliciesResponse">
+        <wsdl:part name="idList" type="tns:StringList"></wsdl:part>
+    </wsdl:message>
+    
+    <wsdl:portType name="PROVAPolicyManagement">
+    
+        <wsdl:operation name="getPolicy">
+            <wsdl:input message="tns:getPolicyRequest" />
+            <wsdl:output message="tns:getPolicyResponse" />
+        </wsdl:operation>
+        
+        <wsdl:operation name="storePolicies">
+            <wsdl:input message="tns:storePoliciesRequest"></wsdl:input>
+            <wsdl:output message="tns:storePoliciesResponse"></wsdl:output>
+        </wsdl:operation>
+    </wsdl:portType>
+
+    <wsdl:binding name="PROVAPolicyManagement" type="tns:PROVAPolicyManagement">
+        <soap:binding style="rpc"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="getPolicy">
+            <soap:operation
+                soapAction="http://org.glite.authz/wsdl/pap/services/policy_management/getPolicy" />
+            <wsdl:input>
+                <soap:body
+                    namespace="http://org.glite.authz/wsdl/pap/services/policy_management"
+                    use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body
+                    namespace="http://org.glite.authz/wsdl/pap/services/policy_management"
+                    use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        
+        <wsdl:operation name="storePolicies">
+            <soap:operation
+                soapAction="http://org.glite.authz/wsdl/pap/services/policy_management/storePolicies" />
+            <wsdl:input>
+                <soap:body
+                    namespace="http://org.glite.authz/wsdl/pap/services/policy_management"
+                    use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body
+                    namespace="http://org.glite.authz/wsdl/pap/services/policy_management"
+                    use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        
+    </wsdl:binding>
+
+    <wsdl:service name="PROVAPolicyManagementService">
+        <wsdl:port binding="tns:PROVAPolicyManagement" name="PROVAPolicyManagement">
+            <soap:address location="https://localhost:8443/pap" />
+        </wsdl:port>
+    </wsdl:service>
+</wsdl:definitions>
