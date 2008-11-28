@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class DistributionConfiguration {
 
     private static final String REMOTE_PAPS_STANZA = "remote-paps";
-    private static final String CONFIGURATION_STANZA = "configuration";
+    private static final String CONFIGURATION_STANZA = "distribution-configuration";
 
     private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
     private static DistributionConfiguration instance = null;
@@ -144,7 +144,7 @@ public class DistributionConfiguration {
 //        
 //        setPAPOrder(papOrderArrayNew);
         
-        papConfiguration.saveDistributionConfiguration();
+        papConfiguration.saveStartupConfiguration();
     }
     
     public void setPAP(PAP pap) {
@@ -153,7 +153,7 @@ public class DistributionConfiguration {
         papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
         papConfiguration.setDistributionProperty(endpointKey(papAlias), pap.getHostname());
         
-        papConfiguration.saveDistributionConfiguration();
+        papConfiguration.saveStartupConfiguration();
     }
     
     public String[] getPAPOrderArray() {
