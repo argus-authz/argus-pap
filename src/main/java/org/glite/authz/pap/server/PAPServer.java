@@ -14,6 +14,7 @@ import org.glite.authz.pap.server.jetty.TrustManagerConnector;
 import org.glite.authz.pap.servlet.SecurityContextFilter;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.security.SslSelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -58,7 +59,13 @@ public final class PAPServer {
         ThreadPool threadPool = new ThreadPool(5, maxConnections, 60, TimeUnit.SECONDS, requestQueue);
         httpServer.setThreadPool(threadPool);
         
-        TrustManagerConnector connector = new TrustManagerConnector(getTrustmanagerConfiguration());
+        // TrustManagerConnector connector = new TrustManagerConnector(getTrustmanagerConfiguration());
+        SslSelectChannelConnector connector = new SslSelectChannelConnector();
+        
+        // connector.setKeystore("/Users/andrea/.globus/keystore");
+        // connector.setPassword("0v0s0d0");
+        // connector.setKeyPassword("0v0s0d0");
+        
         connector.setHost( getString( "host", "localhost" ));
         connector.setPort( port );
         // Add more sophisticated configuration of the connector here

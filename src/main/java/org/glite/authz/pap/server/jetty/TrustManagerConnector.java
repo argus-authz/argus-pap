@@ -1,6 +1,7 @@
 package org.glite.authz.pap.server.jetty;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.security.GeneralSecurityException;
@@ -12,6 +13,7 @@ import java.util.Properties;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLServerSocket;
 
 import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -110,8 +112,11 @@ public class TrustManagerConnector extends SslSelectChannelConnector {
     protected SelectChannelEndPoint newEndPoint( SocketChannel channel,
             SelectSet selectSet, SelectionKey key ) throws IOException {
     
-        // TODO Auto-generated method stub
-        return super.newEndPoint( channel, selectSet, key );
+    	
+    	SelectChannelEndPoint ep = super.newEndPoint( channel, selectSet, key );
+    	
+        
+        return ep;
     }
     
     @Override
@@ -120,5 +125,18 @@ public class TrustManagerConnector extends SslSelectChannelConnector {
     
         // TODO Auto-generated method stub
         return super.newConnection( channel, endpoint );
+    }
+    
+    @Override
+    protected SSLEngine createSSLEngine() throws IOException {
+    	 
+    	SSLEngine engine = super.createSSLEngine();
+    	
+    	String[] eCiphers = engine.getEnabledCipherSuites();
+    	String[] sCiphers = engine.getSupportedCipherSuites();
+    	
+    	return engine;
+    	
+    	 
     }
 }
