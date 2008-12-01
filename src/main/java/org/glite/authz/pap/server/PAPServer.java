@@ -1,20 +1,20 @@
 package org.glite.authz.pap.server;
 
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.axis.transport.http.AxisServlet;
 import org.apache.commons.configuration.Configuration;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.server.jetty.TrustManagerConnector;
+import org.glite.authz.pap.common.PAPContextListener;
+import org.glite.authz.pap.server.jetty.TrustManagerSocketConnector;
 import org.glite.authz.pap.servlet.SecurityContextFilter;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
-import org.mortbay.jetty.security.SslSelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
@@ -31,18 +31,24 @@ public final class PAPServer {
     private static final String TRUSTMANAGER_STANZA = STANDALONE_STANZA+":trustmanager"; 
     
     
+    private static void configureConnector(Connector connector){
+        
+        connector.setHost( getString( "host", "localhost" ));
+        connector.setPort( getInt( "port", 4554));
+
+        // Add more sophisticated configuration of the connector below
+        
+    }
+    
     public static void main( String[] args ) {
 
         // Initialize PAP configuration
         PAPConfiguration.initialize();
         
-        int port = getInt( "port", 5566);
-        
         int maxRequestQueueSize  = getInt("max_request_queue_size", 0);
         int maxConnections = getInt("max_connections", 30 );
         
-        Server httpServer = new Server(port);
-        
+        Server httpServer = new Server(getInt( "port", 4554));
         
         // Are these needed for the PAP?
         httpServer.setSendServerVersion(false);
@@ -59,26 +65,26 @@ public final class PAPServer {
         ThreadPool threadPool = new ThreadPool(5, maxConnections, 60, TimeUnit.SECONDS, requestQueue);
         httpServer.setThreadPool(threadPool);
         
-        // TrustManagerConnector connector = new TrustManagerConnector(getTrustmanagerConfiguration());
-        SslSelectChannelConnector connector = new SslSelectChannelConnector();
+        TrustManagerSocketConnector connector = new TrustManagerSocketConnector(getTrustmanagerConfiguration());
         
-        // connector.setKeystore("/Users/andrea/.globus/keystore");
-        // connector.setPassword("0v0s0d0");
-        // connector.setKeyPassword("0v0s0d0");
+        // TrustManagerSelectChannelConnector connector = new TrustManagerSelectChannelConnector(getTrustmanagerConfiguration());
+        // SslSelectChannelConnector connector = new SslSelectChannelConnector();
         
-        connector.setHost( getString( "host", "localhost" ));
-        connector.setPort( port );
-        // Add more sophisticated configuration of the connector here
+        configureConnector( connector );
         
         httpServer.setConnectors( new Connector[]{connector} );
         
         Context servletContext = new Context(httpServer,"/", false, false);
         
-                
         FilterHolder securityFilter = new FilterHolder(new SecurityContextFilter());
         securityFilter.setName( "Security context filter" );
         servletContext.addFilter( securityFilter, "/*", 0);
         
+        servletContext.addEventListener( new PAPContextListener() );
+        
+        ServletHolder axisServlet = new ServletHolder(new AxisServlet());
+        axisServlet.setName( "Axis servlet" );
+        servletContext.addServlet( axisServlet, "/services/*");
         
         ServletHolder testServlet = new ServletHolder(new TestServlet());
         testServlet.setName( "Test servlet" );
