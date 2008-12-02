@@ -1,0 +1,38 @@
+<assembly xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd">
+  
+  <id>service-distribution</id>
+  
+  <formats>
+    <format>dir</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <files>
+    <file>
+      <source>target/pap.war</source>
+      <outputDirectory>share/webapps</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    <file>
+      <source>src/main/scripts/init-pap.py</source>
+      <outputDirectory>sbin</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    <!-- placeholder for adding config files
+    <file>
+      <source>src/main/config</source>
+      <outputDirectory>etc/pap</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    -->
+    <file>
+      <source>target/pap.jar</source>
+      <outputDirectory>share/java</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+  </files>
+  
+</assembly>
