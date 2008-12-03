@@ -19,17 +19,24 @@ import org.glite.authz.pap.client.ServiceClientFactory;
 public abstract class ServiceCLI {
     
     private static final HelpFormatter helpFormatter = new HelpFormatter();
+    protected static final String DEFAULT_HOST = "localhost";
+    protected static final String DEFAULT_PORT = "8443";
+    protected static final String DEFAULT_SERVICE_URL = "https://%s:%s/pap/services/";
     private static final String LOPT_CERT = "cert";
     private static final String LOPT_HOST = "host";
+    private static final String LOPT_PORT = "port";
     private static final String LOPT_KEY = "key";
     private static final String LOPT_PASSWORD = "password";
     private static final String LOPT_URL = "url";
     private static final String LOPT_VERBOSE = "verbose";
     private static final String OPT_CERT = "cert";
+    private static final String OPT_PORT = "p";
     private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
+    private static final String OPT_PORT_DESCRIPTION = "Specifies the port on which the target PAP is listening " +
+    		"(default is " + DEFAULT_PORT + ")";
     private static final String OPT_HOST = "host";
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). " +
-    		"This option defines the PAP endpoint to be contacted as follows: https://hostname:8443/pap/services";
+    		"This option defines the PAP endpoint to be contacted as follows: https://hostname:port/pap/services";
     private static final String OPT_KEY = "key";
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
     private static final String OPT_PASSWORD = "password";
@@ -38,8 +45,6 @@ public abstract class ServiceCLI {
     private static final String OPT_URL = "url";
     private static final String OPT_VERBOSE = "v";
     
-    protected static final String DEFAULT_HOST = "localhost";
-    protected static final String DEFAULT_SERVICE_URL = "https://%s:8443/pap/services/";
     protected static final String LOPT_HELP = "help";
     protected static final String LOPT_PRIVATE = "private";
     protected static final String LOPT_PUBLIC = "public";
@@ -107,12 +112,24 @@ public abstract class ServiceCLI {
         if (commandLine.hasOption(OPT_HELP))
             throw new HelpMessageException();
         
-        if (commandLine.hasOption(OPT_URL))
+        if (commandLine.hasOption(OPT_URL)) {
+            
             serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
-        else if (commandLine.hasOption(OPT_HOST))
-            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, commandLine.getOptionValue(OPT_HOST)));
-        else
-            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST));
+            
+        } else {
+            
+            String host = DEFAULT_HOST;
+            String port = DEFAULT_PORT;
+            
+            if (commandLine.hasOption(OPT_HOST))
+                host = commandLine.getOptionValue(OPT_HOST);
+            
+            if (commandLine.hasOption(OPT_PORT))
+                port = commandLine.getOptionValue(OPT_PORT);
+            
+            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, host, port));
+            
+        }
         
         if (commandLine.hasOption(OPT_CERT)) 
             serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
@@ -171,15 +188,15 @@ public abstract class ServiceCLI {
     private Options defineGlobalOptions() {
         
         Options options = new Options();
-        OptionGroup mutuallyExclusiveOptions = new OptionGroup();
         
-        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
+        // TODO: OPT_URL and (OPT_HOST, OPT_PORT) are mutually exclusive options. Use OptionGroup.
+        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
                 .withDescription("Specifies the target PAP endpoint (default: "
                         + String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST) + ").").create(OPT_URL));
-        mutuallyExclusiveOptions.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
+        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
                 .withDescription(OPT_HOST_DESCRIPTION).create(OPT_HOST));
-        
-        options.addOptionGroup(mutuallyExclusiveOptions);
+        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_PORT)
+                .withDescription(OPT_PORT_DESCRIPTION).create(OPT_PORT));
         
         options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_CERT)
                 .withDescription(OPT_CERT_DESCRIPTION).create(OPT_CERT));
