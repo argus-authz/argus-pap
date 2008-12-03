@@ -46,7 +46,7 @@ public final class AuthzConfigurationParser {
     public static final Pattern emptyLinePattern = Pattern
             .compile( emptyLineRegex );
 
-    public static final String commentRegex = "^#.*$";
+    public static final String commentRegex = "^[#;].*$";
 
     public static final Pattern commentPattern = Pattern.compile( commentRegex );
 

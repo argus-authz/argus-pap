@@ -124,22 +124,22 @@ public final class PAPServer {
 
     private void configureServlets() {
 
-        Context servletContext = new Context( httpServer, "/", false, false );
+        Context servletContext = new Context( httpServer, "/glite-authz-pap", false, false );
 
         FilterHolder securityFilter = new FilterHolder(
                 new SecurityContextFilter() );
         securityFilter.setName( "Security context filter" );
-        servletContext.addFilter( securityFilter, "/*", 0 );
+        servletContext.addFilter( securityFilter, "/glite-authz-pap/*", 0 );
 
         servletContext.addEventListener( new PAPContextListener() );
 
         ServletHolder axisServlet = new ServletHolder( new AxisServlet() );
         axisServlet.setName( "Axis servlet" );
-        servletContext.addServlet( axisServlet, "/services/*" );
+        servletContext.addServlet( axisServlet, "/glite-authz-pap/services/*" );
 
         ServletHolder testServlet = new ServletHolder( new TestServlet() );
         testServlet.setName( "Test servlet" );
-        servletContext.addServlet( testServlet, "/test" );
+        servletContext.addServlet( testServlet, "/glite-authz-pap/test" );
 
     }
 

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.glite.security.authz.pap</groupId>
-  <artifactId>org.glite.security.authz.pap
+  <groupId>org.glite.authz.pap</groupId>
+  <artifactId>org.glite.authz.pap
   </artifactId>
   <packaging>war</packaging>
-  <name>PAP</name>
+  <name>glite-authz-pap</name>
   <version>0.1</version>
   <properties>
     <pap-services-namespace> http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
   </properties>
   <build>
-    <finalName>pap</finalName>
+    <finalName>glite-authz-pap</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -32,9 +32,6 @@
               <goal>jar</goal>
             </goals>
             <configuration>
-              <includes>
-                <include>target/pap/WEB-INF/classes/</include>
-              </includes>
             </configuration>
           </execution>
         </executions>
