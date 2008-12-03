@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <parent>
+    <groupId>org.glite.authz.pap</groupId>
+    <artifactId>project</artifactId>
+    <version>0.1</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.glite.authz.pap</groupId>
+  <artifactId>pap-standalone</artifactId>
+  <packaging>jar</packaging>
+  <name>PAP standalone service</name>
+  <version>0.1</version>
+  <build>
+    <finalName>glite-authz-pap-standalone</finalName>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.glite.authz.pap</groupId>
+      <artifactId>pap-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>    
+  </dependencies>
+</project>

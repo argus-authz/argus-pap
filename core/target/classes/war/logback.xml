@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+  <appender name="A" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!--See http://logback.qos.ch/manual/appenders.html#RollingFileAppender-->
+    <!--and http://logback.qos.ch/manual/appenders.html#TimeBasedRollingPolicy-->
+    <!--for further documentation-->
+    <File>${catalina.base}/logs/glite-authz-pap.log</File>
+    <layout class="ch.qos.logback.classic.PatternLayout">
+      <Pattern>%d{HH:mm:ss,SSS} %-5p %c : %x %m %n</Pattern>
+    </layout>
+  </appender>
+  <logger name="org.apache.axis" level="WARN"/>
+  <logger name="org.apache.catalina" level="WARN"/>
+  <logger name="org.apache" level="WARN"/>
+  <logger name="org.springframework" level="WARN"/>
+  <logger name="org.opensaml" level="WARN"/>
+  <logger name="org.glite.security" level="WARN"/>
+  <logger name="com.opensymphony" level="WARN"/>
+  <root level="DEBUG">
+    <appender-ref ref="A"/>
+  </root>
+</configuration>
