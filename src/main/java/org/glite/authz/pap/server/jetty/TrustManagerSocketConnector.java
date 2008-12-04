@@ -7,6 +7,7 @@ import java.security.GeneralSecurityException;
 import java.util.Properties;
 
 import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocketFactory;
 
 import org.glite.security.trustmanager.ContextWrapper;
 import org.mortbay.jetty.security.SslSocketConnector;
@@ -56,5 +57,6 @@ public class TrustManagerSocketConnector extends SslSocketConnector {
         
         return context.getServerSocketFactory();
     }
+    
 
 }

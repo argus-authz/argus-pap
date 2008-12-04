@@ -21,32 +21,7 @@
 #     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
 #############################################################################
 
-import getopt, sys, os, os.path, commands,urllib,xml.dom.minidom, getopt, shutil, time, re, glob
-
-pap_app_name = "glite-authz-pap"
-pap_context_name = pap_app_name+".xml"
-par_war_name = pap_app_name+".war"
-
-def catalina_conf_dir():
-    if not os.environ.has_key('CATALINA_HOME'):
-        raise ValueError, "CATALINA_HOME is not defined!"
-    
-    return os.path.join(os.environ['CATALINA_HOME'],"conf","Catalina","localhost")
-
-def catalina_webapp_dir():
-    if not os.environ.has_key('CATALINA_HOME'):
-        raise ValueError, "CATALINA_HOME is not defined!"
-    
-    return os.path.join(os.environ['CATALINA_HOME'],"webapps")
-
-def catalina_webapp_pap_dir():   
-    return os.path.join(catalina_webapp_dir(), pap_app_name)
-
-def catalina_pap_war_file():
-    return os.path.join(catalina_webapp_dir(), pap_war_name)
-
-def catalina_pap_context_file():
-    return os.path.join(catalina_conf_dir(), pap_context_name)
+import getopt, sys, os, os.path, commands,urllib,xml.dom.minidom, getopt, shutil, time, re, glob, pap_utils
 
 def remove_webapp_pap_war():
     if os.path.exists(catalina_pap_war_file()):
@@ -56,22 +31,18 @@ def remove_webapp_pap_dir():
     if os.path.exists(catalina_webapp_pap_dir()):
         shutil.rmtree(catalina_webapp_pap_dir(),
                       True)
-def pap_war_file():
-    if not os.path.exists(os.path.join(os.environ['GLITE_LOCATION'],"share","webapps",pap_war_name)):
-        raise RuntimeError,"PAP webapplication not found in usual location: %s." % os.path.join(os.environ['GLITE_LOCATION'],"share","webapps")   
-    
-    return os.path.join(os.environ['GLITE_LOCATION'],"share","webapps",pap_war_name)
+
 
 def usage():
     
     usage_str = """
     Usage:
     
-    init-pap.py (start|stop|reload|status) 
+    pap-deploy.py (deploy|undeploy|redeploy|status) 
     
-    start deploys the PAP web application on tomcat
-    stop undeploys the PAP web application from tomcat
-    relead redeploys the PAP web application on tomcat
+    deploy deploys the PAP web application on tomcat
+    undeploy undeploys the PAP web application from tomcat
+    redeploy redeploys the PAP web application on tomcat
     status prints a message saying whether the PAP web 
     application is currently deployed on tomcat. 
     """
@@ -79,7 +50,7 @@ def usage():
     
 
 def parse_cmd_line():   
-    global command, vo, options, use_manager
+    global command
     
     if len(sys.argv) == 1:
         print "No command given!"
@@ -106,20 +77,20 @@ def parse_cmd_line():
         sys.exit(1)
         
 
-def start():
+def deploy():
     shutil.copy(pap_war_file(), catalina_webapp_dir())
     print "The PAP web application has been deployed to tomcat, and it will be soon reachable."
 
-def stop():
+def undeploy():
     remove_webapp_pap_war()
     remove_webapp_pap_dir()
     print "The PAP web application has been undeployed from tomcat, and it will be soon unreachable."
     
 
-def releoad():
+def redeploy():
     remove_webapp_pap_dir()
     time.sleep(5)
-    start()
+    deploy()
 
 def status():
     if (os.path.exists(catalina_pap_context_file())):
@@ -132,14 +103,14 @@ def status():
 def main():
     parse_cmd_line()
     try:
-        if command == "start":
-            start()
+        if command == "deploy":
+            deploy()
     
-        elif command == "stop":
-            stop()
+        elif command == "undeploy":
+            undeploy()
     
-        elif command == "restart":
-            reload()
+        elif command == "redeploy":
+            redeploy()
     
         elif command == "status":
             status()

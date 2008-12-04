@@ -81,6 +81,11 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
+          <descriptors>
+            <descriptor>
+              src/main/assembly/service-descriptor.xml
+            </descriptor>
+           </descriptors>
         </configuration>
       </plugin>		
     </plugins>
@@ -132,10 +137,14 @@
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml</artifactId>
       <version>2.2.1</version>
-      <!--
-        <exclusions> <exclusion> <groupId>org.slf4j</groupId>
-        <artifactId>jcl104-over-slf4j</artifactId> </exclusion> </exclusions>
-      -->
+      
+        <exclusions>
+          <exclusion> 
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl104-over-slf4j</artifactId>
+          </exclusion> 
+        </exclusions>
+      
     </dependency>
     <dependency>
       <groupId>axis</groupId>
@@ -202,25 +211,25 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.6</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>jcl104-over-slf4j</artifactId>
-      <version>1.5.0</version>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.5.6</version>
     </dependency>
     <!-- 
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.6</version>
     </dependency>
     -->
     
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
-      <version>1.5.0</version>
+      <version>1.5.6</version>
       <scope>runtime</scope>
     </dependency>
     
