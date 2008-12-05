@@ -34,12 +34,6 @@ public final class PAPService {
 
 	    logger.info("Bootstraping OpenSAML...");
 	    DefaultBootstrap.bootstrap();
-	    XMLConfigurator xmlConfigurator = new XMLConfigurator();
-
-	    // Needed because of a "bug" in opensaml 2.1.0... can be removed
-	    // when opensaml is updated
-	    xmlConfigurator.load(Configuration.class
-		    .getResourceAsStream("/opensaml_bugfix.xml"));
 
 	} catch (ConfigurationException e) {
 

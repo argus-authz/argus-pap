@@ -11,13 +11,18 @@ import org.apache.axis.transport.http.AxisServlet;
 import org.apache.commons.configuration.Configuration;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.PAPContextListener;
+import org.glite.authz.pap.server.jetty.TrustManagerSelectChannelConnector;
 import org.glite.authz.pap.server.jetty.TrustManagerSocketConnector;
 import org.glite.authz.pap.servlet.SecurityContextFilter;
 import org.mortbay.jetty.Connector;
+import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.DefaultHandler;
+import org.mortbay.jetty.handler.HandlerCollection;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.FilterHolder;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.thread.concurrent.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,6 +61,10 @@ public final class PAPServer {
     protected String papRepositoryDir;
 
     protected Server httpServer;
+    
+    protected String getPAPWar(){
+        return (String)System.getProperty( "GLITE_LOCATION" )+"/share/webapps/glite-authz-pap.war";
+    }
 
     public PAPServer( String[] args ) {
 
@@ -65,6 +74,7 @@ public final class PAPServer {
 
         configureHttpServer();
 
+        // configureWar();
         configureServlets();
 
         try {
@@ -112,8 +122,11 @@ public final class PAPServer {
                 TimeUnit.SECONDS, requestQueue );
         httpServer.setThreadPool( threadPool );
 
-        TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
-                getTrustmanagerConfiguration() );
+        //TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
+        //        getTrustmanagerConfiguration() );
+
+        TrustManagerSelectChannelConnector connector = new
+         TrustManagerSelectChannelConnector(getTrustmanagerConfiguration());
 
         connector.setHost( getString( "host", "localhost" ) );
         connector.setPort( getInt( "port", PAPDefaults.PORT ) );
@@ -122,24 +135,40 @@ public final class PAPServer {
 
     }
 
+    private void configureWar(){
+        
+        WebAppContext webappContext = new WebAppContext();
+        
+        webappContext.setContextPath( "/glite-authz-pap" );
+        webappContext.setWar( getPAPWar() );
+        
+        HandlerCollection handlers= new HandlerCollection();
+        handlers.setHandlers(new Handler[]{webappContext, new DefaultHandler()});
+        
+        httpServer.setHandler( handlers );
+        
+    }
+    
     private void configureServlets() {
 
-        Context servletContext = new Context( httpServer, "/glite-authz-pap", false, false );
+        Context servletContext = new Context( httpServer, "/",
+                false, false );
 
         FilterHolder securityFilter = new FilterHolder(
                 new SecurityContextFilter() );
+
         securityFilter.setName( "Security context filter" );
-        servletContext.addFilter( securityFilter, "/glite-authz-pap/*", 0 );
-
+        servletContext.addFilter( securityFilter, "/*", 0 );
+        
         servletContext.addEventListener( new PAPContextListener() );
-
+        
         ServletHolder axisServlet = new ServletHolder( new AxisServlet() );
         axisServlet.setName( "Axis servlet" );
-        servletContext.addServlet( axisServlet, "/glite-authz-pap/services/*" );
+        servletContext.addServlet( axisServlet, "/services/*" );
 
         ServletHolder testServlet = new ServletHolder( new TestServlet() );
         testServlet.setName( "Test servlet" );
-        servletContext.addServlet( testServlet, "/glite-authz-pap/test" );
+        servletContext.addServlet( testServlet, "/test" );
 
     }
 
@@ -187,12 +216,14 @@ public final class PAPServer {
                 } else if ( args[currentArg].equalsIgnoreCase( "--"
                         + CONF_DIR_OPTION_NAME ) ) {
                     papConfigurationDir = args[currentArg + 1];
-                    log.info( "Starting PAP with configuration dir: {}", papConfigurationDir );
+                    log.info( "Starting PAP with configuration dir: {}",
+                            papConfigurationDir );
                     currentArg = currentArg + 2;
                 } else if ( args[currentArg].equalsIgnoreCase( "--"
                         + REPO_DIR_OPTION_NAME ) ) {
                     papRepositoryDir = args[currentArg + 1];
-                    log.info( "Starting PAP with repo dir: {}", papRepositoryDir );
+                    log.info( "Starting PAP with repo dir: {}",
+                            papRepositoryDir );
                     currentArg = currentArg + 2;
                 } else
                     usage();
@@ -206,8 +237,8 @@ public final class PAPServer {
 
         String usage = "PAPServer [--" + CONF_DIR_OPTION_NAME
                 + " <confDir>] [--" + REPO_DIR_OPTION_NAME + " <repoDir>]";
-        
-        System.out.println(usage);
+
+        System.out.println( usage );
         System.exit( 0 );
     }
 }
