@@ -8,19 +8,19 @@ import javax.xml.rpc.ServiceException;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Service;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.papmanagement.PAPManagementService;
 import org.glite.authz.pap.policymanagement.PolicyManagementService;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagementServiceLocator;
-import org.glite.authz.pap.ui.cli.PAPCLI;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
 
 public class ServiceClientImplAxis implements ServiceClient {
 	
-	public static final Logger log = Logger.getLogger( ServiceClientImplAxis.class );
+	public static final Logger log = LoggerFactory.getLogger( ServiceClientImplAxis.class );
     
     private static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
     private static final String DEFAULT_SSL_KEY = "/etc/grid-security/hostkey.pem";

@@ -21,7 +21,8 @@
 #     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
 #############################################################################
 
-import getopt, sys, os, os.path, commands,urllib,xml.dom.minidom, getopt, shutil, time, re, glob, pap_utils
+import getopt,sys, os, os.path, commands,shutil, time, re, glob
+from pap_utils import *
 
 def remove_webapp_pap_war():
     if os.path.exists(catalina_pap_war_file()):

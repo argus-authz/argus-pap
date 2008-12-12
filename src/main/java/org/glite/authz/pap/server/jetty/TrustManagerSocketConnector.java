@@ -37,16 +37,14 @@ public class TrustManagerSocketConnector extends SslSocketConnector {
         
         log.debug( "TrustManagerSocketConnector.initializeSSLContext():" );
         
-        String clientAuth = props.getProperty( "clientAuth" );
-
-        if ( "true".equalsIgnoreCase( clientAuth )
-                || "yes".equalsIgnoreCase( clientAuth ) )
-            setNeedClientAuth( true );
-
-        else if ( "want".equalsIgnoreCase( clientAuth ) )
-            setWantClientAuth( true );
+        // Override clientAuth settings for trustmanager
+        // The PAP authz system always need clientAuth on!
+        props.setProperty( "clientAuth", "yes" );
+        
+        setNeedClientAuth( true );
+        setWantClientAuth( true );
                 
-        context = new ContextWrapper(props);
+        context = new ContextWrapper(props,false);
         
     }
     @Override

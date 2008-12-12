@@ -14,13 +14,13 @@ pap_dependencies = glob.glob(pap_jar_dir+"/*.jar")
 pap_jar = os.path.join(glite_location,"share","java",pap_jar_name)
 pap_war = os.path.join(glite_location,"share","webapps", pap_war_name)
 
+pap_client_class = "org.glite.authz.pap.ui.cli.PAPCLI"
 pap_standalone_class = "org.glite.authz.pap.server.PAPServer"
 
 pap_client_classes = os.path.join(pap_conf_dir,"logging","client")
 pap_standalone_classes = os.path.join(pap_conf_dir,"logging","standalone")
 
 env_variables = ['GLITE_LOCATION', 'GLITE_LOCATION_VAR', 'GLITE_LOCATION_LOG']
-
 
 def pap_war_file():
     if not os.path.exists(pap_war):
@@ -69,10 +69,3 @@ def build_client_classpath():
 
 def build_env_vars_string():
     return string.join(map(lambda x: "-D%s=%s" % (x, os.environ[x]), env_variables)," ")
-
-
-if __name__ == '__main__':
-    
-    cp = build_client_classpath()
-    
-    print cp

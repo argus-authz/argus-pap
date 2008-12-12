@@ -16,18 +16,8 @@
             <outputDirectory>etc/pap</outputDirectory>
             <fileMode>0644</fileMode>
         </fileSet>
-        
-        <fileSet>
-            <directory>src/main/python</directory>
-            <outputDirectory>sbin</outputDirectory>
-            <fileMode>0755</fileMode>
-            <includes>
-              <include>*.py</include>
-            </includes>
-       </fileSet>
   </fileSets>
-  
-  
+   
   <files>
     <file>
       <source>target/${project.build.finalName}.war</source>
@@ -39,6 +29,38 @@
       <outputDirectory>share/java</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
+    
+    <file>
+      <source>${basedir}/src/main/python/pap_utils.py</source>
+      <outputDirectory>sbin</outputDirectory>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/python/pap-deploy.py</source>
+      <outputDirectory>sbin</outputDirectory>
+      <destName>pap-deploy</destName>
+      <fileMode>0755</fileMode>
+    </file>
+        
+    <file>
+      <source>${basedir}/src/main/bash/pap-utils.sh</source>
+      <outputDirectory>etc/pap/sh</outputDirectory>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/bash/pap-standalone.sh</source>
+      <destName>pap-standalone</destName>
+      <outputDirectory>/etc/init.d</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/bash/pap-admin.sh</source>
+      <destName>pap-admin</destName>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    
   </files>
   
   <dependencySets>

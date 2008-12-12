@@ -19,16 +19,16 @@ import org.mortbay.jetty.security.SslSelectChannelConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TrustManagerSelectChannelConnector extends SslSelectChannelConnector {
+public class TrustManagerSelectChannelConnector extends
+        SslSelectChannelConnector {
 
-        
     private static final Logger log = LoggerFactory
             .getLogger( TrustManagerSelectChannelConnector.class );
 
     Properties props;
 
     protected SSLContext context = null;
-    
+
     protected static final String defaultAlgorithm = "SunX509";
 
     public TrustManagerSelectChannelConnector( Properties props ) {
@@ -37,74 +37,75 @@ public class TrustManagerSelectChannelConnector extends SslSelectChannelConnecto
 
     }
 
-    protected void initializeSSLContext() throws Exception{
-        
-        String clientAuth = props.getProperty( "clientAuth" );
+    protected void initializeSSLContext() throws Exception {
 
-        if ( "true".equalsIgnoreCase( clientAuth )
-                || "yes".equalsIgnoreCase( clientAuth ) )
-            setNeedClientAuth( true );
+        log
+                .debug( "TrustManagerSelectChannelConnector.initializeSSLContext():" );
 
-        else if ( "want".equalsIgnoreCase( clientAuth ) )
-            setWantClientAuth( true );
-                
-        ContextWrapper tmContext = new ContextWrapper(props);
+        // Override clientAuth settings for trustmanager
+        // The PAP authz system always need clientAuth on!
+        props.setProperty( "clientAuth", "yes" );
+
+        setNeedClientAuth( true );
+        setWantClientAuth( true );
+
+        ContextWrapper tmContext = new ContextWrapper( props, false );
         context = tmContext.getContext();
     }
 
     @Override
     protected SSLContext createSSLContext() throws Exception {
-        
-        if (context == null)
+
+        if ( context == null )
             initializeSSLContext();
-        
+
         return context;
     }
-    
-    
+
     @Override
     protected SSLEngine createSSLEngine() throws IOException {
-    
-        SSLEngine engine = context.createSSLEngine(); 
-         
-        if (getWantClientAuth())
-            engine.setWantClientAuth(getWantClientAuth());
-        else{
+
+        SSLEngine engine = context.createSSLEngine();
+
+        if ( getWantClientAuth() )
+            engine.setWantClientAuth( getWantClientAuth() );
+        else {
             engine.setNeedClientAuth( getNeedClientAuth() );
         }
-                
-        
-        if (getExcludeCipherSuites()!= null && getExcludeCipherSuites().length > 0)
-        {
-            List<String> excludedCSList=Arrays.asList(getExcludeCipherSuites());
-            String[] enabledCipherSuites=engine.getEnabledCipherSuites();
-            List<String> enabledCSList=new ArrayList<String>(Arrays.asList(enabledCipherSuites));
 
-            for (String cipherName : excludedCSList)
-            {
-                if (enabledCSList.contains(cipherName))
-                {
-                    enabledCSList.remove(cipherName);
+        if ( getExcludeCipherSuites() != null
+                && getExcludeCipherSuites().length > 0 ) {
+            List <String> excludedCSList = Arrays
+                    .asList( getExcludeCipherSuites() );
+            String[] enabledCipherSuites = engine.getEnabledCipherSuites();
+            List <String> enabledCSList = new ArrayList <String>( Arrays
+                    .asList( enabledCipherSuites ) );
+
+            for ( String cipherName : excludedCSList ) {
+                if ( enabledCSList.contains( cipherName ) ) {
+                    enabledCSList.remove( cipherName );
                 }
             }
-            enabledCipherSuites=enabledCSList.toArray(new String[enabledCSList.size()]);
+            enabledCipherSuites = enabledCSList
+                    .toArray( new String[enabledCSList.size()] );
 
-            engine.setEnabledCipherSuites(enabledCipherSuites);
+            engine.setEnabledCipherSuites( enabledCipherSuites );
         }
-    	
-        return engine;     	    	
-    	 
+
+        return engine;
+
     }
-    
+
     @Override
     protected SelectChannelEndPoint newEndPoint( SocketChannel channel,
             SelectSet selectSet, SelectionKey key ) throws IOException {
-    
+
         SSLEngine engine = createSSLEngine();
         engine.setUseClientMode( false );
-        
-        return new SslHttpChannelEndPoint(this,channel,selectSet,key,engine);
-        
+
+        return new SslHttpChannelEndPoint( this, channel, selectSet, key,
+                engine );
+
     }
-    
+
 }

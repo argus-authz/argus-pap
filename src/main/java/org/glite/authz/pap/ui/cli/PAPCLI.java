@@ -12,7 +12,8 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.glite.authz.pap.ui.cli.authzmanagement.AddACE;
 import org.glite.authz.pap.ui.cli.authzmanagement.ListACL;
 import org.glite.authz.pap.ui.cli.authzmanagement.RemoveACE;
@@ -33,7 +34,7 @@ import org.glite.authz.pap.ui.cli.policymanagement.UpdatePolicy;
 
 public class PAPCLI {
 
-    public static final Logger log = Logger.getLogger( PAPCLI.class );
+    public static final Logger log = LoggerFactory.getLogger( PAPCLI.class );
 
     private static final List<ServiceCLI> serviceCLIList = new LinkedList<ServiceCLI>();
     private static final List<ServiceCLI> policyMgmtCommandList = new LinkedList<ServiceCLI>();

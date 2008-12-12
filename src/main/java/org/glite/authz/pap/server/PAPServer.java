@@ -28,6 +28,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class PAPServer {
+    
+    
 
     final class PAPDefaults {
 
@@ -49,6 +51,8 @@ public final class PAPServer {
     private static final String CONF_DIR_OPTION_NAME = "conf-dir";
 
     private static final String REPO_DIR_OPTION_NAME = "repo-dir";
+    
+    private static final String PAP_DEFAULT_CONTEXT = "/glite-authz-pap";
 
     public static void main( String[] args ) {
 
@@ -74,8 +78,8 @@ public final class PAPServer {
 
         configureHttpServer();
 
-        // configureWar();
-        configureServlets();
+        configureWar();
+        // configureServlets();
 
         try {
             httpServer.start();
@@ -139,7 +143,7 @@ public final class PAPServer {
         
         WebAppContext webappContext = new WebAppContext();
         
-        webappContext.setContextPath( "/glite-authz-pap" );
+        webappContext.setContextPath( PAP_DEFAULT_CONTEXT );
         webappContext.setWar( getPAPWar() );
         
         HandlerCollection handlers= new HandlerCollection();

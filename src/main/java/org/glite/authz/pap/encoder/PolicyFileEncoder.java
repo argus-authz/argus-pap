@@ -5,14 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.File;
 import java.lang.String;
-import org.glite.authz.pap.ui.wizard.*;
+
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import java.util.List;
 import org.opensaml.xacml.XACMLObject;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
-import org.apache.log4j.PropertyConfigurator;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.XMLConfigurator;
 import org.opensaml.xml.Configuration;

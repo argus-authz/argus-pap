@@ -37,6 +37,7 @@
         <configuration>
          </configuration>
       </plugin>
+      
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>tomcat-maven-plugin</artifactId>
@@ -184,18 +185,32 @@
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-util-java</artifactId>
-      <version>1.4.0</version>
+      <version>head-101208</version>
     </dependency>
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-trustmanager
       </artifactId>
-      <version>1.8.10-1</version>
+      <version>head-101208</version>
     </dependency>
     <dependency>
       <groupId>commons-configuration</groupId>
       <artifactId>commons-configuration</artifactId>
       <version>1.5</version>
+      <exclusions>
+          <exclusion> 
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+          <exclusion> 
+            <groupId>logkit</groupId>
+            <artifactId>logkit</artifactId>
+          </exclusion>
+          <exclusion> 
+            <groupId>avalon-framework</groupId>
+            <artifactId>avalon-framework</artifactId>
+          </exclusion>
+        </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-lang</groupId>
@@ -219,6 +234,7 @@
       <artifactId>jcl-over-slf4j</artifactId>
       <version>1.5.6</version>
     </dependency>
+    
     <!-- 
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -239,6 +255,12 @@
            <groupId>ch.qos.logback</groupId>
            <artifactId>logback-classic</artifactId>
            <version>0.9.11</version>
+    </dependency>
+    
+    <dependency>
+           <groupId>it.cnaf</groupId>
+           <artifactId>fake-log4j</artifactId>
+           <version>0.1</version>
     </dependency>
     
     <!-- Jetty stuff -->

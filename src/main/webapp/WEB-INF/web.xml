@@ -73,9 +73,7 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
   <!-- Welcome file lists -->
 
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-    <welcome-file>index.html</welcome-file>
+    <welcome-file>pages/index.html</welcome-file>
   </welcome-file-list>
 
 </web-app>

@@ -21,7 +21,7 @@ public abstract class ServiceCLI {
     private static final HelpFormatter helpFormatter = new HelpFormatter();
     protected static final String DEFAULT_HOST = "localhost";
     protected static final String DEFAULT_PORT = "8443";
-    protected static final String DEFAULT_SERVICE_URL = "https://%s:%s/pap/services/";
+    protected static final String DEFAULT_SERVICE_URL = "https://%s:%s/glite-authz-pap/services/";
     private static final String LOPT_CERT = "cert";
     private static final String LOPT_HOST = "host";
     private static final String LOPT_PORT = "port";
@@ -192,7 +192,7 @@ public abstract class ServiceCLI {
         // TODO: OPT_URL and (OPT_HOST, OPT_PORT) are mutually exclusive options. Use OptionGroup.
         options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
                 .withDescription("Specifies the target PAP endpoint (default: "
-                        + String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST) + ").").create(OPT_URL));
+                        + String.format(DEFAULT_SERVICE_URL, DEFAULT_HOST, DEFAULT_PORT) + ").").create(OPT_URL));
         options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
                 .withDescription(OPT_HOST_DESCRIPTION).create(OPT_HOST));
         options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_PORT)
