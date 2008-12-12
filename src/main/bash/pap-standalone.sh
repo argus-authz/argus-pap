@@ -30,9 +30,23 @@ pap_pid(){
 	
 }
 
+kill_pap_proc(){
+
+	pap_pid
+	kill -TERM $PAP_PID
+	RETVAL=$?
+    [ "$RETVAL" = 0 ] && rm -f $PAP_RUN_FILE;
+    
+}
 start(){
 
 	echo -n "Starting $prog: "
+	
+	if test -f $PAP_RUN_FILE; then
+		echo "already running [`head -n 1 $PAP_RUN_FILE`]!"
+		failure
+	fi
+	
 	$PAP_STANDALONE_CMD &
 	
 	if [ "$?" = "0" ]; then
@@ -47,11 +61,8 @@ start(){
 stop(){
 	echo -n "Stopping $prog: "
 	pap_pid
-	kill -TERM $PAP_PID
-	RETVAL=$?
-    [ "$RETVAL" = 0 ] && rm -f $PAP_RUN_FILE; success || failure
+	kill_pap_proc && success || failure
 }
-
 
 case "$1" in
 	start)
