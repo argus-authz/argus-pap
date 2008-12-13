@@ -1,13 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <configuration>
-
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender"> 
-    <File>${catalina.base}/logs/glite-authz-pap.log</File>
-    <Append>true</Append> 
-    <layout class="ch.qos.logback.classic.PatternLayout">
+  <appender
+    name="FILE"
+    class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <File>${catalina.base}/logs/glite-authz-pap.log
+    </File>
+    <Append>true</Append>
+    <layout
+      class="ch.qos.logback.classic.PatternLayout">
       <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
     </layout>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
+      <FileNamePattern>glite-authz-pap.%d{yyyy-MM-dd}.log</FileNamePattern>
+    </rollingPolicy> 
   </appender>
 
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

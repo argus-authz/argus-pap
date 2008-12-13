@@ -5,12 +5,13 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
 
-  <display-name>PAP</display-name>
+  <display-name>glite-authz-pap</display-name>
 
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath*:applicationContext*.xml</param-value>
   </context-param>
+  
   
   <!-- Filters -->
   <filter>
@@ -70,6 +71,11 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <mime-type>text/xml</mime-type>
   </mime-mapping>
 
+  <env-entry>
+    <env-entry-name>logback/configuration-resource</env-entry-name>
+    <env-entry-type>java.lang.String</env-entry-type> 
+    <env-entry-value>${GLITE_LOCATION}/etc/pap/config/logging/war/logback.xml</env-entry-value> 
+  </env-entry>
   <!-- Welcome file lists -->
 
   <welcome-file-list>

@@ -67,7 +67,7 @@ public final class PAPServer {
     protected Server httpServer;
     
     protected String getPAPWar(){
-        return (String)System.getProperty( "GLITE_LOCATION" )+"/share/webapps/glite-authz-pap.war";
+        return (String)System.getProperty( "GLITE_LOCATION" )+"/share/webapps/glite-authz-pap-standalone.war";
     }
 
     public PAPServer( String[] args ) {
