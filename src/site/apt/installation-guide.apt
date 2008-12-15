@@ -2,7 +2,7 @@ Installation instructions
 
 * PAP distribution
   
-  To install the glite-authz-pap daemon on your sl machine, first make sure you have 
+  To install the glite-authz-pap daemon on your machine, first make sure you have 
   a gLite installation already in place or define the two following environment
   variables in a meaningful way:
   

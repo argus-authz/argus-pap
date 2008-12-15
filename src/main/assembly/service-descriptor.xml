@@ -26,6 +26,11 @@
             </includes>
             <fileMode>0644</fileMode>
         </fileSet>
+        
+        <fileSet>
+        	<directory>target/site</directory>
+        	<outputDirectory>share/doc/glite-authz-pap/html</outputDirectory>
+        </fileSet>
   </fileSets>
    
   <files>

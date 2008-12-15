@@ -14,8 +14,8 @@
     </menu>
     
     <menu name="Documentation">
+    	<item name="Installation instructions" href="installation-guide.html"/>
     	<item name="User's guide" href="user-guide.html"/>
-    	<item name="Installation guide" href="installation-guide.html"/>
     </menu>
     
   </body>
