@@ -1,0 +1,56 @@
+User's guide
+
+* Running the PAP service
+
+** Standalone daemon
+
+  In order to start the pap standalone daemon you have to issue the following command:
+  
++---
+  $GLITE_LOCATION/etc/init.d/pap-standalone start
++---
+
+  The pap-standalone log is located in the $GLITE_LOCATION_VAR/log directory.
+  The pap-standalone server listens by default on port 4554. To changes this (and possibly
+  other) configuration browser, you can edit the pap-configuration.ini file located
+  in the $GLITE_LOCATION/etc/pap directory
+  
+  To stop the standalone server, issue the following command:
+
++---
+  $GLITE_LOCATION/etc/init.d/pap-standalone stop
++---
+
+** Tomcat web application
+
+  The pap can also run on a working tomcat installation. To deploy the PAP you can use the
+  pap-deploy command:
+  
++---
+  
+  $GLITE_LOCATION/sbin/pap-deploy deploy
+
++---
+
+  To undeploy the wepapp issue:
+
++---
+  
+  $GLITE_LOCATION/sbin/pap-deploy undeploy
+
++---
+
+  The PAP web application will start up under the context 'glite-authz-pap'.
+
+* Running the PAP client
+
+  Type:
+
++---
+  pap-admin 
++---
+
+  to use and get a list of the commands supported by the current version of the PAP
+  command line client.
+
+ 

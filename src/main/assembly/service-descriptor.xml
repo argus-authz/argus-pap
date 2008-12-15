@@ -17,6 +17,15 @@
             </excludes>
             <fileMode>0644</fileMode>
         </fileSet>
+        
+        <fileSet>
+            <directory>src/main/jaxp-libs</directory>
+            <outputDirectory>etc/pap/jaxp-libs</outputDirectory>
+            <includes>
+              <include>*.jar</include>
+            </includes>
+            <fileMode>0644</fileMode>
+        </fileSet>
   </fileSets>
    
   <files>
