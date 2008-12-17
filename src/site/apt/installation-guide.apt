@@ -1,5 +1,19 @@
 Installation instructions
 
+* Prerequisites
+  
+  In order to run the glite-authz-pap service you will need the following:
+    
+    * a recent version of openssl installed on your system
+    
+    * LCG trusted Certificate Autorities certificates installed. In SL4,
+    the lcg-ca package provides those certificates.
+    
+    * a valid X5O9 certificate issued by a trusted CA. Such certificate must
+    be encoded in pem format, and you have to put in the /etc/grid-security 
+    diretory (the certificate in the hostcert.pem file, the private key in
+    the hostkey.pem file).  
+
 * PAP distribution
   
   To install the glite-authz-pap daemon on your machine, first make sure you have 
@@ -11,6 +25,12 @@ Installation instructions
   GLITE_LOCATION_VAR (usually /var/glite)
 +---
   
+  If missing, create the following directory:
+
++---
+  $GLITE_LOCATION_VAR/lock/subsys
++---
+
   Then unpack the glite-authz-pap tar file in the $GLITE_LOCATION directory:
   
 +---
