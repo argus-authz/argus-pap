@@ -134,7 +134,8 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor> src/main/assembly/service-descriptor.xml</descriptor>
+            <descriptor>src/main/assembly/service-descriptor.xml</descriptor>
+            <descriptor>src/main/assembly/client-descriptor.xml</descriptor>
           </descriptors>
         </configuration>
       </plugin>
