@@ -1,6 +1,7 @@
 package org.glite.authz.pap.common.utils.xacml;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import org.opensaml.xacml.ctx.AttributeType;
@@ -34,17 +35,39 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
         ResourceMatchType resourceMatch = build();
         
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
-                AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
+                AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
         
-        org.opensaml.xacml.ctx.AttributeValueType ctxAttributeValue = (org.opensaml.xacml.ctx.AttributeValueType) attribute
-                .getAttributeValues().get(0);
         AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute
-                .getDataType(), ctxAttributeValue.getValue());
+                .getDataType(), CtxAttributeTypeHelper.getFirstValue(attribute));
         
         resourceMatch.setResourceAttributeDesignator(designator);
         resourceMatch.setAttributeValue(policyAttributeValue);
         
         return resourceMatch;
+    }
+    
+    public static AttributeType getAttribute(ResourceMatchType resourceMatch) {
+
+        AttributeValueType policyAttributeValue = resourceMatch.getAttributeValue();
+        String attributeId = resourceMatch.getResourceAttributeDesignator().getAttributeId();
+        return CtxAttributeTypeHelper.build(attributeId, policyAttributeValue.getDataType(),
+                policyAttributeValue.getValue());
+        
+    }
+    
+    public static List<AttributeType> getAttributeList(List<ResourceMatchType> resourceMatchList) {
+        
+        List<AttributeType> attributeList = new LinkedList<AttributeType>();
+        
+        if (resourceMatchList == null)
+            return attributeList;
+        
+        for (ResourceMatchType subjectMatch:resourceMatchList) {
+            attributeList.add(getAttribute(subjectMatch));
+        }
+        
+        return attributeList;
+        
     }
 
     public static ResourceMatchHelper getInstance() {

@@ -35,6 +35,7 @@ public class PAPClient {
     private static final Logger log = LoggerFactory.getLogger(PAPClient.class);
     private static final ProvisioningServiceClient client;
     private static final XACMLPolicyQueryType xacmlPolicyQuery;
+    private final String url;
 
     static {
         ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
@@ -81,24 +82,23 @@ public class PAPClient {
     private final ProvisioningServicePortType port;
 
     public PAPClient(String url) {
-        port = client.getProvisioningServicePortType(url);
+        
+        if (!url.endsWith("/"))
+            url += "/";
+        
+        this.url = url + "ProvisioningService";
+        
+        port = client.getProvisioningServicePortType(this.url);
     }
 
-    public List<XACMLObject> getLocalPolicies() {
-        List<XACMLObject> resultList = null;
-        Response response;
-        try {
-            response = port.xacmlPolicyQuery(xacmlPolicyQuery);
-            resultList = getXACMLObjectList(response);
-        } catch (RemoteException e) {
-            // TODO: do something better
-            e.printStackTrace();
-            resultList = new LinkedList<XACMLObject>();
-        } catch (ServiceException e) {
-            // TODO: do something better
-            e.printStackTrace();
-            resultList = new LinkedList<XACMLObject>();
-        }
+    public List<XACMLObject> getLocalPolicies() throws RemoteException, ServiceException {
+        
+        log.info("Requesting policies from remote PAP endpoint: " + url);
+        
+        Response response = port.xacmlPolicyQuery(xacmlPolicyQuery);
+        
+        List<XACMLObject> resultList = getXACMLObjectList(response);
+        
         return resultList;
     }
 

@@ -19,9 +19,11 @@ public class DistributionConfiguration {
     private static final String CONFIGURATION_STANZA = "configuration";
 
     private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
-    private static final DistributionConfiguration instance = new DistributionConfiguration();
+    private static DistributionConfiguration instance = null;
 
     public static DistributionConfiguration getInstance() {
+        if (instance == null)
+            instance = new DistributionConfiguration();
         return instance;
     }
 
@@ -49,10 +51,12 @@ public class DistributionConfiguration {
         return CONFIGURATION_STANZA + "." + "poll-interval";
     }
 
-    private final PAPConfiguration papConfiguration = PAPConfiguration.instance();
+    private PAPConfiguration papConfiguration;
 
-    private DistributionConfiguration() {}
-
+    public DistributionConfiguration() {
+        papConfiguration = PAPConfiguration.instance();
+    }
+    
     public long getPollIntervallInMillis() {
 
         long pollIntervalInSecs = papConfiguration.getLong(pollIntervallKey());
@@ -80,7 +84,7 @@ public class DistributionConfiguration {
 
         // Get an ordered list of PAP aliases
         List<String> papAliasList = new ArrayList<String>(papAliasSet.size());
-        String[] papOrder = papConfiguration.getStringArray(papOrderKey());
+        String[] papOrder = getPAPOrderArray();
 
         if (papOrder != null) {
             for (String papAlias : papOrder) {
@@ -113,7 +117,7 @@ public class DistributionConfiguration {
                         + papAlias + "\"");
             }
 
-            PAP pap = new PAP(endpoint, dn);
+            PAP pap = new PAP(papAlias, endpoint, dn);
 
             log.info("Adding remote PAP: " + pap);
             papList.add(pap);
@@ -124,4 +128,55 @@ public class DistributionConfiguration {
 
         return papList;
     }
+    
+    public void removePAP(String papAlias) {
+        papConfiguration.clearDistributionProperty(dnKey(papAlias));
+        papConfiguration.clearDistributionProperty(endpointKey(papAlias));
+        
+        // TODO: remove PAP from pap-order
+//        String[] papOrderArrayOld = getPAPOrderArray();
+//        List<String> papOrderList = new ArrayList<String>(papOrderArrayOld.length);
+//        for (String pap:papOrderArrayOld) {
+//            if (!(pap.equals(papAlias)))
+//                papOrderList.add(pap);
+//        }
+//        String[] papOrderArrayNew = (String[]) papOrderList.toArray();
+//        
+//        setPAPOrder(papOrderArrayNew);
+        
+        papConfiguration.saveDistributionConfiguration();
+    }
+    
+    public void setPAP(PAP pap) {
+        String papAlias = pap.getAlias();
+        
+        papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
+        papConfiguration.setDistributionProperty(endpointKey(papAlias), pap.getHostname());
+        
+        papConfiguration.saveDistributionConfiguration();
+    }
+    
+    public String[] getPAPOrderArray() {
+        return papConfiguration.getStringArray(papOrderKey());
+    }
+    
+    public void setPAPOrder(String[] papArray) {
+        papConfiguration.clearDistributionProperty(papOrderKey());
+
+        if (papArray == null)
+            return;
+        
+        if (papArray.length == 0)
+            return;
+        
+        StringBuilder sb = new StringBuilder(papArray[0]);
+        
+        for (int i=0; i<papArray.length; i++) {
+            sb.append(", " + papArray[i]);
+        }
+        
+        papConfiguration.setDistributionProperty(papOrderKey(), sb.toString());
+        
+    }
+    
 }

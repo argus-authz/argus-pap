@@ -1,0 +1,36 @@
+@IMPORT url("reset.css");
+
+BODY {
+	text-align: center;
+	background: white;
+	font-family: Tahoma,sans-serif;
+	font-size: 11pt;
+	
+}
+
+
+#page-wrap{
+	
+	width: 780px;
+	background: white;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#page-header{
+	width: 100%;
+	overflow: auto;
+	padding-bottom: 2px;
+	border-bottom: 1px dashed rgb(200,200,200); 
+}
+
+#page-body{
+	margin-top: 2em;
+	margin-bottom: 2em; 
+	 		
+}
+
+#page-footer{
+	
+}
+

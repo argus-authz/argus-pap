@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class FileSystemPolicyDAO implements PolicyDAO {
 
     @SuppressWarnings("unused")
-    private static final Logger log = LoggerFactory.getLogger(FileSystemPolicyDAO.class);
+	private static final Logger log = LoggerFactory.getLogger(FileSystemPolicyDAO.class);
     private static final PolicyHelper policyHelper = PolicyHelper.getInstance();
     private static final String policyFileNamePrefix = FileSystemRepositoryManager
             .getPolicyFileNamePrefix();
@@ -27,7 +27,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
     private FileSystemPolicyDAO() {}
 
-    public void delete(String papId, String policyId) {
+    public void delete(String papId, String policyId) throws NotFoundException, RepositoryException {
         String policyFileName = FileSystemRepositoryManager.getPolicyAbsolutePath(papId, policyId);
 
         if (exists(papId, policyId)) {
@@ -46,8 +46,10 @@ public class FileSystemPolicyDAO implements PolicyDAO {
     public void deleteAll(String papId) {
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        
         if (!papDir.exists())
-            throw new NotFoundException("Not found: papId=" + papId);
+            throw new NotFoundException("Not found: papId=" + papId + " directory=" + papDir
+            		.getAbsolutePath());
 
         for (File file : papDir.listFiles()) {
 
@@ -61,7 +63,10 @@ public class FileSystemPolicyDAO implements PolicyDAO {
     }
 
     public boolean exists(String papId, String policyId) {
-        File policyFile = new File(FileSystemRepositoryManager.getPolicyAbsolutePath(papId, policyId));
+    	String policyFilePath = FileSystemRepositoryManager.getPolicyAbsolutePath(papId, policyId);
+    	
+        File policyFile = new File(policyFilePath);
+        
         return policyFile.exists();
     }
 

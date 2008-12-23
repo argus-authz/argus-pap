@@ -1,23 +1,23 @@
 package org.glite.authz.pap.ui.wizard;
 
-public class UnsupportedAttributeException extends Exception {
+public class UnsupportedAttributeException extends WizardException {
 
     private static final long serialVersionUID = 1L;
 
     public UnsupportedAttributeException() {
-	super();
+        super();
     }
 
     public UnsupportedAttributeException(String message, Throwable cause) {
-	super(message, cause);
+        super(message, cause);
     }
 
     public UnsupportedAttributeException(String message) {
-	super(message);
+        super(message);
     }
 
     public UnsupportedAttributeException(Throwable cause) {
-	super(cause);
+        super(cause);
     }
 
 }

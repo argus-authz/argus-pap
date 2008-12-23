@@ -5,6 +5,11 @@
   <packaging>war</packaging>
   <name>PAP</name>
   <version>0.1</version>
+  <properties>
+    <pap-services-namespace>
+        http://org.glite.authz/wsdl/pap/services
+    </pap-services-namespace>
+  </properties>
   <build>
   	<finalName>pap</finalName>
     <plugins>
@@ -23,6 +28,41 @@
           	<server>tomcat</server>
 		</configuration>
       </plugin>
+       <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+	    <artifactId>maven-dependency-plugin</artifactId>
+	    <version>2.0</version>
+	</plugin>
+    <plugin>
+       <groupId>org.codehaus.mojo</groupId>
+                <artifactId>axistools-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>src/main/wsdl</sourceDirectory>
+                            <typeMappingVersion>1.2</typeMappingVersion>
+                            <mappings>
+                                <mapping>
+                                    <namespace>
+                                        ${pap-services-namespace}/authz_management
+                                    </namespace>
+                                    <targetPackage>
+                                        org.glite.authz.pap.services.authz_management.axis_skeletons
+                                    </targetPackage>
+                                </mapping>
+                            </mappings>
+                            <serverSide>true</serverSide>
+                            <skeletonDeploy>true</skeletonDeploy>
+                            <helperGen>true</helperGen>
+                            <useEmitter>true</useEmitter>
+                            <wrapArrays>false</wrapArrays>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
     </plugins>
   </build>
   <distributionManagement>
@@ -62,8 +102,18 @@
     <dependency>
       <groupId>org.opensaml</groupId>
       <artifactId>opensaml</artifactId>
-      <version>2.1.0.alb</version>
+      <version>2.2.1</version>
+      
+      <!-- 
+      <exclusions>
+        <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl104-over-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
+      -->
     </dependency>
+    
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis</artifactId>
@@ -75,43 +125,36 @@
         </exclusion>
       </exclusions>
     </dependency>
+     
     <dependency>
       <groupId>commons-discovery</groupId>
       <artifactId>commons-discovery</artifactId>
       <version>0.2</version>
+      <scope>runtime</scope>
     </dependency>
+    
+         
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis-jaxrpc</artifactId>
       <version>1.4</version>
     </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>1.5.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl104-over-slf4j</artifactId>
-      <version>1.5.0</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <version>1.5.0</version>
-    </dependency>
+    
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>servlet-api</artifactId>
       <version>2.4</version>
       <scope>provided</scope>
     </dependency>
+    
+ 
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>jsp-api</artifactId>
       <version>2.0</version>
       <scope>provided</scope>
     </dependency>
+     
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-util-java</artifactId>
@@ -142,5 +185,36 @@
       <artifactId>sunxacml</artifactId>
       <version>boh</version>
     </dependency>
+    
+    <!--  SLF4J stuff -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+      <version>1.5.0</version>
+    </dependency>
+     
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl104-over-slf4j</artifactId>
+      <version>1.5.0</version>
+    </dependency>
+    
+     
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.5.0</version>
+    </dependency>
+    
+    <!-- 
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>log4j-over-slf4j</artifactId>
+      <version>1.5.0</version>
+      <scope>runtime</scope>
+    </dependency>
+    -->
+
   </dependencies>
+  
 </project>

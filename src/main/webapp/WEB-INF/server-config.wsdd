@@ -1,6 +1,9 @@
 <deployment
   xmlns="http://xml.apache.org/axis/wsdd/"
-  xmlns:java="http://xml.apache.org/axis/wsdd/providers/java">
+  xmlns:tns="http://www.w3.org/2001/XMLSchema"
+  xmlns:java="http://xml.apache.org/axis/wsdd/providers/java"
+  xmlns:papns="http://common.pap.authz.glite.org"
+  xmlns:xacml="urn:oasis:names:tc:xacml:2.0:policy:schema:os">
 
   <service
     name="ProvisioningService"
@@ -40,6 +43,226 @@
       deserializer="org.glite.authz.pap.provisioning.axis.DeserializerFactory"
       encodingStyle="" />
 
+  </service>
+  
+  <service name="PolicyManagementService" provider="java:RPC" style="rpc" use="literal"
+           xmlns:pm="urn:org:glite:authz:pap:policymanagement">
+      <parameter name="className" value="org.glite.authz.pap.policymanagement.PolicyManagementServiceImpl"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      
+      <operation name="getPolicy" qname="pm:getPolicy"
+                 returnQName="pm:getPolicyResponse" returnType="xacml:PolicyType"
+                 soapAction="http://www.example.org/PolicyManagementService/getPolicy" >
+           <parameter qname="pm:getPolicy_PolicyId" type="tns:string"/>
+      </operation>
+      
+      <operation name="getPolicySet" qname="pm:getPolicySet"
+                 returnQName="pm:getPolicySetResponse" returnType="xacml:PolicySetType"
+                 soapAction="http://www.example.org/PolicyManagementService/getPolicySet" >
+           <parameter qname="pm:getPolicySet_PolicySetId" type="tns:string"/>
+      </operation>
+      
+      <operation name="hasPolicy" qname="pm:hasPolicy"
+                 returnQName="pm:hasPolicyResponse" returnType="tns:boolean"
+                 soapAction="http://www.example.org/PolicyManagementService/hasPolicy" >
+           <parameter qname="pm:hasPolicy_PolicyId" type="tns:string"/>
+      </operation>
+      
+      <operation name="hasPolicySet" qname="pm:hasPolicySet"
+                 returnQName="pm:hasPolicySetResponse" returnType="tns:boolean"
+                 soapAction="http://www.example.org/PolicyManagementService/hasPolicySet" >
+           <parameter qname="pm:hasPolicySet_PolicySetId" type="tns:string"/>
+      </operation>
+      
+      <operation name="storePolicy" qname="pm:storePolicy"
+                 returnQName="pm:storePolicyResponse" returnType="tns:string"
+                 soapAction="http://www.example.org/PolicyManagementService/storePolicy" >
+           <parameter qname="pm:storePolicy_idPrefix" type="tns:string"/>
+           <parameter qname="pm:storePolicy_xacmlPolicy" type="xacml:PolicyType"/>
+      </operation>
+
+      <operation name="storePolicySet" qname="pm:storePolicySet"
+                 returnQName="pm:storePolicySetResponse" returnType="tns:string"
+                 soapAction="http://www.example.org/PolicyManagementService/storePolicySet" >
+           <parameter qname="pm:storePolicySet_idPrefix" type="tns:String"/>
+           <parameter qname="pm:storePolicySet_xacmlPolicySet" type="xacml:PolicySetType"/>
+      </operation>
+      
+      <operation name="updatePolicy" qname="pm:updatePolicy"
+                 soapAction="http://www.example.org/PolicyManagementService/updatePolicy" >
+           <parameter qname="pm:updatePolicy_xacmlPolicy" type="xacml:PolicyType"/>
+      </operation>
+      
+      <operation name="updatePolicySet" qname="pm:updatePolicySet"
+                 soapAction="http://www.example.org/PolicyManagementService/updatePolicySet" >
+           <parameter qname="pm:updatePolicy_xacmlPolicySet" type="xacml:PolicySetType"/>
+      </operation>
+      
+      <operation name="removePolicy" qname="pm:removePolicy">
+           <parameter qname="pm:removePolicy_policyId" type="tns:string"/>
+      </operation>
+      
+      <operation name="removePolicySet" qname="pm:removePolicySet"
+                 soapAction="http://www.example.org/PolicyManagementService/removePolicySet" >
+           <parameter qname="pm:removePolicySet_policySetId" type="tns:string"/>
+      </operation>
+      
+      <operation name="listPolicies" qname="pm:listPolicies"
+                 returnQName="pm:listPoliciesReturn" returnType="pm:ArrayOf_xacml_PolicyType" returnItemType="xacml:PolicyType"
+                 soapAction="http://www.example.org/PolicyManagementService/listPolicies" >
+      </operation>
+      
+      <operation name="listPolicySets" qname="pm:listPolicySets"
+                 returnQName="pm:listPolicySetsReturn" returnType="pm:ArrayOf_xacml_PolicySetType" returnItemType="xacml:PolicySetType"
+                 soapAction="http://www.example.org/PolicyManagementService/listPolicySets" >
+      </operation>
+      
+      <operation name="listPolicies" qname="pm:listPolicies"
+                 returnQName="pm:listPoliciesReturn" returnType="pm:ArrayOf_xacml_PolicyType" returnItemType="xacml:PolicyType"
+                 soapAction="http://www.example.org/PolicyManagementService/listPolicies" >
+          <parameter qname="pm:listPolicies_papId" type="tns:string"/>
+      </operation>
+      
+      <operation name="listPolicySets" qname="pm:listPolicySets"
+                 returnQName="pm:listPolicySetsReturn" returnType="pm:ArrayOf_xacml_PolicySetType" returnItemType="xacml:PolicySetType"
+                 soapAction="http://www.example.org/PolicyManagementService/listPolicySets">
+          <parameter qname="pm:listPolicySets_papId" type="tns:string"/>
+      </operation>
+      
+      <parameter name="allowedMethods" value="*"/>
+      
+      <typeMapping qname="xacml:PolicyType"
+          type="java:org.opensaml.xacml.policy.PolicyType"
+          serializer="org.glite.authz.pap.provisioning.axis.SerializerFactory"
+          deserializer="org.glite.authz.pap.provisioning.axis.DeserializerFactory"
+          encodingStyle=""
+      />
+      
+      <typeMapping qname="xacml:PolicySetType"
+          type="java:org.opensaml.xacml.policy.PolicySetType"
+          serializer="org.glite.authz.pap.provisioning.axis.SerializerFactory"
+          deserializer="org.glite.authz.pap.provisioning.axis.DeserializerFactory"
+          encodingStyle=""
+      />
+      
+      <arrayMapping qname="pm:ArrayOf_xacml_PolicyType"
+          type="java:org.opensaml.xacml.policy.PolicyType[]" innerType="xacml:PolicyType"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      
+      <arrayMapping qname="pm:ArrayOf_xacml_PolicySetType"
+          type="java:org.opensaml.xacml.policy.PolicySetType[]" innerType="xacml:PolicySetType"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+          
+   </service>
+   
+   <service name="PAPManagementService" provider="java:RPC" style="rpc" use="literal"
+           xmlns:papmgmt="urn:org:glite:authz:pap:papmanagement">
+      <parameter name="className" value="org.glite.authz.pap.papmanagement.PAPManagementServiceImpl"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      
+      <operation name="addTrustedPAP" qname="papmgmt:addTrustedPAP">
+           <parameter qname="papmgmt:addTrustedPAP_pap" type="papns:PAP"/>
+      </operation>
+      
+      <operation name="exists" qname="papmgmt:exists"
+                 returnQName="papmgmt:existsResponse" returnType="tns:boolean">
+           <parameter qname="papmgmt:exists_papId" type="tns:string"/>
+      </operation>
+      
+      <operation name="getTrustedPAP" qname="papmgmt:getTrustedPAP"
+                 returnQName="papmgmt:getTrustedPAPResponse" returnType="papns:PAP">
+           <parameter qname="papmgmt:getTrustedPAP_papId" type="tns:string"/>
+      </operation>
+      
+      <operation name="listTrustedPAPs" qname="papmgmt:listTrustedPAP"
+                 returnQName="papmgmt:listTrustedPAPResponse" returnType="papns:ArrayOfPAP">
+      </operation>
+      
+      <operation name="ping" qname="papmgmt:ping"
+                 returnQName="papmgmt:pingResponse" returnType="tns:string">
+      </operation>
+      
+      <operation name="refreshCache" qname="papmgmt:refreshCache">
+           <parameter qname="papmgmt:refreshCache_papId" type="tns:string"/>
+      </operation>
+      
+      <operation name="removeTrustedPAP" qname="papmgmt:removeTrustedPAP">
+           <parameter qname="papmgmt:removeTrustedPAP_papId" type="tns:string"/>
+      </operation>
+      
+      <operation name="updateTrustedPAP" qname="papmgmt:updateTrustedPAP">
+           <parameter qname="papmgmt:updateTrustedPAP_papId" type="tns:string"/>
+           <parameter qname="papmgmt:updateTrustedPAP_newpap" type="papns:PAP"/>
+      </operation>
+      
+      <parameter name="allowedMethods" value="*"/>
+      
+      <typeMapping qname="papns:PAP"
+        type="java:org.glite.authz.pap.common.PAP"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      
+      <beanMapping qname="papns:PAP" languageSpecificType="java:org.glite.authz.pap.common.PAP"/>
+      
+      <arrayMapping qname="papns:ArrayOfPAP"
+          type="java:org.glite.authz.pap.common.PAP[]" innerType="papns:PAP"
+          encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"
+      />
+      
+   </service>
+   
+     <service name="AuthorizationManagementService" provider="java:RPC" style="rpc" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://org.glite.authz/wsdl/pap/services/authz_management"/>
+      <parameter name="wsdlServiceElement" value="PAPAuthorizationManagementService"/>
+      <parameter name="schemaUnqualified" value="http://org.glite.authz/wsdl/pap/services/authz_management"/>
+      <parameter name="wsdlServicePort" value="PAPAuthorizationManagement"/>
+      <parameter name="className" value="org.glite.authz.pap.services.authz_management.PAPAuthzManagementService"/>
+      <parameter name="wsdlPortType" value="PAPAuthorizationManagement"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <parameter name="allowedMethods" value="addACE,removeACE,setACL,getACL"/>
+
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPPrincipal"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPPrincipal"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPACE"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACE"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPException"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPException"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPACEList"
+        type="java:org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACE[]"
+        innerType="cmp-ns:PAPACE" xmlns:cmp-ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        encodingStyle=""
+      />
+      <arrayMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/authz_management"
+        qname="ns:PAPPermissionList"
+        type="java:java.lang.String[]"
+        innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
   </service>
 
   <service

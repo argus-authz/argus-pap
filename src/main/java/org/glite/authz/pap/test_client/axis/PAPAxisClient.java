@@ -13,6 +13,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
 import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
@@ -46,6 +47,8 @@ import org.slf4j.LoggerFactory;
  */
 
 public class PAPAxisClient {
+    
+    private Response response;
 
     static final Logger log = LoggerFactory.getLogger(PAPAxisClient.class);
 
@@ -69,194 +72,176 @@ public class PAPAxisClient {
 
     private void setupDefaults() {
 
-	papMode = false;
-	url = "https://localhost:8443/org.glite.security.authz.pap-0.1/services/ProvisioningService";
+        papMode = false;
+        url = "https://localhost:8443/pap/services/ProvisioningService";
 
     }
 
     private void setupCLParser() {
 
-	options = new Options();
+        options = new Options();
 
-	options.addOption(OptionBuilder.withLongOpt("help").withDescription(
-		"Displays helps and exits.").create("h"));
+        options.addOption(OptionBuilder.withLongOpt("help").withDescription("Displays helps and exits.")
+                .create("h"));
 
-	options.addOption(OptionBuilder.withLongOpt("url").withDescription(
-		"Specifies the target PAP endpoint that is contacted.")
-		.hasArg().create("url"));
+        options.addOption(OptionBuilder.withLongOpt("url").withDescription(
+                "Specifies the target PAP endpoint that is contacted.").hasArg().create("url"));
 
-	options.addOption(OptionBuilder.withLongOpt("cert").withDescription(
-		"Specifies non-standard user certificate.").hasArg().create(
-		"cert"));
+        options.addOption(OptionBuilder.withLongOpt("cert").withDescription(
+                "Specifies non-standard user certificate.").hasArg().create("cert"));
 
-	options.addOption(OptionBuilder.withLongOpt("key").withDescription(
-		"Specifies non-standard user private key.").hasArg().create(
-		"key"));
+        options.addOption(OptionBuilder.withLongOpt("key").withDescription(
+                "Specifies non-standard user private key.").hasArg().create("key"));
 
-	options
-		.addOption(OptionBuilder
-			.withLongOpt("password")
-			.withDescription(
-				"Specifies a password that is used to decrypt the user's private key.")
-			.hasArg().create("password"));
+        options.addOption(OptionBuilder.withLongOpt("password").withDescription(
+                "Specifies a password that is used to decrypt the user's private key.").hasArg().create(
+                "password"));
 
-	options.addOption(OptionBuilder.withLongOpt("url").withDescription(
-		"Specifies the target PAP endpoint that is contacted.")
-		.hasArg().create("url"));
+        options.addOption(OptionBuilder.withLongOpt("url").withDescription(
+                "Specifies the target PAP endpoint that is contacted.").hasArg().create("url"));
 
-	options
-		.addOption(OptionBuilder
-			.withLongOpt("pap-mode")
-			.withDescription(
-				"When set, the client behaves as a PAP client instead of a PDP client.")
-			.create("pap_mode"));
+        options.addOption(OptionBuilder.withLongOpt("pap-mode").withDescription(
+                "When set, the client behaves as a PAP client instead of a PDP client.").create(
+                "pap_mode"));
 
     }
 
     private void parseArguments(String[] args) {
 
-	setupDefaults();
+        setupDefaults();
 
-	try {
+        try {
 
-	    CommandLine line = parser.parse(options, args);
+            CommandLine line = parser.parse(options, args);
 
-	    if (line.hasOption("h"))
-		printHelpMessageAndExit(0);
+            if (line.hasOption("h"))
+                printHelpMessageAndExit(0);
 
-	    if (line.hasOption("url"))
-		url = line.getOptionValue("url");
+            if (line.hasOption("url"))
+                url = line.getOptionValue("url");
 
-	    if (line.hasOption("cert"))
-		certificate = line.getOptionValue("cert");
+            if (line.hasOption("cert"))
+                certificate = line.getOptionValue("cert");
 
-	    if (line.hasOption("key"))
-		key = line.getOptionValue("key");
+            if (line.hasOption("key"))
+                key = line.getOptionValue("key");
 
-	    if (line.hasOption("password"))
-		keyPasswd = line.getOptionValue("password");
+            if (line.hasOption("password"))
+                keyPasswd = line.getOptionValue("password");
 
-	    if (line.hasOption("pap-mode"))
-		papMode = true;
+            if (line.hasOption("pap-mode"))
+                papMode = true;
 
-	} catch (ParseException e) {
+        } catch (ParseException e) {
 
-	    log
-		    .error("Error parsing command line arguments: "
-			    + e.getMessage());
-	    printHelpMessageAndExit(1);
-	}
+            log.error("Error parsing command line arguments: " + e.getMessage());
+            printHelpMessageAndExit(1);
+        }
 
     }
 
     private void printHelpMessageAndExit(int exitStatus) {
 
-	helpFormatter.printHelp("PAPAxisClient", options);
-	System.exit(exitStatus);
+        helpFormatter.printHelp("PAPAxisClient", options);
+        System.exit(exitStatus);
 
     }
 
     private void configureOpenSAML() {
 
-	try {
-	    DefaultBootstrap.bootstrap();
+        try {
+            DefaultBootstrap.bootstrap();
 
-	} catch (ConfigurationException e) {
-	    throw new RuntimeException(e);
-	}
-
-    }
-
-    public XACMLPolicyQueryType buildPolicyQuery(String issuerString,
-	    boolean isPAPQuery) {
-
-	XMLObjectBuilderFactory bf = Configuration.getBuilderFactory();
-
-	XACMLPolicyQueryTypeImplBuilder builder = (XACMLPolicyQueryTypeImplBuilder) bf
-		.getBuilder(XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20);
-
-	// TODO: submit bug to opensaml ?
-	XACMLPolicyQueryType policyQuery = builder.buildObject(
-		XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20
-			.getNamespaceURI(),
-		XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20
-			.getLocalPart(),
-		XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20.getPrefix());
-
-	IssuerBuilder issuerBuilder = (IssuerBuilder) bf
-		.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
-
-	Issuer issuer = issuerBuilder.buildObject();
-
-	issuer.setValue(issuerString);
-	issuer.setFormat(NameID.ENTITY);
-
-	policyQuery.setIssuer(issuer);
-	policyQuery.setIssueInstant(new DateTime());
-
-	if (isPAPQuery) {
-
-	    // TODO: submit bug to opensaml?
-	    ExtensionsBuilder eBuilder = (ExtensionsBuilder) bf
-		    .getBuilder(new QName(SAMLConstants.SAML20MD_NS,
-			    Extensions.LOCAL_NAME,
-			    SAMLConstants.SAML20MD_PREFIX));
-	    Extensions extensions = eBuilder.buildObject();
-
-	    policyQuery.setExtensions(extensions);
-
-	}
-	return policyQuery;
+        } catch (ConfigurationException e) {
+            throw new RuntimeException(e);
+        }
 
     }
 
-    private void printXMLObject(String prefix, XMLObject o)
-	    throws MarshallingException {
+    public XACMLPolicyQueryType buildPolicyQuery(String issuerString, boolean isPAPQuery) {
 
-	MarshallerFactory mf = Configuration.getMarshallerFactory();
-	Marshaller marshaller = mf.getMarshaller(o);
-	log.info(prefix + " " + XMLHelper.nodeToString(marshaller.marshall(o)));
+        XMLObjectBuilderFactory bf = Configuration.getBuilderFactory();
+
+        XACMLPolicyQueryTypeImplBuilder builder = (XACMLPolicyQueryTypeImplBuilder) bf
+                .getBuilder(XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20);
+
+        // TODO: submit bug to opensaml ?
+        XACMLPolicyQueryType policyQuery = builder.buildObject(
+                XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20.getNamespaceURI(),
+                XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20.getLocalPart(),
+                XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20.getPrefix());
+
+        IssuerBuilder issuerBuilder = (IssuerBuilder) bf.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
+
+        Issuer issuer = issuerBuilder.buildObject();
+
+        issuer.setValue(issuerString);
+        issuer.setFormat(NameID.ENTITY);
+
+        policyQuery.setIssuer(issuer);
+        policyQuery.setIssueInstant(new DateTime());
+
+        if (isPAPQuery) {
+
+            // TODO: submit bug to opensaml?
+            ExtensionsBuilder eBuilder = (ExtensionsBuilder) bf.getBuilder(new QName(
+                    SAMLConstants.SAML20MD_NS, Extensions.LOCAL_NAME, SAMLConstants.SAML20MD_PREFIX));
+            Extensions extensions = eBuilder.buildObject();
+
+            policyQuery.setExtensions(extensions);
+
+        }
+        return policyQuery;
 
     }
 
-    public PAPAxisClient(String[] args) throws RemoteException,
-	    ServiceException, MarshallingException, TransformerException {
+    private void printXMLObject(String prefix, XMLObject o) throws MarshallingException {
 
-	setupCLParser();
+        MarshallerFactory mf = Configuration.getMarshallerFactory();
+        Marshaller marshaller = mf.getMarshaller(o);
+        log.info(prefix + " " + XMLHelper.nodeToString(marshaller.marshall(o)));
+        System.out.println(XMLObjectHelper.toString(o));
+    }
 
-	parseArguments(args);
+    public PAPAxisClient(String[] args) throws RemoteException, ServiceException, MarshallingException,
+            TransformerException {
 
-	configureOpenSAML();
+        setupCLParser();
 
-	XACMLPolicyQueryType policyQuery = buildPolicyQuery("IssuerString",
-		papMode);
+        parseArguments(args);
 
-	printXMLObject("PolicyQuery:", policyQuery);
+        configureOpenSAML();
 
-	/* get the client */
-	ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
-		.getProvisioningServiceClientFactory();
+        XACMLPolicyQueryType policyQuery = buildPolicyQuery("IssuerString", papMode);
 
-	ProvisioningServiceClient client = factory
-		.createPolicyProvisioningServiceClient();
+        printXMLObject("PolicyQuery:", policyQuery);
 
-	ProvisioningServicePortType port = client
-		.getProvisioningServicePortType(url);
+        /* get the client */
+        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
+                .getProvisioningServiceClientFactory();
 
-	if (certificate != null)
-	    port.setClientCertificate(certificate);
+        ProvisioningServiceClient client = factory.createPolicyProvisioningServiceClient();
 
-	if (key != null)
-	    port.setClientPrivateKey(key);
+        ProvisioningServicePortType port = client.getProvisioningServicePortType(url);
 
-	if (keyPasswd != null)
-	    port.setClientPrivateKeyPassword(keyPasswd);
+        if (certificate != null)
+            port.setClientCertificate(certificate);
 
-	/* call the service */
-	Response response = port.xacmlPolicyQuery(policyQuery);
+        if (key != null)
+            port.setClientPrivateKey(key);
 
-	printXMLObject("Response:", response);
+        if (keyPasswd != null)
+            port.setClientPrivateKeyPassword(keyPasswd);
 
+        /* call the service */
+        response = port.xacmlPolicyQuery(policyQuery);
+
+        printXMLObject("Response:", response);
+
+    }
+    
+    public Response getReponse() {
+        return response;
     }
 
     /**
@@ -265,10 +250,10 @@ public class PAPAxisClient {
      * @throws MarshallingException
      * @throws TransformerException
      */
-    public static void main(String[] args) throws RemoteException,
-	    ServiceException, MarshallingException, TransformerException {
+    public static void main(String[] args) throws RemoteException, ServiceException,
+            MarshallingException, TransformerException {
 
-	new PAPAxisClient(args);
+        new PAPAxisClient(args);
 
     }
 
