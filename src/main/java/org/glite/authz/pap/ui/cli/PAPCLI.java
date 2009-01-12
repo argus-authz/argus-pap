@@ -49,7 +49,7 @@ public class PAPCLI {
         
         for (ServiceCLI.ExitStatus es:ServiceCLI.ExitStatus.values()) {
             if (es.ordinal() == exitStatus)
-                log.info("Exit status: " + es);
+                log.info(cli.getCommandName() + " exit status: " + es);
         }
         
         System.exit(exitStatus);
@@ -146,6 +146,14 @@ public class PAPCLI {
             throw new ParseException("Unknown command: " + command);
         }
         
+    }
+    
+    public String getCommandName() {
+        
+        if (serviceCLI != null)
+            return serviceCLI.getCommandNameValues()[0];
+        
+        return null;
     }
 
     private void defineCommands() {
