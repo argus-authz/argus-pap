@@ -24,7 +24,7 @@ public class RemoveACE extends AuthZManagementCLI {
     }
 
     @Override
-    protected void executeCommand( CommandLine commandLine )
+    protected int executeCommand( CommandLine commandLine )
             throws CLIException , ParseException , RemoteException {
 
         String[] args = commandLine.getArgs();
@@ -35,7 +35,8 @@ public class RemoveACE extends AuthZManagementCLI {
         PAPPrincipal principal = AuthzCLIUtils.principalFromString( args[1] );
         
         authzMgmtClient.removeACE( null, principal );
-        return;
+        
+        return ExitStatus.SUCCESS.ordinal();
         
     }
 

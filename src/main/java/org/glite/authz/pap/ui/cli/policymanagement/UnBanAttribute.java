@@ -37,7 +37,7 @@ public class UnBanAttribute extends PolicyManagementCLI {
     }
     
     @Override
-    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
             RemoteException {
     
         String[] args = commandLine.getArgs();
@@ -73,6 +73,8 @@ public class UnBanAttribute extends PolicyManagementCLI {
             System.out.println("Error: blacklist policy not found for " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
         else
             System.out.println("Successfully un-banned " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+        
+        return ExitStatus.SUCCESS.ordinal();
     }
     
     @Override

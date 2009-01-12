@@ -26,7 +26,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
     }
     
     @Override
-    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
             RemoteException {
         
         String[] args = commandLine.getArgs();
@@ -39,13 +39,13 @@ public class UpdatePolicy extends PolicyManagementCLI {
         
         if (!policyMgmtClient.hasPolicy(policyId)) {
             System.out.println("Error: policId \"" + policyId + "\" does not exists.");
-            return;
+            return ExitStatus.FAILURE.ordinal();
         }
         
         File file = new File(fileName);
         if (!file.exists()) {
             System.out.println("Error: file " + file.getAbsolutePath() + "does not exists.");
-            return;
+            return ExitStatus.FAILURE.ordinal();
         }
         
         initOpenSAML();
@@ -56,7 +56,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         } catch (EncodingException e) {
             System.out.println("Syntax error. Skipping file:" + fileName);
             System.out.println(e.getMessage());
-            return;
+            return ExitStatus.FAILURE.ordinal();
         }
         
         PolicyType policy = null;
@@ -71,12 +71,12 @@ public class UpdatePolicy extends PolicyManagementCLI {
         
         if (npolicies == 0) {
             System.out.println("Error: no policies has been defined in file " + fileName);
-            return;
+            return ExitStatus.FAILURE.ordinal();
         }
         
         if (npolicies > 1) {
             System.out.println("Error: more than one policy has been defined in file " + fileName);
-            return;
+            return ExitStatus.FAILURE.ordinal();
         }
         
         policy.setPolicyId(policyId);
@@ -84,6 +84,8 @@ public class UpdatePolicy extends PolicyManagementCLI {
         
         if (verboseMode)
             System.out.println("Success: policy has been updated.");
+        
+        return ExitStatus.SUCCESS.ordinal();
         
     }
     

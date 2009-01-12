@@ -16,11 +16,9 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 import org.glite.authz.pap.ui.wizard.BlacklistPolicySet;
 import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.glite.authz.pap.ui.wizard.ServiceClassPolicySet;
-import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLConfigurator;
 
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
@@ -81,29 +79,28 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 
 			policyMgmtClient.updatePolicySet(localPolicySet);
 		}
+		
+		// the effective PolicyId is the one returned by the server
+		policy.getPolicyType().setPolicyId(policyId);
 
 	}
 
-	protected abstract void executeCommand(CommandLine commandLine)
+	protected abstract int executeCommand(CommandLine commandLine)
 			throws CLIException, ParseException, RemoteException;
 
 	@Override
-	protected void executeCommandService(CommandLine commandLine,
+	protected int executeCommandService(CommandLine commandLine,
 			ServiceClient serviceClient) throws CLIException, ParseException,
 			RemoteException {
 
-		policyMgmtClient = serviceClient
-				.getPolicyManagementService(serviceClient.getTargetEndpoint()
-						+ SERVICE_NAME);
+		policyMgmtClient = serviceClient.getPolicyManagementService(serviceClient.getTargetEndpoint() + SERVICE_NAME);
 
-		executeCommand(commandLine);
+		return executeCommand(commandLine);
 	}
 
 	protected void initOpenSAML() {
 		try {
 			DefaultBootstrap.bootstrap();
-			XMLConfigurator xmlConfigurator = new XMLConfigurator();
-			
 		} catch (ConfigurationException e) {
 			throw new PAPConfigurationException(
 					"Error initializing OpenSAML library", e);

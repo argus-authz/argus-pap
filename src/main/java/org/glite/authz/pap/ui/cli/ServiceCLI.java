@@ -10,13 +10,21 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.OptionGroup;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 
 public abstract class ServiceCLI {
+    
+    public static enum ExitStatus {
+        SUCCESS,                // value = 0
+        PARTIAL_SUCCESS,        // value = 1
+        FAILURE,                // value = 2
+        PARSE_ERROR,            // value = 3
+        REMOTE_EXCEPTION,       // value = 4
+        INITIALIZATION_ERROR;   // value = 5
+    }
     
     private static final HelpFormatter helpFormatter = new HelpFormatter();
     protected static final String DEFAULT_HOST = "localhost";
@@ -105,7 +113,7 @@ public abstract class ServiceCLI {
         return false;
     }
     
-    public void execute(String[] args) throws ParseException, HelpMessageException, RemoteException {
+    public int execute(String[] args) throws ParseException, HelpMessageException, RemoteException {
         
         CommandLine commandLine = parser.parse(options, args);
         
@@ -144,7 +152,7 @@ public abstract class ServiceCLI {
         if (commandLine.hasOption(OPT_VERBOSE))
             verboseMode = true;
         
-        executeCommandService(commandLine, serviceClient);
+        return executeCommandService(commandLine, serviceClient);
         
     }
     
@@ -212,7 +220,7 @@ public abstract class ServiceCLI {
     
     protected abstract Options defineCommandOptions();
     
-    protected abstract void executeCommandService(CommandLine commandLine,
+    protected abstract int executeCommandService(CommandLine commandLine,
             ServiceClient serviceClient) throws CLIException, ParseException, RemoteException;
 
     protected void printVerboseMessage(String msg) {

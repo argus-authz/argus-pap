@@ -53,7 +53,7 @@ public class BanAttribute extends PolicyManagementCLI {
     }
 
     @Override
-    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
 
         String[] args = commandLine.getArgs();
 
@@ -82,6 +82,8 @@ public class BanAttribute extends PolicyManagementCLI {
         
         if (verboseMode)
         	System.out.println("ok (id=" + pw.getPolicyType().getPolicyId() + ")");
+        
+        return ExitStatus.SUCCESS.ordinal();
 
     }
 

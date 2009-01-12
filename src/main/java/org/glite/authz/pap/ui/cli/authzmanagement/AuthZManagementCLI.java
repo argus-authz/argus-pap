@@ -19,17 +19,17 @@ public abstract class AuthZManagementCLI extends ServiceCLI {
         super(commandNameValues, usage, description, longDescription);
     }
     
-    protected abstract void executeCommand(CommandLine commandLine) throws CLIException,
+    protected abstract int executeCommand(CommandLine commandLine) throws CLIException,
             ParseException, RemoteException;
     
     @Override
-    protected void executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
+    protected int executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
             throws CLIException, ParseException, RemoteException {
         
         authzMgmtClient = serviceClient.getPAPAuthorizationManagementService( serviceClient.getTargetEndpoint()
                 + SERVICE_NAME );
         
-        executeCommand(commandLine);
+        return executeCommand(commandLine);
         
     }
     

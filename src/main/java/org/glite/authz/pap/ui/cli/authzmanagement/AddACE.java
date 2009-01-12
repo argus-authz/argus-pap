@@ -5,9 +5,6 @@ import java.rmi.RemoteException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.exceptions.VOMSSyntaxException;
-import org.glite.authz.pap.common.utils.PathNamingScheme;
-import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACE;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPPrincipal;
 import org.glite.authz.pap.ui.cli.CLIException;
 
@@ -32,7 +29,7 @@ public class AddACE extends AuthZManagementCLI {
     }
 
     @Override
-    protected void executeCommand( CommandLine commandLine )
+    protected int executeCommand( CommandLine commandLine )
             throws CLIException , ParseException , RemoteException {
         
         String[] args = commandLine.getArgs();
@@ -48,7 +45,7 @@ public class AddACE extends AuthZManagementCLI {
         
         authzMgmtClient.addACE( null, principal, permissions );
         
-        return;
+        return ExitStatus.SUCCESS.ordinal();
 
     }
 

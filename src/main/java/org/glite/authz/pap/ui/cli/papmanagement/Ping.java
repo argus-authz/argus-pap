@@ -19,7 +19,7 @@ public class Ping extends PAPManagementCLI {
 	}
 
 	@Override
-	protected void executeCommand(CommandLine commandLine)
+	protected int executeCommand(CommandLine commandLine)
 			throws CLIException, ParseException, RemoteException {
 		
 		String[] args = commandLine.getArgs();
@@ -30,6 +30,8 @@ public class Ping extends PAPManagementCLI {
 		String papVersion = papMgmtClient.ping();
 		
 		System.out.println("PAP successfully contacted: version=" + papVersion);
+		
+		return ExitStatus.SUCCESS.ordinal();
   	}
 
 	@Override

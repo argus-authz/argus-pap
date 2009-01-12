@@ -55,7 +55,7 @@ public class ListPolicies extends PolicyManagementCLI {
     }
     
     @Override
-    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         boolean showPrivate = true;
         boolean showPublic = true;
         boolean showBlacklist = true;
@@ -87,7 +87,7 @@ public class ListPolicies extends PolicyManagementCLI {
         
         if (backupMode && plainFormat) {
             printErrorMessage("Conflicting options specified: --" + LOPT_BACKUP + " and --" + LOPT_PLAIN_FORMAT + ".");
-            return;
+            return ExitStatus.PARSE_ERROR.ordinal();
         }
             
         
@@ -97,7 +97,7 @@ public class ListPolicies extends PolicyManagementCLI {
         
         if (policyList.isEmpty()) {
             printOutputMessage("No policies has been found.");
-            return;
+            return ExitStatus.SUCCESS.ordinal();
         }
         
         boolean policiesFound;
@@ -120,6 +120,7 @@ public class ListPolicies extends PolicyManagementCLI {
         if (!policiesFound)
             printOutputMessage(noPoliciesFoundMessage(showPrivate, showPublic, showBlacklist, showServiceclass));
         
+        return ExitStatus.SUCCESS.ordinal();
     }
     
     protected static boolean listUsingGroupedFormat(List<PolicyType> policyList,

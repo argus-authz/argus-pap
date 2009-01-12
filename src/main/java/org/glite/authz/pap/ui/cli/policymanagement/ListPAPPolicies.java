@@ -21,7 +21,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
     }
     
     @Override
-    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
             RemoteException {
         
         String[] args = commandLine.getArgs();
@@ -52,7 +52,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         
         if (policyList.isEmpty()) {
             System.out.println("No policies has been found.");
-            return;
+            return ExitStatus.SUCCESS.ordinal();
         }
         
         boolean policiesFound;
@@ -64,6 +64,8 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         
         if (!policiesFound)
             System.out.println(ListPolicies.noPoliciesFoundMessage(true, true, showBlacklist, showServiceclass));
+        
+        return ExitStatus.SUCCESS.ordinal();
         
     }
     

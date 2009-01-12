@@ -32,95 +32,120 @@ import org.glite.authz.pap.ui.cli.policymanagement.UnBanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.UpdatePolicy;
 
 public class PAPCLI {
+    
+    private static final Logger log = LoggerFactory.getLogger(PAPCLI.class);
 
     public static void main(String[] args) {
 
         PAPCLI cli = new PAPCLI(args);
-
-        System.exit(cli.getExitCode());
+        
+        try {
+            cli.parseCommandLine();
+        } catch (ParseException e) {
+            System.out.println(e.getMessage());
+        }
+        
+        int exitStatus = cli.executeCommand();
+        
+        for (ServiceCLI.ExitStatus es:ServiceCLI.ExitStatus.values()) {
+            if (es.ordinal() == exitStatus)
+                log.info("Exit status: " + es);
+        }
+        
+        System.exit(exitStatus);
 
     }
 
-    private final Logger log = LoggerFactory.getLogger(PAPCLI.class);
     private final List<ServiceCLI> serviceCLIList = new LinkedList<ServiceCLI>();
     private final List<ServiceCLI> policyMgmtCommandList = new LinkedList<ServiceCLI>();
     private final List<ServiceCLI> papMgmtCommandList = new LinkedList<ServiceCLI>();
     private final List<ServiceCLI> authzMgmtCommandList = new LinkedList<ServiceCLI>();
-    private int exitCode = 1;
 
     protected int hfWidth = 80;
     protected final Options options = new Options();
     protected final CommandLineParser parser = new GnuParser();
     protected final HelpFormatter helpFormatter = new HelpFormatter();
+    protected ServiceCLI serviceCLI = null;
+    protected String[] args;
+    protected boolean printGeneralHelpMessage = false;
 
     public PAPCLI(String[] args) {
 
+        this.args = args;
+        
         helpFormatter.setLeftPadding(4);
 
         defineCommands();
         defineOptions();
 
-        ServiceCLI serviceCLI = null;
-        String command = null;
-
-        try {
-
-            CommandLine commandLine = parser.parse(options, args, true);
-
-            if (commandLine.hasOption('h'))
-                printGeneralHelpAndExit(0);
-
-        } catch (ParseException e) {
-            System.err.println("Parsing failed.  Reason: " + e.getMessage());
-            printGeneralHelpAndExit(1);
+    }
+    
+    public int executeCommand() {
+        
+        if (printGeneralHelpMessage) {
+            printGeneralHelp();
+            return ServiceCLI.ExitStatus.SUCCESS.ordinal();
         }
-
+        
+        if (serviceCLI == null)
+            return ServiceCLI.ExitStatus.INITIALIZATION_ERROR.ordinal();
+        
+        int exitStatus;
+        
         try {
-            command = getCommand(args);
-        } catch (ParseException e) {
-            System.out.println("You must specify a command, available commands are listed below.");
-            printGeneralHelpAndExit(1);
-        }
-
-        boolean commandFound = false;
-
-        try {
-
-            Iterator<ServiceCLI> serviceCLIIterator = serviceCLIList.iterator();
-            while (serviceCLIIterator.hasNext()) {
-                serviceCLI = serviceCLIIterator.next();
-                if (serviceCLI.commandMatch(command)) {
-
-                    if (System.getProperty("enablePapCliProfiling") != null)
-                        profileCommandExecution(serviceCLI, args);
-                    else
-                        serviceCLI.execute(args);
-
-                    commandFound = true;
-                    break;
-                }
-            }
-
-            if (!commandFound)
-                System.out.println("Unknown command: " + command);
-
+            
+            if (System.getProperty("enablePapCliProfiling") != null)
+                exitStatus = profileCommandExecution(serviceCLI, args);
+            else
+                exitStatus = serviceCLI.execute(args);
+            
         } catch (ParseException e) {
             System.err.println("\nParsing failed.  Reason: " + e.getMessage() + "\n");
-            printCommandHelpAndExit(serviceCLI, 4);
+            printCommandHelp(serviceCLI);
+            return ServiceCLI.ExitStatus.PARSE_ERROR.ordinal();
+            
         } catch (HelpMessageException e) {
-            printCommandHelpAndExit(serviceCLI, 4);
+            printCommandHelp(serviceCLI);
+            return ServiceCLI.ExitStatus.SUCCESS.ordinal();
+            
         } catch (RemoteException e) {
             System.out.println("Error invoking the '" + serviceCLI.getClass().getSimpleName() + "' method on remote endpoint: "
                     + serviceCLI.getServiceClient().getTargetEndpoint());
             System.out.println("Reason: " + e.getMessage());
+            return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
         }
-
-        exitCode = 0;
-
+        
+        return exitStatus;
+        
     }
+    
+    public void parseCommandLine() throws ParseException {
+        
+        CommandLine commandLine = parser.parse(options, args, true);
+        
+        if (commandLine.hasOption('h'))
+            printGeneralHelpMessage = true;
+        else
+            printGeneralHelpMessage = false;
+        
+        String command = getCommand(args);
+        
+        boolean commandFound = false;
 
-    public int getExitCode() {
-        return exitCode;
+        Iterator<ServiceCLI> serviceCLIIterator = serviceCLIList.iterator();
+        while (serviceCLIIterator.hasNext()) {
+            serviceCLI = serviceCLIIterator.next();
+            if (serviceCLI.commandMatch(command)) {
+                commandFound = true;
+                break;
+            }
+        }
+        
+        if (!commandFound) {
+            serviceCLI = null;
+            throw new ParseException("Unknown command: " + command);
+        }
+        
     }
 
     private void defineCommands() {
@@ -180,7 +205,7 @@ public class PAPCLI {
         return commandString;
     }
 
-    private void printCommandHelpAndExit(ServiceCLI serviceCLI, int statusCode) {
+    private void printCommandHelp(ServiceCLI serviceCLI) {
 
         PrintWriter pw = new PrintWriter(System.out);
 
@@ -189,10 +214,9 @@ public class PAPCLI {
         pw.println();
         pw.flush();
 
-        System.exit(statusCode);
     }
 
-    private void printGeneralHelpAndExit(int statusCode) {
+    private void printGeneralHelp() {
         PrintWriter pw = new PrintWriter(System.out);
 
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin <subcommand> [options]");
@@ -228,7 +252,6 @@ public class PAPCLI {
         pw.println();
         pw.flush();
 
-        System.exit(statusCode);
     }
 
     protected long computeAvg(long[] values) {
@@ -257,21 +280,24 @@ public class PAPCLI {
         throw new ParseException("Missing command");
     }
 
-    protected void profileCommandExecution(ServiceCLI serviceCLI, String[] args) throws HelpMessageException, RemoteException,
+    protected int profileCommandExecution(ServiceCLI serviceCLI, String[] args) throws HelpMessageException, RemoteException,
             ParseException {
 
+        int status = ServiceCLI.ExitStatus.FAILURE.ordinal();
         int numSamples = 10;
 
         long[] samples = new long[numSamples];
 
         for (int i = 0; i < numSamples; i++) {
             long cmdFoundTime = System.currentTimeMillis();
-            serviceCLI.execute(args);
+            status = serviceCLI.execute(args);
             samples[i] = System.currentTimeMillis() - cmdFoundTime;
         }
 
         log.debug("Avg '" + serviceCLI.getClass().getSimpleName() + "'cmd execution time: " + computeAvg(samples) + " msecs.");
         log.debug("Fist '" + serviceCLI.getClass().getSimpleName() + "' execution (bootstrap) time: " + samples[0] + " msecs.");
+        
+        return status;
 
     }
 

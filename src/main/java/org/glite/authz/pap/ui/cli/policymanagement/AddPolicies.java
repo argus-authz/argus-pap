@@ -27,11 +27,20 @@ public class AddPolicies extends PolicyManagementCLI {
     }
 
     @Override
-    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
         String[] args = commandLine.getArgs();
         
         if (args.length < 2)
             throw new ParseException("No input files defined.");
+        
+        for (int i=1; i<args.length; i++) {
+            File file = new File(args[i]);
+            if (!file.exists())
+                throw new ParseException("File not found: " + file.getAbsolutePath());
+        }
+        
+        boolean partialSuccess = false;
+        boolean failure = false;
         
         for (int i=1; i<args.length; i++) {
             
@@ -39,8 +48,10 @@ public class AddPolicies extends PolicyManagementCLI {
             
             try {
                 addPolicy(fileName);
+                partialSuccess = true;
             } catch (EncodingException e) {
-                System.out.println("Syntax error. Skipping file:" + fileName);
+                failure = true;
+                System.out.println("Syntax error. Skipping file (no policies has been added):" + fileName);
                 System.out.println(e.getMessage());
                 continue;
             }
@@ -49,13 +60,19 @@ public class AddPolicies extends PolicyManagementCLI {
                 System.out.println("Success: policies has been added from file " + fileName);
         }
         
+        if (failure && !partialSuccess)
+            return ExitStatus.FAILURE.ordinal();
+        
+        if (failure && partialSuccess)
+            return ExitStatus.PARTIAL_SUCCESS.ordinal();
+        
+        return ExitStatus.SUCCESS.ordinal();
+        
     }
     
-    private void addPolicy(String fileName) throws EncodingException, ParseException, RemoteException {
-        File file = new File(fileName);
+    private void addPolicy(String fileName) throws EncodingException, RemoteException {
         
-        if (!file.exists())
-            throw new ParseException("File not found: " + file.getAbsolutePath());
+        File file = new File(fileName);
         
         initOpenSAML();
         
@@ -65,6 +82,7 @@ public class AddPolicies extends PolicyManagementCLI {
             
             if (xacmlObject instanceof PolicySetType)
                 continue;
+            
             PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
             
             if (verboseMode) {

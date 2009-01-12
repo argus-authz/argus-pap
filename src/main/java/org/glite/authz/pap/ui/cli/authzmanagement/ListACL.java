@@ -25,7 +25,7 @@ public class ListACL extends AuthZManagementCLI {
     }
 
     @Override
-    protected void executeCommand( CommandLine commandLine )
+    protected int executeCommand( CommandLine commandLine )
             throws CLIException , ParseException , RemoteException {
 
         PAPACE[] aces = authzMgmtClient.getACL( null );
@@ -35,6 +35,8 @@ public class ListACL extends AuthZManagementCLI {
         
         for (PAPACE ace: aces)  
             printACE( ace );
+        
+        return ExitStatus.SUCCESS.ordinal();
 
     }
     

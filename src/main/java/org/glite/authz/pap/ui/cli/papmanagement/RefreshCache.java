@@ -23,7 +23,7 @@ public class RefreshCache extends PAPManagementCLI {
     }
     
     @Override
-    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
             RemoteException {
         
         String[] args = commandLine.getArgs();
@@ -40,14 +40,18 @@ public class RefreshCache extends PAPManagementCLI {
         
         if (papIdList.isEmpty()) {
             System.out.println("No remote PAPs found.");
-            return;
+            return ExitStatus.SUCCESS.ordinal();
         }
         
         for (String papId : papIdList) {
             System.out.print("Refreshing cache for pap \"" + papId + "\"...");
+            // TODO: catch Remote exceptions in order to set exit status information for each PAP
             papMgmtClient.refreshCache(papId);
             System.out.println(" ok.");
         }
+        
+        return ExitStatus.SUCCESS.ordinal();
+        
     }
     
     @Override

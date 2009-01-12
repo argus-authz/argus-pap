@@ -54,7 +54,7 @@ public class JobPriority extends PolicyManagementCLI {
     }
 
     @Override
-    protected void executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
         if (args.length != 3)
@@ -83,6 +83,8 @@ public class JobPriority extends PolicyManagementCLI {
 
         if (verboseMode)
             System.out.println("Success: policy has been added.");
+        
+        return ExitStatus.SUCCESS.ordinal();
     }
 
 }

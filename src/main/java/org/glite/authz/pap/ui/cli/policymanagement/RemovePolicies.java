@@ -20,7 +20,7 @@ public class RemovePolicies extends PolicyManagementCLI {
     }
 
     @Override
-    protected void executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
             RemoteException {
         
         String[] args = commandLine.getArgs();
@@ -30,14 +30,19 @@ public class RemovePolicies extends PolicyManagementCLI {
         
         initOpenSAML();
         
+        boolean partialSuccess = false;
+        boolean failure = false;
+        
         try {
         	
 	        for (int i=1; i<args.length; i++) {
+	            
 	            String policyId = args[i];
 	            System.out.print("Removing policy \"" + policyId + "\"... ");
 	            
 	            if (!policyMgmtClient.hasPolicy(policyId)) {
 	            	System.out.println("NOT FOUND.");
+	            	failure = true;
 	            	continue;
 	            }
 	            
@@ -47,12 +52,23 @@ public class RemovePolicies extends PolicyManagementCLI {
 	            
 	            removePolicy(policyWizard);
 	            
+	            partialSuccess = true;
+	            
 	            System.out.println("ok.");
 	        }
         } catch (RemoteException e) {
         	System.out.println("ERROR.");
         	throw e;
         }
+        
+        if (failure && !partialSuccess)
+            return ExitStatus.FAILURE.ordinal();
+        
+        if (failure && partialSuccess)
+            return ExitStatus.PARTIAL_SUCCESS.ordinal();
+        
+        return ExitStatus.SUCCESS.ordinal();
+        
     }
 
     @Override
