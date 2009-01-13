@@ -1,17 +1,12 @@
 package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.rmi.RemoteException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.ui.wizard.AttributeWizard;
-import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType;
-import org.opensaml.xacml.policy.EffectType;
 
 public class BanAttribute extends PolicyManagementCLI {
 
@@ -60,28 +55,24 @@ public class BanAttribute extends PolicyManagementCLI {
         if (args.length != 2)
             throw new ParseException("Wrong number of arguments");
         
+        String attributeValue = args[1];
+        
         boolean isPrivate = false;
         if (commandLine.hasOption(LOPT_PRIVATE))
             isPrivate = true;
 
-        List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
-        targetList.add(new AttributeWizard(attributeToDeny, args[1]));
-        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_URI, "*"));
-
-        initOpenSAML();
-
-        PolicyWizard pw = new PolicyWizard(targetList, null, EffectType.Deny);
-        
-        if (isPrivate)
-            pw.setPrivate(true);
-
         if (verboseMode)
             System.out.print("Adding policy... ");
-
-        addPolicy(pw);
         
+        String policyId;
+        
+        if (AttributeWizardType.DN.equals(attributeToDeny))
+            policyId = highlevelPolicyMgmtClient.banDN(attributeValue, !isPrivate);
+        else
+            policyId = highlevelPolicyMgmtClient.banFQAN(attributeValue, !isPrivate);
+
         if (verboseMode)
-        	System.out.println("ok (id=" + pw.getPolicyType().getPolicyId() + ")");
+        	System.out.println("ok (id=" + policyId + ")");
         
         return ExitStatus.SUCCESS.ordinal();
 

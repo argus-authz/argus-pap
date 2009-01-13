@@ -5,19 +5,12 @@ import java.rmi.RemoteException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
-import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.policymanagement.PolicyManagementService;
-import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.glite.authz.pap.ui.cli.ServiceCLI;
-import org.glite.authz.pap.ui.wizard.BlacklistPolicySet;
-import org.glite.authz.pap.ui.wizard.PolicyWizard;
-import org.glite.authz.pap.ui.wizard.ServiceClassPolicySet;
 import org.opensaml.DefaultBootstrap;
-import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xml.ConfigurationException;
 
 public abstract class PolicyManagementCLI extends ServiceCLI {
@@ -35,54 +28,14 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 	protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"
         + LOPT_SHOW_XACML + ".";
 
-	protected static final String SERVICE_NAME = "PolicyManagementService";
-	protected PolicyManagementService policyMgmtClient;
+	protected static final String XACML_POLICY_MANAGEMENT_SERVICE_NAME = "XACMLPolicyManagement";
+	protected static final String HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME = "HighLevelPolicyManagement";
+	protected PolicyManagementService xacmlPolicyMgmtClient;
+	protected HighLevelPolicyManagement highlevelPolicyMgmtClient;
 
 	public PolicyManagementCLI(String[] commandNameValues, String usage,
 			String description, String longDescription) {
 		super(commandNameValues, usage, description, longDescription);
-	}
-
-	protected void addPolicy(PolicyWizard policy) throws CLIException,
-			RemoteException {
-
-		PolicySetType policySet;
-
-		if (policy.isBlacklistPolicy())
-			policySet = (new BlacklistPolicySet()).getPolicySetType();
-		else
-			policySet = (new ServiceClassPolicySet()).getPolicySetType();
-
-		String policySetId = policySet.getPolicySetId();
-
-		boolean updateOperation = false;
-
-		if (policyMgmtClient.hasPolicySet(policySetId)) {
-			updateOperation = true;
-			policySet = policyMgmtClient.getPolicySet(policySetId);
-		}
-
-		String policyId = policyMgmtClient.storePolicy(policy
-				.getPolicyIdPrefix(), policy.getPolicyType());
-
-		PolicySetHelper.addPolicyReference(policySet, policyId);
-
-		if (updateOperation)
-			policyMgmtClient.updatePolicySet(policySet);
-		else {
-			policyMgmtClient.storePolicySet(null, policySet);
-
-			PolicySetType localPolicySet = policyMgmtClient
-					.getPolicySet(PAP.localPAPId);
-
-			PolicySetHelper.addPolicySetReference(localPolicySet, policySetId);
-
-			policyMgmtClient.updatePolicySet(localPolicySet);
-		}
-		
-		// the effective PolicyId is the one returned by the server
-		policy.getPolicyType().setPolicyId(policyId);
-
 	}
 
 	protected abstract int executeCommand(CommandLine commandLine)
@@ -93,7 +46,8 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 			ServiceClient serviceClient) throws CLIException, ParseException,
 			RemoteException {
 
-		policyMgmtClient = serviceClient.getPolicyManagementService(serviceClient.getTargetEndpoint() + SERVICE_NAME);
+		xacmlPolicyMgmtClient = serviceClient.getPolicyManagementService(serviceClient.getTargetEndpoint() + XACML_POLICY_MANAGEMENT_SERVICE_NAME);
+		highlevelPolicyMgmtClient = serviceClient.getHighLevelPolicyManagementService(serviceClient.getTargetEndpoint() + HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME);
 
 		return executeCommand(commandLine);
 	}
@@ -105,28 +59,6 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 			throw new PAPConfigurationException(
 					"Error initializing OpenSAML library", e);
 		}
-	}
-
-	protected void removePolicy(PolicyWizard policy) throws NotFoundException,
-			RepositoryException, RemoteException {
-
-		PolicySetType policySet;
-		String policySetId;
-
-		if (policy.isBlacklistPolicy())
-			policySetId = BlacklistPolicySet.POLICY_SET_ID;
-		else
-			policySetId = ServiceClassPolicySet.POLICY_SET_ID;
-
-		policySet = policyMgmtClient.getPolicySet(policySetId);
-
-		String policyId = policy.getPolicyType().getPolicyId();
-		PolicySetHelper.deletePolicyReference(policySet, policyId);
-
-		policyMgmtClient.updatePolicySet(policySet);
-
-		policyMgmtClient.removePolicy(policyId);
-
 	}
 
 }

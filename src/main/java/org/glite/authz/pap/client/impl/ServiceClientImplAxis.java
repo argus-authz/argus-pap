@@ -8,15 +8,17 @@ import javax.xml.rpc.ServiceException;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.papmanagement.PAPManagementService;
 import org.glite.authz.pap.policymanagement.PolicyManagementService;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagementServiceLocator;
+import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
+import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagementServiceLocator;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ServiceClientImplAxis implements ServiceClient {
 	
@@ -47,6 +49,44 @@ public class ServiceClientImplAxis implements ServiceClient {
         return clientPrivateKeyPassword;
     }
 
+    public HighLevelPolicyManagement getHighLevelPolicyManagementService(
+            String url ) {
+
+        initializeAxisProperties();
+        HighLevelPolicyManagementServiceLocator loc = new HighLevelPolicyManagementServiceLocator();
+        
+        
+        try {
+            return loc.getHighLevelPolicyManagement( new URL(url) );
+        
+        } catch ( MalformedURLException e ) {
+            throw new PAPException("Error contacting Highlevel Policy management service: "+e.getMessage(),e);
+            
+        } catch ( ServiceException e ) {
+            throw new PAPException("Error contacting HighLevel Policy management service: "+e.getMessage(),e);
+            
+        } 
+    }
+    
+    public PAPAuthorizationManagement getPAPAuthorizationManagementService(
+            String url ) {
+
+        initializeAxisProperties();
+        PAPAuthorizationManagementServiceLocator loc = new PAPAuthorizationManagementServiceLocator();
+        
+        
+        try {
+            return loc.getPAPAuthorizationManagement( new URL(url) );
+        
+        } catch ( MalformedURLException e ) {
+            throw new PAPException("Error contacting PAP Authorization management service: "+e.getMessage(),e);
+            
+        } catch ( ServiceException e ) {
+            throw new PAPException("Error contacting PAP Authorization management service: "+e.getMessage(),e);
+            
+        } 
+    }
+
     public PAPManagementService getPAPManagementService(String url) {
         return new PAPManagementServiceClientImpl(url, getService());
     }
@@ -55,6 +95,33 @@ public class ServiceClientImplAxis implements ServiceClient {
         return new PolicyManagementServiceClientImpl(url, getService());
     }
     
+    public Service getService() {
+        initializeAxisProperties();
+        return new Service();
+    }
+
+    public String getTargetEndpoint() {
+        return serviceURL;
+    }
+
+    public void setClientCertificate(String certFile) {
+    	log.debug("clientCertificate=" + certFile);
+        clientCertificate = certFile;
+    }
+
+    public void setClientPrivateKey(String keyFile) {
+    	log.debug("clientPrivateKey=" + keyFile);
+        clientPrivateKey = keyFile;
+    }
+
+    public void setClientPrivateKeyPassword(String privateKeyPassword) {
+        clientPrivateKeyPassword = privateKeyPassword;
+    }
+    
+    public void setTargetEndpoint(String endpointURL) {
+        serviceURL = endpointURL;
+    }
+
     protected void initializeAxisProperties(){
         
         AxisProperties.setProperty("axis.socketSecureFactory",
@@ -84,52 +151,6 @@ public class ServiceClientImplAxis implements ServiceClient {
         AXISSocketFactory.setCurrentProperties(properties);
         System.setProperties( properties );
         
-    }
-
-    public Service getService() {
-        initializeAxisProperties();
-        return new Service();
-    }
-
-    public String getTargetEndpoint() {
-        return serviceURL;
-    }
-    
-    public void setClientCertificate(String certFile) {
-    	log.debug("clientCertificate=" + certFile);
-        clientCertificate = certFile;
-    }
-
-    public void setClientPrivateKey(String keyFile) {
-    	log.debug("clientPrivateKey=" + keyFile);
-        clientPrivateKey = keyFile;
-    }
-
-    public void setClientPrivateKeyPassword(String privateKeyPassword) {
-        clientPrivateKeyPassword = privateKeyPassword;
-    }
-
-    public void setTargetEndpoint(String endpointURL) {
-        serviceURL = endpointURL;
-    }
-
-    public PAPAuthorizationManagement getPAPAuthorizationManagementService(
-            String url ) {
-
-        initializeAxisProperties();
-        PAPAuthorizationManagementServiceLocator loc = new PAPAuthorizationManagementServiceLocator();
-        
-        
-        try {
-            return loc.getPAPAuthorizationManagement( new URL(url) );
-        
-        } catch ( MalformedURLException e ) {
-            throw new PAPException("Error contacting PAP Authorization management service: "+e.getMessage(),e);
-            
-        } catch ( ServiceException e ) {
-            throw new PAPException("Error contacting PAP Authorization management service: "+e.getMessage(),e);
-            
-        } 
     }
     
     

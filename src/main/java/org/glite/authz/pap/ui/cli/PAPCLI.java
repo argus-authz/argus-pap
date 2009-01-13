@@ -12,8 +12,6 @@ import org.apache.commons.cli.GnuParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.glite.authz.pap.ui.cli.authzmanagement.AddACE;
 import org.glite.authz.pap.ui.cli.authzmanagement.ListACL;
 import org.glite.authz.pap.ui.cli.authzmanagement.RemoveACE;
@@ -30,6 +28,8 @@ import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.RemovePolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.UnBanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.UpdatePolicy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PAPCLI {
     
@@ -112,7 +112,21 @@ public class PAPCLI {
             System.out.println("Error invoking the '" + serviceCLI.getClass().getSimpleName() + "' method on remote endpoint: "
                     + serviceCLI.getServiceClient().getTargetEndpoint());
             System.out.println("Reason: " + e.getMessage());
+            log.error("Remote exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnn", e);
+            log.error("NESTED: ", e.detail);
+            
+            if (e.detail == null)
+                System.out.println("datail NULLLLLLLLLLLLLLLLLLLLL");
+            else
+                System.out.println("detail OKKKKKKKKKKKKKKKKKKKKKKKKKKK");
+            
+            System.out.println("getMEssage(): " + e.getMessage());
+            
             return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
+        } catch (Exception e) {
+            System.out.println("EXCEPTION");
+            log.error("EXCEPTION", e);
+            return 1;
         }
         
         return exitStatus;

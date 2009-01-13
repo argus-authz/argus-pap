@@ -1,20 +1,15 @@
 package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.rmi.RemoteException;
-import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.ui.wizard.AttributeWizard;
-import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType;
-import org.opensaml.xacml.policy.EffectType;
 
 public class JobPriority extends PolicyManagementCLI {
-    
+
     private static String USAGE_DN = "<dn> <service_class> [options]";
     private static String USAGE_FQAN = "<fqan> <service_class> [options]";
     private static String[] COMMAND_NAME_VALUES_DN = { "user-job-prority", "ujp" };
@@ -31,10 +26,10 @@ public class JobPriority extends PolicyManagementCLI {
     }
 
     private AttributeWizardType attributeToDeny;
-    
-    private JobPriority(String[] commandNameValues, String usage, String description,
-            String longDescription, AttributeWizardType awt) {
-        
+
+    private JobPriority(String[] commandNameValues, String usage, String description, String longDescription,
+            AttributeWizardType awt) {
+
         super(commandNameValues, usage, description, longDescription);
         attributeToDeny = awt;
     }
@@ -44,11 +39,10 @@ public class JobPriority extends PolicyManagementCLI {
     protected Options defineCommandOptions() {
         Options options = new Options();
 
-        options.addOption(OptionBuilder.hasArg(false).withDescription(
-                "Set the policy as public (default)").withLongOpt(LOPT_PUBLIC).create());
-        options.addOption(OptionBuilder.hasArg(false).withDescription(
-                "Set the policy as private (it won't be distributed)").withLongOpt(LOPT_PRIVATE)
-                .create());
+        options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as public (default)").withLongOpt(
+                LOPT_PUBLIC).create());
+        options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as private (it won't be distributed)")
+                .withLongOpt(LOPT_PRIVATE).create());
 
         return options;
     }
@@ -59,32 +53,29 @@ public class JobPriority extends PolicyManagementCLI {
 
         if (args.length != 3)
             throw new ParseException("Wrong number of arguments");
-        
+
+        String attributeValue = args[1];
+        String serviceClass = args[2];
+
         boolean isPrivate = false;
         if (commandLine.hasOption(LOPT_PRIVATE))
             isPrivate = true;
 
-        List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
-        targetList.add(new AttributeWizard(attributeToDeny, args[1]));
-        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_URI, "*"));
-        targetList.add(new AttributeWizard(AttributeWizardType.SERVICE_CLASS, args[2]));
+        if (verboseMode)
+            System.out.print("Adding policy... ");
 
-        initOpenSAML();
+        String policyId;
 
-        PolicyWizard pw = new PolicyWizard(targetList, null, EffectType.Permit);
-        pw.setPrivate(isPrivate);
-
-        if (verboseMode) {
-            System.out.print("Adding policy: ");
-            System.out.println(pw.toFormattedString(0, 19));
-        }
-
-        addPolicy(pw);
+        if (AttributeWizardType.DN.equals(attributeToDeny))
+            policyId = highlevelPolicyMgmtClient.dnJobPriority(attributeValue, serviceClass, !isPrivate);
+        else
+            policyId = highlevelPolicyMgmtClient.fqanJobPriority(attributeValue, serviceClass, !isPrivate);
 
         if (verboseMode)
-            System.out.println("Success: policy has been added.");
-        
+            System.out.println("ok (id=" + policyId + ")");
+
         return ExitStatus.SUCCESS.ordinal();
+
     }
 
 }

@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	name="HighLevelPolicyManagement"
+	targetNamespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management">
+
+	<wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management">
+			<xsd:complexType name="StringList">
+				<xsd:sequence>
+					<xsd:element name="policyId" type="xsd:string"
+						maxOccurs="unbounded" minOccurs="0"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="UnbanResult">
+				<xsd:sequence>
+					<xsd:element name="statusCode" type="xsd:int"></xsd:element>
+					<xsd:element name="conflictingPolicies" type="tns:StringList">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="banDNRequest">
+		<wsdl:part name="dn" type="xsd:string" />
+		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="banDNResponse">
+		<wsdl:part name="policyId" type="xsd:string" />
+	</wsdl:message>
+
+	<wsdl:message name="banFQANRequest">
+		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
+		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="banFQANResponse">
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="unbanDNRequest">
+		<wsdl:part name="dn" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="unbanDNResponse">
+        <wsdl:part name="unbanResult" type="tns:UnbanResult"></wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="unbanFQANRequest">
+		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="unbanFQANResponse">
+		<wsdl:part name="unbanresult" type="tns:UnbanResult"></wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="dnJobPriorityRequest">
+		<wsdl:part name="dn" type="xsd:string"></wsdl:part>
+		<wsdl:part name="serviceClass" type="xsd:string"></wsdl:part>
+		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="dnJobPriorityResponse">
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="fqanJobPriorityRequest">
+		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
+		<wsdl:part name="serviceClass" type="xsd:string"></wsdl:part>
+		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="fqanJobPriorityResponse">
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	
+	<wsdl:portType name="HighLevelPolicyManagement">
+		<wsdl:operation name="banDN">
+			<wsdl:input message="tns:banDNRequest" />
+			<wsdl:output message="tns:banDNResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="banFQAN">
+			<wsdl:input message="tns:banFQANRequest"></wsdl:input>
+			<wsdl:output message="tns:banFQANResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="unbanDN">
+			<wsdl:input message="tns:unbanDNRequest"></wsdl:input>
+			<wsdl:output message="tns:unbanDNResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="unbanFQAN">
+			<wsdl:input message="tns:unbanFQANRequest"></wsdl:input>
+			<wsdl:output message="tns:unbanFQANResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="dnJobPriority">
+			<wsdl:input message="tns:dnJobPriorityRequest"></wsdl:input>
+			<wsdl:output message="tns:dnJobPriorityResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="fqanJobPriority">
+			<wsdl:input message="tns:fqanJobPriorityRequest"></wsdl:input>
+			<wsdl:output message="tns:fqanJobPriorityResponse"></wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="HighLevelPolicyManagementSOAP" type="tns:HighLevelPolicyManagement">
+		<soap:binding style="rpc"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="banDN">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/banDN" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="banFQAN">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/banFQAN" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+		<wsdl:operation name="unbanDN">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/unbanDN" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="unbanFQAN">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/unbanFQAN" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="dnJobPriority">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/dnJobPriority" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		
+		<wsdl:operation name="fqanJobPriority">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/fqanJobPriority" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+
+	</wsdl:binding>
+
+	<wsdl:service name="HighLevelPolicyManagementService">
+		<wsdl:port binding="tns:HighLevelPolicyManagementSOAP" name="HighLevelPolicyManagement">
+			<soap:address location="https://localhost:8443/pap" />
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>

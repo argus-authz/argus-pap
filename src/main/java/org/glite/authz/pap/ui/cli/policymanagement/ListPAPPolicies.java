@@ -48,7 +48,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         
         initOpenSAML();
         
-        List<PolicyType> policyList = policyMgmtClient.listPolicies(args[1]);
+        List<PolicyType> policyList = xacmlPolicyMgmtClient.listPolicies(args[1]);
         
         if (policyList.isEmpty()) {
             System.out.println("No policies has been found.");

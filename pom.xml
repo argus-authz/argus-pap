@@ -119,6 +119,13 @@
                     org.glite.authz.pap.services.authz_management.axis_skeletons
                   </targetPackage>
                 </mapping>
+                <mapping>
+                  <namespace> ${pap-services-namespace}/highlevel_policy_management
+                  </namespace>
+                  <targetPackage>
+                    org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons
+                  </targetPackage>
+                </mapping>
               </mappings>
               <serverSide>true</serverSide>
               <skeletonDeploy>true</skeletonDeploy>

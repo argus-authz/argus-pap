@@ -37,7 +37,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         String policyId = args[1];
         String fileName = args[2];
         
-        if (!policyMgmtClient.hasPolicy(policyId)) {
+        if (!xacmlPolicyMgmtClient.hasPolicy(policyId)) {
             System.out.println("Error: policId \"" + policyId + "\" does not exists.");
             return ExitStatus.FAILURE.ordinal();
         }
@@ -80,7 +80,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         }
         
         policy.setPolicyId(policyId);
-        policyMgmtClient.updatePolicy(policy);
+        xacmlPolicyMgmtClient.updatePolicy(policy);
         
         if (verboseMode)
             System.out.println("Success: policy has been updated.");

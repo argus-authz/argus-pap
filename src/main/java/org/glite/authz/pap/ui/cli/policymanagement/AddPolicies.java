@@ -90,7 +90,7 @@ public class AddPolicies extends PolicyManagementCLI {
                 System.out.println(pw.toFormattedString(0, 19));
             }
             
-            addPolicy(pw);
+            XACMLPolicyCLIUtils.addPolicy(pw, xacmlPolicyMgmtClient);
         }
         
     }

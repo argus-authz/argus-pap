@@ -40,17 +40,17 @@ public class RemovePolicies extends PolicyManagementCLI {
 	            String policyId = args[i];
 	            System.out.print("Removing policy \"" + policyId + "\"... ");
 	            
-	            if (!policyMgmtClient.hasPolicy(policyId)) {
+	            if (!xacmlPolicyMgmtClient.hasPolicy(policyId)) {
 	            	System.out.println("NOT FOUND.");
 	            	failure = true;
 	            	continue;
 	            }
 	            
-	            PolicyType policy = policyMgmtClient.getPolicy(policyId);
+	            PolicyType policy = xacmlPolicyMgmtClient.getPolicy(policyId);
 	            
 	            PolicyWizard policyWizard = new PolicyWizard(policy);
 	            
-	            removePolicy(policyWizard);
+	            XACMLPolicyCLIUtils.removePolicy(policyWizard, xacmlPolicyMgmtClient);
 	            
 	            partialSuccess = true;
 	            

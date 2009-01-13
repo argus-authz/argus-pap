@@ -45,7 +45,7 @@
 
   </service>
   
-  <service name="PolicyManagementService" provider="java:RPC" style="rpc" use="literal"
+  <service name="XACMLPolicyManagement" provider="java:RPC" style="rpc" use="literal"
            xmlns:pm="urn:org:glite:authz:pap:policymanagement">
       <parameter name="className" value="org.glite.authz.pap.policymanagement.PolicyManagementServiceImpl"/>
       <parameter name="typeMappingVersion" value="1.2"/>
@@ -261,6 +261,37 @@
         qname="ns:PAPPermissionList"
         type="java:java.lang.String[]"
         innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+  </service>
+  
+  <!-- org.glite.authz.pap.services.highlevel_policy_management.HighLevelPolicyManagementService -->
+  
+  <!-- Services from HighLevelPolicyManagementService WSDL service -->
+
+  <service name="HighLevelPolicyManagement" provider="java:RPC" style="rpc" use="literal">
+      <parameter name="wsdlTargetNamespace" value="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"/>
+      <parameter name="wsdlServiceElement" value="HighLevelPolicyManagementService"/>
+      <parameter name="schemaUnqualified" value="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"/>
+      <parameter name="wsdlServicePort" value="HighLevelPolicyManagement"/>
+      <parameter name="className" value="org.glite.authz.pap.services.highlevel_policy_management.HighLevelPolicyManagementService"/>
+      <parameter name="wsdlPortType" value="HighLevelPolicyManagement"/>
+      <parameter name="typeMappingVersion" value="1.2"/>
+      <parameter name="allowedMethods" value="*"/>
+
+      <arrayMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+        qname="ns:StringList"
+        type="java:java.lang.String[]"
+        innerType="cmp-ns:string" xmlns:cmp-ns="http://www.w3.org/2001/XMLSchema"
+        encodingStyle=""
+      />
+      <typeMapping
+        xmlns:ns="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+        qname="ns:UnbanResult"
+        type="java:org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult"
+        serializer="org.apache.axis.encoding.ser.BeanSerializerFactory"
+        deserializer="org.apache.axis.encoding.ser.BeanDeserializerFactory"
         encodingStyle=""
       />
   </service>

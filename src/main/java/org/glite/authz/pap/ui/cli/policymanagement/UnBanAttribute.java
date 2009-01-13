@@ -1,15 +1,13 @@
 package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.glite.authz.pap.ui.cli.CLIException;
-import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType;
-import org.opensaml.xacml.policy.PolicyType;
 
 public class UnBanAttribute extends PolicyManagementCLI {
     
@@ -46,33 +44,23 @@ public class UnBanAttribute extends PolicyManagementCLI {
             throw new ParseException("Wrong number of arguments");
         
         String attributeToUnBanValue = args[1];
+
+        UnbanResult unbanResult;
         
-        initOpenSAML();
-        
-        List<PolicyType> policyList = policyMgmtClient.listPolicies();
-        
-        boolean noPoliciesRemoved = true;
-        
-        for (PolicyType policy:policyList) {
-            PolicyWizard pw = new PolicyWizard(policy);
-            
-            if (AttributeWizardType.DN.equals(attributeToUnBan)) {
-                if (pw.isBanPolicyForDN(attributeToUnBanValue)) {
-                    removePolicy(pw);
-                    noPoliciesRemoved = false;
-                }
-            } else {
-                if (pw.isBanPolicyForFQAN(attributeToUnBanValue)) {
-                    removePolicy(pw);
-                    noPoliciesRemoved = false;
-                }
-            }
-        }
-        
-        if (noPoliciesRemoved)
-            System.out.println("Error: blacklist policy not found for " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+        if (AttributeWizardType.DN.equals(attributeToUnBan))
+            unbanResult = highlevelPolicyMgmtClient.unbanDN(attributeToUnBanValue);
         else
-            System.out.println("Successfully un-banned " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+            unbanResult = highlevelPolicyMgmtClient.unbanFQAN(attributeToUnBanValue);
+        
+        if (unbanResult.getStatusCode() != 0) {
+            
+            System.out.println("Error: blacklist policy not found for " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+            return ExitStatus.FAILURE.ordinal();
+            
+        } else {
+            if (verboseMode)
+                System.out.println("Successfully un-banned " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+        }
         
         return ExitStatus.SUCCESS.ordinal();
     }
