@@ -141,10 +141,35 @@
                   <namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os</namespace>
                   <targetPackage>org.opensaml.xacml.policy</targetPackage>
                 </mapping>
+                <!--
+                <mapping>
+                  <namespace>urn:oasis:xacml:2.0:saml:protocol:schema:os</namespace>
+                  <targetPackage>org.opensaml.xacml.profile.saml</targetPackage>
+                </mapping>
+                <mapping>
+                  <namespace>urn:oasis:names:tc:SAML:2.0:protocol</namespace>
+                  <targetPackage>org.opensaml.saml2.core</targetPackage>
+                </mapping>
+                <mapping>
+                  <namespace>urn:oasis:names:tc:xacml:2.0:context:schema:os</namespace>
+                  <targetPackage>org.opensaml.xacml.ctx</targetPackage>
+                </mapping>
+              -->
               </mappings>
+              
+              
               <nsExcludes>
+                <!--
                 <nsExclude>urn:oasis:names:tc:xacml:2.0:policy:schema:os</nsExclude>
+                <nsExclude>urn:oasis:names:tc:xacml:2.0:context:schema:os</nsExclude>
+                <nsExclude>urn:oasis:xacml:2.0:saml:protocol:schema:os</nsExclude>
+                <nsExclude>urn:oasis:names:tc:SAML:2.0:protocol</nsExclude>
+                <nsExclude>http://www.w3.org/2000/09/xmldsig#</nsExclude>
+                <nsExclude>http://www.w3.org/2001/04/xmlenc#</nsExclude>
+                <nsExclude>urn:oasis:names:tc:SAML:2.0:assertion</nsExclude>
+                -->
               </nsExcludes>
+              <allElements>false</allElements>
               <serverSide>true</serverSide>
               <skeletonDeploy>true</skeletonDeploy>
               <helperGen>true</helperGen>
