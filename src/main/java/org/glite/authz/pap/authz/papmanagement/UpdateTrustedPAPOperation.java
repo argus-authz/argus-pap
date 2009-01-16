@@ -5,30 +5,35 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.distribution.PAPManager;
+import org.glite.authz.pap.repository.exceptions.NotFoundException;
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
-public class UpdateTrustedPAPOperation extends BasePAPOperation {
+public class UpdateTrustedPAPOperation extends BasePAPOperation<Boolean> {
 
-    String papId;
     PAP pap;
     
-    protected UpdateTrustedPAPOperation(String papId, PAP pap){
+    protected UpdateTrustedPAPOperation(PAPData papData){
         
-        this.papId = papId;
-        this.pap = pap;
+        this.pap = new PAP(papData);
         
     }
         
-    public static UpdateTrustedPAPOperation instance(String papId, PAP pap) {
+    public static UpdateTrustedPAPOperation instance(PAPData papData) {
 
-        return new UpdateTrustedPAPOperation(papId,pap);
+        return new UpdateTrustedPAPOperation(papData);
     }
     
     @Override
-    protected Object doExecute() {
+    protected Boolean doExecute() {
 
-        PAPManager.getInstance().updateTrustedPAP( papId, pap );
-        return null;
+        try {
+            PAPManager.getInstance().updateTrustedPAP( pap.getPapId(), pap );
+        } catch (NotFoundException e) {
+            return false;
+        }
+        
+        return true;
     }
 
     @Override

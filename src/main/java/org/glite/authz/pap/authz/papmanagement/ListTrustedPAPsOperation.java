@@ -7,9 +7,10 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.distribution.PAPManager;
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
-public class ListTrustedPAPsOperation extends BasePAPOperation<List <PAP>> {
+public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
 
     
     
@@ -26,9 +27,30 @@ public class ListTrustedPAPsOperation extends BasePAPOperation<List <PAP>> {
     
     
     @Override
-    protected List<PAP> doExecute() {
+    protected PAPData[] doExecute() {
+        
+        List<PAP> papList = PAPManager.getInstance().getAllTrustedPAPs();
+        
+        PAPData[] papArray = new PAPData[papList.size()];
+        
+        for (int i=0; i<papArray.length; i++) {
+            PAP pap = papList.get(i);
+            
+            PAPData papData = new PAPData();
+            
+            papData.setAlias(pap.getAlias());
+            papData.setDn(pap.getDn());
+            papData.setHostname(pap.getHostname());
+            papData.setPapId(pap.getPapId());
+            papData.setPath(pap.getPath());
+            papData.setPort(pap.getPort());
+            papData.setProtocol(pap.getProtocol());
+            papData.setVisibilityPublic(pap.isPublic());
+            
+            papArray[i] = papData;
+        }
 
-        return PAPManager.getInstance().getAllTrustedPAPs();
+        return papArray;
     }
 
     @Override

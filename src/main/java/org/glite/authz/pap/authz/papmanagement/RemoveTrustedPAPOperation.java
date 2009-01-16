@@ -4,9 +4,10 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.distribution.PAPManager;
+import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 
-public class RemoveTrustedPAPOperation extends BasePAPOperation {
+public class RemoveTrustedPAPOperation extends BasePAPOperation <Boolean> {
 
     String papId;
     
@@ -21,11 +22,15 @@ public class RemoveTrustedPAPOperation extends BasePAPOperation {
     }
     
     @Override
-    protected Object doExecute() {
+    protected Boolean doExecute() {
 
-        PAPManager.getInstance().deleteTrustedPAP( papId );
+        try {
+            PAPManager.getInstance().deleteTrustedPAP( papId );
+        } catch (NotFoundException e) {
+            return false;
+        }
         
-        return null;
+        return true;
     }
 
     @Override
