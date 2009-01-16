@@ -20,7 +20,7 @@
  * 
  */
 
-package org.glite.authz.pap.provisioning;
+package org.glite.authz.pap.services;
 
 import java.util.List;
 
