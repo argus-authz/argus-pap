@@ -2,7 +2,7 @@
 <wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	xmlns:tns="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	name="HighLevelPolicyManagement"
+	name="HighLevelPolicyManagementService"
 	targetNamespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management">
 
 	<wsdl:types>
@@ -196,7 +196,7 @@
 	</wsdl:binding>
 
 	<wsdl:service name="HighLevelPolicyManagementService">
-		<wsdl:port binding="tns:HighLevelPolicyManagementSOAP" name="HighLevelPolicyManagement">
+		<wsdl:port binding="tns:HighLevelPolicyManagementSOAP" name="HighLevelPolicyManagementService">
 			<soap:address location="https://localhost:8443/pap" />
 		</wsdl:port>
 	</wsdl:service>

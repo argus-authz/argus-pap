@@ -10,7 +10,7 @@ import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicyType;
 
 
-public class ListPoliciesOperation extends BasePAPOperation <List <PolicyType>> {
+public class ListPoliciesOperation extends BasePAPOperation <PolicyType[]> {
 
     private ListPoliciesOperation() {
 
@@ -24,10 +24,19 @@ public class ListPoliciesOperation extends BasePAPOperation <List <PolicyType>> 
     
     
     @Override
-    protected List <PolicyType> doExecute() {
+    protected PolicyType[] doExecute() {
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
-        return localPAP.getAllPolicies();
+        
+        List<PolicyType> policyList = localPAP.getAllPolicies();
+        
+        PolicyType[] policyArray = new PolicyType[policyList.size()];
+        
+        for (int i=0; i<policyList.size(); i++) {
+            policyArray[i] = policyList.get(i);
+        }
+        
+        return policyArray;
     }
 
     @Override

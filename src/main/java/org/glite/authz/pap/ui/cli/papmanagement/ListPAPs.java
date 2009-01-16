@@ -1,12 +1,12 @@
 package org.glite.authz.pap.ui.cli.papmanagement;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class ListPAPs extends PAPManagementCLI {
     
@@ -26,15 +26,15 @@ public class ListPAPs extends PAPManagementCLI {
     @Override
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         
-        List<PAP> papList = papMgmtClient.listTrustedPAPs();
+        PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
         
-        if (papList.isEmpty()) {
+        if (papDataArray.length == 0) {
         	System.out.println("No remote PAPs has been found.");
         	return ExitStatus.SUCCESS.ordinal();
         }
         	
-        for (PAP pap:papList) {
-            System.out.println(pap.toFormattedString());
+        for (PAPData papData:papDataArray) {
+            System.out.println((new PAP(papData)).toFormattedString());
         }
         
         return ExitStatus.SUCCESS.ordinal();

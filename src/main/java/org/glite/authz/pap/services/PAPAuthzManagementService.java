@@ -1,4 +1,4 @@
-package org.glite.authz.pap.services.authz_management;
+package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
 import java.util.HashMap;

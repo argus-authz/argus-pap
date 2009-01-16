@@ -120,13 +120,31 @@
                   </targetPackage>
                 </mapping>
                 <mapping>
-                  <namespace> ${pap-services-namespace}/highlevel_policy_management
-                  </namespace>
+                  <namespace>${pap-services-namespace}/highlevel_policy_management</namespace>
                   <targetPackage>
                     org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons
                   </targetPackage>
                 </mapping>
+                <mapping>
+                  <namespace> ${pap-services-namespace}/xacml_policy_management</namespace>
+                  <targetPackage>
+                    org.glite.authz.pap.services.xacml_policy_management.axis_skeletons
+                  </targetPackage>
+                </mapping>
+                <mapping>
+                  <namespace>${pap-services-namespace}/pap_management</namespace>
+                  <targetPackage>
+                    org.glite.authz.pap.services.pap_management.axis_skeletons
+                  </targetPackage>
+                </mapping>
+                <mapping>
+                  <namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os</namespace>
+                  <targetPackage>org.opensaml.xacml.policy</targetPackage>
+                </mapping>
               </mappings>
+              <nsExcludes>
+                <nsExclude>urn:oasis:names:tc:xacml:2.0:policy:schema:os</nsExclude>
+              </nsExcludes>
               <serverSide>true</serverSide>
               <skeletonDeploy>true</skeletonDeploy>
               <helperGen>true</helperGen>

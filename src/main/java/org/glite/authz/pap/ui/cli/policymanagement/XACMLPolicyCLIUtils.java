@@ -5,9 +5,9 @@ import java.rmi.RemoteException;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
-import org.glite.authz.pap.policymanagement.PolicyManagementService;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.glite.authz.pap.ui.wizard.BlacklistPolicySet;
 import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.glite.authz.pap.ui.wizard.ServiceClassPolicySet;
@@ -17,7 +17,7 @@ import org.opensaml.xml.ConfigurationException;
 
 public class XACMLPolicyCLIUtils {
 
-    public synchronized static void addPolicy(PolicyWizard policy, PolicyManagementService policyMgmtClient) throws RemoteException {
+    public synchronized static void addPolicy(PolicyWizard policy, XACMLPolicyManagement policyMgmtClient) throws RemoteException {
 
         PolicySetType policySet;
 
@@ -64,7 +64,7 @@ public class XACMLPolicyCLIUtils {
         }
     }
     
-    public static void removePolicy(PolicyWizard policy, PolicyManagementService policyMgmtClient) throws NotFoundException,
+    public static void removePolicy(PolicyWizard policy, XACMLPolicyManagement policyMgmtClient) throws NotFoundException,
             RepositoryException, RemoteException {
 
         PolicySetType policySet;

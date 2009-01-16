@@ -8,7 +8,7 @@ import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicyType;
 
 
-public class UpdatePolicyOperation extends BasePAPOperation {
+public class UpdatePolicyOperation extends BasePAPOperation <Boolean> {
 
     PolicyType policy;
     
@@ -23,12 +23,16 @@ public class UpdatePolicyOperation extends BasePAPOperation {
     }
     
     @Override
-    protected Object doExecute() {
+    protected Boolean doExecute() {
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        
+        if (!localPAP.hasPolicy(policy.getPolicyId()))
+            return false;
+        
         localPAP.storePolicy(policy);
         
-        return null;
+        return true;
     }
 
     @Override

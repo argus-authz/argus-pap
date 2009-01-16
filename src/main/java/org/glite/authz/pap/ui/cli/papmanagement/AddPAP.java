@@ -7,6 +7,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class AddPAP extends PAPManagementCLI {
 
@@ -60,7 +61,18 @@ public class AddPAP extends PAPManagementCLI {
         	return ExitStatus.FAILURE.ordinal();
         }
         
-        papMgmtClient.addTrustedPAP(pap);
+        PAPData papData = new PAPData();
+        
+        papData.setAlias(pap.getAlias());
+        papData.setDn(pap.getDn());
+        papData.setHostname(pap.getHostname());
+        papData.setPapId(pap.getPapId());
+        papData.setPath(pap.getPath());
+        papData.setPort(pap.getPort());
+        papData.setProtocol(pap.getProtocol());
+        papData.setVisibilityPublic(pap.isPublic());
+        
+        papMgmtClient.addTrustedPAP(papData);
         
         if (verboseMode)
             System.out.println("Success: new trusted PAP has been added.");

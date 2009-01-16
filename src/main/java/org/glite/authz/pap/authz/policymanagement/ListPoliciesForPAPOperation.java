@@ -1,7 +1,5 @@
 package org.glite.authz.pap.authz.policymanagement;
 
-import java.util.List;
-
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
@@ -11,7 +9,7 @@ import org.opensaml.xacml.policy.PolicyType;
 
 
 public class ListPoliciesForPAPOperation extends
-        BasePAPOperation <List<PolicyType>>
+        BasePAPOperation <PolicyType[]>
 {
     
     String papId;
@@ -29,10 +27,10 @@ public class ListPoliciesForPAPOperation extends
     }
 
     @Override
-    protected List <PolicyType> doExecute() {
+    protected PolicyType[] doExecute() {
 
         PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
-        return pap.getAllPolicies();
+        return (PolicyType[]) pap.getAllPolicies().toArray();
         
     }
 

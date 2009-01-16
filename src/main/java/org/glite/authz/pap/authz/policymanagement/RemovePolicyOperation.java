@@ -5,9 +5,10 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 
-public class RemovePolicyOperation extends BasePAPOperation <Object>{
+public class RemovePolicyOperation extends BasePAPOperation <Boolean>{
 
 
     String policyId;
@@ -26,12 +27,16 @@ public class RemovePolicyOperation extends BasePAPOperation <Object>{
     
     
     @Override
-    protected Object doExecute() {
+    protected Boolean doExecute() {
        
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
-        localPAP.deletePolicy(policyId);
+        try {
+            localPAP.deletePolicy(policyId);
+        } catch (NotFoundException e) {
+            return false;
+        }
         
-        return null;
+        return true;
     }
 
     @Override

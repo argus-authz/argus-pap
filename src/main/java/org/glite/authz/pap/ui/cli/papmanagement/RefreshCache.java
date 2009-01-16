@@ -7,7 +7,7 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.ui.cli.CLIException;
 
 public class RefreshCache extends PAPManagementCLI {
@@ -62,10 +62,10 @@ public class RefreshCache extends PAPManagementCLI {
     private List<String> getAllPAPIds() throws RemoteException {
         List<String> papIdList = new LinkedList<String>();
         
-        List<PAP> papList = papMgmtClient.listTrustedPAPs();
+        PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
         
-        for (PAP pap : papList) {
-            papIdList.add(pap.getPapId());
+        for (PAPData papData : papDataArray) {
+            papIdList.add(papData.getPapId());
         }
         
         return papIdList;

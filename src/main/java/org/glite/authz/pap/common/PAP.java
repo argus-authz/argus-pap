@@ -1,5 +1,7 @@
 package org.glite.authz.pap.common;
 
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
+
 
 public class PAP  {
     public static final String localPAPId = "Local";
@@ -14,8 +16,15 @@ public class PAP  {
     private String hostname = "";
     private boolean isPublic = false;
     private String papId = "";
+    private String path = "/pap/services";
+    private String port = "8443";
+    private String protocol = "https";
     
     public PAP() {}
+    
+    public PAP(PAPData papData) {
+        this(papData.getAlias(), papData.getHostname(), papData.getDn(), papData.isVisibilityPublic());
+    }
     
     public PAP(String alias, String hostname, String dn) {
         this(alias, hostname, dn, false);
@@ -55,6 +64,18 @@ public class PAP  {
 
     public String getHostname() {
         return hostname;
+    }
+    
+    public String getPath() {
+        return path;
+    }
+    
+    public String getPort() {
+        return port;
+    }
+    
+    public String getProtocol() {
+        return protocol;
     }
     
     public String getPapId() {
@@ -128,7 +149,7 @@ public class PAP  {
     
     private void buildEndpoint() {
     
-        endpoint = "https://" + hostname + ":8443/pap/services";
+        endpoint = protocol + "://" + hostname + ":" + port + path;
         
     }
     

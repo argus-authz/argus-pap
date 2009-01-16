@@ -1,7 +1,6 @@
 package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
@@ -93,9 +92,9 @@ public class ListPolicies extends PolicyManagementCLI {
         
         initOpenSAML();
         
-        List<PolicyType> policyList = xacmlPolicyMgmtClient.listPolicies();
+        PolicyType[] policyList = xacmlPolicyMgmtClient.listPolicies();
         
-        if (policyList.isEmpty()) {
+        if (policyList.length == 0) {
             printOutputMessage("No policies has been found.");
             return ExitStatus.SUCCESS.ordinal();
         }
@@ -123,7 +122,7 @@ public class ListPolicies extends PolicyManagementCLI {
         return ExitStatus.SUCCESS.ordinal();
     }
     
-    protected static boolean listUsingGroupedFormat(List<PolicyType> policyList,
+    protected static boolean listUsingGroupedFormat(PolicyType[] policyList,
             boolean showPrivate, boolean showPublic, boolean showBlacklist, boolean showServiceclass, boolean noId) {
         
         boolean somethingHasBeenSelected = false;
@@ -158,7 +157,7 @@ public class ListPolicies extends PolicyManagementCLI {
         return somethingHasBeenSelected;
     }
     
-    protected static boolean listUsingPlaingFormat(List<PolicyType> policyList,
+    protected static boolean listUsingPlaingFormat(PolicyType[] policyList,
             boolean xacmlOutput, boolean showPrivate, boolean showPublic, boolean showBlacklist,
             boolean showServiceclass) {
         

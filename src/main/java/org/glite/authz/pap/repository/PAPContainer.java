@@ -45,7 +45,7 @@ public class PAPContainer {
         policyDAO.delete(papId, id);
     }
 
-    public void deletePolicySet(String id) {
+    public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
         policySetDAO.delete(papId, id);
     }
 

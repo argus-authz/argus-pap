@@ -109,28 +109,19 @@ public class PAPCLI {
             return ServiceCLI.ExitStatus.SUCCESS.ordinal();
             
         } catch (RemoteException e) {
+            log.error("Remote exception", e);
             System.out.println("Error invoking the '" + serviceCLI.getClass().getSimpleName() + "' method on remote endpoint: "
                     + serviceCLI.getServiceClient().getTargetEndpoint());
             System.out.println("Reason: " + e.getMessage());
-            log.error("Remote exceptionnnnnnnnnnnnnnnnnnnnnnnnnnnn", e);
-            log.error("NESTED: ", e.detail);
-            
-            if (e.detail == null)
-                System.out.println("datail NULLLLLLLLLLLLLLLLLLLLL");
-            else
-                System.out.println("detail OKKKKKKKKKKKKKKKKKKKKKKKKKKK");
-            
-            System.out.println("getMEssage(): " + e.getMessage());
-            
             return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
+            
         } catch (Exception e) {
-            System.out.println("EXCEPTION");
-            log.error("EXCEPTION", e);
-            return 1;
+            System.out.println("Error: " + e.getMessage());
+            log.error("admin exception", e);
+            return ServiceCLI.ExitStatus.FAILURE.ordinal();
         }
         
         return exitStatus;
-        
     }
     
     public void parseCommandLine() throws ParseException {

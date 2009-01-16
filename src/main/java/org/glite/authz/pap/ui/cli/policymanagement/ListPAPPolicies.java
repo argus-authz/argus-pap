@@ -1,7 +1,6 @@
 package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
@@ -48,9 +47,9 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         
         initOpenSAML();
         
-        List<PolicyType> policyList = xacmlPolicyMgmtClient.listPolicies(args[1]);
+        PolicyType[] policyList = xacmlPolicyMgmtClient.listPAPPolicies(args[1]);
         
-        if (policyList.isEmpty()) {
+        if (policyList.length == 0) {
             System.out.println("No policies has been found.");
             return ExitStatus.SUCCESS.ordinal();
         }

@@ -1,9 +1,9 @@
 package org.glite.authz.pap.client;
 
-import org.glite.authz.pap.papmanagement.PAPManagementService;
-import org.glite.authz.pap.policymanagement.PolicyManagementService;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
+import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 
 public interface ServiceClient {
     
@@ -13,9 +13,9 @@ public interface ServiceClient {
     
     public String getClientPrivateKeyPassword();
     
-    public PAPManagementService getPAPManagementService(String url);
+    public PAPManagement getPAPManagementService(String url);
 
-    public PolicyManagementService getPolicyManagementService(String url);
+    public XACMLPolicyManagement getXACMLPolicyManagementService(String url);
     
     public HighLevelPolicyManagement getHighLevelPolicyManagementService(String url);
     

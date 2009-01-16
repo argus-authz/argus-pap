@@ -140,13 +140,20 @@ public class PAPManager {
     }
     
     public void updateTrustedPAP(String papId, PAP newpap) {
+        
+        boolean found = false;
+        
         for (int i=0; i<papList.size(); i++) {
             PAP pap = papList.get(i);
             if (pap.getPapId().equals(papId)) {
                 papList.set(i, newpap);
+                found = true;
                 break;
             }
         }
+        
+        if (!found)
+            throw new NotFoundException("PAP not found (id=" + papId + ")");
     }
     
     private void initPAPList() {

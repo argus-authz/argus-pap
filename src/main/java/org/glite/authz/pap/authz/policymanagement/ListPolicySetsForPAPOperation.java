@@ -11,7 +11,7 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 
 public class ListPolicySetsForPAPOperation extends
-        BasePAPOperation <List <PolicySetType>>{
+        BasePAPOperation <PolicySetType[]>{
     
     String papId;
     
@@ -27,11 +27,20 @@ public class ListPolicySetsForPAPOperation extends
 
     
     @Override
-    protected List <PolicySetType> doExecute() {
+    protected PolicySetType[] doExecute() {
         
         PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer( papId );
         
-        return pap.getAllPolicySets();
+        List<PolicySetType> policySetList = pap.getAllPolicySets();
+        
+        PolicySetType[] policySetArray = new PolicySetType[policySetList.size()];
+        
+        for (int i=0; i<policySetList.size(); i++) {
+            policySetArray[i] = policySetList.get(i);
+        }
+        
+        return policySetArray;
+        
     }
 
     @Override

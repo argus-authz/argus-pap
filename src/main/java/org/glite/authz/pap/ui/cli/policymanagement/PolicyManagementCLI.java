@@ -6,8 +6,8 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
-import org.glite.authz.pap.policymanagement.PolicyManagementService;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
+import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.glite.authz.pap.ui.cli.ServiceCLI;
 import org.opensaml.DefaultBootstrap;
@@ -28,9 +28,9 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 	protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"
         + LOPT_SHOW_XACML + ".";
 
-	protected static final String XACML_POLICY_MANAGEMENT_SERVICE_NAME = "XACMLPolicyManagement";
-	protected static final String HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME = "HighLevelPolicyManagement";
-	protected PolicyManagementService xacmlPolicyMgmtClient;
+	protected static final String XACML_POLICY_MANAGEMENT_SERVICE_NAME = "XACMLPolicyManagementService";
+	protected static final String HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME = "HighLevelPolicyManagementService";
+	protected XACMLPolicyManagement xacmlPolicyMgmtClient;
 	protected HighLevelPolicyManagement highlevelPolicyMgmtClient;
 
 	public PolicyManagementCLI(String[] commandNameValues, String usage,
@@ -46,7 +46,7 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 			ServiceClient serviceClient) throws CLIException, ParseException,
 			RemoteException {
 
-		xacmlPolicyMgmtClient = serviceClient.getPolicyManagementService(serviceClient.getTargetEndpoint() + XACML_POLICY_MANAGEMENT_SERVICE_NAME);
+		xacmlPolicyMgmtClient = serviceClient.getXACMLPolicyManagementService(serviceClient.getTargetEndpoint() + XACML_POLICY_MANAGEMENT_SERVICE_NAME);
 		highlevelPolicyMgmtClient = serviceClient.getHighLevelPolicyManagementService(serviceClient.getTargetEndpoint() + HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME);
 
 		return executeCommand(commandLine);
