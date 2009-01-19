@@ -13,7 +13,7 @@
 
     <parameter
       name="className"
-      value="org.glite.authz.pap.provisioning.ProvisioningService" />
+      value="org.glite.authz.pap.services.ProvisioningService" />
     
     <parameter
       name="typeMappingVersion"
