@@ -38,6 +38,7 @@ public class PAPManager {
     }
     
     public PAPContainer addTrustedPAP(PAP pap) {
+        
         if (exists(pap.getPapId()))
             throw new AlreadyExistsException();
         

@@ -18,9 +18,9 @@ public class PAPManagementService implements PAPManagement {
 
     private static final Logger log = LoggerFactory.getLogger(PAPManagementService.class);
 
-    public boolean addTrustedPAP(PAPData pap) throws RemoteException {
-        log.info("addTrustedPAP(" + pap + ");");
-        AddTrustedPAPOperation.instance(pap).execute();
+    public boolean addTrustedPAP(PAPData papData) throws RemoteException {
+        log.info("addTrustedPAP();");
+        AddTrustedPAPOperation.instance(papData).execute();
         return false;
     }
 

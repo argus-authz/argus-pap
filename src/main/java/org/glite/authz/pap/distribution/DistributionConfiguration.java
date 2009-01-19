@@ -151,7 +151,7 @@ public class DistributionConfiguration {
         String papAlias = pap.getAlias();
         
         papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
-        papConfiguration.setDistributionProperty(endpointKey(papAlias), pap.getHostname());
+        papConfiguration.setDistributionProperty(endpointKey(papAlias), pap.getEndpoint());
         
         papConfiguration.saveStartupConfiguration();
     }

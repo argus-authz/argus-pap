@@ -28,7 +28,9 @@ public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
     
     @Override
     protected Boolean doExecute() {
-
+        
+        log.info("Adding PAP: " + pap);
+        
         try {
             
             PAPManager.getInstance().addTrustedPAP( pap );

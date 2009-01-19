@@ -59,7 +59,7 @@ public class AddPAP extends PAPManagementCLI {
         String port = args[4];
         String path = null;
         if (args.length == 6)
-            path = args[6];
+            path = args[5];
         
         PAP pap = new PAP(alias, dn, host, port, path, isPublic);
         

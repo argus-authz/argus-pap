@@ -31,7 +31,6 @@ import org.slf4j.LoggerFactory;
 
 public class PAPClient {
 
-    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PAPClient.class);
     private static final ProvisioningServiceClient client;
     private static final XACMLPolicyQueryType xacmlPolicyQuery;
@@ -79,7 +78,7 @@ public class PAPClient {
         return xacmlPolicyQuery;
     }
     
-    private final ProvisioningServicePortType port;
+    private final ProvisioningServicePortType provisioningClient;
 
     public PAPClient(String url) {
         
@@ -88,14 +87,14 @@ public class PAPClient {
         
         this.url = url + "ProvisioningService";
         
-        port = client.getProvisioningServicePortType(this.url);
+        provisioningClient = client.getProvisioningServicePortType(this.url);
     }
 
     public List<XACMLObject> getLocalPolicies() throws RemoteException, ServiceException {
         
         log.info("Requesting policies from remote PAP endpoint: " + url);
         
-        Response response = port.xacmlPolicyQuery(xacmlPolicyQuery);
+        Response response = provisioningClient.xacmlPolicyQuery(xacmlPolicyQuery);
         
         List<XACMLObject> resultList = getXACMLObjectList(response);
         
