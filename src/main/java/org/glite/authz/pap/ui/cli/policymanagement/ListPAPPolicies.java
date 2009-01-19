@@ -7,7 +7,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.ui.cli.CLIException;
-import org.opensaml.xacml.policy.PolicyType;
 
 public class ListPAPPolicies extends PolicyManagementCLI {
     
@@ -28,10 +27,13 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         if (args.length != 2)
             throw new ParseException("Missing argument <papId>");
         
+        String papId = args[1];
+        
         boolean xacmlOutput = false;
         boolean plainFormat = false;
         boolean showBlacklist = true;
         boolean showServiceclass = true;
+        boolean getPoliciesOneByOne = false;
         
         if (commandLine.hasOption(LOPT_SHOW_XACML))
             xacmlOutput = true;
@@ -45,11 +47,16 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         if (commandLine.hasOption(OPT_SERVICECLASS))
             showBlacklist = false;
         
+        if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE))
+            getPoliciesOneByOne = true;
+        
         initOpenSAML();
         
-        PolicyType[] policyList = xacmlPolicyMgmtClient.listPAPPolicies(args[1]);
+        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papId, !getPoliciesOneByOne);
         
-        if (policyList.length == 0) {
+        policyIter.init();
+        
+        if (policyIter.getNumberOfPolicies() == 0) {
             System.out.println("No policies has been found.");
             return ExitStatus.SUCCESS.ordinal();
         }
@@ -57,9 +64,9 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         boolean policiesFound;
         
         if (xacmlOutput || plainFormat)
-            policiesFound = ListPolicies.listUsingPlaingFormat(policyList, xacmlOutput, true, true, showBlacklist, showServiceclass);
+            policiesFound = ListPolicies.listUsingPlaingFormat(policyIter, xacmlOutput, true, true, showBlacklist, showServiceclass);
         else
-            policiesFound = ListPolicies.listUsingGroupedFormat(policyList, true, true, showBlacklist, showServiceclass, false);
+            policiesFound = ListPolicies.listUsingGroupedFormat(policyIter, true, true, showBlacklist, showServiceclass, false);
         
         if (!policiesFound)
             System.out.println(ListPolicies.noPoliciesFoundMessage(true, true, showBlacklist, showServiceclass));

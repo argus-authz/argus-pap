@@ -49,6 +49,8 @@ public class ListPolicies extends PolicyManagementCLI {
                 .withLongOpt(LOPT_PLAIN_FORMAT).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_BACKUP_DESCRIPTION)
                 .withLongOpt(LOPT_BACKUP).create());
+        options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_LIST_ONE_BY_ONE_DESCRIPTION)
+                .withLongOpt(LOPT_LIST_ONE_BY_ONE).create(OPT_LIST_ONE_BY_ONE));
         
         return options;
     }
@@ -62,6 +64,7 @@ public class ListPolicies extends PolicyManagementCLI {
         boolean xacmlOutput = false;
         boolean plainFormat = false;
         boolean backupMode = false;
+        boolean getPoliciesOneByOne = false;
         
         if (commandLine.hasOption(LOPT_PRIVATE))
             showPublic = false;
@@ -78,6 +81,9 @@ public class ListPolicies extends PolicyManagementCLI {
         if (commandLine.hasOption(LOPT_SHOW_XACML))
             xacmlOutput = true;
         
+        if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE))
+            getPoliciesOneByOne = true;
+        
         if (commandLine.hasOption(LOPT_PLAIN_FORMAT))
             plainFormat = true;
         
@@ -92,9 +98,11 @@ public class ListPolicies extends PolicyManagementCLI {
         
         initOpenSAML();
         
-        PolicyType[] policyList = xacmlPolicyMgmtClient.listPolicies();
+        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, null, !getPoliciesOneByOne);
         
-        if (policyList.length == 0) {
+        policyIter.init();
+        
+        if (policyIter.getNumberOfPolicies() == 0) {
             printOutputMessage("No policies has been found.");
             return ExitStatus.SUCCESS.ordinal();
         }
@@ -102,14 +110,14 @@ public class ListPolicies extends PolicyManagementCLI {
         boolean policiesFound;
         
         if (plainFormat || xacmlOutput)
-            policiesFound = listUsingPlaingFormat(policyList,
+            policiesFound = listUsingPlaingFormat(policyIter,
                     xacmlOutput,
                     showPrivate,
                     showPublic,
                     showBlacklist,
                     showServiceclass);
         else
-            policiesFound = listUsingGroupedFormat(policyList,
+            policiesFound = listUsingGroupedFormat(policyIter,
                     showPrivate,
                     showPublic,
                     showBlacklist,
@@ -122,14 +130,16 @@ public class ListPolicies extends PolicyManagementCLI {
         return ExitStatus.SUCCESS.ordinal();
     }
     
-    protected static boolean listUsingGroupedFormat(PolicyType[] policyList,
+    protected static boolean listUsingGroupedFormat(PAPPolicyIterator policyIter,
             boolean showPrivate, boolean showPublic, boolean showBlacklist, boolean showServiceclass, boolean noId) {
         
         boolean somethingHasBeenSelected = false;
         
         LocalPolicySetWizard localPolicySetWizard = new LocalPolicySetWizard();
         
-        for (PolicyType policy : policyList) {
+        while (policyIter.hasNext()) {
+            
+            PolicyType policy = policyIter.next();
             
             try {
                 PolicyWizard policyWizard = new PolicyWizard(policy);
@@ -157,14 +167,15 @@ public class ListPolicies extends PolicyManagementCLI {
         return somethingHasBeenSelected;
     }
     
-    protected static boolean listUsingPlaingFormat(PolicyType[] policyList,
+    protected static boolean listUsingPlaingFormat(PAPPolicyIterator policyIter,
             boolean xacmlOutput, boolean showPrivate, boolean showPublic, boolean showBlacklist,
             boolean showServiceclass) {
         
         boolean somethingHasBeenSelected = false;
         
-        for (PolicyType policy : policyList) {
+        while (policyIter.hasNext()) {
             
+            PolicyType policy = policyIter.next();
             String policyString;
             
             try {
