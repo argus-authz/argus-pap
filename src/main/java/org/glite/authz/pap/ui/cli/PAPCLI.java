@@ -101,7 +101,6 @@ public class PAPCLI {
             
         } catch (ParseException e) {
             System.err.println("\nParsing failed.  Reason: " + e.getMessage() + "\n");
-            printCommandHelp(serviceCLI);
             return ServiceCLI.ExitStatus.PARSE_ERROR.ordinal();
             
         } catch (HelpMessageException e) {

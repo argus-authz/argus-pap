@@ -13,12 +13,20 @@ public class AddPAP extends PAPManagementCLI {
 
     private static final String LOPT_PUBLIC = "public";
     private static final String LOPT_PRIVATE = "private";
-    private static final String USAGE = "<alias> <endpoint> <dn> [options]";
+    private static final String USAGE = "<alias> <dn> <host> <port> [path] [options]";
     private static final String[] commandNameValues = { "add-pap", "apap" };
     private static final String DESCRIPTION = "Add a trusted PAP to get policies from.";
+    private static final String LONG_DESCRIPTION =  "<alias> is a friendly name (it has to be unique) used to identify the PAP\n" +
+    		"<dn> DN of the PAP\n" +
+    		"<host> hostname of the PAP machine\n" +
+    		"<port> the port the PAP is listening to\n" +
+    		"[path] root path of the services of the PAP (the default is " + PAP.DEFAULT_SERVICES_ROOT_PATH + ")\n" +
+			"\nExample:\n" +
+			"\t pap-admin " + commandNameValues[0] + "cnaf_pap \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\" " +
+			"test.cnaf.infn.it " + PAP.DEFAULT_PORT;
     
     public AddPAP() {
-        super(commandNameValues, USAGE, DESCRIPTION, null);
+        super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
     }
 
     @SuppressWarnings("static-access")
@@ -37,7 +45,7 @@ public class AddPAP extends PAPManagementCLI {
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
-        if (args.length != 4)
+        if ((args.length != 5) && (args.length != 6))
             throw new ParseException("Wrong number of arguments");
 
         boolean isPublic = false;
@@ -46,10 +54,14 @@ public class AddPAP extends PAPManagementCLI {
             isPublic = true;
 
         String alias = args[1];
-        String endpoint = args[2];
-        String dn = args[3];
-
-        PAP pap = new PAP(alias, endpoint, dn, isPublic);
+        String dn = args[2];
+        String host = args[3];
+        String port = args[4];
+        String path = null;
+        if (args.length == 6)
+            path = args[6];
+        
+        PAP pap = new PAP(alias, dn, host, port, path, isPublic);
         
         String msg = "Adding trusted PAP: ";
         

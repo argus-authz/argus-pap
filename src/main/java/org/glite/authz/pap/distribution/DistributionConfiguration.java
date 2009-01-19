@@ -117,7 +117,7 @@ public class DistributionConfiguration {
                         + papAlias + "\"");
             }
 
-            PAP pap = new PAP(papAlias, endpoint, dn);
+            PAP pap = new PAP(papAlias, dn, endpoint);
 
             log.info("Adding remote PAP: " + pap);
             papList.add(pap);

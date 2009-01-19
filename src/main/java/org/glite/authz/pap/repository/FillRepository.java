@@ -23,7 +23,7 @@ public class FillRepository {
     
     public static void fillPAP(String papId, int numberOfPolicySets, int numberOfPolicies) {
         
-        PAP pap = new PAP(null, null, papId);
+        PAP pap = new PAP(null, papId, null);
         PAPManager pm = PAPManager.getInstance();
         
         PAPContainer container = null;
