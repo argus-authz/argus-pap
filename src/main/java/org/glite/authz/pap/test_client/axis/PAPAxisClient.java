@@ -73,7 +73,7 @@ public class PAPAxisClient {
     private void setupDefaults() {
 
         papMode = false;
-        url = "https://localhost:8443/pap/services/ProvisioningService";
+        url = "https://localhost:8443/glite-authz-pap/services/ProvisioningService";
 
     }
 
