@@ -1,13 +1,11 @@
 package org.glite.authz.pap.distribution;
 
 import java.rmi.RemoteException;
-import java.security.Security;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.rpc.ServiceException;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.PAP;
