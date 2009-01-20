@@ -27,12 +27,36 @@ public class DistributionConfiguration {
         return instance;
     }
 
+    private static String aliasKey(String papAlias) {
+        return REMOTE_PAPS_STANZA + "." + papAlias;
+    }
+    
     private static String dnKey(String papAlias) {
         return REMOTE_PAPS_STANZA + "." + papAlias + "." + "dn";
     }
 
     private static String endpointKey(String papAlias) {
         return REMOTE_PAPS_STANZA + "." + papAlias + "." + "endpoint";
+    }
+    
+    private static String hostnameKey(String papAlias) {
+        return REMOTE_PAPS_STANZA + "." + papAlias + "." + "hostname";
+    }
+    
+    private static String pathKey(String papAlias) {
+        return REMOTE_PAPS_STANZA + "." + papAlias + "." + "path";
+    }
+    
+    private static String portKey(String papAlias) {
+        return REMOTE_PAPS_STANZA + "." + papAlias + "." + "port";
+    }
+    
+    private static String publicVisibilityKey(String papAlias) {
+        return REMOTE_PAPS_STANZA + "." + papAlias + "." + "public_visibility";
+    }
+    
+    private static String protocolKey(String papAlias) {
+        return REMOTE_PAPS_STANZA + "." + papAlias + "." + "protocol";
     }
 
     private static String minKeyLengthKey() {
@@ -111,15 +135,23 @@ public class DistributionConfiguration {
                         + papAlias + "\"");
             }
 
-            String endpoint = papConfiguration.getString(endpointKey(papAlias));
-            if (endpoint == null) {
-                throw new DistributionConfigurationException("Endpoint is not set for remote PAP \""
+            String hostname = papConfiguration.getString(hostnameKey(papAlias));
+            if (hostname == null)
+                throw new DistributionConfigurationException("Hostname is not set for remote PAP \""
                         + papAlias + "\"");
-            }
-
-            PAP pap = new PAP(papAlias, dn, endpoint);
+            
+            // port can be null or empty
+            String port = papConfiguration.getString(portKey(papAlias));
+            // path can be null or empty
+            String path = papConfiguration.getString(pathKey(papAlias));
+            // protocol can be null or empty
+            String protocol = papConfiguration.getString(protocolKey(papAlias));
+            boolean visibilityPublic = papConfiguration.getBoolean(publicVisibilityKey(papAlias));
+            
+            PAP pap = new PAP(papAlias, dn, hostname, port, path, protocol, visibilityPublic);
 
             log.info("Adding remote PAP: " + pap);
+            
             papList.add(pap);
         }
         
@@ -130,8 +162,7 @@ public class DistributionConfiguration {
     }
     
     public void removePAP(String papAlias) {
-        papConfiguration.clearDistributionProperty(dnKey(papAlias));
-        papConfiguration.clearDistributionProperty(endpointKey(papAlias));
+        papConfiguration.clearDistributionProperty(aliasKey(papAlias));
         
         // TODO: remove PAP from pap-order
 //        String[] papOrderArrayOld = getPAPOrderArray();
@@ -151,7 +182,18 @@ public class DistributionConfiguration {
         String papAlias = pap.getAlias();
         
         papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
-        papConfiguration.setDistributionProperty(endpointKey(papAlias), pap.getEndpoint());
+        
+        papConfiguration.setDistributionProperty(hostnameKey(papAlias), pap.getHostname());
+        papConfiguration.setDistributionProperty(portKey(papAlias), pap.getPort());
+        papConfiguration.setDistributionProperty(pathKey(papAlias), pap.getPath());
+        papConfiguration.setDistributionProperty(protocolKey(papAlias), pap.getProtocol());
+        
+        String visibilityPublic;
+        if (pap.isVisibilityPublic())
+            visibilityPublic = "true";
+        else
+            visibilityPublic = "false";
+        papConfiguration.setDistributionProperty(publicVisibilityKey(papAlias), visibilityPublic);
         
         papConfiguration.saveStartupConfiguration();
     }

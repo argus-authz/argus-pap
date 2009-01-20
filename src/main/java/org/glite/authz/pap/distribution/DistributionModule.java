@@ -1,21 +1,31 @@
 package org.glite.authz.pap.distribution;
 
 import java.rmi.RemoteException;
+import java.security.Security;
 import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.rpc.ServiceException;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACE;
+import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
+import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
+import org.opensaml.DefaultBootstrap;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xml.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
-
+    
     private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
     private static DistributionModule instance = null;
 
@@ -30,6 +40,23 @@ public class DistributionModule extends Thread {
         List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
 
         log.info("Contacting: " + remotePAP.getEndpoint());
+        
+        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
+        ServiceClient serviceClient = serviceClientFactory.createServiceClient();
+        
+        PAPAuthorizationManagement am = serviceClient.getPAPAuthorizationManagementService(remotePAP.getEndpoint() + "/AuthorizationManagementService");
+        
+        PAPACE[] aa = am.getACL(null);
+        
+        log.info("RETRIEVED ACE: " + aa.length + " POLICIES");
+        System.out.println("RETRIEVED ACE: " + aa.length + " POLICIES");
+        
+        XACMLPolicyManagement pc = serviceClient.getXACMLPolicyManagementService(remotePAP.getEndpoint() + "/XACMLPolicyManagementService");
+        PolicyType[] pa = pc.listPolicies();
+        
+        log.info("RETRIEVED: " + pa.length + " POLICIES");
+        System.out.println("RETRIEVED: " + pa.length + " POLICIES");
+        
         PAPClient client = new PAPClient(remotePAP.getEndpoint());
         papPolicies = client.getLocalPolicies();
 
@@ -136,7 +163,23 @@ public class DistributionModule extends Thread {
 
     protected void initialize() {
         log.info("Initilizing distribution module...");
-
+        
         sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMillis();
     }
+    
+    public static void main(String[] args) throws RemoteException, ServiceException {
+        
+        try {
+            DefaultBootstrap.bootstrap();
+        } catch (ConfigurationException e) {
+            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
+        }
+        
+        PAP pap = new PAP("prova", "/C=IT/O=INFN/OU=Host/L=CNAF/CN=pbox3.cnaf.infn.it", "pbox3.cnaf.infn.it", "8443", "/glite-authz-pap/services", false);
+        System.out.println(pap.toString());
+        List<XACMLObject> list = getPoliciesFromPAP(pap);
+        System.out.println("Retrieved " + list.size() + " policies");
+        System.out.println("OK");
+    }
+    
 }

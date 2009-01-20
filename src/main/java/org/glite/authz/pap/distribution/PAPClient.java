@@ -7,10 +7,12 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
 import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
 import org.joda.time.DateTime;
+import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLVersion;
 import org.opensaml.common.xml.SAMLConstants;
 import org.opensaml.saml2.common.Extensions;
@@ -25,6 +27,7 @@ import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyStatementType;
 import org.opensaml.xml.Configuration;
+import org.opensaml.xml.ConfigurationException;
 import org.opensaml.xml.XMLObjectBuilderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,16 +35,9 @@ import org.slf4j.LoggerFactory;
 public class PAPClient {
 
     private static final Logger log = LoggerFactory.getLogger(PAPClient.class);
-    private static final ProvisioningServiceClient client;
-    private static final XACMLPolicyQueryType xacmlPolicyQuery;
+    private ProvisioningServiceClient client;
+    private XACMLPolicyQueryType xacmlPolicyQuery;
     private final String url;
-
-    static {
-        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
-                .getProvisioningServiceClientFactory();
-        client = factory.createPolicyProvisioningServiceClient();
-        xacmlPolicyQuery = makeStandardPAPQuery();
-    }
 
     private static XACMLPolicyQueryType makeStandardPAPQuery() {
 
@@ -82,6 +78,10 @@ public class PAPClient {
 
     public PAPClient(String url) {
         
+        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory.getProvisioningServiceClientFactory();
+        client = factory.createPolicyProvisioningServiceClient();
+        xacmlPolicyQuery = makeStandardPAPQuery();
+        
         if (!url.endsWith("/"))
             url += "/";
         
@@ -118,5 +118,17 @@ public class PAPClient {
             }
         }
         return responseList;
+    }
+    
+    public static void main(String[] args) throws RemoteException, ServiceException {
+        try {
+            DefaultBootstrap.bootstrap();
+        } catch (ConfigurationException e) {
+            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
+        }
+        PAPClient client = new PAPClient("https://pbox3.cnaf.infn.it:8443/glite-authz-pap/services/");
+        List<XACMLObject> list = client.getLocalPolicies();
+        System.out.println("Retrieved " + list.size() + " policies");
+        System.out.println("OK");
     }
 }

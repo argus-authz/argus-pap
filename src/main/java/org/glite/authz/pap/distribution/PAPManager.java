@@ -108,7 +108,7 @@ public class PAPManager {
         List<PAP> resultList = new LinkedList<PAP>();
         
         for (PAP pap:papList) {
-            if (pap.isPublic())
+            if (pap.isVisibilityPublic())
                 resultList.add(pap);
         }
         
@@ -130,7 +130,7 @@ public class PAPManager {
     public List<PAPContainer> getTrustedPAPContainerPublic() {
         List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
         for (PAP pap:papList) {
-            if (pap.isPublic())
+            if (pap.isVisibilityPublic())
                 papContainerList.add(new PAPContainer(pap));
         }
         return papContainerList;

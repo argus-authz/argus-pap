@@ -45,7 +45,7 @@ public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
             papData.setPath(pap.getPath());
             papData.setPort(pap.getPort());
             papData.setProtocol(pap.getProtocol());
-            papData.setVisibilityPublic(pap.isPublic());
+            papData.setVisibilityPublic(pap.isVisibilityPublic());
             
             papArray[i] = papData;
         }

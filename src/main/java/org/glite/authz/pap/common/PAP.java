@@ -71,6 +71,7 @@ public class PAP  {
     }
     
     public String getEndpoint() {
+        buildEndpoint();
         return endpoint;
     }
 
@@ -92,10 +93,6 @@ public class PAP  {
 
     public String getProtocol() {
         return protocol;
-    }
-
-    public boolean isPublic() {
-        return visibilityPublic;
     }
 
     public boolean isVisibilityPublic() {
