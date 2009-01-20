@@ -4,10 +4,13 @@ prog=pap-standalone
 
 PAP_RUN_FILE=$GLITE_LOCATION_VAR/lock/subsys/pap-standalone.pid
 
-#PAP_LOCK_DIR=/var/lock/subsys
-#PAP_LOCK_FILE=$PAP_LOCK_DIR/pap-standalone
-
 . $GLITE_LOCATION/etc/pap/sh/pap-utils.sh
+
+
+pre_checks(){
+	check_openssl
+	check_certificates
+}
 
 success(){
 	echo " success!"
@@ -32,25 +35,69 @@ pap_pid(){
 
 kill_pap_proc(){
 
-	pap_pid
-	kill -TERM $PAP_PID
-	RETVAL=$?
-    [ "$RETVAL" = 0 ] && rm -f $PAP_RUN_FILE;
-    
+	status
+	if [ $? -eq 0 ]; then
+		## pap process is running
+		pid=`head -1 $PAP_RUN_FILE`
+		kill -TERM $pid
+		if [ $? -ne 0 ]; then
+			echo "Error killing PAP process"
+			failure
+		else
+			## remove pid file
+			rm $PAP_RUN_FILE
+		fi
+	else
+		echo "PAP standalone server is not running!"
+		failure
+	fi 
 }
+	
+status(){
+
+	if [ -f $PAP_RUN_FILE ]; then
+		pid=`head -1 $PAP_RUN_FILE`
+		ps -p $pid >/dev/null 2>&1
+		
+		if [ $? -ne 0 ]; then
+			echo "PAP not running...removing stale pid file"
+			rm $PAP_RUN_FILE
+			return 1
+		else
+			echo "PAP running ($pid)"
+			return 0
+		fi
+	else
+		return 1
+	fi
+}
+
+alive_and_kicking(){
+
+	$GLITE_LOCATION/bin/pap-admin ping -host $PAP_HOST -port $PAP_PORT -cert $PAP_CERT -key $PAP_KEY >/dev/null 2>&1
+	if [ $? -eq 0 ]; then
+		echo "PAP alive and kicking responded to service ping request!"
+		return 0
+	else
+		echo "PAP did not respond to service ping request!"
+		return 1
+	fi
+}
+
 start(){
 
 	echo -n "Starting $prog: "
+		
+	pre_checks || failure
 	
-	if test -f $PAP_RUN_FILE; then
-		echo "already running [`head -n 1 $PAP_RUN_FILE`]!"
-		failure
-	fi
+	status && failure
 	
 	$PAP_STANDALONE_CMD &
 	
-	if [ "$?" = "0" ]; then
+	if [ $? -eq 0 ]; then
 		echo "$!" > $PAP_RUN_FILE;
+		status || failure
+		alive_and_kicking || failure
 	 	success 
 	else
 		failure
@@ -60,8 +107,8 @@ start(){
 
 stop(){
 	echo -n "Stopping $prog: "
-	pap_pid
 	kill_pap_proc && success || failure
+	rm -f $PAP_RUN_FILE
 }
 
 case "$1" in

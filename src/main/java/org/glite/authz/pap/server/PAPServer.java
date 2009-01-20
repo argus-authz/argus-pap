@@ -12,7 +12,6 @@ import org.apache.commons.configuration.Configuration;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.PAPContextListener;
 import org.glite.authz.pap.server.jetty.TrustManagerSelectChannelConnector;
-import org.glite.authz.pap.server.jetty.TrustManagerSocketConnector;
 import org.glite.authz.pap.servlet.SecurityContextFilter;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -75,13 +74,13 @@ public final class PAPServer {
         parseOptions( args );
 
         PAPConfiguration.initialize( papConfigurationDir, papRepositoryDir );
-
+        
         configureHttpServer();
 
         configureWar();
-        // configureServlets();
-
+        
         try {
+            
             httpServer.start();
             httpServer.join();
 
@@ -97,13 +96,26 @@ public final class PAPServer {
             } catch ( Exception e1 ) {
                 // Just ignore this
             }
+            
+            System.exit(1);
         }
 
     }
 
+    private void checkCertificates() {
+        
+        Properties tmProps = getTrustmanagerConfiguration();
+
+        CertificateChecker cc = CertificateChecker.instance();
+        
+        cc.checkCertificate( tmProps.getProperty( "sslCertFile" ) );
+        cc.checkCertificate( tmProps.getProperty( "sslKey" ) );        
+        
+    }
+
     private void configureHttpServer() {
 
-        httpServer = new Server( getInt( "port", PAPDefaults.PORT ) );
+        httpServer = new Server();
 
         int maxRequestQueueSize = getInt( "max_request_queue_size",
                 PAPDefaults.MAX_REQUEST_QUEUE_SIZE );
@@ -124,6 +136,7 @@ public final class PAPServer {
 
         ThreadPool threadPool = new ThreadPool( 5, maxConnections, 60,
                 TimeUnit.SECONDS, requestQueue );
+        
         httpServer.setThreadPool( threadPool );
 
         //TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
@@ -132,7 +145,6 @@ public final class PAPServer {
         TrustManagerSelectChannelConnector connector = new
          TrustManagerSelectChannelConnector(getTrustmanagerConfiguration());
 
-        connector.setHost( getString( "host", "localhost" ) );
         connector.setPort( getInt( "port", PAPDefaults.PORT ) );
 
         httpServer.setConnectors( new Connector[] { connector } );
@@ -169,10 +181,6 @@ public final class PAPServer {
         ServletHolder axisServlet = new ServletHolder( new AxisServlet() );
         axisServlet.setName( "Axis servlet" );
         servletContext.addServlet( axisServlet, "/services/*" );
-
-        ServletHolder testServlet = new ServletHolder( new TestServlet() );
-        testServlet.setName( "Test servlet" );
-        servletContext.addServlet( testServlet, "/test" );
 
     }
 
