@@ -76,7 +76,7 @@ public class AddPolicies extends PolicyManagementCLI {
         
         File file = new File(fileName);
         
-        initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAML();
         
         List<XACMLObject> policyList = policyFileEncoder.parse(file);
         

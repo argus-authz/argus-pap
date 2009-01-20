@@ -50,7 +50,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE))
             getPoliciesOneByOne = true;
         
-        initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAML();
         
         PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papId, !getPoliciesOneByOne);
         

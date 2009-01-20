@@ -5,13 +5,10 @@ import java.rmi.RemoteException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.glite.authz.pap.ui.cli.ServiceCLI;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.xml.ConfigurationException;
 
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
@@ -53,15 +50,6 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 		highlevelPolicyMgmtClient = serviceClient.getHighLevelPolicyManagementService(serviceClient.getTargetEndpoint() + HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME);
 
 		return executeCommand(commandLine);
-	}
-
-	protected void initOpenSAML() {
-		try {
-			DefaultBootstrap.bootstrap();
-		} catch (ConfigurationException e) {
-			throw new PAPConfigurationException(
-					"Error initializing OpenSAML library", e);
-		}
 	}
 
 }

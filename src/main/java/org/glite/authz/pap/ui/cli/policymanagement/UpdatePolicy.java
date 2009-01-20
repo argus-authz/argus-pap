@@ -48,7 +48,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
             return ExitStatus.FAILURE.ordinal();
         }
         
-        initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAML();
         List<XACMLObject> policyList;
         
         try {
