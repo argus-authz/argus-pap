@@ -97,7 +97,6 @@ start(){
 	if [ $? -eq 0 ]; then
 		echo "$!" > $PAP_RUN_FILE;
 		status || failure
-		alive_and_kicking || failure
 	 	success 
 	else
 		failure

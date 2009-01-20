@@ -16,8 +16,11 @@ PAP_STANDALONE_CP="$PAP_DEPS$PAP_JAR:$GLITE_LOCATION/etc/pap/logging/standalone"
 PAP_CLIENT_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE_LOCATION_VAR"
 PAP_STANDALONE_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE_LOCATION_VAR"
 
+# Uncomment the line below to enable remote standalone debugging
+# PAP_STANDALONE_VM_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=9876,server=y,suspend=y"
+
 PAP_CLIENT_CMD="java $PAP_CLIENT_ENV -DconfigureLog4j=false -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
-PAP_STANDALONE_CMD="java $PAP_STANDALONE_ENV -cp $PAP_STANDALONE_CP $PAP_STANDALONE_CLASS"
+PAP_STANDALONE_CMD="java $PAP_STANDALONE_VM_OPTIONS $PAP_STANDALONE_ENV -cp $PAP_STANDALONE_CP $PAP_STANDALONE_CLASS"
 
 PAP_HOST=`grep 'host =' $GLITE_LOCATION/etc/pap/pap_configuration.ini | awk '{print $3}'`
 PAP_PORT=`grep 'port =' $GLITE_LOCATION/etc/pap/pap_configuration.ini | awk '{print $3}'`
