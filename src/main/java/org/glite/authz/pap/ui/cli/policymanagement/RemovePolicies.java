@@ -6,8 +6,6 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.ui.cli.CLIException;
-import org.glite.authz.pap.ui.wizard.PolicyWizard;
-import org.opensaml.xacml.policy.PolicyType;
 
 public class RemovePolicies extends PolicyManagementCLI {
     
@@ -28,8 +26,6 @@ public class RemovePolicies extends PolicyManagementCLI {
         if (args.length < 2)
             throw new ParseException("Missing argument <policyId>");
         
-        initOpenSAML();
-        
         boolean partialSuccess = false;
         boolean failure = false;
         
@@ -40,17 +36,13 @@ public class RemovePolicies extends PolicyManagementCLI {
 	            String policyId = args[i];
 	            System.out.print("Removing policy \"" + policyId + "\"... ");
 	            
-	            if (!xacmlPolicyMgmtClient.hasPolicy(policyId)) {
+	            boolean policyRemoved = xacmlPolicyMgmtClient.removePolicyAndReferences(policyId);
+	            
+	            if (!policyRemoved) {
 	            	System.out.println("NOT FOUND.");
 	            	failure = true;
 	            	continue;
 	            }
-	            
-	            PolicyType policy = xacmlPolicyMgmtClient.getPolicy(policyId);
-	            
-	            PolicyWizard policyWizard = new PolicyWizard(policy);
-	            
-	            XACMLPolicyCLIUtils.removePolicy(policyWizard, xacmlPolicyMgmtClient);
 	            
 	            partialSuccess = true;
 	            

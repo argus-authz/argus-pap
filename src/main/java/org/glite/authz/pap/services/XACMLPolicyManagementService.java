@@ -1,6 +1,7 @@
 package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
+import java.util.List;
 
 import org.glite.authz.pap.authz.policymanagement.GetPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicySetOperation;
@@ -16,7 +17,11 @@ import org.glite.authz.pap.authz.policymanagement.StorePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.StorePolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.UpdatePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.UpdatePolicySetOperation;
+import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.distribution.PAPManager;
+import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
+import org.glite.authz.pap.ui.wizard.PolicyWizard;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
@@ -26,10 +31,54 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
     private static final Logger log = LoggerFactory.getLogger(XACMLPolicyManagementService.class);
 
+    public String addPolicy(String policySetId, String policyIdPrefix, PolicyType policy) throws RemoteException {
+        log.info("addPolicy();");
+        
+        String emptyString = "";
+        
+        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        
+        if (!localPAP.hasPolicySet(policySetId))
+            return emptyString;
+        
+        String policyId = PolicyWizard.generateId(policyIdPrefix);
+        policy.setPolicyId(policyId);
+        
+        localPAP.storePolicy(policy);
+        
+        synchronized (this) {
+            PolicySetType policySet = localPAP.getPolicySet(policySetId);
+            PolicySetHelper.addPolicyReference(policySet, policyId);
+            localPAP.storePolicySet(policySet);
+        }
+        
+        return policyId;
+    }
+
+    public PolicyType getPAPPolicy(String papId, String policyId) throws RemoteException {
+        log.info("getPAPPolicy(" + papId + ", " + policyId + ");");
+        
+        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
+        
+        PolicyType policy = pap.getPolicy(policyId);
+        
+        return policy;
+    }
+
+    public PolicySetType getPAPPolicySet(String papId, String policySetId) throws RemoteException {
+        log.info("getPAPPolicySet(" + papId + ", " + policySetId + ");");
+        
+        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
+        
+        PolicySetType policySet = pap.getPolicySet(policySetId);
+        
+        return policySet;
+    }
+
     public PolicyType getPolicy(String policyId) throws RemoteException {
         log.info("getPolicy(" + policyId + ");");
         PolicyType policy = GetPolicyOperation.instance(policyId).execute();
-        log.info("Policy found! Sending...");
+        log.info("Policy found!");
         return policy;
     }
 
@@ -49,21 +98,9 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         return HasPolicySetOperation.instance(policySetId).execute();
     }
 
-    public PolicyType[] listPolicies() throws RemoteException {
-        log.info("listPolicies();");
-        PolicyType[] policyArray = ListPoliciesOperation.instance().execute();
-        log.info("Returning " + policyArray.length + " policies");
-        return policyArray;
-    }
-
     public PolicyType[] listPAPPolicies(String papId) throws RemoteException {
         log.info("listPolicies(" + papId + ");");
         return ListPoliciesForPAPOperation.instance(papId).execute();
-    }
-
-    public PolicySetType[] listPolicySets() throws RemoteException {
-        log.info("listPolicySets();");
-        return ListPolicySetOperation.instance().execute();
     }
 
     public PolicySetType[] listPAPPolicySets(String papId) throws RemoteException {
@@ -71,9 +108,42 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         return ListPolicySetsForPAPOperation.instance(papId).execute();
     }
 
+    public PolicyType[] listPolicies() throws RemoteException {
+        log.info("listPolicies();");
+        PolicyType[] policyArray = ListPoliciesOperation.instance().execute();
+        log.info("Returning " + policyArray.length + " policies");
+        return policyArray;
+    }
+
+    public PolicySetType[] listPolicySets() throws RemoteException {
+        log.info("listPolicySets();");
+        return ListPolicySetOperation.instance().execute();
+    }
+
     public boolean removePolicy(String policyId) throws RemoteException {
         log.info("removePolicy(" + policyId + ");");
         return RemovePolicyOperation.instance(policyId).execute();
+    }
+
+    public boolean removePolicyAndReferences(String policyId) throws RemoteException {
+        log.info("removePolicyAndReferences(" + policyId + ");");
+        
+        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        
+        if (!localPAP.hasPolicy(policyId))
+            return false;
+        
+        synchronized (this) {
+            List<PolicySetType> policySetList = localPAP.getAllPolicySets();
+            for (PolicySetType policySet:policySetList) {
+                if (PolicySetHelper.deletePolicyReference(policySet, policyId))
+                    localPAP.storePolicySet(policySet);
+            }
+        }
+        
+        localPAP.deletePolicy(policyId);
+        
+        return true;
     }
 
     public boolean removePolicySet(String policySetId) throws RemoteException {

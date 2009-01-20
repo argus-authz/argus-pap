@@ -10,7 +10,9 @@ import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
 import org.glite.authz.pap.ui.cli.CLIException;
+import org.glite.authz.pap.ui.wizard.BlacklistPolicySet;
 import org.glite.authz.pap.ui.wizard.PolicyWizard;
+import org.glite.authz.pap.ui.wizard.ServiceClassPolicySet;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -83,14 +85,25 @@ public class AddPolicies extends PolicyManagementCLI {
             if (xacmlObject instanceof PolicySetType)
                 continue;
             
-            PolicyWizard pw = new PolicyWizard((PolicyType) xacmlObject);
+            PolicyType policy = (PolicyType) xacmlObject;
+            PolicyWizard policywizard = new PolicyWizard(policy);
             
             if (verboseMode) {
                 System.out.print("Adding policy: ");
-                System.out.println(pw.toFormattedString(0, 19));
+                System.out.println(policywizard.toFormattedString(0, 19));
             }
             
-            XACMLPolicyCLIUtils.addPolicy(pw, xacmlPolicyMgmtClient);
+            String policySetId;
+            
+            if (policywizard.isBlacklistPolicy())
+                policySetId = BlacklistPolicySet.POLICY_SET_ID;
+            else
+                policySetId = ServiceClassPolicySet.POLICY_SET_ID;
+            
+            // the effective PolicyId is the one returned by the server
+            String policyId = xacmlPolicyMgmtClient.addPolicy(policySetId, policywizard.getPolicyIdPrefix(), policy);
+            policy.setPolicyId(policyId);
+            
         }
         
     }

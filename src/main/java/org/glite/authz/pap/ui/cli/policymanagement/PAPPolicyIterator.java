@@ -71,7 +71,7 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
                 if (papId == null)
                     policy = xacmlPolicyMgmtClient.getPolicy(policyIdsArray[curPos]);
                 else {
-                    //policy = xacmlPolicyMgmtClient.getPAPPolicy(papId, policyIdsArray[curPos]);
+                    policy = xacmlPolicyMgmtClient.getPAPPolicy(papId, policyIdsArray[curPos]);
                 }
             } catch (RemoteException e) {
                 log.error("Cannot retrive policy \"" + policyIdsArray[curPos] + "\"");
