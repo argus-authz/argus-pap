@@ -56,7 +56,6 @@ TOKEN:
 |  <PILOT:    "pilot">
 |  <NO:       "no">
 |  <YES:      "yes">
-|  <BW:       "blacklist">
 |  <CLASS:    "service_class">
 |  <EXCEPT:   "except">
 |  <PRIVATE:  "private">
@@ -98,8 +97,19 @@ List<XACMLObject> Text() :
 { 
   (policy=SectionType() { 
     allpolicies.policies.add(policy); 
-    })*
+    })+
   { return allpolicies.Output(); }
+|
+  { if (jj_ntk == 0) {
+      return allpolicies.Output();//end of file
+  } else {
+    System.out.println("VALUE: " +jj_gen +" " + jj_ntk);
+    System.out.println("IMAGE: " + token.next.image);
+    System.out.println("["+token.next.beginColumn+","+token.next.endColumn+"]");
+    throw new ParseException("Strange token found on line:" + jj_input_stream.getEndLine() + 
+       " Column: " +jj_input_stream.getEndColumn()+
+       " value: " + token.image); }
+  }
 }
 
 Policies Section() :
@@ -120,11 +130,11 @@ Policy SectionType() :
   Policy policy = null;
 }
 {
-        
   <RESOURCE> policy = BW_Policy()
   { return policy; }
 | <CLASS> policy = ServiceClassPolicy()
   { return policy; }
+
 }
 
 Policies BW_Policies() :
