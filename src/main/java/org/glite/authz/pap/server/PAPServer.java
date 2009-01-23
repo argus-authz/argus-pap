@@ -1,5 +1,7 @@
 package org.glite.authz.pap.server;
 
+import java.security.Security;
+import java.security.cert.CertificateFactory;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -9,8 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.axis.transport.http.AxisServlet;
 import org.apache.commons.configuration.Configuration;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.PAPContextListener;
+import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.server.jetty.TrustManagerSelectChannelConnector;
 import org.glite.authz.pap.servlet.SecurityContextFilter;
 import org.mortbay.jetty.Connector;
@@ -27,8 +31,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class PAPServer {
-    
-    
+
+    static {
+
+        try {
+
+            if ( Security.getProvider( "BC" ) == null ) {
+                Security.addProvider( new BouncyCastleProvider() );
+            }
+
+            CertificateFactory.getInstance( "X.509", "BC" );
+
+        } catch ( Exception e ) {
+            throw new PAPConfigurationException(
+                    "Error instantiating x509 certificate factory! Check that your bouncycastle jars are in place!" );
+        }
+    }
 
     final class PAPDefaults {
 
@@ -50,7 +68,7 @@ public final class PAPServer {
     private static final String CONF_DIR_OPTION_NAME = "conf-dir";
 
     private static final String REPO_DIR_OPTION_NAME = "repo-dir";
-    
+
     private static final String PAP_DEFAULT_CONTEXT = "/glite-authz-pap";
 
     public static void main( String[] args ) {
@@ -64,9 +82,11 @@ public final class PAPServer {
     protected String papRepositoryDir;
 
     protected Server httpServer;
-    
-    protected String getPAPWar(){
-        return (String)System.getProperty( "GLITE_LOCATION" )+"/share/webapps/glite-authz-pap-standalone.war";
+
+    protected String getPAPWar() {
+
+        return (String) System.getProperty( "GLITE_LOCATION" )
+                + "/share/webapps/glite-authz-pap-standalone.war";
     }
 
     public PAPServer( String[] args ) {
@@ -74,13 +94,13 @@ public final class PAPServer {
         parseOptions( args );
 
         PAPConfiguration.initialize( papConfigurationDir, papRepositoryDir );
-        
+
         configureHttpServer();
 
         configureWar();
-        
+
         try {
-            
+
             httpServer.start();
             httpServer.join();
 
@@ -96,26 +116,26 @@ public final class PAPServer {
             } catch ( Exception e1 ) {
                 // Just ignore this
             }
-            
-            System.exit(1);
+
+            System.exit( 1 );
         }
 
     }
 
     private void checkCertificates() {
-        
+
         Properties tmProps = getTrustmanagerConfiguration();
 
         CertificateChecker cc = CertificateChecker.instance();
-        
+
         cc.checkCertificate( tmProps.getProperty( "sslCertFile" ) );
-        cc.checkCertificate( tmProps.getProperty( "sslKey" ) );        
-        
+        cc.checkCertificate( tmProps.getProperty( "sslKey" ) );
+
     }
 
     private void configureHttpServer() {
 
-        httpServer = new Server();
+        httpServer = new Server( getInt( "port", PAPDefaults.PORT ) );
 
         int maxRequestQueueSize = getInt( "max_request_queue_size",
                 PAPDefaults.MAX_REQUEST_QUEUE_SIZE );
@@ -136,14 +156,15 @@ public final class PAPServer {
 
         ThreadPool threadPool = new ThreadPool( 5, maxConnections, 60,
                 TimeUnit.SECONDS, requestQueue );
-        
+
         httpServer.setThreadPool( threadPool );
 
-        //TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
-        //        getTrustmanagerConfiguration() );
+        // TrustManagerSocketConnector connector = new
+        // TrustManagerSocketConnector(
+        // getTrustmanagerConfiguration() );
 
-        TrustManagerSelectChannelConnector connector = new
-         TrustManagerSelectChannelConnector(getTrustmanagerConfiguration());
+        TrustManagerSelectChannelConnector connector = new TrustManagerSelectChannelConnector(
+                getTrustmanagerConfiguration() );
 
         connector.setPort( getInt( "port", PAPDefaults.PORT ) );
 
@@ -151,33 +172,33 @@ public final class PAPServer {
 
     }
 
-    private void configureWar(){
-        
+    private void configureWar() {
+
         WebAppContext webappContext = new WebAppContext();
-        
+
         webappContext.setContextPath( PAP_DEFAULT_CONTEXT );
         webappContext.setWar( getPAPWar() );
-        
-        HandlerCollection handlers= new HandlerCollection();
-        handlers.setHandlers(new Handler[]{webappContext, new DefaultHandler()});
-        
+
+        HandlerCollection handlers = new HandlerCollection();
+        handlers.setHandlers( new Handler[] { webappContext,
+                new DefaultHandler() } );
+
         httpServer.setHandler( handlers );
-        
+
     }
-    
+
     private void configureServlets() {
 
-        Context servletContext = new Context( httpServer, "/",
-                false, false );
+        Context servletContext = new Context( httpServer, "/", false, false );
 
         FilterHolder securityFilter = new FilterHolder(
                 new SecurityContextFilter() );
 
         securityFilter.setName( "Security context filter" );
         servletContext.addFilter( securityFilter, "/*", 0 );
-        
+
         servletContext.addEventListener( new PAPContextListener() );
-        
+
         ServletHolder axisServlet = new ServletHolder( new AxisServlet() );
         axisServlet.setName( "Axis servlet" );
         servletContext.addServlet( axisServlet, "/services/*" );
