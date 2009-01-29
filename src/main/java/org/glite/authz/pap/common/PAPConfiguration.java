@@ -51,6 +51,8 @@ public class PAPConfiguration {
     private static final String DEFAULT_PAP_POLICY_FILE_NAME = "pap_policy.ini";
     
     private static final String DEFAULT_PAP_CONFIGURATION_FILE_NAME = "pap_configuration.ini";
+    
+    public static final String MONITORING_PROPERTY_PREFIX = "pap-monitoring";
 
     final static Logger logger = LoggerFactory
             .getLogger( PAPConfiguration.class );
@@ -390,7 +392,16 @@ public class PAPConfiguration {
 
         return configuration.subset( prefix );
     }
+   
     
+    public void setMonitoringProperty(String name, Object value){
+        
+        configuration.setProperty( MONITORING_PROPERTY_PREFIX+"."+name, value );
+    }
     
+    public Object getMonitoringProperty(String name){
+        
+        return configuration.getProperty( MONITORING_PROPERTY_PREFIX+"."+name );
+    }
 
 }
