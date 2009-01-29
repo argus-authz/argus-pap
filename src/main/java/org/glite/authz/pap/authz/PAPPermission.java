@@ -1,6 +1,6 @@
 package org.glite.authz.pap.authz;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 
 import org.apache.commons.lang.StringUtils;
@@ -114,7 +114,19 @@ public class PAPPermission {
     
     
 
-    public static PAPPermission of( PermissionFlags p ) {
+    public boolean add(PAPPermission o){
+    	
+    	if (o == null)
+    		return false;
+    	
+    	return addAll(o.permissions);
+    }
+    
+	protected boolean addAll(Collection<? extends PermissionFlags> c) {
+		return permissions.addAll(c);
+	}
+
+	public static PAPPermission of( PermissionFlags p ) {
 
         PAPPermission papPerm = new PAPPermission();
         papPerm.permissions.add( p );

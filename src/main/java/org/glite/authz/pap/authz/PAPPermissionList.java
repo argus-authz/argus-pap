@@ -7,47 +7,51 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 
 public class PAPPermissionList {
 
-    protected List<PAPPermission> permissions = new ArrayList<PAPPermission>();
+	protected List<PAPPermission> permissions = new ArrayList<PAPPermission>();
 
-    private PAPPermissionList() {
+	private PAPPermissionList() {
 
-	// TODO Auto-generated constructor stub
-    }
-
-    public void addPermission(PAPPermission p) {
-
-	// Silently ignore null additions
-	if (p == null)
-	    return;
-
-	permissions.add(p);
-
-    }
-
-    public boolean satisfies(PAPPermission other) {
-
-	for (PAPPermission perm : permissions) {
-
-	    if (perm.satisfies(other))
-		return true;
 	}
 
-	return false;
-    }
+	public void addPermission(PAPPermission p) {
 
-    public int size() {
+		// Silently ignore null additions
+		if (p == null)
+			return;
 
-	return permissions.size();
-    }
+		permissions.add(p);
 
-    public static PAPPermissionList instance() {
+	}
 
-	return new PAPPermissionList();
-    }
+	public boolean satisfies(PAPPermission other) {
 
-    @Override
-    public String toString() {
+		return getCumulativePermission().satisfies(other);
+		
+	}
 
-	return ToStringBuilder.reflectionToString(this);
-    }
+	public int size() {
+
+		return permissions.size();
+	}
+
+	public static PAPPermissionList instance() {
+
+		return new PAPPermissionList();
+	}
+
+	@Override
+	public String toString() {
+
+		return ToStringBuilder.reflectionToString(this);
+	}
+	
+	
+	public PAPPermission getCumulativePermission(){
+		PAPPermission cumulativePerms = PAPPermission.getEmptyPermission();
+		
+		for (PAPPermission p: permissions)
+			cumulativePerms.add(p);
+		
+		return cumulativePerms;
+	}
 }

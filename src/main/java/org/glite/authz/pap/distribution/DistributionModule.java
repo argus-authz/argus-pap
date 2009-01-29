@@ -173,7 +173,7 @@ public class DistributionModule extends Thread {
             throw new PAPConfigurationException("Error initializing OpenSAML library", e);
         }
         
-        PAP pap = new PAP("prova", "/C=IT/O=INFN/OU=Host/L=CNAF/CN=pbox3.cnaf.infn.it", "pbox3.cnaf.infn.it", "8443", "/glite-authz-pap/services", false);
+        PAP pap = new PAP("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost", "4554", "/glite-authz-pap/services", false);
         System.out.println(pap.toString());
         List<XACMLObject> list = getPoliciesFromPAP(pap);
         System.out.println("Retrieved " + list.size() + " policies");

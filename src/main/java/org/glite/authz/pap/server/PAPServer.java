@@ -32,21 +32,21 @@ import org.slf4j.LoggerFactory;
 
 public final class PAPServer {
 
-    static {
-
-        try {
-
-            if ( Security.getProvider( "BC" ) == null ) {
-                Security.addProvider( new BouncyCastleProvider() );
-            }
-
-            CertificateFactory.getInstance( "X.509", "BC" );
-
-        } catch ( Exception e ) {
-            throw new PAPConfigurationException(
-                    "Error instantiating x509 certificate factory! Check that your bouncycastle jars are in place!" );
-        }
-    }
+//    static {
+//
+//        try {
+//
+//            if ( Security.getProvider( "BC" ) == null ) {
+//                Security.addProvider( new BouncyCastleProvider() );
+//            }
+//
+//            CertificateFactory.getInstance( "X.509", "BC" );
+//
+//        } catch ( Exception e ) {
+//            throw new PAPConfigurationException(
+//                    "Error instantiating x509 certificate factory! Check that your bouncycastle jars are in place!" );
+//        }
+//    }
 
     final class PAPDefaults {
 
@@ -184,24 +184,6 @@ public final class PAPServer {
                 new DefaultHandler() } );
 
         httpServer.setHandler( handlers );
-
-    }
-
-    private void configureServlets() {
-
-        Context servletContext = new Context( httpServer, "/", false, false );
-
-        FilterHolder securityFilter = new FilterHolder(
-                new SecurityContextFilter() );
-
-        securityFilter.setName( "Security context filter" );
-        servletContext.addFilter( securityFilter, "/*", 0 );
-
-        servletContext.addEventListener( new PAPContextListener() );
-
-        ServletHolder axisServlet = new ServletHolder( new AxisServlet() );
-        axisServlet.setName( "Axis servlet" );
-        servletContext.addServlet( axisServlet, "/services/*" );
 
     }
 
