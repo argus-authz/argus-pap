@@ -42,12 +42,12 @@ public class DistributionModule extends Thread {
         ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
         ServiceClient serviceClient = serviceClientFactory.createServiceClient();
         
-        PAPAuthorizationManagement am = serviceClient.getPAPAuthorizationManagementService(remotePAP.getEndpoint() + "/AuthorizationManagementService");
-        
-        PAPACE[] aa = am.getACL(null);
-        
-        log.info("RETRIEVED ACE: " + aa.length + " POLICIES");
-        System.out.println("RETRIEVED ACE: " + aa.length + " POLICIES");
+//        PAPAuthorizationManagement am = serviceClient.getPAPAuthorizationManagementService(remotePAP.getEndpoint() + "/AuthorizationManagementService");
+//        
+//        PAPACE[] aa = am.getACL(null);
+//        
+//        log.info("RETRIEVED ACE: " + aa.length + " POLICIES");
+//        System.out.println("RETRIEVED ACE: " + aa.length + " POLICIES");
         
         XACMLPolicyManagement pc = serviceClient.getXACMLPolicyManagementService(remotePAP.getEndpoint() + "/XACMLPolicyManagementService");
         PolicyType[] pa = pc.listPolicies();

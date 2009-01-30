@@ -74,19 +74,11 @@
           </execution>
         </executions>
       </plugin>
-      <!-- 
-      <plugin>
-      	<groupId>org.apache.maven.plugins</groupId>
-      	<artifactId>maven-site-plugin</artifactId>
-      	<executions>
-      		<execution>
-      			<phase>package</phase>
-      			<goals>
-      				<goal>site</goal>
-      			</goals>
-      		</execution>
-      	</executions>
-      </plugin>
+      <!--
+        <plugin> <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-site-plugin</artifactId> <executions> <execution>
+        <phase>package</phase> <goals> <goal>site</goal> </goals> </execution>
+        </executions> </plugin>
       -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -120,30 +112,37 @@
                   </targetPackage>
                 </mapping>
                 <mapping>
-                  <namespace>${pap-services-namespace}/highlevel_policy_management</namespace>
+                  <namespace>
+                    ${pap-services-namespace}/highlevel_policy_management
+                  </namespace>
                   <targetPackage>
                     org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons
                   </targetPackage>
                 </mapping>
                 <mapping>
-                  <namespace> ${pap-services-namespace}/xacml_policy_management</namespace>
+                  <namespace> ${pap-services-namespace}/xacml_policy_management
+                  </namespace>
                   <targetPackage>
                     org.glite.authz.pap.services.xacml_policy_management.axis_skeletons
                   </targetPackage>
                 </mapping>
                 <mapping>
-                  <namespace>${pap-services-namespace}/pap_management</namespace>
+                  <namespace>${pap-services-namespace}/pap_management
+                  </namespace>
                   <targetPackage>
                     org.glite.authz.pap.services.pap_management.axis_skeletons
                   </targetPackage>
                 </mapping>
                 <mapping>
-                  <namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os</namespace>
-                  <targetPackage>org.opensaml.xacml.policy</targetPackage>
+                  <namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os
+                  </namespace>
+                  <targetPackage>org.opensaml.xacml.policy
+                  </targetPackage>
                 </mapping>
               </mappings>
               <nsExcludes>
-                <nsExclude>urn:oasis:names:tc:xacml:2.0:policy:schema:os</nsExclude>
+                <nsExclude>urn:oasis:names:tc:xacml:2.0:policy:schema:os
+                </nsExclude>
               </nsExcludes>
               <serverSide>true</serverSide>
               <skeletonDeploy>true</skeletonDeploy>
@@ -159,8 +158,10 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assembly/service-descriptor.xml</descriptor>
-            <descriptor>src/main/assembly/client-descriptor.xml</descriptor>
+            <descriptor>src/main/assembly/service-descriptor.xml
+            </descriptor>
+            <descriptor>src/main/assembly/client-descriptor.xml
+            </descriptor>
           </descriptors>
         </configuration>
       </plugin>
@@ -218,8 +219,19 @@
           <groupId>org.slf4j</groupId>
           <artifactId>jcl104-over-slf4j</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcprov-ext-jdk15</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
+
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk15</artifactId>
+      <version>1.40</version>
+    </dependency>
+    
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis</artifactId>
@@ -257,13 +269,13 @@
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-util-java</artifactId>
-      <version>head-101208</version>
+      <version>head-300109</version>
     </dependency>
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-trustmanager
       </artifactId>
-      <version>head-101208</version>
+      <version>head-300109</version>
     </dependency>
     <dependency>
       <groupId>commons-configuration</groupId>
@@ -294,7 +306,7 @@
       <artifactId>commons-cli</artifactId>
       <version>1.1</version>
     </dependency>
-    
+
     <!--  SLF4J stuff -->
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -327,7 +339,7 @@
       <artifactId>fake-log4j</artifactId>
       <version>0.1</version>
     </dependency>
-    
+
     <!-- Jetty stuff -->
     <dependency>
       <groupId>org.mortbay.jetty</groupId>

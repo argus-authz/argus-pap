@@ -1,7 +1,5 @@
 package org.glite.authz.pap.server;
 
-import java.security.Security;
-import java.security.cert.CertificateFactory;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -9,44 +7,20 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.axis.transport.http.AxisServlet;
 import org.apache.commons.configuration.Configuration;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.PAPContextListener;
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.server.jetty.TrustManagerSelectChannelConnector;
-import org.glite.authz.pap.servlet.SecurityContextFilter;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.DefaultHandler;
 import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.FilterHolder;
-import org.mortbay.jetty.servlet.ServletHolder;
 import org.mortbay.jetty.webapp.WebAppContext;
 import org.mortbay.thread.concurrent.ThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public final class PAPServer {
-
-//    static {
-//
-//        try {
-//
-//            if ( Security.getProvider( "BC" ) == null ) {
-//                Security.addProvider( new BouncyCastleProvider() );
-//            }
-//
-//            CertificateFactory.getInstance( "X.509", "BC" );
-//
-//        } catch ( Exception e ) {
-//            throw new PAPConfigurationException(
-//                    "Error instantiating x509 certificate factory! Check that your bouncycastle jars are in place!" );
-//        }
-//    }
 
     final class PAPDefaults {
 
@@ -122,17 +96,6 @@ public final class PAPServer {
 
     }
 
-    private void checkCertificates() {
-
-        Properties tmProps = getTrustmanagerConfiguration();
-
-        CertificateChecker cc = CertificateChecker.instance();
-
-        cc.checkCertificate( tmProps.getProperty( "sslCertFile" ) );
-        cc.checkCertificate( tmProps.getProperty( "sslKey" ) );
-
-    }
-
     private void configureHttpServer() {
 
         httpServer = new Server( getInt( "port", PAPDefaults.PORT ) );
@@ -178,7 +141,9 @@ public final class PAPServer {
 
         webappContext.setContextPath( PAP_DEFAULT_CONTEXT );
         webappContext.setWar( getPAPWar() );
-
+        
+        webappContext.setParentLoaderPriority( false );
+        
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers( new Handler[] { webappContext,
                 new DefaultHandler() } );

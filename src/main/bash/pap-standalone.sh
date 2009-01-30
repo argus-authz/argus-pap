@@ -12,13 +12,17 @@ pre_checks(){
 	check_certificates
 }
 
-success(){
-	echo " success!"
+success () {
+	if [ ! -z "$1" ]; then
+		echo "$1"
+	fi
 	exit 0
 }
 
-failure(){
-	echo " failure!"
+failure () {
+	if [ ! -z "$1" ]; then
+		echo "$1"
+	fi
 	exit 1
 }
 
@@ -41,15 +45,13 @@ kill_pap_proc(){
 		pid=`head -1 $PAP_RUN_FILE`
 		kill -TERM $pid
 		if [ $? -ne 0 ]; then
-			echo "Error killing PAP process"
-			failure
+			failure "Error killing PAP process!"
 		else
 			## remove pid file
 			rm $PAP_RUN_FILE
 		fi
 	else
-		echo "PAP standalone server is not running!"
-		failure
+		failure "PAP standalone server is not running!"
 	fi 
 }
 	
@@ -64,7 +66,6 @@ status(){
 			rm $PAP_RUN_FILE
 			return 1
 		else
-			echo "PAP running ($pid)"
 			return 0
 		fi
 	else
@@ -88,25 +89,25 @@ start(){
 
 	echo -n "Starting $prog: "
 		
-	pre_checks || failure
+	pre_checks || failure 
 	
-	status && failure
+	status && failure "PAP already running..."
 	
 	$PAP_STANDALONE_CMD &
 	
 	if [ $? -eq 0 ]; then
 		echo "$!" > $PAP_RUN_FILE;
-		status || failure
-	 	success 
+		status || failure "PAP not running after being just started!"
+	 	success "Ok."
 	else
-		failure
+		failure "failed!"
 	fi
 		
 }
 
 stop(){
 	echo -n "Stopping $prog: "
-	kill_pap_proc && success || failure
+	kill_pap_proc && success "Ok." || failure "Error killing PAP process!"
 	rm -f $PAP_RUN_FILE
 }
 
@@ -120,7 +121,7 @@ case "$1" in
 		;;
 	
 	status)
-		echo "not implemented yet sorry..."
+		status && success "PAP running!" || failure "PAP not running!"
 		;;
 
 	restart)

@@ -1,5 +1,7 @@
 package org.glite.authz.pap.common;
 
+import java.util.Date;
+
 import javax.servlet.ServletContext;
 
 import org.glite.authz.pap.authz.AuthorizationEngine;
@@ -13,47 +15,58 @@ import org.slf4j.Logger;
 public final class PAPService {
 
     static final Logger logger = org.slf4j.LoggerFactory
-	    .getLogger(PAPService.class);
+            .getLogger( PAPService.class );
 
-    public static void start(ServletContext context) {
+    protected static void setStartupMonitoringProperties(){
+        
+        // TODO: find a more reliable naming scheme
+        PAPConfiguration.instance().setMonitoringProperty( "ServiceStartupTime", new Date() );
+        
+        
+    }
+    public static void start( ServletContext context ) {
 
-	logger.info("Starting PAP service...");
+        logger.info( "Starting PAP service..." );
 
-	// Initialize configuaration
-	PAPConfiguration conf = PAPConfiguration.initialize(context);
-	
-	// Start autorization service
-	logger.info("Starting authorization engine...");
+        // Initialize configuaration
+        PAPConfiguration conf = PAPConfiguration.initialize( context );
 
-	AuthorizationEngine.initialize(conf.getPapAuthzConfigurationFileName());
+        // Start autorization service
+        logger.info( "Starting authorization engine..." );
 
-	// Bootstrap opensaml
-	try {
+        AuthorizationEngine
+                .initialize( conf.getPapAuthzConfigurationFileName() );
 
-	    logger.info("Bootstraping OpenSAML...");
-	    DefaultBootstrap.bootstrap();
+        // Bootstrap opensaml
+        try {
 
-	} catch (ConfigurationException e) {
+            logger.info( "Bootstraping OpenSAML..." );
+            DefaultBootstrap.bootstrap();
 
-	    logger.error("Error configuring OpenSAML:" + e.getMessage());
-	    throw new PAPConfigurationException("Error configuring OpenSAML:"
-		    + e.getMessage(), e);
-	}
+        } catch ( ConfigurationException e ) {
 
-	// Start repository manager
-	logger.info("Starting repository manager...");
-	RepositoryManager.getInstance().bootstrap();
-	
-	logger.info("Starting pap distribution module...");
-	DistributionModule.getInstance().startDistributionModule();    }
+            logger.error( "Error configuring OpenSAML:" + e.getMessage() );
+            throw new PAPConfigurationException( "Error configuring OpenSAML:"
+                    + e.getMessage(), e );
+        }
+
+        // Start repository manager
+        logger.info( "Starting repository manager..." );
+        RepositoryManager.getInstance().bootstrap();
+
+        logger.info( "Starting pap distribution module..." );
+        DistributionModule.getInstance().startDistributionModule();
+        
+        setStartupMonitoringProperties();
+    }
 
     public static void stop() {
 
-	logger.info("Shutting down PAP service...");
-	
-	logger.info("Shutting down distribution module...");
-	DistributionModule.getInstance().stopDistributionModule();
-	
+        logger.info( "Shutting down PAP service..." );
+
+        logger.info( "Shutting down distribution module..." );
+        DistributionModule.getInstance().stopDistributionModule();
+
     }
 
 }
