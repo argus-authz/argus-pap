@@ -162,7 +162,8 @@ public class DistributionConfiguration {
     }
     
     public void removePAP(String papAlias) {
-        papConfiguration.clearDistributionProperty(aliasKey(papAlias));
+    	
+        clearPAPProperties(papAlias);
         
         // TODO: remove PAP from pap-order
 //        String[] papOrderArrayOld = getPAPOrderArray();
@@ -178,23 +179,8 @@ public class DistributionConfiguration {
         papConfiguration.saveStartupConfiguration();
     }
     
-    public void setPAP(PAP pap) {
-        String papAlias = pap.getAlias();
-        
-        papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
-        
-        papConfiguration.setDistributionProperty(hostnameKey(papAlias), pap.getHostname());
-        papConfiguration.setDistributionProperty(portKey(papAlias), pap.getPort());
-        papConfiguration.setDistributionProperty(pathKey(papAlias), pap.getPath());
-        papConfiguration.setDistributionProperty(protocolKey(papAlias), pap.getProtocol());
-        
-        String visibilityPublic;
-        if (pap.isVisibilityPublic())
-            visibilityPublic = "true";
-        else
-            visibilityPublic = "false";
-        papConfiguration.setDistributionProperty(publicVisibilityKey(papAlias), visibilityPublic);
-        
+    public void setPAPAndSave(PAP pap) {
+        setPAPProperties(pap);
         papConfiguration.saveStartupConfiguration();
     }
     
@@ -219,6 +205,33 @@ public class DistributionConfiguration {
         
         papConfiguration.setDistributionProperty(papOrderKey(), sb.toString());
         
+    }
+    
+    private void setPAPProperties(PAP pap) {
+    	String papAlias = pap.getAlias();
+        
+        papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
+        
+        papConfiguration.setDistributionProperty(hostnameKey(papAlias), pap.getHostname());
+        papConfiguration.setDistributionProperty(portKey(papAlias), pap.getPort());
+        papConfiguration.setDistributionProperty(pathKey(papAlias), pap.getPath());
+        papConfiguration.setDistributionProperty(protocolKey(papAlias), pap.getProtocol());
+        
+        String visibilityPublic;
+        if (pap.isVisibilityPublic())
+            visibilityPublic = "true";
+        else
+            visibilityPublic = "false";
+        papConfiguration.setDistributionProperty(publicVisibilityKey(papAlias), visibilityPublic);
+    }
+    
+    private void clearPAPProperties(String papAlias) {
+        papConfiguration.clearDistributionProperty(dnKey(papAlias));
+        papConfiguration.clearDistributionProperty(hostnameKey(papAlias));
+        papConfiguration.clearDistributionProperty(portKey(papAlias));
+        papConfiguration.clearDistributionProperty(pathKey(papAlias));
+        papConfiguration.clearDistributionProperty(protocolKey(papAlias));
+        papConfiguration.clearDistributionProperty(publicVisibilityKey(papAlias));
     }
     
 }

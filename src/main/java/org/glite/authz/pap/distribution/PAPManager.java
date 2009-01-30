@@ -42,7 +42,7 @@ public class PAPManager {
         if (exists(pap.getPapId()))
             throw new AlreadyExistsException();
         
-        distributionConfiguration.setPAP(pap);
+        distributionConfiguration.setPAPAndSave(pap);
         papList.add(pap);
         papDAO.add(pap);
         

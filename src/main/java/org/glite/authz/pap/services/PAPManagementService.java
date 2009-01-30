@@ -20,8 +20,14 @@ public class PAPManagementService implements PAPManagement {
 
     public boolean addTrustedPAP(PAPData papData) throws RemoteException {
         log.info("addTrustedPAP();");
-        AddTrustedPAPOperation.instance(papData).execute();
-        return false;
+        
+        try {
+        	AddTrustedPAPOperation.instance(papData).execute();
+        } catch (RuntimeException e) {
+        	ServiceClassExceptionManager.logAndThrow(log, e);
+        }
+        
+        return true;
     }
 
     public boolean exists(String papId) throws RemoteException {
