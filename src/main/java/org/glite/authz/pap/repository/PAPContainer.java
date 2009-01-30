@@ -52,7 +52,7 @@ public class PAPContainer {
     public void erasePAP() {
         deleteAllPolicies();
         deleteAllPolicySets();
-        papDAO.delete(papId);
+        papDAO.deleteByAlias(papId);
     }
 
     public List<PolicyType> getAllPolicies() {

@@ -46,7 +46,7 @@ public class PAPManager {
         
         distributionConfiguration.setPAPAndSave(pap);
         papList.add(pap);
-        papDAO.add(pap);
+        papDAO.store(pap);
         
         return new PAPContainer(pap);
     }
@@ -56,7 +56,7 @@ public class PAPManager {
         if (localPAPExists())
             return;
         
-        papDAO.add(localPAP);
+        papDAO.store(localPAP);
         
         PAPContainer localPAPContainer = getLocalPAPContainer();
         
@@ -173,22 +173,22 @@ public class PAPManager {
         // Add PAPs defined in the configuration file
         for (PAP pap:papList) {
             
-            if (papDAO.exists(pap.getPapId()))
+            if (papDAO.papExistsByAlias(pap.getPapId()))
                 continue;
             
-            papDAO.add(pap);
+            papDAO.store(pap);
         }
         
         // If the configuration was modified off-line then remove unwanted PAPs still in the DB
-        for (String papId:papDAO.getAllIds()) {
+        for (String papId:papDAO.getAllAliases()) {
             if (exists(papId))
                 continue;
-            papDAO.delete(papId);
+            papDAO.deleteByAlias(papId);
         }
     }
     
     private boolean localPAPExists() {
-        return RepositoryManager.getDAOFactory().getPAPDAO().exists(localPAP.getPapId());
+        return RepositoryManager.getDAOFactory().getPAPDAO().papExistsByAlias(localPAP.getPapId());
     }
     
 }

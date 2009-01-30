@@ -6,20 +6,24 @@ import org.glite.authz.pap.common.PAP;
 
 public interface PAPDAO {
 
-    public void add(PAP pap);
-
-    public void delete(String papId);
-
-    public boolean exists(String papId);
+    public void deleteByAlias(String papAlias);
+    
+    public void deleteById(String papId);
 
     public List<PAP> getAll();
     
-    public List<String> getAllIds();
-    
+    public List<String> getAllAliases();
+
     public PAP getById(String papId);
+
+    public boolean papExistsByAlias(String papAlias);
     
-    public void setOrder(List<String> papId);
+    public boolean papExistsById(String papId);
+    
+    // public void setOrder(List<String> papId);
+    
+    public void store(PAP pap);
 
     public void update(PAP pap);
-
+    
 }
