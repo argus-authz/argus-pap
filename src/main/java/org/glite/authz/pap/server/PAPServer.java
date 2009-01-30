@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.configuration.Configuration;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.server.jetty.TrustManagerSelectChannelConnector;
+import org.glite.authz.pap.server.jetty.TrustManagerSocketConnector;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
@@ -122,12 +123,12 @@ public final class PAPServer {
 
         httpServer.setThreadPool( threadPool );
 
-        // TrustManagerSocketConnector connector = new
-        // TrustManagerSocketConnector(
-        // getTrustmanagerConfiguration() );
-
-        TrustManagerSelectChannelConnector connector = new TrustManagerSelectChannelConnector(
+        TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
                 getTrustmanagerConfiguration() );
+
+        // TrustManagerSelectChannelConnector connector = new
+        // TrustManagerSelectChannelConnector(
+        // getTrustmanagerConfiguration() );
 
         connector.setPort( getInt( "port", PAPDefaults.PORT ) );
 
@@ -141,9 +142,9 @@ public final class PAPServer {
 
         webappContext.setContextPath( PAP_DEFAULT_CONTEXT );
         webappContext.setWar( getPAPWar() );
-        
+
         webappContext.setParentLoaderPriority( false );
-        
+
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers( new Handler[] { webappContext,
                 new DefaultHandler() } );

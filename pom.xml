@@ -231,7 +231,7 @@
       <artifactId>bcprov-ext-jdk15</artifactId>
       <version>1.40</version>
     </dependency>
-    
+
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis</artifactId>
@@ -269,13 +269,13 @@
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-util-java</artifactId>
-      <version>head-300109</version>
+      <version>1.4.0</version>
     </dependency>
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-trustmanager
       </artifactId>
-      <version>head-300109</version>
+      <version>1.8.10-1</version>
     </dependency>
     <dependency>
       <groupId>commons-configuration</groupId>
@@ -318,27 +318,39 @@
       <artifactId>jcl-over-slf4j</artifactId>
       <version>1.5.6</version>
     </dependency>
-    <!--
-      <dependency> <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId> <version>1.5.6</version>
-      </dependency>
-    -->
+
     <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-log4j12</artifactId>
+      <version>1.5.6</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.14</version>
+      <scope>runtime</scope>
+    </dependency>
+
+    <!--
+      Uncomment me if you want to use logback as backend <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId> <version>0.9.11</version>
+      </dependency>
+      
+     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
       <version>1.5.6</version>
       <scope>runtime</scope>
     </dependency>
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <version>0.9.11</version>
-    </dependency>
-    <dependency>
       <groupId>it.cnaf</groupId>
       <artifactId>fake-log4j</artifactId>
       <version>0.1</version>
     </dependency>
+    
+    -->
 
     <!-- Jetty stuff -->
     <dependency>

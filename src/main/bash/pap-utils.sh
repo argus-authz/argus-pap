@@ -6,14 +6,12 @@ PAP_LIBS=$GLITE_LOCATION/share/pap/lib
 PAP_STANDALONE_CLASS="org.glite.authz.pap.server.PAPServer"
 PAP_CLIENT_CLASS="org.glite.authz.pap.ui.cli.PAPCLI"
 
-JETTY_DEPS=`ls -x $PAP_LIBS/jetty*.jar $PAP_LIBS/slf4j*.jar $PAP_LIBS/logback*.jar | tr '\n' ':'`
-
 PAP_DEPS=`ls -x $PAP_LIBS/*.jar | tr '\n' ':'`
 
 PAP_JAR="$GLITE_LOCATION/share/java/glite-authz-pap.jar"
 
 PAP_CLIENT_CP="$PAP_DEPS$PAP_JAR:$GLITE_LOCATION/etc/pap/logging/client"
-PAP_STANDALONE_CP="$JETTY_DEPS$PAP_JAR:$GLITE_LOCATION/etc/pap/logging/standalone"
+PAP_STANDALONE_CP="$PAP_DEPS$PAP_JAR:$GLITE_LOCATION/etc/pap/logging/standalone"
 
 PAP_CLIENT_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE_LOCATION_VAR"
 PAP_STANDALONE_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE_LOCATION_VAR"
