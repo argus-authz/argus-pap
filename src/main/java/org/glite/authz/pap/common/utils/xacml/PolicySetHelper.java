@@ -83,7 +83,7 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
         return build(policySetId, policyCombinerAlgorithmId, null, null);
     }
-
+    
     public static boolean deletePolicyReference(PolicySetType policySet, String policyId) {
         List<IdReferenceType> policyRefList = policySet.getPolicyIdReferences();
         for (IdReferenceType policyRef : policyRefList) {
@@ -116,6 +116,15 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
     public static List<String> getPolicySetIdReferencesValues(PolicySetType policySet) {
         List<IdReferenceType> refList = policySet.getPolicySetIdReferences();
+        List<String> list = new ArrayList<String>(refList.size());
+        for (IdReferenceType ref : refList) {
+            list.add(ref.getValue());
+        }
+        return list;
+    }
+    
+    public static List<String> getPolicyIdReferencesValues(PolicySetType policySet) {
+        List<IdReferenceType> refList = policySet.getPolicyIdReferences();
         List<String> list = new ArrayList<String>(refList.size());
         for (IdReferenceType ref : refList) {
             list.add(ref.getValue());

@@ -49,10 +49,16 @@ public class PAPContainer {
         policySetDAO.delete(papId, id);
     }
 
+    public void erasePAP() {
+        deleteAllPolicies();
+        deleteAllPolicySets();
+        papDAO.delete(papId);
+    }
+
     public List<PolicyType> getAllPolicies() {
         return policyDAO.getAll(papId);
     }
-
+    
     public List<PolicySetType> getAllPolicySets() {
         List<PolicySetType> policySetList = policySetDAO.getAll(papId);
         
@@ -76,18 +82,22 @@ public class PAPContainer {
         return this.pap;
     }
 
+    public PolicySetType getPAPRootPolicySet()
+    {
+        return policySetDAO.getById(papId, getPAPRootPolicySetId());
+    }
+    
+    public String getPAPRootPolicySetId()
+    {
+        return papId;
+    }
+
     public PolicyType getPolicy(String id) {
         return policyDAO.getById(papId, id);
     }
-
+    
     public PolicySetType getPolicySet(String id) {
         return policySetDAO.getById(papId, id);
-    }
-    
-    public void erasePAP() {
-        deleteAllPolicies();
-        deleteAllPolicySets();
-        papDAO.delete(papId);
     }
 
     public boolean hasPolicy(String id) {

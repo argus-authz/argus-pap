@@ -11,6 +11,8 @@ import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
+import org.glite.authz.pap.ui.wizard.BlacklistPolicySet;
+import org.glite.authz.pap.ui.wizard.ServiceClassPolicySet;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +58,18 @@ public class PAPManager {
         
         papDAO.add(localPAP);
         
+        PAPContainer localPAPContainer = getLocalPAPContainer();
+        
         PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
                 PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
         
-        getLocalPAPContainer().storePolicySet(localPolicySet);
+        localPAPContainer.storePolicySet((new BlacklistPolicySet()).getPolicySetType());
+        localPAPContainer.storePolicySet((new ServiceClassPolicySet()).getPolicySetType());
+        
+        PolicySetHelper.addPolicySetReference(localPolicySet, BlacklistPolicySet.POLICY_SET_ID);
+        PolicySetHelper.addPolicySetReference(localPolicySet, ServiceClassPolicySet.POLICY_SET_ID);
+        
+        localPAPContainer.storePolicySet(localPolicySet);
     }
     
     public PAP deleteTrustedPAP(String papId) throws NotFoundException {

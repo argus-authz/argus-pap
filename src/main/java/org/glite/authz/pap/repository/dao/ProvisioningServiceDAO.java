@@ -80,11 +80,8 @@ public class ProvisioningServiceDAO {
 
         // Add references to the remote PAPs
         for (PAPContainer papContainer : papContainerList) {
-            String papId = papContainer.getPAP().getPapId();
-
-            PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
-
-            resultList.addAll(getAll(papContainer));
+            PolicySetType papPolicySetNoReferences = getPolicySetNoReferences(papContainer, papContainer.getPAPRootPolicySetId());
+            PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
         }
 
         log.debug("PDP query executed: retrieved " + resultList.size()
@@ -94,6 +91,31 @@ public class ProvisioningServiceDAO {
         return resultList;
     }
     
+    private PolicySetType getPolicySetNoReferences(PAPContainer papContainer, String policySetId) {
+        
+        PolicySetType policySet = papContainer.getPolicySet(policySetId);
+        
+        // replace policy set references with policy sets
+        List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySet);
+        for (String policySetIdReference:idReferenceList) {
+            PolicySetHelper.addPolicySet(policySet, getPolicySetNoReferences(papContainer, policySetIdReference));
+            PolicySetHelper.deletePolicySetReference(policySet, policySetIdReference);
+        }
+        
+        // replace policy references with policies
+        idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
+        for (String policyIdReference:idReferenceList) {
+            PolicyType policy = papContainer.getPolicy(policyIdReference);
+            PolicySetHelper.addPolicy(policySet, policy);
+            PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
+        }
+        
+        return policySet;
+    }
+    
+    // pdpQuery() was modified in order to do not use references, therefore this
+    // method is no more used... consider to delete it before or later...
+    @SuppressWarnings("unused")
     private List<XACMLObject> getAll(PAPContainer papContainer) {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
         
