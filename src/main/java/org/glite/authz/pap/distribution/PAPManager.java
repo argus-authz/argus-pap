@@ -170,16 +170,15 @@ public class PAPManager {
     private void initPAPList() {
         papList = DistributionConfiguration.getInstance().getRemotePAPList();
         
-        // Add PAPs defined in the configuration file
+        // Add not already existing PAPs defined in the configuration file
         for (PAP pap:papList) {
-            
             if (papDAO.papExistsByAlias(pap.getPapId()))
                 continue;
-            
             papDAO.store(pap);
         }
         
-        // If the configuration was modified off-line then remove unwanted PAPs still in the DB
+        // If the configuration was modified off-line 
+        // remove unwanted PAPs still in the repository
         for (String papId:papDAO.getAllAliases()) {
             if (exists(papId))
                 continue;
