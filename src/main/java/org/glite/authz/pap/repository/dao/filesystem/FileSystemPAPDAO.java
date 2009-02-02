@@ -2,9 +2,10 @@ package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
@@ -13,15 +14,19 @@ import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.mortbay.log.Log;
 
 public class FileSystemPAPDAO implements PAPDAO {
 
     private static String PAP_FILE_NAME = "pap_info.ini";
     private static String REMOTE_PAP_STANZA = "remote-paps";
+    private static FileSystemPAPDAO instance = null;
     private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
 
     public static FileSystemPAPDAO getInstance() {
-        return new FileSystemPAPDAO();
+    	if (instance == null)
+            instance = new FileSystemPAPDAO();
+    	return instance;
     }
 
     private static String aliasKey(String papAlias) {
@@ -53,7 +58,7 @@ public class FileSystemPAPDAO implements PAPDAO {
     }
     
     private static String visibilityPublicKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "visibility-puclic";
+        return aliasKey(papAlias) + "." + "public";
     }
 
     private INIConfiguration papsFile;
@@ -77,23 +82,13 @@ public class FileSystemPAPDAO implements PAPDAO {
 
     }
 
-    public void deleteByAlias(String papAlias) throws NotFoundException, RepositoryException {
+    public void delete(String papAlias) throws NotFoundException, RepositoryException {
 
-        if (!papExistsByAlias(papAlias))
+        if (!exists(papAlias))
             throw new NotFoundException("Not found: papAlias=" + papAlias);
 
         String papId = papsFile.getString(idKey(papAlias));
         
-        deleteById(papId);
-    }
-
-    public void deleteById(String papId) throws NotFoundException, RepositoryException {
-        
-        String papAlias = getAliasFromId(papId);
-        
-        if (papAlias == null)
-            throw new NotFoundException("Not found: papId=" + papId);
-
         File papDir = new File(getPAPDirAbsolutePath(papId));
         
         // empty PAP directory (delete all policies and policy sets)
@@ -124,22 +119,33 @@ public class FileSystemPAPDAO implements PAPDAO {
         return papList;
     }
 
-    public List<String> getAllAliases() {
-        List<String> idList = new LinkedList<String>();
+    @SuppressWarnings("unchecked")
+	public List<String> getAllAliases() {
+    	
+    	Set<String> aliasSet = new HashSet<String>();
 
         Iterator<String> iterator = papsFile.getKeys(REMOTE_PAP_STANZA);
-
         while (iterator.hasNext()) {
             String key = iterator.next();
+            
             int firstAliasChar = key.indexOf('.') + 1;
-            String papAlias = key.substring(firstAliasChar, key.indexOf('.', firstAliasChar));
-            idList.add(papAlias);
+            int lastAliasChar = key.indexOf('.', firstAliasChar);
+            
+            String alias = key.substring(firstAliasChar, lastAliasChar);
+            
+            aliasSet.add(alias);
+        }
+        
+        List<String> aliasList = new ArrayList<String>();
+        
+        for (String alias : aliasSet) {
+        	aliasList.add(alias);
         }
 
-        return idList;
+        return aliasList;
     }
 
-    public PAP getByAlias(String papAlias) throws NotFoundException {
+    public PAP get(String papAlias) throws NotFoundException {
         
         PAP pap = getPAPFromProperies(papAlias);
         
@@ -149,41 +155,42 @@ public class FileSystemPAPDAO implements PAPDAO {
         return pap;
     }
     
-    public PAP getById(String papId) throws NotFoundException {
-        return getByAlias(getAliasFromId(papId));
+    public boolean exists(String papAlias) {
+    	
+    	boolean result = keyExists(dnKey(papAlias));
+    	
+    	Log.debug("Call to exists(\"" + papAlias + "\": result=" + result);
+    	
+        return result;
     }
 
-    public boolean papExistsByAlias(String papAlias) {
-        return keyExists(dnKey(papAlias));
-    }
+    public void store(PAP pap) throws AlreadyExistsException,
+			RepositoryException {
 
-    public boolean papExistsById(String papId) {
-        
-        if (getAliasFromId(papId) != null)
-            return true;
+		String papAlias = pap.getAlias();
 
-        return false;
-    }
+		if (exists(papAlias))
+			throw new AlreadyExistsException("Already exists: papAlias="
+					+ papAlias);
 
-    public void store(PAP pap) throws AlreadyExistsException, RepositoryException {
+		File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
+		if (!directory.mkdir())
+			throw new RepositoryException("Cannot create directory for PAP: "
+					+ papAlias + " (id=" + pap.getPapId() + ")");
 
-        if (papExistsByAlias(pap.getAlias()))
-            throw new AlreadyExistsException("Already exists: papAlias=" + pap.getAlias());
-
-        File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
-        if (!directory.mkdir())
-            throw new RepositoryException("Cannot create directory for PAP: " + pap.getAlias() + " (id=" + pap.getPapId() + ")");
-
-        savePAP(pap);
-    }
+		savePAP(pap);
+	}
 
     public void update(PAP pap) throws NotFoundException, RepositoryException {
-        
-        if (!papExistsByAlias(pap.getAlias()))
-            throw new NotFoundException("PAP \"" + pap.getAlias() + "\" (id=" + pap.getPapId() + ")does not exists");
-        
-        savePAP(pap);
-    }
+
+		String papAlias = pap.getAlias();
+
+		if (!exists(papAlias))
+			throw new NotFoundException("PAP \"" + papAlias + "\" (id="
+					+ pap.getPapId() + ")does not exists");
+
+		savePAP(pap);
+	}
 
     private void clearPAPProperties(String papAlias) {
         papsFile.clearProperty(dnKey(papAlias));
@@ -193,23 +200,6 @@ public class FileSystemPAPDAO implements PAPDAO {
         papsFile.clearProperty(protocolKey(papAlias));
         papsFile.clearProperty(idKey(papAlias));
         papsFile.clearProperty(visibilityPublicKey(papAlias));
-    }
-
-    private String getAliasFromId(String papId) {
-        
-        if (papId == null)
-            return null;
-
-        List<String> aliasList = getAllAliases();
-
-        for (String papAlias : aliasList) {
-
-            if (papId.equals(papsFile.getString(idKey(papAlias))))
-                return papAlias;
-        }
-
-        return null;
-
     }
 
     private String getPAPDirAbsolutePath(String papId) {
@@ -233,21 +223,24 @@ public class FileSystemPAPDAO implements PAPDAO {
     }
     
     private void savePAP(PAP pap) throws RepositoryException {
-        
-        if (pap == null)
-            throw new RepositoryException("Cannot save PAP because input parameter (PAP type) is null");
-        
-        setPAPProperties(pap);
-        
-        try {
-            papsFile.save();
-        } catch (ConfigurationException e) {
-            throw new RepositoryException(e);
-        }
-    }
+
+		if (pap == null)
+			throw new RepositoryException(
+					"Cannot save PAP because input parameter (PAP type) is null");
+
+		setPAPProperties(pap);
+
+		try {
+			papsFile.save();
+		} catch (ConfigurationException e) {
+			throw new RepositoryException(e);
+		}
+	}
 
     private void setPAPProperties(PAP pap) {
+    	
         String papAlias = pap.getAlias();
+        
         papsFile.setProperty(dnKey(papAlias), pap.getDn());
         papsFile.setProperty(hostnameKey(papAlias), pap.getHostname());
         papsFile.setProperty(portKey(papAlias), pap.getPort());
@@ -262,7 +255,7 @@ public class FileSystemPAPDAO implements PAPDAO {
         if (papAlias == null)
             return null;
         
-        if (!papExistsByAlias(papAlias))
+        if (!exists(papAlias))
             return null;
         
         String dn = papsFile.getString(dnKey(papAlias));
@@ -277,7 +270,5 @@ public class FileSystemPAPDAO implements PAPDAO {
         pap.setPapId(id);
         
         return pap;
-        
     }
-
 }

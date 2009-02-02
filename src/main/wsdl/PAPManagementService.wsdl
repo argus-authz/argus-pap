@@ -26,6 +26,12 @@
 						maxOccurs="unbounded" minOccurs="0"></xsd:element>
 				</xsd:sequence>
 			</xsd:complexType>
+			<xsd:complexType name="StringArray">
+				<xsd:sequence>
+					<xsd:element name="stringItem" type="xsd:string"
+						maxOccurs="unbounded" minOccurs="0"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
 		</xsd:schema>
 	</wsdl:types>
 
@@ -75,7 +81,18 @@
 	<wsdl:message name="updateTrustedPAPResponse">
 		<wsdl:part name="updateTrustedPAPResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
-
+	<wsdl:message name="getOrderRequest">
+	</wsdl:message>
+	<wsdl:message name="getOrderResponse">
+		<wsdl:part name="getOrderResponse" type="tns:StringArray"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="setOrderRequest">
+		<wsdl:part name="aliasArray" type="tns:StringArray"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="setOrderResponse">
+		<wsdl:part name="setOrderResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	
 	<wsdl:portType name="PAPManagement">
 		<wsdl:operation name="addTrustedPAP">
 			<wsdl:input message="tns:addTrustedPAPRequest" />
@@ -108,6 +125,14 @@
 		<wsdl:operation name="updateTrustedPAP">
 			<wsdl:input message="tns:updateTrustedPAPRequest"></wsdl:input>
 			<wsdl:output message="tns:updateTrustedPAPResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getOrder">
+			<wsdl:input message="tns:getOrderRequest"></wsdl:input>
+			<wsdl:output message="tns:getOrderResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="setOrder">
+			<wsdl:input message="tns:setOrderRequest"></wsdl:input>
+			<wsdl:output message="tns:setOrderResponse"></wsdl:output>
 		</wsdl:operation>
 	</wsdl:portType>
 
@@ -210,12 +235,36 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="getOrder">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/getOrder" />
+			<wsdl:input>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="setOrder">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/updateTrustedPAP" />
+			<wsdl:input>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
 	</wsdl:binding>
-	
+
 	<wsdl:service name="PAPManagementService">
 		<wsdl:port binding="tns:PAPManagementSOAP" name="PAPManagementService">
 			<soap:address location="https://localhost:8443/pap" />
 		</wsdl:port>
 	</wsdl:service>
-	
+
 </wsdl:definitions>

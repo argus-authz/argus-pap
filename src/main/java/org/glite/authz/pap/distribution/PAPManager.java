@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 
 public class PAPManager {
     
+	private static PAPManager instance = null;
     private static final Logger log = LoggerFactory.getLogger(PAPManager.class);
-    private static PAPManager instance = null;
-    protected static PAP localPAP = PAP.makeLocalPAP();
+    protected static PAP localPAP;
     
     public static PAPManager getInstance() {
         if (instance == null)
@@ -36,15 +36,18 @@ public class PAPManager {
     protected PAPManager() {
         distributionConfiguration = DistributionConfiguration.getInstance();
         papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
+        localPAP = PAP.makeLocalPAP();
         initPAPList();
     }
     
     public PAPContainer addTrustedPAP(PAP pap) {
+    	
+    	String papAlias = pap.getAlias();
         
-        if (exists(pap.getPapId()))
-            throw new AlreadyExistsException();
+        if (exists(papAlias))
+            throw new AlreadyExistsException("PAP \"" + papAlias + "\" already exists");
         
-        distributionConfiguration.setPAPAndSave(pap);
+        distributionConfiguration.savePAP(pap);
         papList.add(pap);
         papDAO.store(pap);
         
@@ -72,18 +75,17 @@ public class PAPManager {
         localPAPContainer.storePolicySet(localPolicySet);
     }
     
-    public PAP deleteTrustedPAP(String papId) throws NotFoundException {
-        PAP pap = getPAP(papId);
-        distributionConfiguration.removePAP(pap.getAlias());
-        papList.remove(pap);
-        PAPContainer papContainer = new PAPContainer(pap);
-        papContainer.erasePAP();
+    public PAP deleteTrustedPAP(String papAlias) throws NotFoundException {
+    	PAP pap = getPAP(papAlias);
+    	papList.remove(pap);
+    	distributionConfiguration.removePAP(papAlias);
+        papDAO.delete(papAlias);
         return pap;
     }
     
-    public boolean exists(String papId) {
+    public boolean exists(String papAlias) {
         for (PAP pap:papList) {
-            if (pap.getPapId().equals(papId))
+            if (pap.getAlias().equals(papAlias))
                 return true;
         }
         return false;
@@ -103,14 +105,14 @@ public class PAPManager {
         return new PAPContainer(localPAP);
     }
     
-    public PAP getPAP(String papId) throws NotFoundException {
+    public PAP getPAP(String papAlias) throws NotFoundException {
         for (PAP pap : papList) {
-            if (pap.getPapId().equals(papId))
+            if (pap.getAlias().equals(papAlias))
                 return pap;
         }
         
-        log.debug("Requested PAP not found:" + papId);
-        throw new NotFoundException("PAP not found: " + papId);
+        log.debug("Requested PAP not found:" + papAlias);
+        throw new NotFoundException("PAP not found: " + papAlias);
     }
     
     public List<PAP> getPublicTrustedPAPs() {
@@ -125,8 +127,8 @@ public class PAPManager {
         return resultList;
     }
     
-    public PAPContainer getTrustedPAPContainer(String papId) {
-        return new PAPContainer(getPAP(papId));
+    public PAPContainer getTrustedPAPContainer(String papAlias) {
+        return new PAPContainer(getPAP(papAlias));
     }
     
     public List<PAPContainer> getTrustedPAPContainerAll() {
@@ -146,17 +148,22 @@ public class PAPManager {
         return papContainerList;
     }
     
-    public void setTrustedPAPOrder(List<String> papIdList) {
-        // TODO
+    public String[] getTrustedPAPOrder() {
+    	return distributionConfiguration.getPAPOrderArray();
     }
     
-    public void updateTrustedPAP(String papId, PAP newpap) {
+    public void setTrustedPAPOrder(String[] aliasArray) {
+    	distributionConfiguration.savePAPOrder(aliasArray);
+    	papList = distributionConfiguration.getRemotePAPList();
+    }
+    
+    public void updateTrustedPAP(String papAlias, PAP newpap) {
         
         boolean found = false;
         
         for (int i=0; i<papList.size(); i++) {
             PAP pap = papList.get(i);
-            if (pap.getPapId().equals(papId)) {
+            if (pap.getAlias().equals(papAlias)) {
                 papList.set(i, newpap);
                 found = true;
                 break;
@@ -164,30 +171,52 @@ public class PAPManager {
         }
         
         if (!found)
-            throw new NotFoundException("PAP not found (id=" + papId + ")");
+            throw new NotFoundException("PAP not found (id=" + papAlias + ")");
     }
     
     private void initPAPList() {
-        papList = DistributionConfiguration.getInstance().getRemotePAPList();
+    	
+    	// synchronize the PAPs stored in the repository with the
+    	// ones defined in the distribution configuration
+    	
+    	papList = new LinkedList<PAP>();
+        List<PAP> configPAPList = DistributionConfiguration.getInstance().getRemotePAPList();
         
-        // Add not already existing PAPs defined in the configuration file
-        for (PAP pap:papList) {
-            if (papDAO.papExistsByAlias(pap.getPapId()))
-                continue;
-            papDAO.store(pap);
+        // follow the order of the distribution config PAP list
+        for (PAP cpap : configPAPList) {
+        	String papAlias = cpap.getAlias();
+        	try {
+        		PAP rpap = papDAO.get(papAlias);
+        		if (cpap.equals(rpap)) {
+        			papList.add(rpap);
+        			continue;
+        		} else {
+        			log.info("Settings for PAP \"" + papAlias
+							+ "\" has been updated. Invalidating cache");
+					papDAO.delete(papAlias);
+        		}
+        	} catch (NotFoundException e) {
+        		// nothing to do
+        	}
+        	papDAO.store(cpap);
         }
         
-        // If the configuration was modified off-line 
-        // remove unwanted PAPs still in the repository
-        for (String papId:papDAO.getAllAliases()) {
-            if (exists(papId))
+        // remove from the repository PAPs that are not in the distribution configuration
+        for (String alias:papDAO.getAllAliases()) {
+        	
+        	if (alias.equals(PAP.localPAPAlias))
+        		continue;
+        	
+            if (exists(alias))
                 continue;
-            papDAO.deleteByAlias(papId);
+            
+            log.info("Removing PAP \"" + alias + "\"");
+            papDAO.delete(alias);
         }
     }
     
     private boolean localPAPExists() {
-        return RepositoryManager.getDAOFactory().getPAPDAO().papExistsByAlias(localPAP.getPapId());
+        return papDAO.exists(localPAP.getAlias());
     }
     
 }

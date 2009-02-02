@@ -1,5 +1,7 @@
 package org.glite.authz.pap.authz.policymanagement;
 
+import java.util.List;
+
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
@@ -12,26 +14,33 @@ public class ListPoliciesForPAPOperation extends
         BasePAPOperation <PolicyType[]>
 {
     
-    String papId;
+    String papAlias;
     
     
-    protected ListPoliciesForPAPOperation(String papId) {
+    protected ListPoliciesForPAPOperation(String papAlias) {
 
-        this.papId = papId;
+        this.papAlias = papAlias;
         
     }
     
-    public static ListPoliciesForPAPOperation instance(String papId) {
+    public static ListPoliciesForPAPOperation instance(String papAlias) {
 
-        return new ListPoliciesForPAPOperation(papId);
+        return new ListPoliciesForPAPOperation(papAlias);
     }
 
     @Override
     protected PolicyType[] doExecute() {
 
-        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
-        return (PolicyType[]) pap.getAllPolicies().toArray();
+        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papAlias);
         
+        List<PolicyType> policyList = pap.getAllPolicies();
+        PolicyType[] policyArray = new PolicyType[policyList.size()];
+        
+        for (int i=0; i<policyList.size(); i++) {
+            policyArray[i] = policyList.get(i);
+        }
+        
+        return policyArray;
     }
 
     @Override

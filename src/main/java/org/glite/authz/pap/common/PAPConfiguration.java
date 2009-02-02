@@ -363,7 +363,7 @@ public class PAPConfiguration {
         configuration.clearProperty( key );
     }
 
-    public void setDistributionProperty( String key, String value ) {
+    public void setDistributionProperty( String key, Object value ) {
 
         startupConfiguration.setProperty( key, value );
     }

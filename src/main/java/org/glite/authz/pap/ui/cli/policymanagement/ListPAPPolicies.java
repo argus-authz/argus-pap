@@ -10,9 +10,9 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class ListPAPPolicies extends PolicyManagementCLI {
     
-    private static final String USAGE = "<papId> [options]";
+    private static final String USAGE = "<pap_alias> [options]";
     private static final String[] commandNameValues = { "list-pap-policies", "lpp" };
-    private static final String DESCRIPTION = "List cached policies of the remote PAP \"papId\". ";
+    private static final String DESCRIPTION = "List cached policies of the remote PAP \"pap_alias\". ";
     
     public ListPAPPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
@@ -25,9 +25,9 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         String[] args = commandLine.getArgs();
         
         if (args.length != 2)
-            throw new ParseException("Missing argument <papId>");
+            throw new ParseException("Missing argument <pap_alias>");
         
-        String papId = args[1];
+        String papAlias = args[1];
         
         boolean xacmlOutput = false;
         boolean plainFormat = false;
@@ -52,7 +52,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         
         XACMLPolicyCLIUtils.initOpenSAML();
         
-        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papId, !getPoliciesOneByOne);
+        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papAlias, !getPoliciesOneByOne);
         
         policyIter.init();
         

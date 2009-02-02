@@ -9,23 +9,23 @@ import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 public class RemoveTrustedPAPOperation extends BasePAPOperation <Boolean> {
 
-    String papId;
+    String papAlias;
     
     
-    protected RemoveTrustedPAPOperation(String papId){
-        this.papId = papId;
+    protected RemoveTrustedPAPOperation(String papAlias){
+        this.papAlias = papAlias;
     }
     
-    public static RemoveTrustedPAPOperation instance(String papId) {
+    public static RemoveTrustedPAPOperation instance(String papAlias) {
 
-        return new RemoveTrustedPAPOperation(papId);
+        return new RemoveTrustedPAPOperation(papAlias);
     }
     
     @Override
     protected Boolean doExecute() {
 
         try {
-            PAPManager.getInstance().deleteTrustedPAP( papId );
+            PAPManager.getInstance().deleteTrustedPAP( papAlias );
         } catch (NotFoundException e) {
             return false;
         }

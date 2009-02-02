@@ -1,5 +1,7 @@
 package org.glite.authz.pap.repository.dao.filesystem;
 
+// TODO: No more used, DELETE this class!
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -91,12 +93,6 @@ public class FileSystemPAPManager extends PAPManager {
 //                papContainerList.add(new PAPContainer(new PAP(file.getName())));
 //            }
 //        }
-    }
-
-    @Override
-    public void setTrustedPAPOrder(List<String> papIdList) {
-        // TODO Auto-generated method stub
-        
     }
 
     @Override

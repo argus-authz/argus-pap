@@ -1,19 +1,14 @@
 package org.glite.authz.pap.distribution;
 
 import java.rmi.RemoteException;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.rpc.ServiceException;
 
-import org.glite.authz.pap.client.ServiceClient;
-import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.repository.PAPContainer;
-import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACE;
-import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
-import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
+import org.glite.authz.pap.repository.dao.ProvisioningServiceDAO;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -35,28 +30,11 @@ public class DistributionModule extends Thread {
 
     public static List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) throws RemoteException, ServiceException {
 
-        List<XACMLObject> papPolicies = new LinkedList<XACMLObject>();
-
         log.info("Contacting: " + remotePAP.getEndpoint());
         
-        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
-        ServiceClient serviceClient = serviceClientFactory.createServiceClient();
-        
-        PAPAuthorizationManagement am = serviceClient.getPAPAuthorizationManagementService(remotePAP.getEndpoint() + "/AuthorizationManagementService");
-        
-        PAPACE[] aa = am.getACL(null);
-        
-        log.info("RETRIEVED ACE: " + aa.length + " POLICIES");
-        System.out.println("RETRIEVED ACE: " + aa.length + " POLICIES");
-        
-        XACMLPolicyManagement pc = serviceClient.getXACMLPolicyManagementService(remotePAP.getEndpoint() + "/XACMLPolicyManagementService");
-        PolicyType[] pa = pc.listPolicies();
-        
-        log.info("RETRIEVED: " + pa.length + " POLICIES");
-        System.out.println("RETRIEVED: " + pa.length + " POLICIES");
-        
         PAPClient client = new PAPClient(remotePAP.getEndpoint());
-        papPolicies = client.getLocalPolicies();
+        //List<XACMLObject> papPolicies = client.getLocalPolicies();
+        List<XACMLObject> papPolicies = ProvisioningServiceDAO.getInstance().papQuery();
 
         log.info("Retrieved " + papPolicies.size() + " policies from: " + remotePAP.getDn());
 
@@ -162,7 +140,7 @@ public class DistributionModule extends Thread {
     protected void initialize() {
         log.info("Initilizing distribution module...");
         
-        sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMillis();
+        sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMilliSecs();
     }
     
     public static void main(String[] args) throws RemoteException, ServiceException {

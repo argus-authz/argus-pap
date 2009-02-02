@@ -162,7 +162,7 @@ public class ProvisioningServiceDAO {
     
     private PolicySetType makeRootPolicySet() {
         PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_"
-                + PAP.localPAPId, PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+                + PAP.localPAPAlias, PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         return rootPolicySet;
     }
 }

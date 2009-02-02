@@ -9,6 +9,7 @@ import org.glite.authz.pap.authz.papmanagement.RefreshPolicyCacheOperation;
 import org.glite.authz.pap.authz.papmanagement.RemoveTrustedPAPOperation;
 import org.glite.authz.pap.authz.papmanagement.TrustedPAPExistsOperation;
 import org.glite.authz.pap.authz.papmanagement.UpdateTrustedPAPOperation;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.slf4j.Logger;
@@ -32,8 +33,29 @@ public class PAPManagementService implements PAPManagement {
 
     public boolean exists(String papId) throws RemoteException {
         log.info("exists(" + papId + ");");
-        return TrustedPAPExistsOperation.instance(papId).execute();
+        
+        boolean result = false;
+        
+        try {
+        	result = TrustedPAPExistsOperation.instance(papId).execute();
+        } catch (RuntimeException e) {
+        	ServiceClassExceptionManager.logAndThrow(log, e);
+        }
+        
+        return result; 
     }
+
+    public String[] getOrder() throws RemoteException {
+		String[] papOrderArray = null;
+		
+		try {
+        	papOrderArray = PAPManager.getInstance().getTrustedPAPOrder();
+        } catch (RuntimeException e) {
+        	ServiceClassExceptionManager.logAndThrow(log, e);
+        }
+        
+		return papOrderArray;
+	}
 
     public PAPData getTrustedPAP(String papId) throws RemoteException {
         log.info("getTrustedPAP(" + papId + ");");
@@ -55,12 +77,33 @@ public class PAPManagementService implements PAPManagement {
         return RefreshPolicyCacheOperation.instance(papId).execute();
     }
 
-    public boolean removeTrustedPAP(String papId) throws RemoteException {
+	public boolean removeTrustedPAP(String papId) throws RemoteException {
         log.info("removeTrustedPAP(" + papId + ");");
-        return RemoveTrustedPAPOperation.instance(papId).execute();
+        
+        boolean result = false;
+        
+        try {
+        	result = RemoveTrustedPAPOperation.instance(papId).execute();
+        } catch (RuntimeException e) {
+        	ServiceClassExceptionManager.logAndThrow(log, e);
+        }
+        
+        return result;
     }
 
-    public boolean updateTrustedPAP(PAPData papData) throws RemoteException {
+	
+
+	public boolean setOrder(String[] aliasArray) throws RemoteException {
+		try {
+        	PAPManager.getInstance().setTrustedPAPOrder(aliasArray);
+        } catch (RuntimeException e) {
+        	ServiceClassExceptionManager.logAndThrow(log, e);
+        }
+        
+		return true;
+	}
+	
+	public boolean updateTrustedPAP(PAPData papData) throws RemoteException {
         log.info("updateTrustedPAP(" + papData.getPapId() + "," + papData + ");");
         return UpdateTrustedPAPOperation.instance(papData).execute();
     }

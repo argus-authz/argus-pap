@@ -18,7 +18,7 @@ public class FillRepository {
     private FillRepository() {}
     
     public static void fillLocalPAP(int numberOfPolicySets, int numberOfPolicies) {
-        fillPAP(PAP.localPAPId, numberOfPolicySets, numberOfPolicies);
+        fillPAP(PAP.localPAPAlias, numberOfPolicySets, numberOfPolicies);
     }
     
     public static void fillPAP(String papId, int numberOfPolicySets, int numberOfPolicies) {

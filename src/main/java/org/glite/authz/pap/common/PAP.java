@@ -4,29 +4,33 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
 public class PAP  {
-    public static final String localPAPId = "Local";
-    public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
-    public static String DEFAULT_PORT = "4554";
+    public static String DEFAULT_DN = "invalid_dn";
     public static String DEFAULT_HOST = "localhost";
+    public static String DEFAULT_PORT = "4554";
     public static String DEFAULT_PROTOCOL = "https";
+    public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
+    public static final String localPAPAlias = "Local";
 
     public static PAP makeLocalPAP() {
-        return new PAP(localPAPId, localPAPId, "localhost");
+        return new PAP(localPAPAlias, localPAPAlias, "localhost", true);
     }
     
     private String alias;
     private String dn;
-    private String endpoint = "";
-    private String hostname = DEFAULT_HOST;
-    private boolean visibilityPublic = false;
-    private String papId = "";
-    private String path = DEFAULT_SERVICES_ROOT_PATH;
-    private String port = DEFAULT_PORT;
-    private String protocol = DEFAULT_PROTOCOL;
+    private String hostname;
+    private String papId;
+    private String path;
+    private String port;
+    private String protocol;
+    private boolean visibilityPublic;
 
     public PAP(PAPData papData) {
         this(papData.getAlias(), papData.getDn(), papData.getHostname(), papData.getPort(), papData.getPath(), papData
                 .getProtocol(), papData.isVisibilityPublic());
+    }
+    
+    public PAP(String alias) {
+    	this(alias, null, null, null, null, null, false);
     }
     
     public PAP(String alias, String dn, String hostname) {
@@ -43,10 +47,20 @@ public class PAP  {
     
     public PAP(String alias, String dn, String hostname, String port, String servicesRootPath, String protocol, boolean visibilityPublic)
     {
-        // TODO: use assert.
+        // TODO: assert alias != null and empty string
         
         this.alias = alias;
-        this.dn = dn;
+        this.papId = alias;
+        this.visibilityPublic = visibilityPublic;
+        
+        this.dn = DEFAULT_DN;
+        this.hostname = DEFAULT_HOST;
+        this.port = DEFAULT_PORT;
+        this.path = DEFAULT_SERVICES_ROOT_PATH;
+        this.protocol = DEFAULT_PROTOCOL;
+        
+        if (isDefined(dn))
+        	this.dn = dn;
         if (isDefined(hostname))
             this.hostname = hostname;
         if (isDefined(port))
@@ -55,14 +69,31 @@ public class PAP  {
             this.path = servicesRootPath;
         if (isDefined(protocol))
             this.protocol = protocol;
-        this.visibilityPublic = visibilityPublic;
-        
-        this.papId = alias;
-        
-        buildEndpoint();
     }
     
-    public String getAlias() {
+	public boolean equals(PAP pap) {
+    	
+    	if (pap == null)
+    		return false;
+    	if (!alias.equals(pap.getAlias()))
+    		return false;
+    	if (!dn.equals(pap.getDn()))
+    		return false;
+    	if (!hostname.equals(pap.getHostname()))
+    		return false;
+    	if (!port.equals(pap.getPort()))
+    		return false;
+    	if (!path.equals(pap.getPath()))
+    		return false;
+    	if (!protocol.equals(pap.getProtocol()))
+    		return false;
+    	if (!(visibilityPublic == pap.isVisibilityPublic()))
+    		return false;
+    	
+    	return true;
+	}
+
+	public String getAlias() {
         return alias;
     }
 
@@ -71,8 +102,7 @@ public class PAP  {
     }
     
     public String getEndpoint() {
-        buildEndpoint();
-        return endpoint;
+        return protocol + "://" + hostname + ":" + port + path;
     }
 
     public String getHostname() {
@@ -107,10 +137,6 @@ public class PAP  {
         this.dn = dn;
     }
     
-//    public void setEndpoint(String endpoint) {
-//        this.endpoint = endpoint;
-//    }
-
     public void setHostname(String hostname) {
         this.hostname = hostname;
     }
@@ -154,7 +180,7 @@ public class PAP  {
     	
     	String aliasString = indentString + "alias=\"" + alias + "\"\n";
     	String dnString = paddingString + "dn=\"" + dn + "\"\n";
-    	String endpointString = paddingString + "endpoint=\"" + endpoint + "\"\n";
+    	String endpointString = paddingString + "endpoint=\"" + getEndpoint() + "\"\n";
         String visibilityString = paddingString + "visibility=";
         if (visibilityPublic)
             visibilityString += "PUBLIC\n";
@@ -173,13 +199,7 @@ public class PAP  {
         else
             visibility += "PRIVATE";
         
-        return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + endpoint + "\" id=\"" + papId + "\"";
-    }
-    
-    private void buildEndpoint() {
-    
-        endpoint = protocol + "://" + hostname + ":" + port + path;
-        
+        return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + getEndpoint() + "\" id=\"" + papId + "\"";
     }
     
     private String fillWithSpaces(int n) {

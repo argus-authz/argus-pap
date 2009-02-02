@@ -9,21 +9,15 @@ import org.glite.authz.pap.repository.exceptions.RepositoryException;
 
 public interface PAPDAO {
 
-    public void deleteByAlias(String papAlias) throws NotFoundException, RepositoryException;
+    public void delete(String papAlias) throws NotFoundException, RepositoryException;
     
-    public void deleteById(String papId) throws NotFoundException, RepositoryException;
-
     public List<PAP> getAll();
     
     public List<String> getAllAliases();
 
-    public PAP getByAlias(String papAlias) throws NotFoundException;
+    public PAP get(String papAlias) throws NotFoundException;
     
-    public PAP getById(String papId) throws NotFoundException;
-
-    public boolean papExistsByAlias(String papAlias);
-    
-    public boolean papExistsById(String papId);
+    public boolean exists(String papAlias);
     
     public void store(PAP pap) throws AlreadyExistsException, RepositoryException;
 

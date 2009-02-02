@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.repository.dao.DAOFactory;
-import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
@@ -23,14 +22,12 @@ public class PAPContainer {
     private final String papId;
     private final PolicySetDAO policySetDAO;
     private final PolicyDAO policyDAO;
-    private final PAPDAO papDAO;
 
     public PAPContainer(PAP pap) {
         this.pap = pap;
         papId = pap.getPapId();
         policySetDAO = DAOFactory.getDAOFactory().getPolicySetDAO();
         policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
-        papDAO = DAOFactory.getDAOFactory().getPAPDAO();
     }
 
     public void deleteAllPolicies() {
@@ -47,12 +44,6 @@ public class PAPContainer {
 
     public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
         policySetDAO.delete(papId, id);
-    }
-
-    public void erasePAP() {
-        deleteAllPolicies();
-        deleteAllPolicySets();
-        papDAO.deleteByAlias(papId);
     }
 
     public List<PolicyType> getAllPolicies() {

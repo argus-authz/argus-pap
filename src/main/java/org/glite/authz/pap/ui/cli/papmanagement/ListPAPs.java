@@ -3,6 +3,7 @@ package org.glite.authz.pap.ui.cli.papmanagement;
 import java.rmi.RemoteException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.PAP;
@@ -10,6 +11,8 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class ListPAPs extends PAPManagementCLI {
     
+	private static final String OPT_LONGLIST_FORMAT = "l";
+	private static final String OPT_LONGLIST_FORMAT_DESCRIPTION = "Use a long list format.";
     private static final String USAGE = "";
     private static final String[] commandNameValues = { "list-paps", "lpaps" };
     private static final String DESCRIPTION = "List trusted PAPs.";
@@ -18,13 +21,24 @@ public class ListPAPs extends PAPManagementCLI {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
     
-    @Override
+    @SuppressWarnings("static-access")
+	@Override
     protected Options defineCommandOptions() {
-        return null;
-    }
+		Options options = new Options();
+
+		options.addOption(OptionBuilder.hasArg(false).withDescription(
+				OPT_LONGLIST_FORMAT_DESCRIPTION).create(OPT_LONGLIST_FORMAT));
+
+		return options;
+	}
 
     @Override
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
+    	
+    	boolean logListFormat = false;
+    	
+    	if (commandLine.hasOption(OPT_LONGLIST_FORMAT))
+    		logListFormat = true;
         
         PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
         
@@ -34,7 +48,10 @@ public class ListPAPs extends PAPManagementCLI {
         }
         	
         for (PAPData papData:papDataArray) {
-            System.out.println((new PAP(papData)).toFormattedString());
+        	if (logListFormat)
+        		System.out.println((new PAP(papData)).toFormattedString());
+        	else
+        		System.out.println("alias=\"" + papData.getAlias() + "\"");
         }
         
         return ExitStatus.SUCCESS.ordinal();

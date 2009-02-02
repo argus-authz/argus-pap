@@ -55,20 +55,20 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         return policyId;
     }
 
-    public PolicyType getPAPPolicy(String papId, String policyId) throws RemoteException {
-        log.info("getPAPPolicy(" + papId + ", " + policyId + ");");
+    public PolicyType getPAPPolicy(String papAlias, String policyId) throws RemoteException {
+        log.info("getPAPPolicy(" + papAlias + ", " + policyId + ");");
         
-        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
+        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papAlias);
         
         PolicyType policy = pap.getPolicy(policyId);
         
         return policy;
     }
 
-    public PolicySetType getPAPPolicySet(String papId, String policySetId) throws RemoteException {
-        log.info("getPAPPolicySet(" + papId + ", " + policySetId + ");");
+    public PolicySetType getPAPPolicySet(String papAlias, String policySetId) throws RemoteException {
+        log.info("getPAPPolicySet(" + papAlias + ", " + policySetId + ");");
         
-        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papId);
+        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papAlias);
         
         PolicySetType policySet = pap.getPolicySet(policySetId);
         
@@ -98,14 +98,14 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         return HasPolicySetOperation.instance(policySetId).execute();
     }
 
-    public PolicyType[] listPAPPolicies(String papId) throws RemoteException {
-        log.info("listPolicies(" + papId + ");");
-        return ListPoliciesForPAPOperation.instance(papId).execute();
+    public PolicyType[] listPAPPolicies(String papAlias) throws RemoteException {
+        log.info("listPolicies(" + papAlias + ");");
+        return ListPoliciesForPAPOperation.instance(papAlias).execute();
     }
 
-    public PolicySetType[] listPAPPolicySets(String papId) throws RemoteException {
-        log.info("listPolicySets(" + papId + ");");
-        return ListPolicySetsForPAPOperation.instance(papId).execute();
+    public PolicySetType[] listPAPPolicySets(String papAlias) throws RemoteException {
+        log.info("listPolicySets(" + papAlias + ");");
+        return ListPolicySetsForPAPOperation.instance(papAlias).execute();
     }
 
     public PolicyType[] listPolicies() throws RemoteException {

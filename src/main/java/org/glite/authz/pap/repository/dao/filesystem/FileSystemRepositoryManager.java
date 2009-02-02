@@ -15,7 +15,7 @@ public class FileSystemRepositoryManager extends RepositoryManager {
 
     private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
     private static final String rootPolicySetId = "Root";
-    private static final String localPAPId = PAP.localPAPId;
+    private static final String localPAPId = PAP.localPAPAlias;
     private static final String policySetFileNamePrefix = "PolicySet_";
     private static final String policyFileNamePrefix = "Policy_";
     private static final String xacmlFileNameExtension = ".xml";
