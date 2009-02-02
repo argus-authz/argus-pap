@@ -5,12 +5,17 @@ import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
 
 public class XACMLPolicyCLIUtils {
+    
+    private static boolean notInitilized = true;
 
     public static void initOpenSAML() {
-        try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException e) {
-            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
+
+        if (notInitilized) {
+            try {
+                DefaultBootstrap.bootstrap();
+            } catch (ConfigurationException e) {
+                throw new PAPConfigurationException("Error initializing OpenSAML library", e);
+            }
         }
     }
     

@@ -100,6 +100,28 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
         
     }
     
+    public String[] getPolicyIdsArray() {
+        
+        if (!initialized)
+            return null;
+        
+        String[] idsArray = null;
+        
+       if (getAllPoliciesInOnce) {
+           
+           int size = policyArray.length;
+           idsArray = new String[size];
+           
+           for (int i=0; i<size; i++) {
+               idsArray[i] = policyArray[i].getPolicyId();
+           }
+       } else {
+           idsArray = policyIdsArray;
+       }
+       
+       return idsArray;
+    }
+    
     public void init() throws RemoteException {
         
         if (!initialized) {

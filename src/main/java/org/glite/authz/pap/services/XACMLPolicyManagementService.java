@@ -117,7 +117,18 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
     public PolicySetType[] listPolicySets() throws RemoteException {
         log.info("listPolicySets();");
-        return ListPolicySetOperation.instance().execute();
+        
+        PolicySetType[] policySetArray = null;
+        
+        try {
+            policySetArray = ListPolicySetOperation.instance().execute();
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.logAndThrow(log, e);
+        }
+        
+        log.info("Returning " + policySetArray.length + " policy sets");
+        
+        return policySetArray;
     }
 
     public boolean removePolicy(String policyId) throws RemoteException {
