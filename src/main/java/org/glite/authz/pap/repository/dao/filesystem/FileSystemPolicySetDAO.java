@@ -86,7 +86,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return policySetList;
     }
 
-    public PolicySetType getById(String papId, String policySetId) {
+    public PolicySetType getById(String papId, String policySetId) throws NotFoundException, RepositoryException {
 
         File policySetFile = new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId,
                 policySetId));
@@ -100,7 +100,14 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             throw new NotFoundException("Not found: (papId=" + papId + ", PolicySetId=" + policySetId
                     + "). Resource: " + policySetFile.getAbsolutePath());
 
-        return policySetHelper.buildFromFile(policySetFile);
+        PolicySetType policySet;
+        try {
+            policySet = policySetHelper.buildFromFile(policySetFile);
+        } catch (Exception e) {
+            throw new RepositoryException(e);
+        }
+        
+        return policySet;
     }
 
     public void store(String papId, PolicySetType ps) {
@@ -109,11 +116,12 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         if (!papDir.exists())
             throw new NotFoundException("Not found: papId=" + papId);
 
-        if (exists(papId, ps.getPolicySetId()))
-            throw new AlreadyExistsException("PolicySet already exists: id=" + ps.getPolicySetId());
+        String policySetId = ps.getPolicySetId();
+        
+        if (exists(papId, policySetId))
+            throw new AlreadyExistsException("PolicySet already exists: id=" + policySetId);
 
-        PolicySetHelper.toFile(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, ps
-                .getPolicySetId()), ps);
+        PolicySetHelper.toFile(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, policySetId), ps);
     }
 
     public void update(String papId, PolicySetType ps) {

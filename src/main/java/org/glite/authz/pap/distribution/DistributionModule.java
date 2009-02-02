@@ -8,6 +8,7 @@ import javax.xml.rpc.ServiceException;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.dao.ProvisioningServiceDAO;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -32,7 +33,8 @@ public class DistributionModule extends Thread {
         log.info("Contacting: " + remotePAP.getEndpoint());
         
         PAPClient client = new PAPClient(remotePAP.getEndpoint());
-        List<XACMLObject> papPolicies = client.getLocalPolicies();
+        //List<XACMLObject> papPolicies = client.getLocalPolicies();
+        List<XACMLObject> papPolicies = ProvisioningServiceDAO.getInstance().papQuery();
 
         log.info("Retrieved " + papPolicies.size() + " policies from: " + remotePAP.getDn());
 

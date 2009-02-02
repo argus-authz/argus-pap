@@ -1,7 +1,6 @@
 package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
-import java.util.List;
 
 import org.glite.authz.pap.authz.policymanagement.GetPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicySetOperation;
@@ -17,7 +16,6 @@ import org.glite.authz.pap.authz.policymanagement.StorePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.StorePolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.UpdatePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.UpdatePolicySetOperation;
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
@@ -33,30 +31,32 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
     public String addPolicy(String policySetId, String policyIdPrefix, PolicyType policy) throws RemoteException {
         log.info("addPolicy();");
-        
-        String emptyString = "";
-        
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
-        
-        if (!localPAP.hasPolicySet(policySetId))
-            return emptyString;
-        
-        String policyId = PolicyWizard.generateId(policyIdPrefix);
-        policy.setPolicyId(policyId);
-        
-        localPAP.storePolicy(policy);
-        
-        synchronized (this) {
-            PolicySetType policySet = localPAP.getPolicySet(policySetId);
-            PolicySetHelper.addPolicyReference(policySet, policyId);
-            localPAP.storePolicySet(policySet);
+
+        String policyId = null;
+
+        try {
+
+            String emptyString = "";
+
+            PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+
+            if (!localPAP.hasPolicySet(policySetId))
+                return emptyString;
+
+            policyId = PolicyWizard.generateId(policyIdPrefix);
+            policy.setPolicyId(policyId);
+
+            localPAP.addPolicy(policySetId, policy);
+
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.logAndThrow(log, e);
         }
-        
+
         return policyId;
     }
 
     public PolicyType getPAPPolicy(String papAlias, String policyId) throws RemoteException {
-        log.info("getPAPPolicy(" + papAlias + ", " + policyId + ");");
+        log.info("getPAPPolicy(\"" + papAlias + "\", \"" + policyId + "\");");
         
         PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papAlias);
         
@@ -66,7 +66,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
     }
 
     public PolicySetType getPAPPolicySet(String papAlias, String policySetId) throws RemoteException {
-        log.info("getPAPPolicySet(" + papAlias + ", " + policySetId + ");");
+        log.info("getPAPPolicySet(\"" + papAlias + "\", \"" + policySetId + "\");");
         
         PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papAlias);
         
@@ -76,35 +76,35 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
     }
 
     public PolicyType getPolicy(String policyId) throws RemoteException {
-        log.info("getPolicy(" + policyId + ");");
+        log.info("getPolicy(\"" + policyId + "\");");
         PolicyType policy = GetPolicyOperation.instance(policyId).execute();
         log.info("Policy found!");
         return policy;
     }
 
     public PolicySetType getPolicySet(String policySetId) throws RemoteException {
-        log.info("getPolicySet(" + policySetId + ");");
+        log.info("getPolicySet(\"" + policySetId + "\");");
         PolicySetType policySet = GetPolicySetOperation.instance(policySetId).execute();
         return policySet;
     }
 
     public boolean hasPolicy(String policyId) throws RemoteException {
-        log.info("hasPolicy(" + policyId + ");");
+        log.info("hasPolicy(\"" + policyId + "\");");
         return HasPolicyOperation.instance(policyId).execute();
     }
 
     public boolean hasPolicySet(String policySetId) throws RemoteException {
-        log.info("hasPolicySet(" + policySetId + ");");
+        log.info("hasPolicySet(\"" + policySetId + "\");");
         return HasPolicySetOperation.instance(policySetId).execute();
     }
 
     public PolicyType[] listPAPPolicies(String papAlias) throws RemoteException {
-        log.info("listPolicies(" + papAlias + ");");
+        log.info("listPolicies(\"" + papAlias + "\");");
         return ListPoliciesForPAPOperation.instance(papAlias).execute();
     }
 
     public PolicySetType[] listPAPPolicySets(String papAlias) throws RemoteException {
-        log.info("listPolicySets(" + papAlias + ");");
+        log.info("listPolicySets(\"" + papAlias + "\");");
         return ListPolicySetsForPAPOperation.instance(papAlias).execute();
     }
 
@@ -121,53 +121,51 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
     }
 
     public boolean removePolicy(String policyId) throws RemoteException {
-        log.info("removePolicy(" + policyId + ");");
+        log.info("removePolicy(\"" + policyId + "\");");
         return RemovePolicyOperation.instance(policyId).execute();
     }
 
     public boolean removePolicyAndReferences(String policyId) throws RemoteException {
-        log.info("removePolicyAndReferences(" + policyId + ");");
-        
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
-        
-        if (!localPAP.hasPolicy(policyId))
-            return false;
-        
-        synchronized (this) {
-            List<PolicySetType> policySetList = localPAP.getAllPolicySets();
-            for (PolicySetType policySet:policySetList) {
-                if (PolicySetHelper.deletePolicyReference(policySet, policyId))
-                    localPAP.storePolicySet(policySet);
-            }
+        log.info("removePolicyAndReferences(\"" + policyId + "\");");
+
+        try {
+
+            PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+
+            if (!localPAP.hasPolicy(policyId))
+                return false;
+
+            localPAP.removePolicyAndReferences(policyId);
+
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.logAndThrow(log, e);
         }
-        
-        localPAP.deletePolicy(policyId);
-        
+
         return true;
     }
 
     public boolean removePolicySet(String policySetId) throws RemoteException {
-        log.info("removePolicySet(" + policySetId + ");");
+        log.info("removePolicySet(\"" + policySetId + "\");");
         return RemovePolicySetOperation.instance(policySetId).execute();
     }
 
     public String storePolicy(String idPrefix, PolicyType policy) throws RemoteException {
-        log.info("storePolicy(" + idPrefix + "," + policy + ");");
+        log.info("storePolicy();");
         return StorePolicyOperation.instance(idPrefix, policy).execute();
     }
 
     public String storePolicySet(String idPrefix, PolicySetType policySet) throws RemoteException {
-        log.info("storePolicySet(" + idPrefix + "," + policySet + ");");
+        log.info("storePolicySet();");
         return StorePolicySetOperation.instance(idPrefix, policySet).execute();
     }
 
     public boolean updatePolicy(PolicyType policy) throws RemoteException {
-        log.info("updatePolicy(" + policy + ");");
+        log.info("updatePolicy();");
         return UpdatePolicyOperation.instance(policy).execute();
     }
 
     public boolean updatePolicySet(PolicySetType policySet) throws RemoteException {
-        log.info("updatePolicySet(" + policySet + ");");
+        log.info("updatePolicySet();");
         return UpdatePolicySetOperation.instance(policySet).execute();
     }
 
