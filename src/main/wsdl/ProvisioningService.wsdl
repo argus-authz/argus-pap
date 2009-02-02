@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://org.glite.authz/wsdl/pap/services/provisioning"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="ProvisioningService"
+	xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+	xmlns:samlxacml="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol"
+	targetNamespace="http://org.glite.authz/wsdl/pap/services/provisioning">
+	<wsdl:types>
+		<xsd:schema targetNamespace="urn:oasis:names:tc:SAML:2.0:protocol"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:complexType name="Response"></xsd:complexType>
+		</xsd:schema>
+		<xsd:schema targetNamespace="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol"
+			xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:complexType name="XACMLPolicyQueryType"></xsd:complexType>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="XACMLPolicyQueryRequest">
+		<wsdl:part name="query" type="samlxacml:XACMLPolicyQueryType" />
+	</wsdl:message>
+	<wsdl:message name="XACMLPolicyQueryResponse">
+		<wsdl:part name="response" type="samlp:Response" />
+	</wsdl:message>
+
+	<wsdl:portType name="Provisioning">
+		<wsdl:operation name="XACMLPolicyQuery">
+			<wsdl:input message="tns:XACMLPolicyQueryRequest" />
+			<wsdl:output message="tns:XACMLPolicyQueryResponse" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="ProvisioningServiceSOAP" type="tns:Provisioning">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="XACMLPolicyQuery">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/provisioning/XACMLPolicyQuery" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="ProvisioningService">
+		<wsdl:port binding="tns:ProvisioningServiceSOAP" name="ProvisioningService">
+			<soap:address location="https://localhost:8443/pap" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
