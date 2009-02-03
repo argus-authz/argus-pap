@@ -126,9 +126,9 @@ public final class PAPServer {
         TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
                 getTrustmanagerConfiguration() );
 
-        // TrustManagerSelectChannelConnector connector = new
-        // TrustManagerSelectChannelConnector(
-        // getTrustmanagerConfiguration() );
+        //TrustManagerSelectChannelConnector connector = new
+        //TrustManagerSelectChannelConnector(
+        //        getTrustmanagerConfiguration() );
 
         connector.setPort( getInt( "port", PAPDefaults.PORT ) );
 
