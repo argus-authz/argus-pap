@@ -38,11 +38,12 @@ public class BanAttribute extends PolicyManagementCLI {
     protected Options defineCommandOptions() {
         Options options = new Options();
 
-        options.addOption(OptionBuilder.hasArg(false).withDescription(
-                "Set the policy as public (default)").withLongOpt(OPT_PUBLIC_LONG).create());
-        options.addOption(OptionBuilder.hasArg(false).withDescription(
-                "Set the policy as private (it won't be distributed)").withLongOpt(OPT_PRIVATE_LONG)
-                .create());
+        options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as public (default)").withLongOpt(
+                OPT_PUBLIC_LONG).create());
+        options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as private (it won't be distributed)")
+                .withLongOpt(OPT_PRIVATE_LONG).create());
+        options.addOption(OptionBuilder.hasArg().withDescription(OPT_POLICY_DESCRIPTION_DESCRIPTION).withLongOpt(
+                OPT_POLICY_DESCRIPTION_LONG).create(OPT_POLICY_DESCRIPTION));
 
         return options;
     }
@@ -57,9 +58,13 @@ public class BanAttribute extends PolicyManagementCLI {
         
         String attributeValue = args[1];
         
-        boolean isPrivate = false;
+        boolean isPublic = true;
         if (commandLine.hasOption(OPT_PRIVATE_LONG))
-            isPrivate = true;
+            isPublic = false;
+        
+        String policyDescription = null;
+        if (commandLine.hasOption(OPT_POLICY_DESCRIPTION_LONG))
+            policyDescription = commandLine.getOptionValue(OPT_POLICY_DESCRIPTION_LONG);
 
         if (verboseMode)
             System.out.print("Adding policy... ");
@@ -67,9 +72,9 @@ public class BanAttribute extends PolicyManagementCLI {
         String policyId;
         
         if (AttributeWizardType.DN.equals(attributeToDeny))
-            policyId = highlevelPolicyMgmtClient.banDN(attributeValue, !isPrivate);
+            policyId = highlevelPolicyMgmtClient.banDN(attributeValue, isPublic, policyDescription);
         else
-            policyId = highlevelPolicyMgmtClient.banFQAN(attributeValue, !isPrivate);
+            policyId = highlevelPolicyMgmtClient.banFQAN(attributeValue, isPublic, policyDescription);
 
         if (verboseMode)
         	System.out.println("ok (id=" + policyId + ")");

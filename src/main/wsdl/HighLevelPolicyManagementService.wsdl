@@ -27,6 +27,7 @@
 	<wsdl:message name="banDNRequest">
 		<wsdl:part name="dn" type="xsd:string" />
 		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="description" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="banDNResponse">
 		<wsdl:part name="policyId" type="xsd:string" />
@@ -35,6 +36,7 @@
 	<wsdl:message name="banFQANRequest">
 		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
 		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="description" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="banFQANResponse">
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
@@ -58,6 +60,7 @@
 		<wsdl:part name="dn" type="xsd:string"></wsdl:part>
 		<wsdl:part name="serviceClass" type="xsd:string"></wsdl:part>
 		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="description" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="dnJobPriorityResponse">
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
@@ -67,6 +70,7 @@
 		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
 		<wsdl:part name="serviceClass" type="xsd:string"></wsdl:part>
 		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="description" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="fqanJobPriorityResponse">
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>

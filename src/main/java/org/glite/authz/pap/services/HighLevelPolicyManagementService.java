@@ -22,14 +22,14 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     private static final Logger log = LoggerFactory.getLogger(HighLevelPolicyManagementService.class);
 
-    public String banDN(String dn, boolean isPublic) throws RemoteException {
+    public String banDN(String dn, boolean isPublic, String description) throws RemoteException {
 
         log.info("Received banDN() request (dn=" + dn + ", isPublic=" + isPublic);
 
         String policyId = null;
 
         try {
-            policyId = banAttribute(AttributeWizardType.DN, dn, isPublic);
+            policyId = banAttribute(AttributeWizardType.DN, dn, isPublic, description);
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.logAndThrow(log, e);
         }
@@ -40,14 +40,14 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     }
 
-    public String banFQAN(String fqan, boolean isPublic) throws RemoteException {
+    public String banFQAN(String fqan, boolean isPublic, String description) throws RemoteException {
 
         log.info("Received banFQAN() request (fqan=" + fqan + ", isPublic=" + isPublic);
 
         String policyId = null;
 
         try {
-            policyId = banAttribute(AttributeWizardType.FQAN, fqan, isPublic);
+            policyId = banAttribute(AttributeWizardType.FQAN, fqan, isPublic, description);
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.logAndThrow(log, e);
         }
@@ -58,13 +58,13 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     }
 
-    public String dnJobPriority(String dn, String serviceClass, boolean isPublic) throws RemoteException {
+    public String dnJobPriority(String dn, String serviceClass, boolean isPublic, String description) throws RemoteException {
         log.info("Received dnJobPriority() request (dn=" + dn + ", serviceClass=" + serviceClass + ", isPublic=" + isPublic);
 
         String policyId = null;
 
         try {
-            policyId = jobPriorityPolicy(AttributeWizardType.DN, dn, serviceClass, isPublic);
+            policyId = jobPriorityPolicy(AttributeWizardType.DN, dn, serviceClass, isPublic, description);
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.logAndThrow(log, e);
         }
@@ -74,15 +74,14 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         return policyId;
     }
 
-    public String fqanJobPriority(String fqan, String serviceClass, boolean isPublic) throws RemoteException {
-        log
-                .info("Received fqanJobPriority() request (fqan=" + fqan + ", serviceClass=" + serviceClass + ", isPublic="
+    public String fqanJobPriority(String fqan, String serviceClass, boolean isPublic, String description) throws RemoteException {
+        log.info("Received fqanJobPriority() request (fqan=" + fqan + ", serviceClass=" + serviceClass + ", isPublic="
                         + isPublic);
 
         String policyId = null;
 
         try {
-            policyId = jobPriorityPolicy(AttributeWizardType.FQAN, fqan, serviceClass, isPublic);
+            policyId = jobPriorityPolicy(AttributeWizardType.FQAN, fqan, serviceClass, isPublic, description);
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.logAndThrow(log, e);
         }
@@ -134,7 +133,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     }
 
-    private String banAttribute(AttributeWizardType attributeWizardType, String attributeValue, boolean isPublic) {
+    private String banAttribute(AttributeWizardType attributeWizardType, String attributeValue, boolean isPublic, String description) {
 
         List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
         targetList.add(new AttributeWizard(attributeWizardType, attributeValue));
@@ -146,6 +145,10 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             policyWizard.setPrivate(false);
         else
             policyWizard.setPrivate(true);
+        
+        if (description != null)
+            if (description.length() > 0)
+                policyWizard.setDescription(description);
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
@@ -156,7 +159,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
     }
 
     private String jobPriorityPolicy(AttributeWizardType attributeWizardType, String attributeValue, String serviceClass,
-            boolean isPublic) {
+            boolean isPublic, String description) {
 
         List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
         targetList.add(new AttributeWizard(attributeWizardType, attributeValue));
@@ -169,6 +172,10 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             policyWizard.setPrivate(false);
         else
             policyWizard.setPrivate(true);
+        
+        if (description != null)
+            if (description.length() > 0)
+                policyWizard.setDescription(description);
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 

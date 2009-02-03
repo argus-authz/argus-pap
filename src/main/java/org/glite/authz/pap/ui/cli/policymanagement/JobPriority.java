@@ -43,6 +43,8 @@ public class JobPriority extends PolicyManagementCLI {
                 OPT_PUBLIC_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as private (it won't be distributed)")
                 .withLongOpt(OPT_PRIVATE_LONG).create());
+        options.addOption(OptionBuilder.hasArg().withDescription(OPT_POLICY_DESCRIPTION_DESCRIPTION).withLongOpt(
+                OPT_POLICY_DESCRIPTION_LONG).create(OPT_POLICY_DESCRIPTION));
 
         return options;
     }
@@ -57,9 +59,13 @@ public class JobPriority extends PolicyManagementCLI {
         String attributeValue = args[1];
         String serviceClass = args[2];
 
-        boolean isPrivate = false;
+        boolean isPublic = true;
         if (commandLine.hasOption(OPT_PRIVATE_LONG))
-            isPrivate = true;
+            isPublic = false;
+        
+        String policyDescription = null;
+        if (commandLine.hasOption(OPT_POLICY_DESCRIPTION_LONG))
+            policyDescription = commandLine.getOptionValue(OPT_POLICY_DESCRIPTION_LONG);
 
         if (verboseMode)
             System.out.print("Adding policy... ");
@@ -67,9 +73,9 @@ public class JobPriority extends PolicyManagementCLI {
         String policyId;
 
         if (AttributeWizardType.DN.equals(attributeToDeny))
-            policyId = highlevelPolicyMgmtClient.dnJobPriority(attributeValue, serviceClass, !isPrivate);
+            policyId = highlevelPolicyMgmtClient.dnJobPriority(attributeValue, serviceClass, isPublic, policyDescription);
         else
-            policyId = highlevelPolicyMgmtClient.fqanJobPriority(attributeValue, serviceClass, !isPrivate);
+            policyId = highlevelPolicyMgmtClient.fqanJobPriority(attributeValue, serviceClass, isPublic, policyDescription);
 
         if (verboseMode)
             System.out.println("ok (id=" + policyId + ")");

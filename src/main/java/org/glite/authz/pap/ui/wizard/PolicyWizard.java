@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.glite.authz.pap.common.utils.xacml.DescriptionTypeHelper;
 import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
 import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType;
 import org.opensaml.xacml.policy.EffectType;
@@ -57,6 +58,8 @@ public class PolicyWizard {
         
         return PolicyWizardType.BLACKLIST;
     }
+    
+    private String description = null;
     private boolean isPrivate = false;
     private final List<List<AttributeWizard>> orExceptionsAttributeWizardList;
     private final PolicyType policy;
@@ -106,10 +109,16 @@ public class PolicyWizard {
         
         policyWizardType = getPolicyWizardType(targetAttributeWizardList);
         
-        orExceptionsAttributeWizardList = RuleWizard.getAttributeWizardList(policy.getRules()
-                .get(0));
+        orExceptionsAttributeWizardList = RuleWizard.getAttributeWizardList(policy.getRules().get(0));
         
+        if (policy.getDescription() != null)
+            this.description = policy.getDescription().getValue();
+
         this.policy = policy;
+    }
+    
+    public String getDescription() {
+        return description;
     }
     
     public List<List<AttributeWizard>> getOrExceptionsAttributeWizardList() {
@@ -153,15 +162,14 @@ public class PolicyWizard {
         
         return true;
     }
-    
+
     public boolean isBanPolicyForDN(String dn) {
         return isBanPolicy(dn, AttributeWizardType.DN);
     }
-    
+
     public boolean isBanPolicyForFQAN(String dn) {
         return isBanPolicy(dn, AttributeWizardType.FQAN);
     }
-    
     
     public boolean isBlacklistPolicy() {
         
@@ -170,6 +178,7 @@ public class PolicyWizard {
         
         return false;
     }
+    
     
     public boolean isPrivate() {
         return isPrivate;
@@ -181,6 +190,11 @@ public class PolicyWizard {
             return true;
         
         return false;
+    }
+    
+    public void setDescription(String description) {
+        policy.setDescription(DescriptionTypeHelper.build(description));
+        this.description = description;
     }
     
     public void setPrivate(boolean isPrivate) {
@@ -205,6 +219,9 @@ public class PolicyWizard {
         
         if (isPrivate())
             formattedString += effectIndentString + "private\n";
+        
+        if (description != null)
+            formattedString += effectIndentString + "description \"" + description + "\"\n";
         
         String effectString;
         
@@ -269,6 +286,9 @@ public class PolicyWizard {
         
         if (isPrivate())
             formattedString += effectIndentString + "private\n";
+        
+        if (description != null)
+            formattedString += effectIndentString + "description \"" + description + "\"\n";
         
         String effectString;
         
