@@ -49,7 +49,8 @@ public class TrustManagerSelectChannelConnector extends
         setNeedClientAuth( true );
         setWantClientAuth( true );
 
-        ContextWrapper tmContext = new ContextWrapper( props, false );
+        
+        ContextWrapper tmContext = new ContextWrapper( props );
         context = tmContext.getContext();
     }
 

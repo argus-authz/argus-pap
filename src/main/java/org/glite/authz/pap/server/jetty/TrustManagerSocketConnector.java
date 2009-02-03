@@ -44,8 +44,8 @@ public class TrustManagerSocketConnector extends SslSocketConnector {
         setNeedClientAuth( true );
         setWantClientAuth( true );
                 
-        context = new ContextWrapper(props,false);
-        
+        // context = new ContextWrapper(props,false);
+        context = new ContextWrapper(props);
     }
     @Override
     protected SSLServerSocketFactory createFactory() throws Exception {
