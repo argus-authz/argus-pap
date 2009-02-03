@@ -35,10 +35,10 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         boolean showServiceclass = true;
         boolean getPoliciesOneByOne = false;
         
-        if (commandLine.hasOption(LOPT_SHOW_XACML))
+        if (commandLine.hasOption(OPT_SHOW_XACML_LONG))
             xacmlOutput = true;
         
-        if (commandLine.hasOption(LOPT_PLAIN_FORMAT))
+        if (commandLine.hasOption(OPT_PLAIN_FORMAT_LONG))
             plainFormat = true;
         
         if (commandLine.hasOption(OPT_BLACKLIST))
@@ -81,10 +81,10 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         Options options = new Options();
         
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_XACML_DESCRIPTION)
-                .withLongOpt(LOPT_SHOW_XACML).create());
+                .withLongOpt(OPT_SHOW_XACML_LONG).create());
         
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_PLAIN_FORMAT_DESCRIPTION)
-                .withLongOpt(LOPT_PLAIN_FORMAT).create());
+                .withLongOpt(OPT_PLAIN_FORMAT_LONG).create());
         
         return options;
     }

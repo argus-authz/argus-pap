@@ -34,23 +34,23 @@ public class ListPolicies extends PolicyManagementCLI {
         Options options = new Options();
         
         options.addOption(OptionBuilder.hasArg(false)
-                .withDescription("List only \"public\" policies.").withLongOpt(LOPT_PUBLIC)
+                .withDescription("List only \"public\" policies.").withLongOpt(OPT_PUBLIC_LONG)
                 .create());
         options.addOption(OptionBuilder.hasArg(false)
-                .withDescription("List only \"private\" policies.").withLongOpt(LOPT_PRIVATE)
+                .withDescription("List only \"private\" policies.").withLongOpt(OPT_PRIVATE_LONG)
                 .create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_BLACKLIST_DESCRIPTION)
-                .withLongOpt(LOPT_BLACKLIST).create(OPT_BLACKLIST));
+                .withLongOpt(OPT_BLACKLIST_LONG).create(OPT_BLACKLIST));
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SERVICECLASS_DESCRIPTION)
-                .withLongOpt(LOPT_SERVICECLASS).create(OPT_SERVICECLASS));
+                .withLongOpt(OPT_SERVICECLASS_LONG).create(OPT_SERVICECLASS));
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_XACML_DESCRIPTION)
-                .withLongOpt(LOPT_SHOW_XACML).create());
+                .withLongOpt(OPT_SHOW_XACML_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_PLAIN_FORMAT_DESCRIPTION)
-                .withLongOpt(LOPT_PLAIN_FORMAT).create());
+                .withLongOpt(OPT_PLAIN_FORMAT_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_BACKUP_DESCRIPTION)
                 .withLongOpt(LOPT_BACKUP).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_LIST_ONE_BY_ONE_DESCRIPTION)
-                .withLongOpt(LOPT_LIST_ONE_BY_ONE).create(OPT_LIST_ONE_BY_ONE));
+                .withLongOpt(OPT_LIST_ONE_BY_ONE_LONG).create(OPT_LIST_ONE_BY_ONE));
         
         return options;
     }
@@ -66,10 +66,10 @@ public class ListPolicies extends PolicyManagementCLI {
         boolean backupMode = false;
         boolean getPoliciesOneByOne = false;
         
-        if (commandLine.hasOption(LOPT_PRIVATE))
+        if (commandLine.hasOption(OPT_PRIVATE_LONG))
             showPublic = false;
         
-        if (commandLine.hasOption(LOPT_PUBLIC))
+        if (commandLine.hasOption(OPT_PUBLIC_LONG))
             showPrivate = false;
         
         if (commandLine.hasOption(OPT_BLACKLIST))
@@ -78,20 +78,20 @@ public class ListPolicies extends PolicyManagementCLI {
         if (commandLine.hasOption(OPT_SERVICECLASS))
             showBlacklist = false;
         
-        if (commandLine.hasOption(LOPT_SHOW_XACML))
+        if (commandLine.hasOption(OPT_SHOW_XACML_LONG))
             xacmlOutput = true;
         
         if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE))
             getPoliciesOneByOne = true;
         
-        if (commandLine.hasOption(LOPT_PLAIN_FORMAT))
+        if (commandLine.hasOption(OPT_PLAIN_FORMAT_LONG))
             plainFormat = true;
         
         if (commandLine.hasOption(LOPT_BACKUP))
             backupMode = true;
         
         if (backupMode && plainFormat) {
-            printErrorMessage("Conflicting options specified: --" + LOPT_BACKUP + " and --" + LOPT_PLAIN_FORMAT + ".");
+            printErrorMessage("Conflicting options specified: --" + LOPT_BACKUP + " and --" + OPT_PLAIN_FORMAT_LONG + ".");
             return ExitStatus.PARSE_ERROR.ordinal();
         }
             

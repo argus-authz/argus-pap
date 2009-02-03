@@ -40,9 +40,9 @@ public class JobPriority extends PolicyManagementCLI {
         Options options = new Options();
 
         options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as public (default)").withLongOpt(
-                LOPT_PUBLIC).create());
+                OPT_PUBLIC_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as private (it won't be distributed)")
-                .withLongOpt(LOPT_PRIVATE).create());
+                .withLongOpt(OPT_PRIVATE_LONG).create());
 
         return options;
     }
@@ -58,7 +58,7 @@ public class JobPriority extends PolicyManagementCLI {
         String serviceClass = args[2];
 
         boolean isPrivate = false;
-        if (commandLine.hasOption(LOPT_PRIVATE))
+        if (commandLine.hasOption(OPT_PRIVATE_LONG))
             isPrivate = true;
 
         if (verboseMode)

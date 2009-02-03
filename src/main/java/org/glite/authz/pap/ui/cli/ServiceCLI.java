@@ -19,44 +19,44 @@ import org.glite.authz.pap.common.PAP;
 public abstract class ServiceCLI {
     
     public static enum ExitStatus {
-        SUCCESS,                // value = 0
-        PARTIAL_SUCCESS,        // value = 1
-        FAILURE,                // value = 2
-        PARSE_ERROR,            // value = 3
+        FAILURE,                // value = 0
+        INITIALIZATION_ERROR,   // value = 1
+        PARSE_ERROR,            // value = 2
+        PARTIAL_SUCCESS,        // value = 3
         REMOTE_EXCEPTION,       // value = 4
-        INITIALIZATION_ERROR;   // value = 5
+        SUCCESS;                // value = 5
     }
     
     private static final HelpFormatter helpFormatter = new HelpFormatter();
-    protected static final String DEFAULT_SERVICE_URL = "https://%s:%s%s";
-    private static final String LOPT_CERT = "cert";
-    private static final String LOPT_HOST = "host";
-    private static final String LOPT_PORT = "port";
-    private static final String LOPT_KEY = "key";
-    private static final String LOPT_PASSWORD = "password";
-    private static final String LOPT_URL = "url";
-    private static final String LOPT_VERBOSE = "verbose";
     private static final String OPT_CERT = "cert";
-    private static final String OPT_PORT = "p";
     private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
-    private static final String OPT_PORT_DESCRIPTION = "Specifies the port on which the target PAP is listening " +
-    		"(default is " + PAP.DEFAULT_PORT + ")";
+    private static final String OPT_CERT_LONG = "cert";
     private static final String OPT_HOST = "host";
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). " +
     		"This option defines the PAP endpoint to be contacted as follows: https://hostname:port/pap/services";
+    private static final String OPT_HOST_LONG = "host";
     private static final String OPT_KEY = "key";
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
+    private static final String OPT_KEY_LONG = "key";
     private static final String OPT_PASSWORD = "password";
     private static final String OPT_PASSWORD_DESCRIPTION = "Specifies the password used to decrypt the user's private key.";
-    private static final String OPT_VERBOSE_DESCRIPTION = "Verbose mode.";
+    private static final String OPT_PASSWORD_LONG = "password";
+    private static final String OPT_PORT = "p";
+    private static final String OPT_PORT_DESCRIPTION = "Specifies the port on which the target PAP is listening " +
+    		"(default is " + PAP.DEFAULT_PORT + ")";
+    private static final String OPT_PORT_LONG = "port";
     private static final String OPT_URL = "url";
+    private static final String OPT_URL_LONG = "url";
     private static final String OPT_VERBOSE = "v";
+    private static final String OPT_VERBOSE_DESCRIPTION = "Verbose mode.";
+    private static final String OPT_VERBOSE_LONG = "verbose";
+    protected static final String DEFAULT_SERVICE_URL = "https://%s:%s%s";
     
-    protected static final String LOPT_HELP = "help";
-    protected static final String LOPT_PRIVATE = "private";
-    protected static final String LOPT_PUBLIC = "public";
     protected static final String OPT_HELP = "h";
     protected static final String OPT_HELP_DESCRIPTION = "Print this message.";
+    protected static final String OPT_HELP_LONG = "help";
+    protected static final String OPT_PRIVATE_LONG = "private";
+    protected static final String OPT_PUBLIC_LONG = "public";
     
     protected static final CommandLineParser parser = new GnuParser();
     private String[] commandNameValues;
@@ -88,7 +88,7 @@ public abstract class ServiceCLI {
         if (commandOptions == null)
             commandOptions = new Options();
         
-        commandOptions.addOption(OPT_HELP, LOPT_HELP, false, OPT_HELP_DESCRIPTION);
+        commandOptions.addOption(OPT_HELP, OPT_HELP_LONG, false, OPT_HELP_DESCRIPTION);
 
         globalOptions = defineGlobalOptions();
         
@@ -197,21 +197,21 @@ public abstract class ServiceCLI {
         Options options = new Options();
         
         // TODO: OPT_URL and (OPT_HOST, OPT_PORT) are mutually exclusive options. Use OptionGroup.
-        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_URL)
+        options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_URL_LONG)
                 .withDescription("Specifies the target PAP endpoint (default: "
                         + String.format(DEFAULT_SERVICE_URL, PAP.DEFAULT_HOST, PAP.DEFAULT_PORT, PAP.DEFAULT_SERVICES_ROOT_PATH) + ").").create(OPT_URL));
-        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_HOST)
+        options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_HOST_LONG)
                 .withDescription(OPT_HOST_DESCRIPTION).create(OPT_HOST));
-        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_PORT)
+        options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_PORT_LONG)
                 .withDescription(OPT_PORT_DESCRIPTION).create(OPT_PORT));
         
-        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_CERT)
+        options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_CERT_LONG)
                 .withDescription(OPT_CERT_DESCRIPTION).create(OPT_CERT));
-        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_KEY)
+        options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_KEY_LONG)
                 .withDescription(OPT_KEY_DESCRIPTION).create(OPT_KEY));
-        options.addOption(OptionBuilder.hasArg().withLongOpt(LOPT_PASSWORD)
+        options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_PASSWORD_LONG)
                 .withDescription(OPT_PASSWORD_DESCRIPTION).create(OPT_PASSWORD));
-        options.addOption(OptionBuilder.withLongOpt(LOPT_VERBOSE)
+        options.addOption(OptionBuilder.withLongOpt(OPT_VERBOSE_LONG)
                 .withDescription(OPT_VERBOSE_DESCRIPTION).create(OPT_VERBOSE));
         
         return options;
@@ -222,17 +222,17 @@ public abstract class ServiceCLI {
     protected abstract int executeCommandService(CommandLine commandLine,
             ServiceClient serviceClient) throws CLIException, ParseException, RemoteException;
 
-    protected void printVerboseMessage(String msg) {
-        if (verboseMode)
-            System.out.println(msg);
+    protected void printErrorMessage(String msg) {
+        System.out.println(msg);
     }
     
     protected void printOutputMessage(String msg) {
         System.out.println(msg);
     }
     
-    protected void printErrorMessage(String msg) {
-        System.out.println(msg);
+    protected void printVerboseMessage(String msg) {
+        if (verboseMode)
+            System.out.println(msg);
     }
     
 }

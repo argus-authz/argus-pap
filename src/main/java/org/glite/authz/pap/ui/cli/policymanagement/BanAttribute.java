@@ -39,9 +39,9 @@ public class BanAttribute extends PolicyManagementCLI {
         Options options = new Options();
 
         options.addOption(OptionBuilder.hasArg(false).withDescription(
-                "Set the policy as public (default)").withLongOpt(LOPT_PUBLIC).create());
+                "Set the policy as public (default)").withLongOpt(OPT_PUBLIC_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(
-                "Set the policy as private (it won't be distributed)").withLongOpt(LOPT_PRIVATE)
+                "Set the policy as private (it won't be distributed)").withLongOpt(OPT_PRIVATE_LONG)
                 .create());
 
         return options;
@@ -58,7 +58,7 @@ public class BanAttribute extends PolicyManagementCLI {
         String attributeValue = args[1];
         
         boolean isPrivate = false;
-        if (commandLine.hasOption(LOPT_PRIVATE))
+        if (commandLine.hasOption(OPT_PRIVATE_LONG))
             isPrivate = true;
 
         if (verboseMode)
