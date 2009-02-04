@@ -4,52 +4,52 @@ public class X509Principal extends BasePAPAdmin {
 
     String dn;
 
-    public X509Principal(String dn) {
+    public X509Principal( String dn ) {
 
-	this.dn = dn;
+        this.dn = dn;
 
     }
 
     public String getName() {
 
-	return getDn();
+        return getDn();
     }
 
     public String getDn() {
 
-	return dn;
+        return dn;
     }
 
-    public void setDn(String dn) {
+    public void setDn( String dn ) {
 
-	this.dn = dn;
+        this.dn = dn;
     }
 
     @Override
     public String toString() {
 
-	return "[dn]=" + getDn();
+        return "[dn]=" + getDn();
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals( Object obj ) {
 
-	if (!(obj instanceof X509Principal))
-	    return false;
+        if ( !( obj instanceof X509Principal ) )
+            return false;
 
-	X509Principal that = (X509Principal) obj;
+        X509Principal that = (X509Principal) obj;
 
-	return this.dn.equals(that.dn);
+        return this.dn.equals( that.dn );
 
     }
 
     @Override
     public int hashCode() {
 
-	if (dn == null)
-	    return 1;
+        if ( dn == null )
+            return 1;
 
-	return dn.hashCode();
+        return dn.hashCode();
     }
 
 }

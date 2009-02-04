@@ -32,19 +32,19 @@ public class PAPPermission {
                         .addAll( EnumSet.allOf( PermissionFlags.class ) );
                 break;
 
-            } else{
-                try{
-                    
+            } else {
+                try {
+
                     PermissionFlags newPerm = PermissionFlags.valueOf( s );
                     perm.permissions.add( newPerm );
-                }catch (IllegalArgumentException e) {
-                    
-                    throw new PAPAuthzException("Unknown permission passed as argument! '"+s+"'.",e);
+                } catch ( IllegalArgumentException e ) {
+
+                    throw new PAPAuthzException(
+                            "Unknown permission passed as argument! '" + s
+                                    + "'.", e );
                 }
-                
-                
+
             }
-                
 
         }
         return perm;
@@ -72,8 +72,9 @@ public class PAPPermission {
 
     @Override
     public String toString() {
-        
-        if (this.permissions.containsAll( EnumSet.allOf( PermissionFlags.class ) ))
+
+        if ( this.permissions.containsAll( EnumSet
+                .allOf( PermissionFlags.class ) ) )
             return "ALL";
 
         return StringUtils.join( permissions.iterator(), "|" );
@@ -89,17 +90,17 @@ public class PAPPermission {
 
         return permissions.containsAll( perms );
     }
-    
-    public String[] toStringArray(){
-        
+
+    public String[] toStringArray() {
+
         String[] perms = new String[permissions.size()];
-        int i=0;
-        
-        for (PermissionFlags p : permissions)
-            perms[i++]= p.name();
-        
+        int i = 0;
+
+        for ( PermissionFlags p : permissions )
+            perms[i++] = p.name();
+
         return perms;
-        
+
     }
 
     public static PAPPermission getAllPermission() {
@@ -111,22 +112,21 @@ public class PAPPermission {
 
         return new PAPPermission();
     }
-    
-    
 
-    public boolean add(PAPPermission o){
-    	
-    	if (o == null)
-    		return false;
-    	
-    	return addAll(o.permissions);
+    public boolean add( PAPPermission o ) {
+
+        if ( o == null )
+            return false;
+
+        return addAll( o.permissions );
     }
-    
-	protected boolean addAll(Collection<? extends PermissionFlags> c) {
-		return permissions.addAll(c);
-	}
 
-	public static PAPPermission of( PermissionFlags p ) {
+    protected boolean addAll( Collection <? extends PermissionFlags> c ) {
+
+        return permissions.addAll( c );
+    }
+
+    public static PAPPermission of( PermissionFlags p ) {
 
         PAPPermission papPerm = new PAPPermission();
         papPerm.permissions.add( p );

@@ -208,52 +208,58 @@ public final class AuthzConfigurationParser {
     public void save( File f, ACL globalContextACL ) {
 
         try {
-        
-            PrintWriter writer = new PrintWriter(f);
-            
-            writer.println("[dn]\n\n");
-            
-            for (Map.Entry <PAPAdmin, PAPPermission> entry: globalContextACL.getPermissions().entrySet()){
-                
-                if (entry.getKey() instanceof X509Principal){
-                    
-                    X509Principal p = (X509Principal)entry.getKey();
-                    
+
+            PrintWriter writer = new PrintWriter( f );
+
+            writer.println( "[dn]\n\n" );
+
+            for ( Map.Entry <PAPAdmin, PAPPermission> entry : globalContextACL
+                    .getPermissions().entrySet() ) {
+
+                if ( entry.getKey() instanceof X509Principal ) {
+
+                    X509Principal p = (X509Principal) entry.getKey();
+
                     String dn = null;
-                    
-                    if (p.equals( PAPAdminFactory.getAnyAuthenticatedUserAdmin() ))
+
+                    if ( p.equals( PAPAdminFactory
+                            .getAnyAuthenticatedUserAdmin() ) )
                         dn = "ANYONE";
                     else
-                        dn = "\""+p.getDn()+"\"";
-                        
-                    writer.println(dn+" : "+entry.getValue().toString());
-                    
+                        dn = "\"" + p.getDn() + "\"";
+
+                    writer.println( dn + " : " + entry.getValue().toString() );
+
                 }
             }
-            
-            writer.println("\n\n[fqan]\n\n");
-            
-            for (Map.Entry <PAPAdmin, PAPPermission> entry: globalContextACL.getPermissions().entrySet()){
-                
-                if (entry.getKey() instanceof VOMSFQAN){
-                    
-                    VOMSFQAN p = (VOMSFQAN)entry.getKey();
-                    writer.println(p.getFqan()+" : "+entry.getValue().toString());
-                    
+
+            writer.println( "\n\n[fqan]\n\n" );
+
+            for ( Map.Entry <PAPAdmin, PAPPermission> entry : globalContextACL
+                    .getPermissions().entrySet() ) {
+
+                if ( entry.getKey() instanceof VOMSFQAN ) {
+
+                    VOMSFQAN p = (VOMSFQAN) entry.getKey();
+                    writer.println( p.getFqan() + " : "
+                            + entry.getValue().toString() );
+
                 }
             }
-            
+
             writer.flush();
             writer.close();
-            
+
         } catch ( IOException e ) {
-            
-            log.error( "Error writing authz configuration to file: "+e.getMessage(),e );
-            throw new PAPAuthzConfigurationException("Error writing authz configuration to file: "+e.getMessage(),e );
-            
-        } 
-        
-        
+
+            log.error( "Error writing authz configuration to file: "
+                    + e.getMessage(), e );
+            throw new PAPAuthzConfigurationException(
+                    "Error writing authz configuration to file: "
+                            + e.getMessage(), e );
+
+        }
+
     }
 
     public ACL getParsedACL() {

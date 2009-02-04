@@ -16,46 +16,47 @@ import org.slf4j.LoggerFactory;
 public class InitSecurityContext {
 
     static public final String SECURITY_CONTEXT_REMOTE_ADDRESS = "org.glite.authz.pap.remote_address";
-    static Logger logger = LoggerFactory.getLogger(InitSecurityContext.class);
 
-    public static void setContextFromRequest(final ServletRequest request) {
+    static Logger logger = LoggerFactory.getLogger( InitSecurityContext.class );
 
-	SecurityContext sc = new SecurityContext();
-	SecurityContext.setCurrentContext(sc);
+    public static void setContextFromRequest( final ServletRequest request ) {
 
-	String remoteAddress = request.getRemoteAddr();
-	sc.setProperty(SECURITY_CONTEXT_REMOTE_ADDRESS, remoteAddress);
+        SecurityContext sc = new SecurityContext();
+        SecurityContext.setCurrentContext( sc );
 
-	X509Certificate[] certChain = null;
-	try {
+        String remoteAddress = request.getRemoteAddr();
+        sc.setProperty( SECURITY_CONTEXT_REMOTE_ADDRESS, remoteAddress );
 
-	    certChain = (X509Certificate[]) request
-		    .getAttribute("javax.servlet.request.X509Certificate");
+        X509Certificate[] certChain = null;
+        try {
 
-	} catch (Exception e) {
+            certChain = (X509Certificate[]) request
+                    .getAttribute( "javax.servlet.request.X509Certificate" );
 
-	    logger.error("Exception during certificate chain retrieval: " + e);
-	    throw new PAPAuthzException("No certificate found in request!", e);
+        } catch ( Exception e ) {
 
-	}
+            logger.error( "Exception during certificate chain retrieval: " + e );
+            throw new PAPAuthzException( "No certificate found in request!", e );
 
-	sc.setClientCertChain(certChain);
+        }
 
-	DN subject = DNHandler.getSubject(sc.getClientCert());
-	DN issuer = DNHandler.getIssuer(sc.getClientCert());
+        sc.setClientCertChain( certChain );
 
-	BigInteger sn = sc.getClientCert().getSerialNumber();
-	String serialNumber = (sn == null) ? "NULL" : sn.toString();
+        DN subject = DNHandler.getSubject( sc.getClientCert() );
+        DN issuer = DNHandler.getIssuer( sc.getClientCert() );
 
-	if (sc.getClientName() != null)
-	    sc.setClientName(subject.getX500());
+        BigInteger sn = sc.getClientCert().getSerialNumber();
+        String serialNumber = ( sn == null ) ? "NULL" : sn.toString();
 
-	if (sc.getIssuerName() != null)
-	    sc.setIssuerName(issuer.getX500());
+        if ( sc.getClientName() != null )
+            sc.setClientName( subject.getX500() );
 
-	logger.info("Connection from \"" + remoteAddress + "\" by \""
-		+ sc.getClientName() + "\" (issued by \"" + sc.getIssuerName()
-		+ "\", " + "serial " + serialNumber + ")");
+        if ( sc.getIssuerName() != null )
+            sc.setIssuerName( issuer.getX500() );
+
+        logger.info( "Connection from \"" + remoteAddress + "\" by \""
+                + sc.getClientName() + "\" (issued by \"" + sc.getIssuerName()
+                + "\", " + "serial " + serialNumber + ")" );
 
     }
 

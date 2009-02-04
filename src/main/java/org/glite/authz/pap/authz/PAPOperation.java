@@ -6,6 +6,6 @@ public interface PAPOperation<T> {
 
     public T execute();
 
-    Map<PAPContext, PAPPermission> getRequiredPermission();
+    Map <PAPContext, PAPPermission> getRequiredPermission();
 
 }

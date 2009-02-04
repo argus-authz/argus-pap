@@ -175,8 +175,7 @@ public class FileSystemPAPDAO implements PAPDAO {
 
 		File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
 		if (!directory.mkdir())
-			throw new RepositoryException("Cannot create directory for PAP: "
-					+ papAlias + " (id=" + pap.getPapId() + ")");
+			throw new RepositoryException(String.format( "Cannot create directory for PAP: %s (id=%s) (dir=%s)", papAlias, pap.getPapId(), directory));
 
 		savePAP(pap);
 	}

@@ -8,68 +8,68 @@ import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 
 public class AuthorizationEngine {
 
-	private boolean initialized = false;
+    private boolean initialized = false;
 
-	private static AuthorizationEngine instance;
+    private static AuthorizationEngine instance;
 
-	private PAPContext globalContext;
+    private PAPContext globalContext;
 
-	private AuthorizationEngine(String papConf) {
+    private AuthorizationEngine( String papConf ) {
 
-		File papConfFile = new File(papConf);
+        File papConfFile = new File( papConf );
 
-		if (!papConfFile.exists())
-			throw new PAPConfigurationException(
-					"PAP Authorization configuration file not found: "
-							+ papConfFile.getAbsolutePath());
+        if ( !papConfFile.exists() )
+            throw new PAPConfigurationException(
+                    "PAP Authorization configuration file not found: "
+                            + papConfFile.getAbsolutePath() );
 
-		globalContext = PAPContext.instance("global-context");
+        globalContext = PAPContext.instance( "global-context" );
 
-		// Parse ACL from configuration file
-		AuthzConfigurationParser confParser = AuthzConfigurationParser
-				.instance();
+        // Parse ACL from configuration file
+        AuthzConfigurationParser confParser = AuthzConfigurationParser
+                .instance();
 
-		confParser.parse(papConfFile);
+        confParser.parse( papConfFile );
 
-		globalContext.setAcl(confParser.getParsedACL());
-	}
+        globalContext.setAcl( confParser.getParsedACL() );
+    }
 
-	public static AuthorizationEngine initialize(String papAuthzConfFile) {
+    public static AuthorizationEngine initialize( String papAuthzConfFile ) {
 
-		if (instance == null)
-			instance = new AuthorizationEngine(papAuthzConfFile);
+        if ( instance == null )
+            instance = new AuthorizationEngine( papAuthzConfFile );
 
-		return instance;
-	}
+        return instance;
+    }
 
-	public static AuthorizationEngine instance() {
+    public static AuthorizationEngine instance() {
 
-		if (instance == null)
-			throw new PAPAuthzException(
-					"Please initialize the authorization engine properly using the initialize method!");
+        if ( instance == null )
+            throw new PAPAuthzException(
+                    "Please initialize the authorization engine properly using the initialize method!" );
 
-		return instance;
-	}
+        return instance;
+    }
 
-	public void saveConfiguration() {
+    public void saveConfiguration() {
 
-		String confFileName = PAPConfiguration.instance()
-				.getPapAuthzConfigurationFileName();
+        String confFileName = PAPConfiguration.instance()
+                .getPapAuthzConfigurationFileName();
 
-		AuthzConfigurationParser confParser = AuthzConfigurationParser
-				.instance();
+        AuthzConfigurationParser confParser = AuthzConfigurationParser
+                .instance();
 
-		confParser.save(new File(confFileName), getGlobalContext().getAcl());
-	}
+        confParser.save( new File( confFileName ), getGlobalContext().getAcl() );
+    }
 
-	public boolean isInitialized() {
+    public boolean isInitialized() {
 
-		return initialized;
-	}
+        return initialized;
+    }
 
-	public PAPContext getGlobalContext() {
+    public PAPContext getGlobalContext() {
 
-		return globalContext;
-	}
+        return globalContext;
+    }
 
 }

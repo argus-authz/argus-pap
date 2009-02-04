@@ -261,6 +261,13 @@
     </dependency>
 
     <dependency>
+      <groupId>org.glite</groupId>
+      <artifactId>glite-security-voms-java-api 
+      </artifactId>
+      <version>1.9.0</version>
+    </dependency>
+    
+    <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15</artifactId>
       <version>1.40</version>
