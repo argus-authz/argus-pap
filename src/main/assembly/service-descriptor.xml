@@ -1,0 +1,89 @@
+<assembly xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd">
+    
+  <id>service</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <fileSets>
+  		<fileSet>
+            <directory>src/main/config</directory>
+            <outputDirectory>etc/pap</outputDirectory>
+            <excludes>
+              <exclude>logging/war/**</exclude>
+            </excludes>
+            <fileMode>0644</fileMode>
+        </fileSet>
+        
+        <fileSet>
+        	<directory>target/site</directory>
+        	<outputDirectory>share/doc/glite-authz-pap/html</outputDirectory>
+        </fileSet>
+  </fileSets>
+   
+  <files>
+    <file>
+      <source>target/${project.build.finalName}.war</source>
+      <outputDirectory>share/webapps</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    
+    <file>
+      <source>target/${project.build.finalName}-standalone.war</source>
+      <outputDirectory>share/webapps</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    
+    <file>
+      <source>target/${project.build.finalName}.jar</source>
+      <outputDirectory>share/java</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/python/pap_utils.py</source>
+      <outputDirectory>sbin</outputDirectory>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/python/pap-deploy.py</source>
+      <outputDirectory>sbin</outputDirectory>
+      <destName>pap-deploy</destName>
+      <fileMode>0755</fileMode>
+    </file>
+        
+    <file>
+      <source>${basedir}/src/main/bash/pap-utils.sh</source>
+      <outputDirectory>etc/pap/sh</outputDirectory>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/bash/pap-standalone.sh</source>
+      <destName>pap-standalone</destName>
+      <outputDirectory>/etc/init.d</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/bash/pap-admin.sh</source>
+      <destName>pap-admin</destName>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    
+  </files>
+  
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>/share/pap/lib</outputDirectory>
+      <excludes>
+        <exclude>javax.servlet:servlet-api</exclude>
+        <exclude>*:war</exclude>
+      </excludes>
+    </dependencySet>
+  </dependencySets>
+</assembly>

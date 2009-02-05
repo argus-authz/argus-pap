@@ -2,9 +2,12 @@ package test.authz;
 
 import java.util.EnumSet;
 
-import org.glite.authz.pap.authz.PAPPermission;
-import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import junit.framework.TestCase;
+
+import org.glite.authz.pap.authz.PAPPermission;
+import org.glite.authz.pap.authz.PAPPermissionList;
+import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
 
 
 public class PAPPermissionTest extends TestCase {
@@ -34,7 +37,8 @@ public class PAPPermissionTest extends TestCase {
         
         try{
             PAPPermission perm = PAPPermission.fromString( permission );
-        }catch (IllegalArgumentException e) {
+        
+        }catch (PAPAuthzException e) {
             caughtException = true;
         }
         
@@ -66,7 +70,7 @@ public class PAPPermissionTest extends TestCase {
             
             PAPPermission perm = PAPPermission.fromString( permissionList );
         
-        }catch (IllegalArgumentException e) {
+        }catch (PAPAuthzException e) {
             caughtException = true;
         }
         
@@ -85,5 +89,52 @@ public class PAPPermissionTest extends TestCase {
         
     }
     
+    
+    public void testCumulativePerms(){
+    	
+    	String perm1 = "POLICY_READ_REMOTE";
+    	String perm2 = "POLICY_READ_LOCAL";
+    	
+    	EnumSet<PermissionFlags> perms = EnumSet.of(PermissionFlags.POLICY_READ_LOCAL,PermissionFlags.POLICY_READ_REMOTE);
+    	EnumSet<PermissionFlags> compPerms = EnumSet.complementOf(perms);
+    	
+    	PAPPermissionList l = PAPPermissionList.instance();
+    	l.addPermission(PAPPermission.fromString(perm1));
+    	l.addPermission(PAPPermission.fromString(perm2));
+    	
+    	assertTrue(l.getCumulativePermission().hasAll(perms));
+    	assertFalse(l.getCumulativePermission().hasAll(compPerms));
+    	
+    	
+    }
+    
+    public void testEmptyCumulativePerms(){
+    	
+    	EnumSet<PermissionFlags> allPerms = EnumSet.allOf(PermissionFlags.class);
+    	
+    	PAPPermissionList l = PAPPermissionList.instance();
+    	l.addPermission(PAPPermission.getEmptyPermission());
+    	l.addPermission(PAPPermission.getEmptyPermission());
+    	
+    	for (PermissionFlags f: allPerms){
+    		
+    		assertFalse(l.getCumulativePermission().has(f));
+    		
+    	}
+    }
+    
+    public void testPermissionListSatisfy(){
+    	
+    	String perm1s = "POLICY_READ_LOCAL|POLICY_READ_REMOTE";
+    	PAPPermission p = PAPPermission.fromString(perm1s);
+    	
+    	PAPPermissionList l = PAPPermissionList.instance();
+    	
+    	l.addPermission(PAPPermission.fromString("POLICY_READ_LOCAL"));
+    	l.addPermission(PAPPermission.fromString("POLICY_READ_REMOTE"));
+    	
+    	assertTrue(l.satisfies(p));
+    	
+    }
     
 }

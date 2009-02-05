@@ -1,0 +1,68 @@
+Installation instructions
+
+* Prerequisites
+  
+  In order to run the glite-authz-pap service you will need the following:
+    
+    * a recent version of openssl installed on your system
+    
+    * LCG trusted Certificate Autorities certificates installed. In SL4,
+    the lcg-ca package provides those certificates.
+    
+    * a valid X5O9 certificate issued by a trusted CA. Such certificate must
+    be encoded in pem format, and you have to put in the /etc/grid-security 
+    diretory (the certificate in the hostcert.pem file, the private key in
+    the hostkey.pem file).  
+
+* PAP distribution
+  
+  To install the glite-authz-pap daemon on your machine, first make sure you have 
+  a gLite installation already in place or define the two following environment
+  variables in a meaningful way:
+  
++---
+  GLITE_LOCATION (usually /opt/glite)
+  GLITE_LOCATION_VAR (usually /var/glite)
++---
+  
+  If missing, create the following directory:
+
++---
+  $GLITE_LOCATION_VAR/lock/subsys
++---
+
+  Then unpack the glite-authz-pap tar file in the $GLITE_LOCATION directory:
+  
++---
+  tar -C $GLITE_LOCATION -xvzf glite-authz-pap.tar.gz
++---
+  
+  In order to use the pap-admin command you may also want to add the $GLITE_LOCATION/bin
+  directory to your PATH:
+  
++---
+  export PATH=$PATH:$GLITE_LOCATION/bin
++---
+  
+  The minimum requirement to run the PAP is a working Java 5 installation.
+   
+* JAXP dependencies
+  
+  The glite-authz-pap makes extensive use of the OpenSAML, which requires a recent
+  version of JAXP to be installed on your system. The JVM shipped with SL4 does not provide
+  such implementation, so in order to run the pap you need to issue the following 
+  command:
+  
++---
+  cd $GLITE_LOCATION/share/pap/lib
+  cp xml-apis-2.9.1.jar xercesImpl-2.9.1.jar xalan-2.7.1.jar serializer-2.9.1.jar $JAVA_HOME/jre/lib/endorsed
++---
+  
+  If you want to deploy the pap on tomcat you should also do the following:
+  
++---
+  cd $GLITE_LOCATION/share/pap/lib
+  cp xml-apis-2.9.1.jar xercesImpl-2.9.1.jar xalan-2.7.1.jar serializer-2.9.1.jar $CATALINA_HOME/common/endorsed
++---
+  
+  

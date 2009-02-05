@@ -24,8 +24,7 @@ class SingleCondition {
     public static final int TYPE_DN       = 1;
     public static final int TYPE_GA       = 2;
     public static final int TYPE_CERT     = 3;
-    public static final int TYPE_PILOT    = 4;
-    public static final int TYPE_RESOURCE = 5;
+    public static final int TYPE_RESOURCE = 4;
 };
 
 class ConditionRow {
@@ -65,6 +64,7 @@ class Conds {
 
 class Policy {
     String name;
+    String serviceClass;
     int type;
     Conds conds;
     Policies policies;
@@ -74,51 +74,50 @@ class Policy {
 
     public Policy() {
         type = POLICY_TYPE_BW;
+        serviceClass = null;
     }
 
-    public PolicySetType Output(int previousType) {
+    public void Output(BlacklistPolicySet blSet, 
+                       ServiceClassPolicySet clSet,
+                       int previousType) {
         if (type == POLICY_TYPE_BW)
-            return OutputBW(previousType);
+            OutputBW(blSet, clSet, previousType);
         else
-            return OutputSClass(previousType);
+            OutputSClass(blSet, clSet, previousType);
     }
 
-    private PolicySetType OutputBW(int previousType) {
-        PolicySetType policySet = null;
-
-        if (previousType == POLICY_TYPE_CLASS)
-            policySet = ServiceClassPolicySet.build();
-        else
-            policySet = BlacklistPolicySet.build();
-
+    private void OutputBW(BlacklistPolicySet blSet,
+                          ServiceClassPolicySet clSet,
+                          int previousType) {
 
         Enumeration conditions = conds.fullconditions.elements();
 
         while (conditions.hasMoreElements()) {
             FullCondition fc = (FullCondition)conditions.nextElement();
-            PolicyType policy = OutputFC(fc, previousType);
+            PolicyWizard policy = OutputFC(fc, previousType);
 
-            PolicySetHelper.addPolicyReference(policySet, policy.getPolicyId());
+            if (previousType == POLICY_TYPE_CLASS)
+                clSet.addPolicy(policy);
+            else
+                blSet.addPolicy(policy);
         }
-
-        return policySet;
     }
 
-    private PolicySetType OutputSClass(int previousType) {
-        PolicySetType policySet = ServiceClassPolicySet.build();
-
+    private void OutputSClass(BlacklistPolicySet blSet,
+                              ServiceClassPolicySet scSet,
+                              int previousType) {
         Vector policiesList = policies.policies;
 
         Enumeration i = policiesList.elements();
 
         while (i.hasMoreElements()) {
-            PolicySetHelper.addPolicySetReference(policySet, (((Policy)i.nextElement()).Output(previousType)).getPolicySetId());
+            Policy p = (Policy)i.nextElement();
+            p.serviceClass = name;
+            p.OutputBW(blSet, scSet, POLICY_TYPE_CLASS);
         }
-
-        return policySet;
     }
 
-    private PolicyType OutputFC(FullCondition fc, int previousType) {
+    private PolicyWizard OutputFC(FullCondition fc, int previousType) {
         ConditionRow denys = fc.simples;
         ConditionList excepts = fc.excepts;
 
@@ -144,21 +143,24 @@ class Policy {
             }
         }
 
-        PolicyType policy = null;
+        PolicyWizard policy = null;
 
         switch (previousType) {
         case POLICY_TYPE_BW:
-            policy = BlacklistPolicy.build(targetAttributeList, exceptsAttributes);
+            policy = new BlacklistPolicy(targetAttributeList, exceptsAttributes);
             break;
 
         case POLICY_TYPE_CLASS:
-            policy = ServiceClassPolicy.build(targetAttributeList, exceptsAttributes, (fc.allow ? org.opensaml.xacml.policy.EffectType.Permit : org.opensaml.xacml.policy.EffectType.Deny));
+            targetAttributeList.add(new AttributeWizard("service_class", serviceClass));
+            policy = new ServiceClassPolicy(targetAttributeList, exceptsAttributes, (fc.allow ? org.opensaml.xacml.policy.EffectType.Permit : org.opensaml.xacml.policy.EffectType.Deny));
             break;
 
         case POLICY_TYPE_UNKNOWN:
             break;
         }
 
+        policy.setPrivate(fc.isprivate);
+            
         return policy;
     }
 
@@ -176,9 +178,6 @@ class Policy {
 
         case SingleCondition.TYPE_CERT:
             return new AttributeWizard("cert", sc.value1 + ":" + sc.value2);
-
-        case SingleCondition.TYPE_PILOT:
-            return new AttributeWizard("pilot", (sc.yesorno ? "Yes" : "No"));
 
         case SingleCondition.TYPE_RESOURCE:
             return new AttributeWizard("resource_uri", sc.value1);
@@ -199,13 +198,17 @@ class Policies {
 
         List <XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        PolicySetType localPAPPolicySet = LocalPAPPolicySet.build();
+        PolicySetWizard localPAPPolicySet = new LocalPAPPolicySet();
+        BlacklistPolicySet blSet = new BlacklistPolicySet();
+        ServiceClassPolicySet scSet = new ServiceClassPolicySet();
 
         while (i.hasMoreElements()) {
-            PolicySetHelper.addPolicySetReference(localPAPPolicySet, (((Policy)i.nextElement()).Output(Policy.POLICY_TYPE_BW)).getPolicySetId());
+            ((Policy)i.nextElement()).Output(blSet, scSet, Policy.POLICY_TYPE_BW);
         }
-        resultList.add(localPAPPolicySet);
 
-        return resultList;
+        localPAPPolicySet.addPolicySet(blSet);
+        localPAPPolicySet.addPolicySet(scSet);
+
+        return localPAPPolicySet.getPolicyTreeAsList();
     }
 };

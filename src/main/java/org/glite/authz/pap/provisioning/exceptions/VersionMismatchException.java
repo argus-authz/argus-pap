@@ -22,12 +22,10 @@
 
 package org.glite.authz.pap.provisioning.exceptions;
 
-
 /**
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
- *
+ * 
  */
-public class VersionMismatchException extends Exception
-{
+public class VersionMismatchException extends Exception {
 
 }

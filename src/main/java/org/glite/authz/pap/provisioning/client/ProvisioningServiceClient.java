@@ -22,13 +22,12 @@
 
 package org.glite.authz.pap.provisioning.client;
 
-
 /**
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
- *
+ * 
  */
 public interface ProvisioningServiceClient {
 
-  ProvisioningServicePortType getProvisioningServicePortType(String url);
-  
+    ProvisioningServicePortType getProvisioningServicePortType(String url);
+
 }

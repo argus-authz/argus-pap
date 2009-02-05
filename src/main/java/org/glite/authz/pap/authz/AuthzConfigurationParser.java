@@ -2,9 +2,13 @@ package org.glite.authz.pap.authz;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.RandomAccessFile;
 import java.util.EnumMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +21,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * @author Andrea Ceccanti
- *
+ * 
  */
 public final class AuthzConfigurationParser {
 
@@ -30,8 +34,9 @@ public final class AuthzConfigurationParser {
             .compile( permissionRegex );
 
     public static final String anyUserRegex = "^ANYONE\\s*";
+
     public static final Pattern anyUserPattern = Pattern.compile( anyUserRegex );
-    
+
     public static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
 
     public static final Pattern dnPattern = Pattern.compile( dnRegex );
@@ -41,7 +46,7 @@ public final class AuthzConfigurationParser {
     public static final Pattern emptyLinePattern = Pattern
             .compile( emptyLineRegex );
 
-    public static final String commentRegex = "^#.*$";
+    public static final String commentRegex = "^[#;].*$";
 
     public static final Pattern commentPattern = Pattern.compile( commentRegex );
 
@@ -63,7 +68,7 @@ public final class AuthzConfigurationParser {
     private ACL globalContextACL;
 
     private ParserStates state = ParserStates.UNDEFINED;
-    
+
     private int lineCounter = 0;
 
     private void init() {
@@ -124,19 +129,17 @@ public final class AuthzConfigurationParser {
 
             Matcher dnMatcher = dnPattern.matcher( principalName );
             Matcher anyUserMatcher = anyUserPattern.matcher( principalName );
-            
-            
-            if (anyUserMatcher.matches()){
-                
+
+            if ( anyUserMatcher.matches() ) {
+
                 if ( !state.equals( ParserStates.DNs ) )
                     throw new PAPAuthzConfigurationException(
                             "Found an X509 ANYONE declaration outside of the [dn] stanza!" );
-                
+
                 PAPAdmin admin = PAPAdminFactory.getAnyAuthenticatedUserAdmin();
-                globalContextACL.setPermissions( admin,perm );
-                
-                
-            }else if ( dnMatcher.matches() ) {
+                globalContextACL.setPermissions( admin, perm );
+
+            } else if ( dnMatcher.matches() ) {
 
                 if ( !state.equals( ParserStates.DNs ) )
                     throw new PAPAuthzConfigurationException(
@@ -147,27 +150,31 @@ public final class AuthzConfigurationParser {
 
                 globalContextACL.setPermissions( admin, perm );
 
-            }else{
-                
+            } else {
+
                 // Check if the Principal is a VOMS FQAN
-                try{
+                try {
                     principalName = principalName.trim();
                     PathNamingScheme.checkSyntax( principalName );
-                    
-                    if (!state.equals( ParserStates.FQANs ))
-                        throw new PAPAuthzConfigurationException("Found a VOMS FQAN outside the [fqan] stanza!");
-                    
+
+                    if ( !state.equals( ParserStates.FQANs ) )
+                        throw new PAPAuthzConfigurationException(
+                                "Found a VOMS FQAN outside the [fqan] stanza!" );
+
                     PAPAdmin admin = PAPAdminFactory.getFQAN( principalName );
                     globalContextACL.setPermissions( admin, perm );
-                    
-                
-                }catch (VOMSSyntaxException e) {
-                    throw new PAPAuthzConfigurationException("Unsupported principal name: '"+principalName+"'.");
+
+                } catch ( VOMSSyntaxException e ) {
+                    throw new PAPAuthzConfigurationException(
+                            "Unsupported principal name: '" + principalName
+                                    + "'." );
                 }
-                
+
             }
-        } else 
-            throw new PAPAuthzConfigurationException("Syntax error at line "+lineCounter+": '"+line+"' does not match the PRINCIPAL : PERMISSION format!");
+        } else
+            throw new PAPAuthzConfigurationException( "Syntax error at line "
+                    + lineCounter + ": '" + line
+                    + "' does not match the PRINCIPAL : PERMISSION format!" );
     }
 
     public ACL parse( File f ) {
@@ -182,7 +189,7 @@ public final class AuthzConfigurationParser {
             do {
 
                 line = reader.readLine();
-                if ( line != null ){
+                if ( line != null ) {
                     lineCounter++;
                     parseLine( line );
                 }
@@ -198,23 +205,79 @@ public final class AuthzConfigurationParser {
 
     }
 
-    public ACL getParsedACL(){
+    public void save( File f, ACL globalContextACL ) {
+
+        try {
+
+            PrintWriter writer = new PrintWriter( f );
+
+            writer.println( "[dn]\n\n" );
+
+            for ( Map.Entry <PAPAdmin, PAPPermission> entry : globalContextACL
+                    .getPermissions().entrySet() ) {
+
+                if ( entry.getKey() instanceof X509Principal ) {
+
+                    X509Principal p = (X509Principal) entry.getKey();
+
+                    String dn = null;
+
+                    if ( p.equals( PAPAdminFactory
+                            .getAnyAuthenticatedUserAdmin() ) )
+                        dn = "ANYONE";
+                    else
+                        dn = "\"" + p.getDn() + "\"";
+
+                    writer.println( dn + " : " + entry.getValue().toString() );
+
+                }
+            }
+
+            writer.println( "\n\n[fqan]\n\n" );
+
+            for ( Map.Entry <PAPAdmin, PAPPermission> entry : globalContextACL
+                    .getPermissions().entrySet() ) {
+
+                if ( entry.getKey() instanceof VOMSFQAN ) {
+
+                    VOMSFQAN p = (VOMSFQAN) entry.getKey();
+                    writer.println( p.getFqan() + " : "
+                            + entry.getValue().toString() );
+
+                }
+            }
+
+            writer.flush();
+            writer.close();
+
+        } catch ( IOException e ) {
+
+            log.error( "Error writing authz configuration to file: "
+                    + e.getMessage(), e );
+            throw new PAPAuthzConfigurationException(
+                    "Error writing authz configuration to file: "
+                            + e.getMessage(), e );
+
+        }
+
+    }
+
+    public ACL getParsedACL() {
+
         return globalContextACL;
     }
-    
+
     public static AuthzConfigurationParser instance() {
 
         return new AuthzConfigurationParser();
     }
 
     public static void main( String[] args ) {
-        
 
         AuthzConfigurationParser parser = AuthzConfigurationParser.instance();
         parser.parse( new File( "/home/andrea/test_authz_conf.txt" ) );
-        
-        log.info( parser.getParsedACL().toString());
-        
-        
+
+        log.info( parser.getParsedACL().toString() );
+
     }
 }

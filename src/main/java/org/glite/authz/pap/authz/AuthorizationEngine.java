@@ -14,13 +14,10 @@ public class AuthorizationEngine {
 
     private PAPContext globalContext;
 
-    private AuthorizationEngine() {
-        
-        String papConf = PAPConfiguration.instance()
-                .getPapAuthzConfigurationFileName();
+    private AuthorizationEngine( String papConf ) {
 
         File papConfFile = new File( papConf );
-        
+
         if ( !papConfFile.exists() )
             throw new PAPConfigurationException(
                     "PAP Authorization configuration file not found: "
@@ -31,27 +28,38 @@ public class AuthorizationEngine {
         // Parse ACL from configuration file
         AuthzConfigurationParser confParser = AuthzConfigurationParser
                 .instance();
-        
+
         confParser.parse( papConfFile );
 
         globalContext.setAcl( confParser.getParsedACL() );
     }
 
-    public static AuthorizationEngine initialize(){
-        
-        if (instance == null)
-            instance = new AuthorizationEngine();
-        
+    public static AuthorizationEngine initialize( String papAuthzConfFile ) {
+
+        if ( instance == null )
+            instance = new AuthorizationEngine( papAuthzConfFile );
+
         return instance;
     }
-    
-    
+
     public static AuthorizationEngine instance() {
 
         if ( instance == null )
-            throw new PAPAuthzException("Please initialize the authorization engine properly using the initialize method!");
-            
+            throw new PAPAuthzException(
+                    "Please initialize the authorization engine properly using the initialize method!" );
+
         return instance;
+    }
+
+    public void saveConfiguration() {
+
+        String confFileName = PAPConfiguration.instance()
+                .getPapAuthzConfigurationFileName();
+
+        AuthzConfigurationParser confParser = AuthzConfigurationParser
+                .instance();
+
+        confParser.save( new File( confFileName ), getGlobalContext().getAcl() );
     }
 
     public boolean isInitialized() {

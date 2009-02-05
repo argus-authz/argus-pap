@@ -6,79 +6,134 @@ import java.util.List;
 
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
+import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
+import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSystemPolicySetDAO implements PolicySetDAO {
-	
-	public static FileSystemPolicySetDAO getInstance() {
-		return new FileSystemPolicySetDAO();
-	}
 
-	private final String policySetFileNamePrefix;
-	private final PolicySetHelper policySetHelper;
+    @SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(FileSystemPolicySetDAO.class);
+    private static final PolicySetHelper policySetHelper = PolicySetHelper.getInstance();
+    private static final String policySetFileNamePrefix = FileSystemRepositoryManager
+            .getPolicySetFileNamePrefix();
 
-	private FileSystemPolicySetDAO() {
-		policySetFileNamePrefix = FileSystemRepositoryManager.getPolicySetFileNamePrefix();
-		policySetHelper = PolicySetHelper.getInstance();
-	}
-	
-	public void delete(String papId, String policySetId) {
-		File policySetFile = new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, policySetId));
-		if (!policySetFile.delete()) {
-			throw new RepositoryException("Cannot delete policyset: " + policySetId);
-		}
-	}
+    public static FileSystemPolicySetDAO getInstance() {
+        return new FileSystemPolicySetDAO();
+    }
 
-	public void deleteAll(String papId) {
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
-		for (File file:papDir.listFiles()) {
-			if (file.isDirectory()) {
-				continue;
-			}
-			if (file.getName().startsWith(policySetFileNamePrefix)) {
-				file.delete();
-			}
-		}
-	}
+    private FileSystemPolicySetDAO() {}
 
-	public boolean exists(String papId, String policySetId) {
-		return new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, policySetId)).exists();
-	}
-	
-	public List<PolicySetType> getAll(String papId) {
-		List<PolicySetType> policySetList = new LinkedList<PolicySetType>();
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
-		for (File file:papDir.listFiles()) {
-			if (file.isDirectory()) {
-				continue;
-			}
-			if (file.getName().startsWith(policySetFileNamePrefix)) {
-				policySetList.add(policySetHelper.buildFromFile(file));
-			}
-		}
-		return policySetList;
-	}
-	
-	public PolicySetType getById(String papId, String policySetId) {
-		File policySetFile = new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, policySetId));
-		if (!policySetFile.exists()) {
-			throw new RepositoryException("PolicySet does not exist: " + policySetId);
-		}
-		return policySetHelper.buildFromFile(policySetFile);
-	}
-	
-	public void store(String papId, PolicySetType ps) {
-		if (!exists(papId, ps.getPolicySetId())) {
-			policySetHelper.toFile(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, ps.getPolicySetId()), ps);
-		}
-	}
+    public void delete(String papId, String policySetId) throws NotFoundException, RepositoryException {
 
-	public void update(String papId, PolicySetType ps) {
-		File policySetFile = new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, ps.getPolicySetId()));
-		if (!policySetFile.exists()) {
-			throw new RepositoryException("PolicySet does not exist: " + ps.getPolicySetId());
-		}
-		policySetHelper.toFile(policySetFile, ps);
-	}
+        String policySetFileName = FileSystemRepositoryManager.getPolicySetAbsolutePath(papId,
+                policySetId);
+
+        if (exists(papId, policySetId)) {
+            File policySetFile = new File(policySetFileName);
+
+            if (!policySetFile.delete())
+                throw new RepositoryException("Cannot delete PolicySet \"" + policySetId + "\": "
+                        + policySetFileName);
+
+        } else
+            throw new NotFoundException("Not found: (papId=" + papId + ", PolicySetId=" + policySetId
+                    + "). Resource: " + policySetFileName);
+    }
+
+    public void deleteAll(String papId) {
+
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        if (!papDir.exists())
+            throw new NotFoundException("Not found: papId=" + papId);
+
+        for (File file : papDir.listFiles()) {
+
+            if (file.isDirectory())
+                continue;
+
+            if (file.getName().startsWith(policySetFileNamePrefix))
+                file.delete();
+        }
+    }
+
+    public boolean exists(String papId, String policySetId) {
+        File policySetFile = new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId,
+                policySetId));
+        return policySetFile.exists();
+    }
+
+    public List<PolicySetType> getAll(String papId) {
+
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        if (!papDir.exists())
+            throw new NotFoundException("Not found: papId=" + papId);
+
+        List<PolicySetType> policySetList = new LinkedList<PolicySetType>();
+
+        for (File file : papDir.listFiles()) {
+
+            if (file.isDirectory())
+                continue;
+
+            if (file.getName().startsWith(policySetFileNamePrefix))
+                policySetList.add(policySetHelper.buildFromFile(file));
+        }
+
+        return policySetList;
+    }
+
+    public PolicySetType getById(String papId, String policySetId) throws NotFoundException, RepositoryException {
+
+        File policySetFile = new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId,
+                policySetId));
+
+        if (exists(papId, policySetId)) {
+
+            if (!policySetFile.exists())
+                throw new NotFoundException("PolicySet not found: id=" + policySetId);
+
+        } else
+            throw new NotFoundException("Not found: (papId=" + papId + ", PolicySetId=" + policySetId
+                    + "). Resource: " + policySetFile.getAbsolutePath());
+
+        PolicySetType policySet;
+        try {
+            policySet = policySetHelper.buildFromFile(policySetFile);
+        } catch (Exception e) {
+            throw new RepositoryException(e);
+        }
+        
+        return policySet;
+    }
+
+    public void store(String papId, PolicySetType ps) {
+
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        if (!papDir.exists())
+            throw new NotFoundException("Not found: papId=" + papId);
+
+        String policySetId = ps.getPolicySetId();
+        
+        if (exists(papId, policySetId))
+            throw new AlreadyExistsException("PolicySet already exists: id=" + policySetId);
+
+        PolicySetHelper.toFile(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, policySetId), ps);
+    }
+
+    public void update(String papId, PolicySetType ps) {
+
+        File policySetFile = new File(FileSystemRepositoryManager.getPolicySetAbsolutePath(papId, ps
+                .getPolicySetId()));
+
+        if (!exists(papId, ps.getPolicySetId()))
+            throw new NotFoundException("Not found: (papId=" + papId + ", PolicySetId="
+                    + ps.getPolicySetId() + "). Resource: " + policySetFile.getAbsolutePath());
+
+        PolicySetHelper.toFile(policySetFile, ps);
+    }
+
 }

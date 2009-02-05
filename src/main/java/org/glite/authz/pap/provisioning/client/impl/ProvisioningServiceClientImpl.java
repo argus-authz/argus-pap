@@ -24,17 +24,11 @@ package org.glite.authz.pap.provisioning.client.impl;
 
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
 import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
-import org.opensaml.xacml.policy.PolicySetType;
-
 
 public class ProvisioningServiceClientImpl implements ProvisioningServiceClient {
 
-  public PolicySetType policyQuery() {
-    return null;
-  }
-
-  public ProvisioningServicePortType getProvisioningServicePortType( String url ) {
-    return new ProvisioningServicePortTypeImpl(url);
-  }
+    public ProvisioningServicePortType getProvisioningServicePortType(String url) {
+	return new ProvisioningServicePortTypeImpl(url);
+    }
 
 }

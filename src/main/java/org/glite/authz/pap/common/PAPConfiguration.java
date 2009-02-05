@@ -33,14 +33,10 @@ import java.util.Properties;
 import javax.servlet.ServletContext;
 
 import org.apache.commons.configuration.CompositeConfiguration;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
-import org.glite.authz.pap.authz.AuthorizationEngine;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
-import org.glite.authz.pap.repository.RepositoryManager;
-import org.opensaml.Configuration;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.xml.ConfigurationException;
-import org.opensaml.xml.XMLConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +46,13 @@ public class PAPConfiguration {
 
     private static final String DEFAULT_PAP_REPOSITORY_DIR = "/var/glite/etc/pap";
 
-    private static final String DEFAULT_PAP_DISTRIBUTION_FILE_NAME = "pap_distribution.ini";
-    
     private static final String DEFAULT_PAP_AUTHZ_FILE_NAME = "pap_authorization.ini";
+
+    private static final String DEFAULT_PAP_POLICY_FILE_NAME = "pap_policy.ini";
+    
+    private static final String DEFAULT_PAP_CONFIGURATION_FILE_NAME = "pap_configuration.ini";
+    
+    public static final String MONITORING_PROPERTY_PREFIX = "pap-monitoring";
 
     final static Logger logger = LoggerFactory
             .getLogger( PAPConfiguration.class );
@@ -61,30 +61,21 @@ public class PAPConfiguration {
 
     private CompositeConfiguration configuration;
 
-    private PAPConfiguration( String papConfigurationDir, String papRepositoryDir ) {
+    private INIConfiguration startupConfiguration;
+
+    private PAPConfiguration( String papConfigurationDir,
+            String papRepositoryDir ) {
 
         configuration = new CompositeConfiguration();
 
-        setupConfigurationDirectories( papConfigurationDir, papRepositoryDir);
+        setupConfigurationDirectories( papConfigurationDir, papRepositoryDir );
 
-        try {
+        loadStartupConfiguration();
 
-            configureRepository();
-            configurePolicyDistribution();
-            configureAuthorizationEngine();
-            configureOpenSAML();
-
-        } catch ( ConfigurationException e ) {
-            logger.error( "Error configuring OpenSAML:" + e.getMessage() );
-            throw new PAPConfigurationException( "Error configuring OpenSAML:"
-                    + e.getMessage(), e );
-        }
     }
 
-    private void setupConfigurationDirectories( String papConfDir, String papRepoDir) {
-
-        // String papConfDir = context.getInitParameter( "papConfigurationDir" );
-        // String papRepoDir = context.getInitParameter( "papRepositoryDir" );
+    private void setupConfigurationDirectories( String papConfDir,
+            String papRepoDir ) {
 
         if ( papConfDir == null )
             papConfDir = DEFAULT_PAP_CONFIGURATION_DIR;
@@ -107,57 +98,54 @@ public class PAPConfiguration {
 
     public static PAPConfiguration initialize( ServletContext context ) {
 
-        if ( instance == null ){
-            String papConfDir = context.getInitParameter( "papConfigurationDir" );
+        if ( instance == null ) {
+            String papConfDir = context
+                    .getInitParameter( "papConfigurationDir" );
             String papRepoDir = context.getInitParameter( "papRepositoryDir" );
-            
-            return initialize( papConfDir,papRepoDir );
-    
-            
+
+            return initialize( papConfDir, papRepoDir );
         }
-                
+
         return instance;
     }
 
-    public static PAPConfiguration initialize(){
-        if (instance == null)
+    public static PAPConfiguration initialize() {
+
+        if ( instance == null )
             return initialize( null, null );
-        
-        return instance;
-        
-    }
-    public static PAPConfiguration initialize(String papConfigurationDir, String papRepositoryDir){
-        
-        if (instance == null)
-            return initialize( papConfigurationDir, papRepositoryDir );
-        
-        return instance;
-    }
-    
-    private void configureAuthorizationEngine(){
-        
-        logger.info( "Configuring authorization engine..." );
-        AuthorizationEngine.initialize();
-        
-    }
-    
-    private void configurePolicyDistribution() {
 
-        logger.info( "Loading policy distribution configuration..." );
+        return instance;
+
+    }
+
+    public static PAPConfiguration initialize( String papConfigurationDir,
+            String papRepositoryDir ) {
+
+        if ( instance == null )
+            instance = new PAPConfiguration( papConfigurationDir,
+                    papRepositoryDir );
+
+        return instance;
+    }
+
+    private void loadStartupConfiguration() {
+
+        logger.info( "Loading pap startup configuration..." );
         String papConfDir = configuration.getString( "papConfigurationDir" );
 
-        File papDistConfFile = new File( papConfDir + "/"
-                + DEFAULT_PAP_DISTRIBUTION_FILE_NAME );
+        File papConfFile = new File( papConfDir + "/"
+                + DEFAULT_PAP_CONFIGURATION_FILE_NAME);
 
-        if ( !papDistConfFile.exists() )
+        if ( !papConfFile.exists() )
             throw new PAPConfigurationException(
-                    "PAP distribution configuration file does not exists on path:"
-                            + papDistConfFile.getAbsolutePath() );
+                    "PAP startup configuration file does not exists on path:"
+                            + papConfFile.getAbsolutePath() );
 
         try {
 
-            configuration.addConfiguration( new INIConfiguration(
-                    papDistConfFile ) );
+            startupConfiguration = new INIConfiguration( papConfFile );
+
+            configuration.addConfiguration( startupConfiguration );
 
         } catch ( org.apache.commons.configuration.ConfigurationException e ) {
 
@@ -171,42 +159,30 @@ public class PAPConfiguration {
 
     }
 
-    private void configureRepository() {
+    // Getter methods that access the configuration object and other services
+    // down here
 
-        logger.info( "Loading repository manager configuration..." );
-        RepositoryManager.getInstance().bootstrap();
-    }
+    public String getPAPConfigurationDir() {
 
-    private void configureOpenSAML() throws ConfigurationException {
-
-        DefaultBootstrap.bootstrap();
-        XMLConfigurator xmlConfigurator = new XMLConfigurator();
-
-        // Needed because of a "bug" in opensaml 2.1.0... can be removed when opensaml is updated
-        xmlConfigurator.load( Configuration.class
-                .getResourceAsStream( "/opensaml_bugfix.xml" ) );
-
-    }
-
-    
-    
-    // Getter methods that access the configuration object and other services down here
-    
-    public String getPAPConfigurationDir(){
         return configuration.getString( "papConfigurationDir" );
-        
+
     }
-    
-    public String getPAPRepositoryDir(){
+
+    public String getPAPRepositoryDir() {
+
         return configuration.getString( "papRepositoryDir" );
     }
-    
-    
-    public String getPapAuthzConfigurationFileName(){
-        
-        return getPAPConfigurationDir()+File.pathSeparator+DEFAULT_PAP_AUTHZ_FILE_NAME;
+
+    public String getPapAuthzConfigurationFileName() {
+
+        return getPAPConfigurationDir() + "/" + DEFAULT_PAP_AUTHZ_FILE_NAME;
     }
-    
+
+    public String getPapPolicyConfigurationFileName() {
+
+        return getPAPConfigurationDir() + "/" + DEFAULT_PAP_POLICY_FILE_NAME;
+    }
+
     public BigDecimal getBigDecimal( String key, BigDecimal defaultValue ) {
 
         return configuration.getBigDecimal( key, defaultValue );
@@ -380,6 +356,52 @@ public class PAPConfiguration {
     public String[] getStringArray( String key ) {
 
         return configuration.getStringArray( key );
+    }
+
+    public void clearDistributionProperty( String key ) {
+
+        configuration.clearProperty( key );
+    }
+
+    public void setDistributionProperty( String key, Object value ) {
+
+        startupConfiguration.setProperty( key, value );
+    }
+
+    public void saveStartupConfiguration() {
+
+        try {
+
+            startupConfiguration.save();
+
+        } catch ( ConfigurationException e ) {
+
+            throw new PAPConfigurationException(
+                    "Error saving policy distribution configuration: "
+                            + e.getMessage(), e );
+        }
+
+    }
+
+    /**
+     * @param prefix
+     * @return
+     * @see org.apache.commons.configuration.AbstractConfiguration#subset(java.lang.String)
+     */
+    public Configuration subset( String prefix ) {
+
+        return configuration.subset( prefix );
+    }
+   
+    
+    public void setMonitoringProperty(String name, Object value){
+        
+        configuration.setProperty( MONITORING_PROPERTY_PREFIX+"."+name, value );
+    }
+    
+    public Object getMonitoringProperty(String name){
+        
+        return configuration.getProperty( MONITORING_PROPERTY_PREFIX+"."+name );
     }
 
 }

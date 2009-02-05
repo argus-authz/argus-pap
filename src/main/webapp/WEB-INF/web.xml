@@ -5,12 +5,24 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
 <web-app>
 
-  <display-name>PAP</display-name>
+  <display-name>glite-authz-pap</display-name>
 
   <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath*:applicationContext*.xml</param-value>
   </context-param>
+  
+  
+  <!-- Filters -->
+  <filter>
+		<filter-name>security-context-filter</filter-name>
+		<filter-class>org.glite.authz.pap.servlet.SecurityContextFilter</filter-class>
+</filter>
+
+	<filter-mapping>
+		<filter-name>security-context-filter</filter-name>
+		<url-pattern>/services/*</url-pattern>
+	</filter-mapping>
 
   <!-- Listeners -->
 
@@ -23,6 +35,12 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
   </listener>
 
   <!-- Servlets -->
+  
+  <servlet>
+    <servlet-name>MonitoringServlet</servlet-name>
+    <display-name>PAP Monitoring Servlet</display-name>
+    <servlet-class>org.glite.authz.pap.monitoring.MonitoringServlet</servlet-class>
+  </servlet>
   
   <servlet>
     <servlet-name>AxisServlet</servlet-name>
@@ -40,6 +58,11 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <url-pattern>/services/*</url-pattern>
   </servlet-mapping>
 
+  <servlet-mapping>
+    <servlet-name>MonitoringServlet</servlet-name>
+    <url-pattern>/status</url-pattern>
+  </servlet-mapping>
+  
   <session-config>
     <!-- Default to 5 minute session timeouts -->
     <session-timeout>5</session-timeout>
@@ -62,9 +85,7 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
   <!-- Welcome file lists -->
 
   <welcome-file-list>
-    <welcome-file>index.jsp</welcome-file>
-    <welcome-file>default.jsp</welcome-file>
-    <welcome-file>index.html</welcome-file>
+    <welcome-file>pages/index.html</welcome-file>
   </welcome-file-list>
 
 </web-app>

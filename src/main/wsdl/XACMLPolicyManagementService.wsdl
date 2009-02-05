@@ -1,0 +1,407 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://org.glite.authz/wsdl/pap/services/xacml_policy_management"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:tns1="urn:policy:xacml:opensaml:org" name="XACMLPolicyManagementService"
+	targetNamespace="http://org.glite.authz/wsdl/pap/services/xacml_policy_management"
+	xmlns:xsd1="urn:oasis:names:tc:xacml:2.0:policy:schema:os">
+	<wsdl:types>
+	    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import
+				namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+				schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd">
+			</xsd:import>
+		</xsd:schema>
+		<xsd:schema targetNamespace="urn:policy:xacml:opensaml:org">
+            <xsd:import schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd" namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"></xsd:import>
+			<xsd:complexType name="PolicyList">
+				<xsd:sequence>
+					<xsd:element name="policy" type="xsd1:PolicyType"
+						maxOccurs="unbounded" minOccurs="0">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+			<xsd:complexType name="PolicySetList">
+				<xsd:sequence>
+					<xsd:element name="policySet"
+						type="xsd1:PolicySetType" maxOccurs="unbounded" minOccurs="0">
+					</xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+	</wsdl:types>
+
+	<wsdl:message name="getPolicyRequest">
+		<wsdl:part name="policyId" type="xsd:string" />
+	</wsdl:message>
+	<wsdl:message name="getPolicyResponse">
+        <wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getPolicySetRequest">
+		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getPolicySetResponse">
+		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="hasPolicyRequest">
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="hasPolicyResponse">
+		<wsdl:part name="hasPolicyResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="hasPolicySetRequest">
+		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="hasPolicySetResponse">
+		<wsdl:part name="hasPolicySetResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="listPoliciesRequest">
+	</wsdl:message>
+	<wsdl:message name="listPoliciesResponse">
+		<wsdl:part name="policyList" type="tns1:PolicyList"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="listPolicySetsRequest">
+	</wsdl:message>
+	<wsdl:message name="listPolicySetsResponse">
+		<wsdl:part name="policySetList" type="tns1:PolicySetList"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="listPAPPoliciesRequest">
+		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="listPAPPolicySetsRequest">
+		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="removePolicyRequest">
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="removePolicyResponse">
+		<wsdl:part name="removePolicyResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="removePolicySetRequest">
+		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="removePolicySetResponse">
+		<wsdl:part name="removePolicySetResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="storePolicyRequest">
+		<wsdl:part name="idPrefix" type="xsd:string"></wsdl:part>
+		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="storePolicyResponse">
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="storePolicySetRequest">
+		<wsdl:part name="idPrefix" type="xsd:string"></wsdl:part>
+		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="storePolicySetResponse">
+		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updatePolicyRequest">
+		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updatePolicyResponse">
+		<wsdl:part name="updatePolicyResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updatePolicySetRequest">
+		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="updatePolicySetResponse">
+		<wsdl:part name="updatePolicySetResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getPAPPolicyRequest">
+		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getPAPPolicyResponse">
+		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getPAPPolicySetRequest">
+		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getPAPPolicySetResponse">
+		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
+	</wsdl:message>
+
+	<wsdl:message name="addPolicyRequest">
+		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
+		<wsdl:part name="policyIdPrefix" type="xsd:string"></wsdl:part>
+		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addPolicyResponse">
+		<wsdl:part name="addPolicyResponse" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="removePolicyAndReferencesRequest">
+		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="removePolicyAndReferencesResponse">
+		<wsdl:part name="removePolicyAndReferencesResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="XACMLPolicyManagement">
+		<wsdl:operation name="getPolicy">
+			<wsdl:input message="tns:getPolicyRequest" />
+			<wsdl:output message="tns:getPolicyResponse" />
+		</wsdl:operation>
+		<wsdl:operation name="getPolicySet">
+			<wsdl:input message="tns:getPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:getPolicySetResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getPAPPolicy">
+			<wsdl:input message="tns:getPAPPolicyRequest"></wsdl:input>
+			<wsdl:output message="tns:getPAPPolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getPAPPolicySet">
+			<wsdl:input message="tns:getPAPPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:getPAPPolicySetResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="hasPolicy">
+			<wsdl:input message="tns:hasPolicyRequest"></wsdl:input>
+			<wsdl:output message="tns:hasPolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="hasPolicySet">
+			<wsdl:input message="tns:hasPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:hasPolicySetResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPolicies">
+            <wsdl:input message="tns:listPoliciesRequest"></wsdl:input>
+			<wsdl:output message="tns:listPoliciesResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPAPPolicies">
+			<wsdl:input message="tns:listPAPPoliciesRequest"></wsdl:input>
+			<wsdl:output message="tns:listPoliciesResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPolicySets">
+			<wsdl:input message="tns:listPolicySetsRequest"></wsdl:input>
+			<wsdl:output message="tns:listPolicySetsResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPAPPolicySets">
+			<wsdl:input message="tns:listPAPPolicySetsRequest"></wsdl:input>
+			<wsdl:output message="tns:listPolicySetsResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removePolicy">
+			<wsdl:input message="tns:removePolicyRequest"></wsdl:input>
+			<wsdl:output message="tns:removePolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removePolicySet">
+			<wsdl:input message="tns:removePolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:removePolicySetResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="storePolicy">
+			<wsdl:input message="tns:storePolicyRequest"></wsdl:input>
+			<wsdl:output message="tns:storePolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="storePolicySet">
+			<wsdl:input message="tns:storePolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:storePolicySetResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updatePolicy">
+			<wsdl:input message="tns:updatePolicyRequest"></wsdl:input>
+			<wsdl:output message="tns:updatePolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updatePolicySet">
+			<wsdl:input message="tns:updatePolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:updatePolicySetResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addPolicy">
+			<wsdl:input message="tns:addPolicyRequest"></wsdl:input>
+			<wsdl:output message="tns:addPolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removePolicyAndReferences">
+			<wsdl:input message="tns:removePolicyAndReferencesRequest"></wsdl:input>
+			<wsdl:output message="tns:removePolicyAndReferencesResponse"></wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+
+	<wsdl:binding name="XACMLPolicyManagementSOAP" type="tns:XACMLPolicyManagement">
+		<soap:binding style="rpc"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+			
+		<wsdl:operation name="getPolicy">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getPolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getPAPPolicy">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPAPPolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getPAPPolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPAPPolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="hasPolicy">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/hasPolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="hasPolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/hasPolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPolicies">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/listPolicies" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPAPPolicies">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/listPAPPolicies" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPolicySets">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/listPolicySets" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="listPAPPolicySets">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/listPolicySets" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removePolicy">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removePolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removePolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removePolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="storePolicy">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/storePolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="storePolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/storePolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updatePolicy">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/updatePolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="updatePolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/updatePolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addPolicy">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/addPolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removePolicyAndReferences">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removePolicyAndReferences" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+
+	<wsdl:service name="XACMLPolicyManagementService">
+		<wsdl:port binding="tns:XACMLPolicyManagementSOAP" name="XACMLPolicyManagementService">
+			<soap:address location="https://localhost:8443/pap" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -2,7 +2,6 @@ package org.glite.authz.pap.authz.exceptions;
 
 import org.glite.authz.pap.common.exceptions.PAPException;
 
-
 public class PAPAuthzConfigurationException extends PAPException {
 
     /**
@@ -12,27 +11,26 @@ public class PAPAuthzConfigurationException extends PAPException {
 
     public PAPAuthzConfigurationException() {
 
-        super();
-        // TODO Auto-generated constructor stub
+	super();
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPAuthzConfigurationException( String message, Throwable cause ) {
+    public PAPAuthzConfigurationException(String message, Throwable cause) {
 
-        super( message, cause );
-        // TODO Auto-generated constructor stub
+	super(message, cause);
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPAuthzConfigurationException( String message ) {
+    public PAPAuthzConfigurationException(String message) {
 
-        super( message );
-        // TODO Auto-generated constructor stub
+	super(message);
+	// TODO Auto-generated constructor stub
     }
 
-    public PAPAuthzConfigurationException( Throwable cause ) {
+    public PAPAuthzConfigurationException(Throwable cause) {
 
-        super( cause );
-        // TODO Auto-generated constructor stub
+	super(cause);
+	// TODO Auto-generated constructor stub
     }
 
-    
 }

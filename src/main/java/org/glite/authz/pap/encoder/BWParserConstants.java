@@ -4,40 +4,46 @@ package org.glite.authz.pap.encoder;
 public interface BWParserConstants {
 
   int EOF = 0;
-  int ALLOW = 6;
-  int DENY = 7;
-  int FQAN = 8;
-  int DN = 9;
-  int GA = 10;
-  int RESOURCE = 11;
-  int CERT = 12;
-  int SERVICE = 13;
-  int PILOT = 14;
-  int NO = 15;
-  int YES = 16;
-  int BW = 17;
-  int CLASS = 18;
-  int EXCEPT = 19;
-  int PRIVATE = 20;
-  int STRING = 21;
-  int ID = 22;
-  int ID2 = 23;
+  int ALLOW = 9;
+  int DENY = 10;
+  int FQAN = 11;
+  int DN = 12;
+  int GA = 13;
+  int RESOURCE = 14;
+  int CERT = 15;
+  int SERVICE = 16;
+  int PILOT = 17;
+  int NO = 18;
+  int YES = 19;
+  int BW = 20;
+  int CLASS = 21;
+  int EXCEPT = 22;
+  int PRIVATE = 23;
+  int STRING = 24;
+  int ID = 25;
+  int ID2 = 26;
+  int HEX = 27;
+  int NUMBER = 28;
 
   int DEFAULT = 0;
+  int ONE_LINE_COMMENT = 1;
 
   String[] tokenImage = {
     "<EOF>",
+    "\"#\"",
     "\" \"",
     "\"\\t\"",
     "\"\\n\"",
     "\"\\r\"",
     "\"\\f\"",
+    "<token of kind 7>",
+    "<token of kind 8>",
     "\"allow\"",
     "\"deny\"",
     "\"fqan\"",
     "\"dn\"",
     "\"ga\"",
-    "\"resource\"",
+    "\"resource_uri\"",
     "\"certificate\"",
     "\"service_class_assignment\"",
     "\"pilot\"",
@@ -50,8 +56,8 @@ public interface BWParserConstants {
     "<STRING>",
     "<ID>",
     "<ID2>",
-    "\"[\"",
-    "\"]\"",
+    "<HEX>",
+    "<NUMBER>",
     "\"{\"",
     "\"}\"",
     "\"=\"",
