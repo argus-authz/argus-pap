@@ -82,8 +82,9 @@ public class DistributionConfiguration {
 
 		String[] papOrderArray = papConfiguration.getStringArray(papOrderKey());
 
-		if (papOrderArray == null)
+		if (papOrderArray == null) {
 			papOrderArray = new String[0];
+		}
 
 		for (String alias : papOrderArray) {
 			if (!aliasExists(alias))
@@ -122,24 +123,29 @@ public class DistributionConfiguration {
     
     public void removePAP(String papAlias) {
 
+        clearPAPProperties(papAlias);
+        
 		String[] oldAliasOrderArray = getPAPOrderArray();
+		
 		int newArraySize = oldAliasOrderArray.length - 1;
-		String[] newAliasOrderArray = new String[newArraySize];
+		
+		if (newArraySize >= 0) {
+            String[] newAliasOrderArray = new String[newArraySize];
 
-		for (int i = 0, j = 0; i < oldAliasOrderArray.length; i++) {
+            for (int i = 0, j = 0; i < oldAliasOrderArray.length; i++) {
 
-			String aliasItem = oldAliasOrderArray[i];
+                String aliasItem = oldAliasOrderArray[i];
 
-			if (!(aliasItem.equals(papAlias))) {
-				if (j < newArraySize) {
-					newAliasOrderArray[j] = aliasItem;
-					j++;
-				}
-			}
-		}
+                if (!(aliasItem.equals(papAlias))) {
+                    if (j < newArraySize) {
+                        newAliasOrderArray[j] = aliasItem;
+                        j++;
+                    }
+                }
+            }
+            savePAPOrder(newAliasOrderArray);
+        }
 
-		clearPAPProperties(papAlias);
-		savePAPOrder(newAliasOrderArray);
 		papConfiguration.saveStartupConfiguration();
 	}
     
