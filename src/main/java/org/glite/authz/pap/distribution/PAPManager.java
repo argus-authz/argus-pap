@@ -77,9 +77,9 @@ public class PAPManager {
     
     public PAP deleteTrustedPAP(String papAlias) throws NotFoundException {
     	PAP pap = getPAP(papAlias);
-    	papList.remove(pap);
     	distributionConfiguration.removePAP(papAlias);
         papDAO.delete(papAlias);
+        papList.remove(pap);
         return pap;
     }
     
