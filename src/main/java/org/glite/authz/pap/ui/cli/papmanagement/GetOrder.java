@@ -39,8 +39,10 @@ public class GetOrder extends PAPManagementCLI {
     	System.out.print(aliasArray[0]);
     	
     	for (int i=1; i<aliasArray.length; i++) {
-    		System.out.println(", " + aliasArray[i]);
+    		System.out.print(", " + aliasArray[i]);
     	}
+    	
+    	System.out.println("");
     	
         return ExitStatus.SUCCESS.ordinal();
         
