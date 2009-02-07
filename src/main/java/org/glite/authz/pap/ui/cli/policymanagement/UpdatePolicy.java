@@ -44,7 +44,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         
         File file = new File(fileName);
         if (!file.exists()) {
-            System.out.println("Error: file " + file.getAbsolutePath() + "does not exists.");
+            System.out.println("Error: file \"" + file.getAbsolutePath() + "\" does not exists.");
             return ExitStatus.FAILURE.ordinal();
         }
         
@@ -54,7 +54,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         try {
             policyList = policyFileEncoder.parse(file);
         } catch (EncodingException e) {
-            System.out.println("Syntax error. Skipping file:" + fileName);
+            System.out.println("Syntax error. Skipping file: " + fileName);
             System.out.println(e.getMessage());
             return ExitStatus.FAILURE.ordinal();
         }
@@ -70,12 +70,12 @@ public class UpdatePolicy extends PolicyManagementCLI {
         }
         
         if (npolicies == 0) {
-            System.out.println("Error: no policies has been defined in file " + fileName);
+            System.out.println("Error: no policies has been defined in file \"" + fileName + "\"");
             return ExitStatus.FAILURE.ordinal();
         }
         
         if (npolicies > 1) {
-            System.out.println("Error: more than one policy has been defined in file " + fileName);
+            System.out.println("Error: more than one policy has been defined in file \"" + fileName + "\"");
             return ExitStatus.FAILURE.ordinal();
         }
         
