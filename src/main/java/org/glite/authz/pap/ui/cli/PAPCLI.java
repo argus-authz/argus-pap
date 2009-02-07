@@ -35,26 +35,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PAPCLI {
-    
+
     private static final Logger log = LoggerFactory.getLogger(PAPCLI.class);
 
     public static void main(String[] args) {
 
         PAPCLI cli = new PAPCLI(args);
-        
+
         try {
             cli.parseCommandLine();
         } catch (ParseException e) {
             System.out.println(e.getMessage());
         }
-        
+
         int exitStatus = cli.executeCommand();
-        
-        for (ServiceCLI.ExitStatus es:ServiceCLI.ExitStatus.values()) {
+
+        for (ServiceCLI.ExitStatus es : ServiceCLI.ExitStatus.values()) {
             if (es.ordinal() == exitStatus)
-                log.info(cli.getCommandName() + " exit status: " + es);
+                log.info("Exit status (\"" + cli.getCommandName() + "\": " + es + " (" + es.ordinal() + ")");
         }
-        
+
         System.exit(exitStatus);
 
     }
@@ -75,68 +75,68 @@ public class PAPCLI {
     public PAPCLI(String[] args) {
 
         this.args = args;
-        
+
         helpFormatter.setLeftPadding(4);
 
         defineCommands();
         defineOptions();
 
     }
-    
+
     public int executeCommand() {
-        
+
         if (printGeneralHelpMessage) {
             printGeneralHelp();
             return ServiceCLI.ExitStatus.SUCCESS.ordinal();
         }
-        
+
         if (serviceCLI == null)
             return ServiceCLI.ExitStatus.INITIALIZATION_ERROR.ordinal();
-        
+
         int exitStatus;
-        
+
         try {
-            
+
             if (System.getProperty("enablePapCliProfiling") != null)
                 exitStatus = profileCommandExecution(serviceCLI, args);
             else
                 exitStatus = serviceCLI.execute(args);
-            
+
         } catch (ParseException e) {
             System.err.println("\nParsing failed.  Reason: " + e.getMessage() + "\n");
             return ServiceCLI.ExitStatus.PARSE_ERROR.ordinal();
-            
+
         } catch (HelpMessageException e) {
             printCommandHelp(serviceCLI);
             return ServiceCLI.ExitStatus.SUCCESS.ordinal();
-            
+
         } catch (RemoteException e) {
             log.error("Remote exception", e);
             System.out.println("Error invoking the '" + serviceCLI.getClass().getSimpleName() + "' method on remote endpoint: "
                     + serviceCLI.getServiceClient().getTargetEndpoint());
             System.out.println("Reason: " + e.getMessage());
             return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
-            
+
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
             log.error("admin exception", e);
             return ServiceCLI.ExitStatus.FAILURE.ordinal();
         }
-        
+
         return exitStatus;
     }
-    
+
     public void parseCommandLine() throws ParseException {
-        
+
         CommandLine commandLine = parser.parse(options, args, true);
-        
+
         if (commandLine.hasOption('h'))
             printGeneralHelpMessage = true;
         else
             printGeneralHelpMessage = false;
-        
+
         String command = getCommand(args);
-        
+
         boolean commandFound = false;
 
         Iterator<ServiceCLI> serviceCLIIterator = serviceCLIList.iterator();
@@ -147,19 +147,19 @@ public class PAPCLI {
                 break;
             }
         }
-        
+
         if (!commandFound) {
             serviceCLI = null;
             throw new ParseException("Unknown command: " + command);
         }
-        
+
     }
-    
+
     public String getCommandName() {
-        
+
         if (serviceCLI != null)
             return serviceCLI.getCommandNameValues()[0];
-        
+
         return null;
     }
 
@@ -314,7 +314,7 @@ public class PAPCLI {
 
         log.debug("Avg '" + serviceCLI.getClass().getSimpleName() + "'cmd execution time: " + computeAvg(samples) + " msecs.");
         log.debug("Fist '" + serviceCLI.getClass().getSimpleName() + "' execution (bootstrap) time: " + samples[0] + " msecs.");
-        
+
         return status;
 
     }
