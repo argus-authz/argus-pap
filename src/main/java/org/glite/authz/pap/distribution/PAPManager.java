@@ -154,6 +154,7 @@ public class PAPManager {
     
     public void setTrustedPAPOrder(String[] aliasArray) {
     	distributionConfiguration.savePAPOrder(aliasArray);
+    	// updated the internal list with the new order
     	papList = distributionConfiguration.getRemotePAPList();
     }
     
