@@ -150,14 +150,15 @@ public class DistributionConfiguration {
     
     public void savePAPOrder(String[] aliasArray) throws AliasNotFoundException {
     	
-        papConfiguration.clearDistributionProperty(papOrderKey());
 
         if (aliasArray == null) {
+            papConfiguration.clearDistributionProperty(papOrderKey());
         	papConfiguration.saveStartupConfiguration();
         	return;
         }
         
         if (aliasArray.length == 0) {
+            papConfiguration.clearDistributionProperty(papOrderKey());
         	papConfiguration.saveStartupConfiguration();
             return;
         }
@@ -177,6 +178,7 @@ public class DistributionConfiguration {
         
         log.info("Setting new PAP order to: " + sb.toString());
         
+        papConfiguration.clearDistributionProperty(papOrderKey());
         papConfiguration.setDistributionProperty(papOrderKey(), aliasArray);
         papConfiguration.saveStartupConfiguration();
     }
