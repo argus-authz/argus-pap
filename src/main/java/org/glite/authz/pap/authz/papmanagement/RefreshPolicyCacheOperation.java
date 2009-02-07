@@ -11,16 +11,16 @@ import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 public class RefreshPolicyCacheOperation extends BasePAPOperation<Boolean> {
 
-    String papId;
+    String papAlias;
 
-    protected RefreshPolicyCacheOperation(String papId) {
+    protected RefreshPolicyCacheOperation(String papAlias) {
 
-        this.papId = papId;
+        this.papAlias = papAlias;
     }
 
-    public static RefreshPolicyCacheOperation instance(String papId) {
+    public static RefreshPolicyCacheOperation instance(String papAlias) {
 
-        return new RefreshPolicyCacheOperation(papId);
+        return new RefreshPolicyCacheOperation(papAlias);
     }
 
     @Override
@@ -31,10 +31,10 @@ public class RefreshPolicyCacheOperation extends BasePAPOperation<Boolean> {
         PAP pap;
 
         try {
-            pap = papManager.getPAP(papId);
+            pap = papManager.getPAP(papAlias);
 
         } catch (NotFoundException e) {
-            log.error("Unable to refresh cache, PAP not found: " + papId);
+            log.error("Unable to refresh cache, PAP not found: " + papAlias);
             return false;
         }
 
