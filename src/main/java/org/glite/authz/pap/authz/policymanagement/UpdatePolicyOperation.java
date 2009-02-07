@@ -30,7 +30,7 @@ public class UpdatePolicyOperation extends BasePAPOperation <Boolean> {
         if (!localPAP.hasPolicy(policy.getPolicyId()))
             return false;
         
-        localPAP.storePolicy(policy);
+        localPAP.updatePolicy(policy);
         
         return true;
     }
