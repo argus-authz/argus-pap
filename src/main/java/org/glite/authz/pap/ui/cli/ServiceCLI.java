@@ -19,12 +19,12 @@ import org.glite.authz.pap.common.PAP;
 public abstract class ServiceCLI {
     
     public static enum ExitStatus {
-        FAILURE,                // value = 0
-        INITIALIZATION_ERROR,   // value = 1
-        PARSE_ERROR,            // value = 2
-        PARTIAL_SUCCESS,        // value = 3
-        REMOTE_EXCEPTION,       // value = 4
-        SUCCESS;                // value = 5
+        SUCCESS,                // value = 0
+        PARTIAL_SUCCESS,        // value = 1
+        FAILURE,                // value = 2
+        INITIALIZATION_ERROR,   // value = 3
+        PARSE_ERROR,            // value = 4
+        REMOTE_EXCEPTION        // value = 5
     }
     
     private static final HelpFormatter helpFormatter = new HelpFormatter();
