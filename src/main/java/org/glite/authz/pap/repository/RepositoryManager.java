@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
@@ -20,36 +19,37 @@ import org.slf4j.LoggerFactory;
 public abstract class RepositoryManager {
     
     private static final Logger log = LoggerFactory.getLogger(RepositoryManager.class);
+    
+    protected RepositoryManager() {}
+    
+    /**
+     * Call the bootstrap() method before using this class.
+     */
+
+    public static void bootstrap() {
+        
+        FileSystemRepositoryManager.initialize();
+        
+        PAPManager.getInstance().createLocalPAPIfNotExists();
+        
+        if (PAPConfiguration.instance().getBoolean("use-policy-config-file")) {
+        	setLocalPoliciesFromConfigurationFile();
+        }
+        
+        // FillRepository.fillFromConfiguration();
+    }
 
     public static DAOFactory getDAOFactory() {
         return DAOFactory.getDAOFactory();
     }
-
-    public static RepositoryManager getInstance() {
-        return new FileSystemRepositoryManager();
-    }
-
-    public void bootstrap() {
-        
-        initialize();
-        
-        PAPManager.getInstance().createLocalPAPIfNotExists();
-        
-        //setLocalPoliciesFromConfigurationFile();
-        
-        //FillRepository.fillFromConfiguration();
-    }
     
-    // Temporary method for initializing the repository
-    private void setLocalPoliciesFromConfigurationFile() {
+    /**
+     * Initialize the repository reading policies from the configuration file.
+     */
+    private static void setLocalPoliciesFromConfigurationFile() {
         PolicyFileEncoder pse = new PolicyFileEncoder();
 
-        File policyConfigurationFile;
-        try {
-            policyConfigurationFile = new File(PAPConfiguration.instance().getPapPolicyConfigurationFileName());
-        } catch (PAPConfigurationException e) {
-            policyConfigurationFile = new File("/opt/glite/etc/pap/pap_policy.ini");
-        }
+        File policyConfigurationFile = new File(PAPConfiguration.instance().getPapPolicyConfigurationFileName());
         
         log.info("Reading policy configuration file: " + policyConfigurationFile.getAbsolutePath());
         
@@ -79,7 +79,4 @@ public abstract class RepositoryManager {
         }
         
     }
-
-    protected abstract void initialize();
-
 }

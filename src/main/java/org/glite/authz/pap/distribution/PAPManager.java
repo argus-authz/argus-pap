@@ -19,25 +19,26 @@ import org.slf4j.LoggerFactory;
 
 public class PAPManager {
     
-	private static PAPManager instance = null;
+	protected static PAP localPAP;
+	
+    private static PAPManager instance = null;
     private static final Logger log = LoggerFactory.getLogger(PAPManager.class);
-    protected static PAP localPAP;
-    
-    public static PAPManager getInstance() {
-        if (instance == null)
-            instance = new PAPManager();
-        return instance;
-    }
     
     protected DistributionConfiguration distributionConfiguration;
     protected PAPDAO papDAO;
     protected List<PAP> papList;
     
-    protected PAPManager() {
+    private PAPManager() {
         distributionConfiguration = DistributionConfiguration.getInstance();
         papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
         localPAP = PAP.makeLocalPAP();
         initPAPList();
+    }
+    
+    public static PAPManager getInstance() {
+        if (instance == null)
+            instance = new PAPManager();
+        return instance;
     }
     
     public PAPContainer addTrustedPAP(PAP pap) {

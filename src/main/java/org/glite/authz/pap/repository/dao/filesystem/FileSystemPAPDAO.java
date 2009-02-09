@@ -10,264 +10,279 @@ import java.util.Set;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
+import org.glite.authz.pap.repository.dao.PolicyDAO;
+import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
-import org.mortbay.log.Log;
 
 public class FileSystemPAPDAO implements PAPDAO {
 
-    private static String PAP_FILE_NAME = "pap_info.ini";
-    private static String REMOTE_PAP_STANZA = "remote-paps";
-    private static FileSystemPAPDAO instance = null;
-    private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
+	private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
+	private static FileSystemPAPDAO instance = null;
+	
+	private static final String PAP_FILE_NAME = "pap_info.ini";
+	private static final String REMOTE_PAP_STANZA = "remote-paps";
 
-    public static FileSystemPAPDAO getInstance() {
-    	if (instance == null)
-            instance = new FileSystemPAPDAO();
-    	return instance;
-    }
+	private INIConfiguration papsINIFile;
 
-    private static String aliasKey(String papAlias) {
-        return REMOTE_PAP_STANZA + "." + papAlias;
-    }
+	private FileSystemPAPDAO() {
+		papsINIFile = new INIConfiguration();
 
-    private static String dnKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "dn";
-    }
+		File iniPAPConfigurationFile = new File(dbPath + File.separator + PAP_FILE_NAME);
 
-    private static String hostnameKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "hostname";
-    }
+		papsINIFile.setFile(iniPAPConfigurationFile);
 
-    private static String idKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "id";
-    }
+		try {
 
-    private static String pathKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "path";
-    }
+			if (!iniPAPConfigurationFile.exists())
+				papsINIFile.save();
 
-    private static String portKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "port";
-    }
+			papsINIFile.load();
+		} catch (ConfigurationException e) {
+			throw new RepositoryException("Configuration error", e);
+		}
 
-    private static String protocolKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "protocol";
-    }
-    
-    private static String visibilityPublicKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "public";
-    }
+	}
 
-    private INIConfiguration papsFile;
+	public static FileSystemPAPDAO getInstance() {
+		if (instance == null)
+			instance = new FileSystemPAPDAO();
+		return instance;
+	}
 
-    private FileSystemPAPDAO() throws RepositoryException {
-        papsFile = new INIConfiguration();
+	private static String aliasAlreadyExistsExceptionMsg(String papAlias) {
+		return "Already exists: papAlias=" + papAlias;
+	}
 
-        File remotePAPsFile = new File(dbPath + File.separator + PAP_FILE_NAME);
+	private static String aliasKey(String papAlias) {
+		return REMOTE_PAP_STANZA + "." + papAlias;
+	}
 
-        papsFile.setFile(remotePAPsFile);
+	private static String aliasNotFoundExceptionMsg(String papAlias) {
+		return "Not found: papAlias=" + papAlias;
+	}
 
-        try {
+	private static String dnKey(String papAlias) {
+		return aliasKey(papAlias) + "." + "dn";
+	}
 
-            if (!remotePAPsFile.exists())
-                papsFile.save();
+	private static String hostnameKey(String papAlias) {
+		return aliasKey(papAlias) + "." + "hostname";
+	}
 
-            papsFile.load();
-        } catch (ConfigurationException e) {
-            throw new RepositoryException("Error during initialization", e);
-        }
+	private static String idKey(String papAlias) {
+		return aliasKey(papAlias) + "." + "id";
+	}
 
-    }
+	private static String pathKey(String papAlias) {
+		return aliasKey(papAlias) + "." + "path";
+	}
 
-    public void delete(String papAlias) throws NotFoundException, RepositoryException {
+	private static String portKey(String papAlias) {
+		return aliasKey(papAlias) + "." + "port";
+	}
 
-        if (!exists(papAlias))
-            throw new NotFoundException("Not found: papAlias=" + papAlias);
+	private static String protocolKey(String papAlias) {
+		return aliasKey(papAlias) + "." + "protocol";
+	}
 
-        String papId = papsFile.getString(idKey(papAlias));
-        
-        File papDir = new File(getPAPDirAbsolutePath(papId));
-        
-        // empty PAP directory (delete all policies and policy sets)
-        for (File file : papDir.listFiles()) {
-            file.delete();
-        }
-        papDir.delete();
+	private static String visibilityPublicKey(String papAlias) {
+		return aliasKey(papAlias) + "." + "public";
+	}
 
-        // remove PAP from INI file
-        clearPAPProperties(papAlias);
-        try {
-            papsFile.save();
-        } catch (ConfigurationException e) {
-            throw new RepositoryException(e);
-        }
-    }
+	public void delete(String papAlias) throws NotFoundException, RepositoryException {
 
-    public List<PAP> getAll() {
-        
-        List<String> aliasList = getAllAliases();
-        
-        List<PAP> papList = new ArrayList<PAP>(aliasList.size());
-        
-        for (String alias:aliasList) {
-            papList.add(getPAPFromProperies(alias));
-        }
+		if (!exists(papAlias))
+			throw new NotFoundException(aliasNotFoundExceptionMsg(papAlias));
 
-        return papList;
-    }
+		String papId = papsINIFile.getString(idKey(papAlias));
+		
+		PolicyDAO policyDAO = RepositoryManager.getDAOFactory().getPolicyDAO();
+		policyDAO.deleteAll(papId);
+		
+		PolicySetDAO policySetDAO = RepositoryManager.getDAOFactory().getPolicySetDAO();
+		policySetDAO.deleteAll(papId);
 
-    @SuppressWarnings("unchecked")
+		File papDir = new File(getPAPDirAbsolutePath(papId));
+		papDir.delete();
+
+		removeFromINIFile(papAlias);
+	}
+
+	public boolean exists(String papAlias) {
+
+		return existsInINIFile(papAlias);
+	}
+
+	public PAP get(String papAlias) {
+
+		PAP pap = getPAPFromINIFile(papAlias);
+
+		if (pap == null)
+			throw new NotFoundException(aliasNotFoundExceptionMsg(papAlias));
+
+		return pap;
+	}
+
+	public List<PAP> getAll() {
+
+		List<String> aliasList = getAllAliases();
+
+		List<PAP> papList = new ArrayList<PAP>(aliasList.size());
+
+		for (String alias : aliasList) {
+			papList.add(getPAPFromINIFile(alias));
+		}
+
+		return papList;
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<String> getAllAliases() {
-    	
-    	Set<String> aliasSet = new HashSet<String>();
 
-        Iterator<String> iterator = papsFile.getKeys(REMOTE_PAP_STANZA);
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            
-            int firstAliasChar = key.indexOf('.') + 1;
-            int lastAliasChar = key.indexOf('.', firstAliasChar);
-            
-            String alias = key.substring(firstAliasChar, lastAliasChar);
-            
-            aliasSet.add(alias);
-        }
-        
-        List<String> aliasList = new ArrayList<String>();
-        
-        for (String alias : aliasSet) {
-        	aliasList.add(alias);
-        }
+		Set<String> aliasSet = new HashSet<String>();
 
-        return aliasList;
-    }
+		Iterator<String> iterator = papsINIFile.getKeys(REMOTE_PAP_STANZA);
+		while (iterator.hasNext()) {
+			String key = iterator.next();
 
-    public PAP get(String papAlias) throws NotFoundException {
-        
-        PAP pap = getPAPFromProperies(papAlias);
-        
-        if (pap == null)
-            throw new NotFoundException("PAP alias \"" + papAlias + "\" not found");
-        
-        return pap;
-    }
-    
-    public boolean exists(String papAlias) {
-    	
-    	boolean result = keyExists(dnKey(papAlias));
-    	
-    	Log.debug("Call to exists(\"" + papAlias + "\": result=" + result);
-    	
-        return result;
-    }
+			int firstAliasChar = key.indexOf('.') + 1;
+			int lastAliasChar = key.indexOf('.', firstAliasChar);
 
-    public void store(PAP pap) throws AlreadyExistsException,
-			RepositoryException {
+			String alias = key.substring(firstAliasChar, lastAliasChar);
+
+			aliasSet.add(alias);
+		}
+
+		List<String> aliasList = new ArrayList<String>();
+
+		for (String alias : aliasSet) {
+			aliasList.add(alias);
+		}
+
+		return aliasList;
+	}
+
+	public void store(PAP pap) {
 
 		String papAlias = pap.getAlias();
 
 		if (exists(papAlias))
-			throw new AlreadyExistsException("Already exists: papAlias="
-					+ papAlias);
+			throw new AlreadyExistsException(aliasAlreadyExistsExceptionMsg(papAlias));
 
 		File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
 		if (!directory.mkdir())
-			throw new RepositoryException(String.format( "Cannot create directory for PAP: %s (id=%s) (dir=%s)", papAlias, pap.getPapId(), directory));
+			throw new RepositoryException(String.format(
+					"Cannot create directory for PAP: %s (id=%s) (dir=%s)", papAlias, pap.getPapId(),
+					directory));
 
-		savePAP(pap);
+		saveToINIFile(pap);
 	}
 
-    public void update(PAP pap) throws NotFoundException, RepositoryException {
+	public void update(PAP pap) {
 
 		String papAlias = pap.getAlias();
 
 		if (!exists(papAlias))
-			throw new NotFoundException("PAP \"" + papAlias + "\" (id="
-					+ pap.getPapId() + ")does not exists");
+			throw new NotFoundException(aliasNotFoundExceptionMsg(papAlias));
 
-		savePAP(pap);
+		saveToINIFile(pap);
 	}
 
-    private void clearPAPProperties(String papAlias) {
-        papsFile.clearProperty(dnKey(papAlias));
-        papsFile.clearProperty(hostnameKey(papAlias));
-        papsFile.clearProperty(portKey(papAlias));
-        papsFile.clearProperty(pathKey(papAlias));
-        papsFile.clearProperty(protocolKey(papAlias));
-        papsFile.clearProperty(idKey(papAlias));
-        papsFile.clearProperty(visibilityPublicKey(papAlias));
-    }
+	private void clearPAPProperties(String papAlias) {
+		papsINIFile.clearProperty(dnKey(papAlias));
+		papsINIFile.clearProperty(hostnameKey(papAlias));
+		papsINIFile.clearProperty(portKey(papAlias));
+		papsINIFile.clearProperty(pathKey(papAlias));
+		papsINIFile.clearProperty(protocolKey(papAlias));
+		papsINIFile.clearProperty(idKey(papAlias));
+		papsINIFile.clearProperty(visibilityPublicKey(papAlias));
+	}
 
-    private String getPAPDirAbsolutePath(String papId) {
-        return dbPath + File.separator + papId;
-    }
+	private boolean existsInINIFile(String papAlias) {
+		return keyExists(dnKey(papAlias));
+	}
 
-    private boolean keyExists(String key) {
-        
-        if (key == null)
-            return false;
+	private String getPAPDirAbsolutePath(String papId) {
+		return dbPath + File.separator + papId;
+	}
 
-        String value = papsFile.getString(key);
+	private PAP getPAPFromINIFile(String papAlias) {
 
-        if (value == null)
-            return false;
+		if (papAlias == null)
+			return null;
 
-        if (value.length() == 0)
-            return false;
+		if (!exists(papAlias))
+			return null;
 
-        return true;
-    }
-    
-    private void savePAP(PAP pap) throws RepositoryException {
+		String dn = papsINIFile.getString(dnKey(papAlias));
+		String host = papsINIFile.getString(hostnameKey(papAlias));
+		String port = papsINIFile.getString(portKey(papAlias));
+		String protocol = papsINIFile.getString(protocolKey(papAlias));
+		String path = papsINIFile.getString(pathKey(papAlias));
+		String id = papsINIFile.getString(idKey(papAlias));
+		boolean visibilityPublic = papsINIFile.getBoolean(visibilityPublicKey(papAlias));
 
-		if (pap == null)
-			throw new RepositoryException(
-					"Cannot save PAP because input parameter (PAP type) is null");
+		PAP pap = new PAP(papAlias, dn, host, port, path, protocol, visibilityPublic);
+		pap.setPapId(id);
 
-		setPAPProperties(pap);
+		return pap;
+	}
+
+	private boolean keyExists(String key) {
+
+		if (key == null)
+			return false;
+
+		String value = papsINIFile.getString(key);
+
+		if (value == null)
+			return false;
+
+		if (value.length() == 0)
+			return false;
+
+		return true;
+	}
+
+	private void removeFromINIFile(String papAlias) {
+
+		clearPAPProperties(papAlias);
 
 		try {
-			papsFile.save();
+			papsINIFile.save();
 		} catch (ConfigurationException e) {
 			throw new RepositoryException(e);
 		}
 	}
 
-    private void setPAPProperties(PAP pap) {
-    	
-        String papAlias = pap.getAlias();
-        
-        papsFile.setProperty(dnKey(papAlias), pap.getDn());
-        papsFile.setProperty(hostnameKey(papAlias), pap.getHostname());
-        papsFile.setProperty(portKey(papAlias), pap.getPort());
-        papsFile.setProperty(pathKey(papAlias), pap.getPath());
-        papsFile.setProperty(protocolKey(papAlias), pap.getProtocol());
-        papsFile.setProperty(idKey(papAlias), pap.getPapId());
-        papsFile.setProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
-    }
-    
-    private PAP getPAPFromProperies(String papAlias) {
-        
-        if (papAlias == null)
-            return null;
-        
-        if (!exists(papAlias))
-            return null;
-        
-        String dn = papsFile.getString(dnKey(papAlias));
-        String host = papsFile.getString(hostnameKey(papAlias));
-        String port = papsFile.getString(portKey(papAlias));
-        String protocol = papsFile.getString(protocolKey(papAlias));
-        String path = papsFile.getString(pathKey(papAlias));
-        String id = papsFile.getString(idKey(papAlias));
-        boolean visibilityPublic = papsFile.getBoolean(visibilityPublicKey(papAlias));
-        
-        PAP pap = new PAP(papAlias, dn, host, port, path, protocol, visibilityPublic);
-        pap.setPapId(id);
-        
-        return pap;
-    }
+	private void saveToINIFile(PAP pap) throws RepositoryException {
+
+		if (pap == null)
+			throw new RepositoryException("BUG: PAP is null");
+
+		setPAPProperties(pap);
+
+		try {
+			papsINIFile.save();
+		} catch (ConfigurationException e) {
+			throw new RepositoryException(e);
+		}
+	}
+
+	private void setPAPProperties(PAP pap) {
+
+		String papAlias = pap.getAlias();
+
+		papsINIFile.setProperty(dnKey(papAlias), pap.getDn());
+		papsINIFile.setProperty(hostnameKey(papAlias), pap.getHostname());
+		papsINIFile.setProperty(portKey(papAlias), pap.getPort());
+		papsINIFile.setProperty(pathKey(papAlias), pap.getPath());
+		papsINIFile.setProperty(protocolKey(papAlias), pap.getProtocol());
+		papsINIFile.setProperty(idKey(papAlias), pap.getPapId());
+		papsINIFile.setProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
+	}
 }

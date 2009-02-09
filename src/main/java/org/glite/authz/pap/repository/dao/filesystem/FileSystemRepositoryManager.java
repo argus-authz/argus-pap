@@ -5,7 +5,6 @@ import java.io.IOException;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
@@ -13,105 +12,102 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemRepositoryManager extends RepositoryManager {
 
-    private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
-    private static final String rootPolicySetId = "Root";
-    private static final String localPAPId = PAP.localPAPAlias;
-    private static final String policySetFileNamePrefix = "PolicySet_";
-    private static final String policyFileNamePrefix = "Policy_";
-    private static final String xacmlFileNameExtension = ".xml";
-    // TODO: this variable should be final too... but it is not possible with
-    // the current definition of the PAPConfiguration class.
-    protected static String fileSystemDatabaseDir;
+	protected static String fileSystemDatabaseDir;
+	private static final String LOCAL_PAP_ID = PAP.localPAPAlias;
+	private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
+	private static final String POLICY_FILENAME_PREFIX = "Policy_";
+	private static final String POLICYSET_FILENAME_PREFIX = "PolicySet_";
+	private static final String ROOT_POLICYSET_ID = "Root";
+	private static final String XACML_FILENAME_EXTENSION = ".xml";
 
-    public static String getFileSystemDatabaseDir() {
-        return fileSystemDatabaseDir;
-    }
+	/*
+	 * Call the initialize() method before using this class. 
+	 */
+	
+	private FileSystemRepositoryManager() {}
 
-    public static String getLocalPAPId() {
-        return localPAPId;
-    }
+	public static String getFileSystemDatabaseDir() {
+		return fileSystemDatabaseDir;
+	}
 
-    public static String getPAPDirAbsolutePath(String papId) {
-        return fileSystemDatabaseDir + File.separator + papId + File.separator;
-    }
+	public static String getLocalPAPId() {
+		return LOCAL_PAP_ID;
+	}
 
-    public static String getPolicyAbsolutePath(String papId, String policyId) {
-        return getPAPDirAbsolutePath(papId) + getPolicyFileName(policyId);
-    }
+	public static String getPAPDirAbsolutePath(String papId) {
+		return fileSystemDatabaseDir + File.separator + papId + File.separator;
+	}
 
-    public static String getPolicyFileName(String policyId) {
-        return policyFileNamePrefix + policyId + xacmlFileNameExtension;
-    }
+	public static String getPolicyAbsolutePath(String papId, String policyId) {
+		return getPAPDirAbsolutePath(papId) + getPolicyFileName(policyId);
+	}
 
-    public static String getPolicyFileNamePrefix() {
-        return policyFileNamePrefix;
-    }
+	public static String getPolicyFileName(String policyId) {
+		return POLICY_FILENAME_PREFIX + policyId + XACML_FILENAME_EXTENSION;
+	}
 
-    public static String getPolicySetAbsolutePath(String papId, String policySetId) {
-        return getPAPDirAbsolutePath(papId) + getPolicySetFileName(policySetId);
-    }
+	public static String getPolicyFileNamePrefix() {
+		return POLICY_FILENAME_PREFIX;
+	}
 
-    public static String getPolicySetFileName(String policySetId) {
-        return policySetFileNamePrefix + policySetId + xacmlFileNameExtension;
-    }
+	public static String getPolicySetAbsolutePath(String papId, String policySetId) {
+		return getPAPDirAbsolutePath(papId) + getPolicySetFileName(policySetId);
+	}
 
-    public static String getPolicySetFileNamePrefix() {
-        return policySetFileNamePrefix;
-    }
+	public static String getPolicySetFileName(String policySetId) {
+		return POLICYSET_FILENAME_PREFIX + policySetId + XACML_FILENAME_EXTENSION;
+	}
 
-    public static String getRootPolicySetId() {
-        return rootPolicySetId;
-    }
+	public static String getPolicySetFileNamePrefix() {
+		return POLICYSET_FILENAME_PREFIX;
+	}
 
-    public static String getXACMLFileNameExtension() {
-        return xacmlFileNameExtension;
-    }
+	public static String getRootPolicySetId() {
+		return ROOT_POLICYSET_ID;
+	}
 
-    public FileSystemRepositoryManager() {
-        
-        try {
-            fileSystemDatabaseDir = PAPConfiguration.instance().getPAPRepositoryDir();
-        } catch (PAPConfigurationException e) {
-            fileSystemDatabaseDir = "/var/glite/etc/pap";
-        }
-    }
+	public static String getXACMLFileNameExtension() {
+		return XACML_FILENAME_EXTENSION;
+	}
 
-    private void createDirectoryPath(File dir) {
+	public static void initialize() {
+		log.info("Initializing filesystem repository...");
+		
+		fileSystemDatabaseDir = PAPConfiguration.instance().getPAPRepositoryDir();
 
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) // Find out what went wrong...
-                createDirectoryPath(dir.getParentFile());
-        }
+		File rootDir = new File(fileSystemDatabaseDir);
 
-        if (!dir.canRead())
-            throw new RepositoryException("Read permission not set: " + dir.getAbsolutePath());
+		try {
+			createDirectoryPath(rootDir);
+		} catch (RepositoryException e) {
+			throw new RepositoryException("Cannot create the repository root directory: "
+					+ rootDir.getAbsolutePath(), e);
+		}
 
-        if (!dir.canWrite())
-            throw new RepositoryException("Write permission not set: " + dir.getAbsolutePath());
+		log.info("Repository root directory is set to: " + rootDir.getAbsolutePath());
+	}
 
-        // Workaround for the canExecute method which does not exist in Java 5
-        try {
-            File tempFile = new File(dir.getAbsoluteFile() + File.separator + "delete_me.tmp");
-            tempFile.createNewFile();
-            tempFile.delete();
-        } catch (IOException e) {
-            throw new RepositoryException("Execute permission not set: " + dir.getAbsolutePath(), e);
-        }
-    }
+	private static void createDirectoryPath(File dir) {
 
-    protected void initialize() {
-        log.info("Initializing filesystem repository...");
+		if (!dir.exists()) {
+			if (!dir.mkdirs()) // Find out what went wrong...
+				createDirectoryPath(dir.getParentFile());
+		}
 
-        File rootDir = new File(getFileSystemDatabaseDir());
+		if (!dir.canRead())
+			throw new RepositoryException("Read permission not set: " + dir.getAbsolutePath());
 
-        try {
-            createDirectoryPath(rootDir);
-        } catch (RepositoryException e) {
-            throw new RepositoryException("Cannot create the repository root directory: "
-                    + rootDir.getAbsolutePath(), e);
-        }
+		if (!dir.canWrite())
+			throw new RepositoryException("Write permission not set: " + dir.getAbsolutePath());
 
-        log.info("Repository root directory is set to: " + rootDir.getAbsolutePath());
-    }
+		// Workaround for the canExecute method which does not exist in Java 5
+		try {
+			File tempFile = new File(dir.getAbsoluteFile() + File.separator + "delete_me.tmp");
+			tempFile.createNewFile();
+			tempFile.delete();
+		} catch (IOException e) {
+			throw new RepositoryException("Execute permission not set: " + dir.getAbsolutePath(), e);
+		}
+	}
 
 }

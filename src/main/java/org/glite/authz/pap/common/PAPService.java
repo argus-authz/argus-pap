@@ -52,7 +52,7 @@ public final class PAPService {
 
         // Start repository manager
         logger.info( "Starting repository manager..." );
-        RepositoryManager.getInstance().bootstrap();
+        RepositoryManager.bootstrap();
 
         logger.info( "Starting pap distribution module..." );
         DistributionModule.getInstance().startDistributionModule();
