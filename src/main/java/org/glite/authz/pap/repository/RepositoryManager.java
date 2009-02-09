@@ -2,6 +2,7 @@ package org.glite.authz.pap.repository;
 
 import java.io.File;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.distribution.PAPManager;
@@ -32,7 +33,15 @@ public abstract class RepositoryManager {
         
         PAPManager.getInstance().createLocalPAPIfNotExists();
         
-        if (PAPConfiguration.instance().getBoolean("use-policy-config-file")) {
+        boolean usePolicyConfigFile;
+        
+        try {
+            usePolicyConfigFile = PAPConfiguration.instance().getBoolean("use-policy-config-file");
+        } catch (NoSuchElementException e) {
+            usePolicyConfigFile = false;
+        }
+        
+        if (usePolicyConfigFile) {
         	setLocalPoliciesFromConfigurationFile();
         }
         
