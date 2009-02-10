@@ -26,48 +26,18 @@ public class PolicyWizard {
     private static final String VISIBILITY_PRIVATE_PREFIX = "PRIVATE";
     private static final String VISIBILITY_PUBLIC_PREFIX = "PUBLIC";
     
-    public static String generateId(String prefix) {
-        return prefix + "_" + generateUUID();
-    }
-    
-    public static boolean isPrivate(String policyId) {
-        String[] idComponents = policyId.split("_");
-        
-        if (idComponents.length != 3)
-            return false;
-        
-        if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0]))
-            return true;
-        
-        return false;
-    }
-    
-    private static String generateUUID() {
-        return UUID.randomUUID().toString();
-    }
-    
-    private static PolicyWizardType getPolicyWizardType(
-            List<AttributeWizard> targetAttributeWizardList) {
-        AttributeWizardType serviceClassWizardType = AttributeWizardType.SERVICE_CLASS;
-        
-        for (AttributeWizard attribute : targetAttributeWizardList) {
-            
-            if (serviceClassWizardType.equals(attribute.getAttributeWizardType()))
-                return PolicyWizardType.SERVICECLASS;
-        }
-        
-        return PolicyWizardType.BLACKLIST;
-    }
-    
     private String description = null;
+    
     private boolean isPrivate = false;
+    
     private final List<List<AttributeWizard>> orExceptionsAttributeWizardList;
+    
     private final PolicyType policy;
+    
     private String policyIdPrefix;
     private String policyIdUniqueNumber;
     private String policyIdVisibilityPrefix;
     private PolicyWizardType policyWizardType;
-    
     private final List<AttributeWizard> targetAttributeWizardList;
     
     public PolicyWizard(List<AttributeWizard> targetAttributeWizardList,
@@ -115,6 +85,38 @@ public class PolicyWizard {
             this.description = policy.getDescription().getValue();
 
         this.policy = policy;
+    }
+    public static String generateId(String prefix) {
+        return prefix + "_" + generateUUID();
+    }
+    
+    public static boolean isPrivate(String policyId) {
+        String[] idComponents = policyId.split("_");
+        
+        if (idComponents.length != 3)
+            return false;
+        
+        if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0]))
+            return true;
+        
+        return false;
+    }
+    
+    private static String generateUUID() {
+        return UUID.randomUUID().toString();
+    }
+    
+    private static PolicyWizardType getPolicyWizardType(
+            List<AttributeWizard> targetAttributeWizardList) {
+        AttributeWizardType serviceClassWizardType = AttributeWizardType.SERVICE_CLASS;
+        
+        for (AttributeWizard attribute : targetAttributeWizardList) {
+            
+            if (serviceClassWizardType.equals(attribute.getAttributeWizardType()))
+                return PolicyWizardType.SERVICECLASS;
+        }
+        
+        return PolicyWizardType.BLACKLIST;
     }
     
     public String getDescription() {

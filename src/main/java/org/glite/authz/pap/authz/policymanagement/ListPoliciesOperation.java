@@ -36,6 +36,8 @@ public class ListPoliciesOperation extends BasePAPOperation <PolicyType[]> {
             policyArray[i] = policyList.get(i);
         }
         
+        log.info("Returning " + policyArray.length + " policies");
+        
         return policyArray;
     }
 
