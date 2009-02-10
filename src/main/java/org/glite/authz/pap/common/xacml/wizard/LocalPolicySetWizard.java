@@ -1,4 +1,4 @@
-package org.glite.authz.pap.ui.wizard;
+package org.glite.authz.pap.common.xacml.wizard;
 
 import java.io.PrintStream;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType;
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 
 public class LocalPolicySetWizard {
 	

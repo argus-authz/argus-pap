@@ -6,13 +6,13 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.wizard.BlacklistPolicySet;
+import org.glite.authz.pap.common.xacml.wizard.ServiceClassPolicySet;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.glite.authz.pap.ui.wizard.BlacklistPolicySet;
-import org.glite.authz.pap.ui.wizard.ServiceClassPolicySet;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

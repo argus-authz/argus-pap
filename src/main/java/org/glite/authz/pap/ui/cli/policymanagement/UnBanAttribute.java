@@ -5,9 +5,9 @@ import java.rmi.RemoteException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.glite.authz.pap.ui.cli.CLIException;
-import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType;
 
 public class UnBanAttribute extends PolicyManagementCLI {
     

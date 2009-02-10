@@ -1,4 +1,4 @@
-package org.glite.authz.pap.ui.wizard;
+package org.glite.authz.pap.common.xacml.wizard;
 
 import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
 

@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType;
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 
 public class JobPriority extends PolicyManagementCLI {
 

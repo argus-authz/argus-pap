@@ -1,4 +1,4 @@
-package org.glite.authz.pap.ui.wizard;
+package org.glite.authz.pap.common.xacml.wizard;
 
 import java.util.LinkedList;
 import java.util.List;

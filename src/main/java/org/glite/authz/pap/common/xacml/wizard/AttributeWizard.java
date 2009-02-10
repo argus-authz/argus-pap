@@ -1,8 +1,8 @@
-package org.glite.authz.pap.ui.wizard;
+package org.glite.authz.pap.common.xacml.wizard;
 
 import org.glite.authz.pap.common.utils.xacml.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.utils.xacml.DataType;
-import org.glite.authz.pap.ui.wizard.AttributeWizard.AttributeWizardType.TargetElement;
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType.TargetElement;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
