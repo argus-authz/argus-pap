@@ -1,17 +1,21 @@
 package org.glite.authz.pap.authz;
 
+import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.glite.authz.pap.common.utils.PathNamingScheme;
 import org.glite.security.SecurityContext;
+import org.glite.voms.VOMSAttribute;
+import org.glite.voms.VOMSValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.glite.voms.VOMSValidator;
 
 public class CurrentAdmin {
 
     static Logger log = LoggerFactory.getLogger( CurrentAdmin.class );
+    
+    static VOMSValidator validator = new VOMSValidator((X509Certificate)null);
 
     private PAPAdmin papAdmin;
 
@@ -35,29 +39,39 @@ public class CurrentAdmin {
             papAdmin = PAPAdminFactory.getAnyAuthenticatedUserAdmin();
 
         // Get VOMS attributes here
-        VOMSValidator validator = new VOMSValidator( theContext
+        validator.setClientChain( theContext
                 .getClientCertChain() );
         try {
 
             validator.validate();
-            String[] attrs = validator.getAllFullyQualifiedAttributes();
+            
+            List<VOMSAttribute> attrs = validator.getVOMSAttributes();
+            
+            List <VOMSFQAN> myFQANs = new ArrayList <VOMSFQAN>();
+            
+            for ( VOMSAttribute voAttr : attrs ) {
 
-            if ( attrs.length > 0 ) {
+                List <String> fqanAttrs = voAttr.getFullyQualifiedAttributes();
 
-                VOMSFQAN[] fqans = new VOMSFQAN[attrs.length];
+                if ( fqanAttrs.size() > 0 ) {
 
-                for ( int i = 0; i < attrs.length; i++ )
-                    fqans[i] = PAPAdminFactory.getFQAN( attrs[i] );
+                    for ( String f : fqanAttrs )
+                        myFQANs.add( PAPAdminFactory.getFQAN( f ) );
 
-                if ( log.isDebugEnabled() ) {
-                    String fqansString = StringUtils.join( fqans, "," );
-                    log.debug( String.format(
-                            "X509Principal: '%s' has valid fqans: '%s'",
-                            papAdmin, fqansString ) );
+                    if ( log.isDebugEnabled() ) {
+
+                        String fqansString = StringUtils.join( myFQANs, "," );
+                        log.debug( "X509Principal: '{}' has valid fqans: '{}'",
+                                papAdmin, fqansString );
+                    }
+
                 }
 
-                return new CurrentAdmin( papAdmin, fqans );
-            } else
+            }
+            
+            if (myFQANs.size() > 0)    
+                return new CurrentAdmin(papAdmin, (VOMSFQAN[])myFQANs.toArray( new VOMSFQAN[0] ));
+            else
                 log.debug( "No VOMS AC found in client certificate chain" );
 
         } catch ( Throwable t ) {

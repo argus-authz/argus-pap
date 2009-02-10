@@ -39,6 +39,9 @@ public class InitSecurityContext {
             throw new PAPAuthzException( "No certificate found in request!", e );
 
         }
+        
+        if (certChain == null)
+            throw new PAPAuthzException( "No certificate found in request!"); 
 
         sc.setClientCertChain( certChain );
 

@@ -66,6 +66,9 @@ public final class PAPService {
 
         logger.info( "Shutting down distribution module..." );
         DistributionModule.getInstance().stopDistributionModule();
+        
+        logger.info( "Shutting down authorization module..." );
+        AuthorizationEngine.instance().shutdown();
 
     }
 

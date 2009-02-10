@@ -7,6 +7,7 @@ PAP_STANDALONE_CLASS="org.glite.authz.pap.server.PAPServer"
 PAP_CLIENT_CLASS="org.glite.authz.pap.ui.cli.PAPCLI"
 
 PAP_DEPS=`ls -x $PAP_LIBS/*.jar | tr '\n' ':'`
+PAP_CLIENT_DEPS=`ls -x $PAP_LIBS/*.jar | grep -v 'glite-security-voms-java-api' | tr '\n' ':'`
 
 PAP_JAR="$GLITE_LOCATION/share/java/glite-authz-pap.jar"
 

@@ -71,5 +71,11 @@ public class AuthorizationEngine {
 
         return globalContext;
     }
+    
+    public void shutdown(){
+        
+        // Cleanup VOMS lib - this will not be required after future voms api refactoring
+        CurrentAdmin.validator.cleanup();
+    }
 
 }
