@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.BlacklistPolicySet;
 import org.glite.authz.pap.common.xacml.wizard.ServiceClassPolicySet;
 import org.glite.authz.pap.repository.PAPContainer;

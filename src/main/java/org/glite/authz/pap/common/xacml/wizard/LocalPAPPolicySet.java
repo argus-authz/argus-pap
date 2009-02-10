@@ -1,7 +1,7 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 
 public class LocalPAPPolicySet extends PolicySetWizard {
 

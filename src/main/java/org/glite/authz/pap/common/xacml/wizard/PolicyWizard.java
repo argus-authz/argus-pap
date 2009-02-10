@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.glite.authz.pap.common.utils.xacml.DescriptionTypeHelper;
-import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
+import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.PolicyType;

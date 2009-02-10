@@ -13,7 +13,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
 import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
 import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;

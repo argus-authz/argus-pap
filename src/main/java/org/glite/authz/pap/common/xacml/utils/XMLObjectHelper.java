@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common.utils.xacml;
+package org.glite.authz.pap.common.xacml.utils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;

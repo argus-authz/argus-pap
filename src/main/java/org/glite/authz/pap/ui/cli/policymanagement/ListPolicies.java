@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.utils.xacml.XMLObjectHelper;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.LocalPolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.UnsupportedPolicyException;

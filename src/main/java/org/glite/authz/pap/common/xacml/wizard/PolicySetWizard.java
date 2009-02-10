@@ -3,7 +3,7 @@ package org.glite.authz.pap.common.xacml.wizard;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.ObligationsType;
 import org.opensaml.xacml.policy.PolicySetType;

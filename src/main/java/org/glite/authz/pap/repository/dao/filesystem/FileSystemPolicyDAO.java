@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.utils.xacml.PolicyHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;

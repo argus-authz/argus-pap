@@ -6,7 +6,8 @@ import org.opensaml.xacml.XACMLObject;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.String;
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.*;
 
 import java.util.List;

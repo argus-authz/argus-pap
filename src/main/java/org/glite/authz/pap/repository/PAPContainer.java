@@ -3,7 +3,7 @@ package org.glite.authz.pap.repository;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;

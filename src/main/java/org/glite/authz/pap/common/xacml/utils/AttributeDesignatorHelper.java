@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common.utils.xacml;
+package org.glite.authz.pap.common.xacml.utils;
 
 import javax.xml.namespace.QName;
 

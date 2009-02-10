@@ -1,6 +1,6 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
-import org.glite.authz.pap.common.utils.xacml.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 
 public class ServiceClassPolicySet extends PolicySetWizard {
     

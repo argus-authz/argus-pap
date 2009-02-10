@@ -5,13 +5,13 @@ import java.util.List;
 
 import javax.xml.namespace.QName;
 
-import org.glite.authz.pap.common.utils.xacml.ApplyHelper;
-import org.glite.authz.pap.common.utils.xacml.AttributeDesignatorHelper;
-import org.glite.authz.pap.common.utils.xacml.CtxAttributeTypeHelper;
-import org.glite.authz.pap.common.utils.xacml.FunctionHelper;
-import org.glite.authz.pap.common.utils.xacml.Functions;
-import org.glite.authz.pap.common.utils.xacml.PolicyAttributeValueHelper;
-import org.glite.authz.pap.common.utils.xacml.RuleHelper;
+import org.glite.authz.pap.common.xacml.utils.ApplyHelper;
+import org.glite.authz.pap.common.xacml.utils.AttributeDesignatorHelper;
+import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
+import org.glite.authz.pap.common.xacml.utils.FunctionHelper;
+import org.glite.authz.pap.common.xacml.utils.Functions;
+import org.glite.authz.pap.common.xacml.utils.PolicyAttributeValueHelper;
+import org.glite.authz.pap.common.xacml.utils.RuleHelper;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
 import org.opensaml.xacml.policy.ApplyType;
