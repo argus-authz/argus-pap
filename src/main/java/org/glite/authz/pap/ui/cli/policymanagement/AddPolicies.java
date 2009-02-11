@@ -49,8 +49,13 @@ public class AddPolicies extends PolicyManagementCLI {
             String fileName = args[i];
             
             try {
-                addPolicy(fileName);
-                partialSuccess = true;
+                
+                boolean result = addPolicy(fileName);
+                
+                if (result == true) {
+                    partialSuccess = true;
+                }
+                
             } catch (EncodingException e) {
                 failure = true;
                 System.out.println("Syntax error. Skipping file (no policies has been added):" + fileName);
@@ -72,7 +77,9 @@ public class AddPolicies extends PolicyManagementCLI {
         
     }
     
-    private void addPolicy(String fileName) throws EncodingException, RemoteException {
+    private boolean addPolicy(String fileName) throws EncodingException, RemoteException {
+        
+        boolean result = true;
         
         File file = new File(fileName);
         
@@ -95,22 +102,27 @@ public class AddPolicies extends PolicyManagementCLI {
             
             String policySetId;
             
-            if (policywizard.isBlacklistPolicy())
+            if (policywizard.isBlacklistPolicy()) {
                 policySetId = BlacklistPolicySet.POLICY_SET_ID;
-            else
+            } else {
                 policySetId = ServiceClassPolicySet.POLICY_SET_ID;
+            }
             
             // the effective PolicyId is the one returned by the server
             String policyId = xacmlPolicyMgmtClient.addPolicy(policySetId, policywizard.getPolicyIdPrefix(), policy);
-            policy.setPolicyId(policyId);
             
+            if (policyId == null) {
+                System.out.println("Error policy not added");
+                result = false;
+            }
+            
+            policy.setPolicyId(policyId);
         }
-        
+        return result;
     }
 
     @Override
     protected Options defineCommandOptions() {
         return null;
     }
-
 }

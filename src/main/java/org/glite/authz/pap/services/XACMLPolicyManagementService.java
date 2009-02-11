@@ -32,7 +32,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
     public String addPolicy(String policySetId, String policyIdPrefix, PolicyType policy) throws RemoteException {
 
-        log.info("addPolicy();");
+        log.info(String.format("addPolicy(policySetId=\"%s\", policyIdPrefix=\"%s\");", policySetId, policyIdPrefix));
 
         try {
 

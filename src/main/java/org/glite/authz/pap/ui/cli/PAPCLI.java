@@ -51,8 +51,9 @@ public class PAPCLI {
         int exitStatus = cli.executeCommand();
 
         for (ServiceCLI.ExitStatus es : ServiceCLI.ExitStatus.values()) {
-            if (es.ordinal() == exitStatus)
-                log.info("Exit status (\"" + cli.getCommandName() + "\": " + es + " (" + es.ordinal() + ")");
+            if (es.ordinal() == exitStatus) {
+                log.info(String.format("Exit status (%s): %s %d", cli.getCommandName(), es.toString(), exitStatus));
+            }
         }
 
         System.exit(exitStatus);
