@@ -36,8 +36,36 @@ public class PAPClient {
 
     private static final Logger log = LoggerFactory.getLogger(PAPClient.class);
     private ProvisioningServiceClient client;
-    private XACMLPolicyQueryType xacmlPolicyQuery;
+    private final ProvisioningServicePortType provisioningClient;
     private final String url;
+
+    private XACMLPolicyQueryType xacmlPolicyQuery;
+    
+    public PAPClient(String url) {
+        
+        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory.getProvisioningServiceClientFactory();
+        client = factory.createPolicyProvisioningServiceClient();
+        xacmlPolicyQuery = makeStandardPAPQuery();
+        
+        if (!url.endsWith("/"))
+            url += "/";
+        
+        this.url = url + "ProvisioningService";
+        
+        provisioningClient = client.getProvisioningServicePortType(this.url);
+    }
+
+    public static void main(String[] args) throws RemoteException, ServiceException {
+        try {
+            DefaultBootstrap.bootstrap();
+        } catch (ConfigurationException e) {
+            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
+        }
+        PAPClient client = new PAPClient("https://pbox3.cnaf.infn.it:8443/glite-authz-pap/services/");
+        List<XACMLObject> list = client.getLocalPolicies();
+        System.out.println("Retrieved " + list.size() + " policies");
+        System.out.println("OK");
+    }
 
     private static XACMLPolicyQueryType makeStandardPAPQuery() {
 
@@ -73,22 +101,6 @@ public class PAPClient {
 
         return xacmlPolicyQuery;
     }
-    
-    private final ProvisioningServicePortType provisioningClient;
-
-    public PAPClient(String url) {
-        
-        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory.getProvisioningServiceClientFactory();
-        client = factory.createPolicyProvisioningServiceClient();
-        xacmlPolicyQuery = makeStandardPAPQuery();
-        
-        if (!url.endsWith("/"))
-            url += "/";
-        
-        this.url = url + "ProvisioningService";
-        
-        provisioningClient = client.getProvisioningServicePortType(this.url);
-    }
 
     public List<XACMLObject> getLocalPolicies() throws RemoteException, ServiceException {
         
@@ -100,7 +112,7 @@ public class PAPClient {
         
         return resultList;
     }
-
+    
     private List<XACMLObject> getXACMLObjectList(Response response) {
 
         List<XACMLObject> responseList = new LinkedList<XACMLObject>();
@@ -118,17 +130,5 @@ public class PAPClient {
             }
         }
         return responseList;
-    }
-    
-    public static void main(String[] args) throws RemoteException, ServiceException {
-        try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException e) {
-            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
-        }
-        PAPClient client = new PAPClient("https://pbox3.cnaf.infn.it:8443/glite-authz-pap/services/");
-        List<XACMLObject> list = client.getLocalPolicies();
-        System.out.println("Retrieved " + list.size() + " policies");
-        System.out.println("OK");
     }
 }
