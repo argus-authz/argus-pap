@@ -6,21 +6,24 @@
 	xmlns:samlxacml="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol"
 	targetNamespace="http://org.glite.authz/wsdl/pap/services/provisioning">
 	<wsdl:types>
-		<xsd:schema targetNamespace="urn:oasis:names:tc:SAML:2.0:protocol"
-			xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-			<xsd:complexType name="Response"></xsd:complexType>
-		</xsd:schema>
-		<xsd:schema targetNamespace="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol"
+		<xsd:schema
+			targetNamespace="urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol"
 			xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 			<xsd:complexType name="XACMLPolicyQueryType"></xsd:complexType>
 		</xsd:schema>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="urn:oasis:names:tc:SAML:2.0:protocol">
+            <xsd:element name="ResponseType" type="samlp:Response"></xsd:element>
+            
+            <xsd:complexType name="Response"></xsd:complexType>
+        </xsd:schema>
 	</wsdl:types>
 
 	<wsdl:message name="XACMLPolicyQueryRequest">
 		<wsdl:part name="query" type="samlxacml:XACMLPolicyQueryType" />
 	</wsdl:message>
 	<wsdl:message name="XACMLPolicyQueryResponse">
-		<wsdl:part name="response" type="samlp:Response" />
+		<wsdl:part name="response" element="samlp:ResponseType" />
 	</wsdl:message>
 
 	<wsdl:portType name="Provisioning">
