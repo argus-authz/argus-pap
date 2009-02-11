@@ -18,9 +18,15 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionModule extends Thread {
     
-    private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
     private static DistributionModule instance = null;
+    private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
 
+    private long sleepTime;
+
+    private DistributionModule() {
+        initialize();
+    }
+    
     public static DistributionModule getInstance() {
     	if (instance == null)
     		instance= new DistributionModule();
@@ -35,7 +41,22 @@ public class DistributionModule extends Thread {
 
         return papPolicies;
     }
-    
+
+    public static void main(String[] args) throws RemoteException, ServiceException {
+        
+        try {
+            DefaultBootstrap.bootstrap();
+        } catch (ConfigurationException e) {
+            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
+        }
+        
+        PAP pap = new PAP("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost", "4554", "/glite-authz-pap/services", false);
+        System.out.println(pap.toString());
+        List<XACMLObject> list = getPoliciesFromPAP(pap);
+        System.out.println("Retrieved " + list.size() + " policies");
+        System.out.println("OK");
+    }
+
     public static void refreshCache(PAP pap) throws RemoteException, ServiceException {
         log.info("Refreshing cache of remote PAP " + pap.getAlias());
     	List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
@@ -81,13 +102,7 @@ public class DistributionModule extends Thread {
                     pap.getEndpoint()));
         }
     }
-
-    private long sleepTime;
-
-    private DistributionModule() {
-        initialize();
-    }
-
+    
     public void run() {
 
         try {
@@ -117,7 +132,7 @@ public class DistributionModule extends Thread {
         } catch (InterruptedException e) {
         }
     }
-    
+
     public void startDistributionModule() {
         this.start();
     }
@@ -131,26 +146,11 @@ public class DistributionModule extends Thread {
 
         log.info("Distribution module stopped");
     }
-
+    
     protected void initialize() {
         log.info("Initilizing distribution module...");
         
         sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMilliSecs();
-    }
-    
-    public static void main(String[] args) throws RemoteException, ServiceException {
-        
-        try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException e) {
-            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
-        }
-        
-        PAP pap = new PAP("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost", "4554", "/glite-authz-pap/services", false);
-        System.out.println(pap.toString());
-        List<XACMLObject> list = getPoliciesFromPAP(pap);
-        System.out.println("Retrieved " + list.size() + " policies");
-        System.out.println("OK");
     }
     
 }
