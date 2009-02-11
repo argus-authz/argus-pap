@@ -16,6 +16,7 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
 
     protected AddPolicyOperation(String policySetId, String policyIdPrefix, PolicyType policy) {
 
+        this.policySetId = policySetId;
         this.policyIdPrefix = policyIdPrefix;
         this.policy = policy;
     }
@@ -30,13 +31,17 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-        if (!localPAP.hasPolicySet(policySetId))
+        if (!localPAP.hasPolicySet(policySetId)) {
+            log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));
             return null;
+        }
 
         policyId = PolicyWizard.generateId(policyIdPrefix);
         policy.setPolicyId(policyId);
 
         localPAP.addPolicy(policySetId, policy);
+        
+        log.info(String.format("Added policy (policyId=\"%s\")", policyId));
 
         return policyId;
 
