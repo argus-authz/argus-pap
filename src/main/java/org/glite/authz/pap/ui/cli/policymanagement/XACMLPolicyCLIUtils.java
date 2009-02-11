@@ -13,6 +13,7 @@ public class XACMLPolicyCLIUtils {
         if (notInitilized) {
             try {
                 DefaultBootstrap.bootstrap();
+                notInitilized = false;
             } catch (ConfigurationException e) {
                 throw new PAPConfigurationException("Error initializing OpenSAML library", e);
             }
