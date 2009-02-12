@@ -32,9 +32,6 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 	protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"
         + OPT_SHOW_XACML_LONG + ".";
 
-	protected static final String XACML_POLICY_MANAGEMENT_SERVICE_NAME = "XACMLPolicyManagementService";
-	protected static final String HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME = "HighLevelPolicyManagementService";
-	
 	protected XACMLPolicyManagement xacmlPolicyMgmtClient;
 	protected HighLevelPolicyManagement highlevelPolicyMgmtClient;
 	protected PAPManagement papMgmtClient;
@@ -52,8 +49,9 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 			ServiceClient serviceClient) throws CLIException, ParseException,
 			RemoteException {
 
-		xacmlPolicyMgmtClient = serviceClient.getXACMLPolicyManagementService(serviceClient.getTargetEndpoint() + XACML_POLICY_MANAGEMENT_SERVICE_NAME);
-		highlevelPolicyMgmtClient = serviceClient.getHighLevelPolicyManagementService(serviceClient.getTargetEndpoint() + HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME);
+		xacmlPolicyMgmtClient = serviceClient.getXACMLPolicyManagementService(serviceClient.getTargetEndpoint() + serviceClient.getXACMLPolicyManagementServiceName());
+		highlevelPolicyMgmtClient = serviceClient.getHighLevelPolicyManagementService(serviceClient.getTargetEndpoint() + serviceClient.getHighLevelPolicyManagementServiceName());
+		papMgmtClient = serviceClient.getPAPManagementService(serviceClient.getTargetEndpoint() + serviceClient.getPAPManagementServiceName());
 
 		return executeCommand(commandLine);
 	}

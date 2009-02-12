@@ -11,7 +11,6 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 
 public abstract class PAPManagementCLI extends ServiceCLI {
 
-    protected static final String SERVICE_NAME = "PAPManagementService";
     protected PAPManagement papMgmtClient;
     
     public PAPManagementCLI(String[] commandNameValues, String usage, String description,
@@ -24,7 +23,7 @@ public abstract class PAPManagementCLI extends ServiceCLI {
             throws CLIException, ParseException, RemoteException {
 
         papMgmtClient = serviceClient.getPAPManagementService(serviceClient.getTargetEndpoint()
-                + SERVICE_NAME);
+                + serviceClient.getPAPManagementServiceName());
 
         return executeCommand(commandLine);
     }

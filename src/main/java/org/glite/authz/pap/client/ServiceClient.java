@@ -26,6 +26,14 @@ public interface ServiceClient {
     
     public Provisioning getProvisioningService(String url);
     
+    public String getXACMLPolicyManagementServiceName();
+    
+    public String getHighLevelPolicyManagementServiceName();
+    
+    public String getPAPAuthorizationManagementServiceName();
+    
+    public String getPAPManagementServiceName();
+    
     public String getTargetEndpoint();
 
     public void setClientCertificate(String certFile);

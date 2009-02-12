@@ -11,7 +11,6 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 
 public abstract class AuthZManagementCLI extends ServiceCLI {
     
-    protected static final String SERVICE_NAME = "AuthorizationManagementService";
     protected PAPAuthorizationManagement authzMgmtClient;
     
     public AuthZManagementCLI(String[] commandNameValues, String usage, String description,
@@ -27,7 +26,7 @@ public abstract class AuthZManagementCLI extends ServiceCLI {
             throws CLIException, ParseException, RemoteException {
         
         authzMgmtClient = serviceClient.getPAPAuthorizationManagementService( serviceClient.getTargetEndpoint()
-                + SERVICE_NAME );
+                + serviceClient.getPAPAuthorizationManagementServiceName() );
         
         return executeCommand(commandLine);
         

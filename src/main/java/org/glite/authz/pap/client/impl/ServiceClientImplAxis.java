@@ -27,15 +27,15 @@ import org.slf4j.LoggerFactory;
 
 public class ServiceClientImplAxis implements ServiceClient {
 
-    public final Logger log = LoggerFactory.getLogger(ServiceClientImplAxis.class);
-
     private static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
+
     private static final String DEFAULT_SSL_KEY = "/etc/grid-security/hostkey.pem";
-    private String serviceURL = null;
+    public final Logger log = LoggerFactory.getLogger(ServiceClientImplAxis.class);
     private String clientCertificate = null;
     private String clientPrivateKey = null;
     private String clientPrivateKeyPassword = null;
     private String clientProxy = null;
+    private String serviceURL = null;
     
 
     public ServiceClientImplAxis() {}
@@ -56,6 +56,11 @@ public class ServiceClientImplAxis implements ServiceClient {
         return clientPrivateKeyPassword;
     }
 
+    public String getClientProxy() {
+
+        return clientProxy;
+    }
+
     public HighLevelPolicyManagement getHighLevelPolicyManagementService(String url) {
 
         initializeAxisProperties();
@@ -71,6 +76,10 @@ public class ServiceClientImplAxis implements ServiceClient {
             throw new PAPException("Error contacting HighLevel Policy management service: " + e.getMessage(), e);
 
         }
+    }
+
+    public String getHighLevelPolicyManagementServiceName() {
+        return "HighLevelPolicyManagementService";
     }
 
     public PAPAuthorizationManagement getPAPAuthorizationManagementService(String url) {
@@ -90,6 +99,10 @@ public class ServiceClientImplAxis implements ServiceClient {
         }
     }
 
+    public String getPAPAuthorizationManagementServiceName() {
+        return "AuthorizationManagementService";
+    }
+
     public PAPManagement getPAPManagementService(String url) {
 
         initializeAxisProperties();
@@ -103,6 +116,38 @@ public class ServiceClientImplAxis implements ServiceClient {
 
         } catch (ServiceException e) {
             throw new PAPException("Error contacting PAP Management service: " + e.getMessage(), e);
+
+        }
+    }
+    
+    public String getPAPManagementServiceName() {
+        return "PAPManagementService";
+    }
+
+    public Provisioning getProvisioningService(String url) {
+
+        initializeAxisProperties();
+        ProvisioningServiceLocator loc = new ProvisioningServiceLocator();
+        TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
+        
+        typeMapping.register(org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.class,
+                org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
+                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
+                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+
+        typeMapping.register(org.opensaml.saml2.core.Response.class,
+                org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
+                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
+                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+
+        try {
+            return loc.getProvisioningService( new URL(url) );
+
+        } catch (MalformedURLException e) {
+            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
+
+        } catch (ServiceException e) {
+            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
 
         }
     }
@@ -143,33 +188,9 @@ public class ServiceClientImplAxis implements ServiceClient {
 
         }
     }
-    
-    public Provisioning getProvisioningService(String url) {
 
-        initializeAxisProperties();
-        ProvisioningServiceLocator loc = new ProvisioningServiceLocator();
-        TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
-        
-        typeMapping.register(org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.class,
-                org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
-                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
-                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
-
-        typeMapping.register(org.opensaml.saml2.core.Response.class,
-                org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
-                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
-                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
-
-        try {
-            return loc.getProvisioningService( new URL(url) );
-
-        } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
-
-        } catch (ServiceException e) {
-            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
-
-        }
+    public String getXACMLPolicyManagementServiceName() {
+        return "XACMLPolicyManagementService";
     }
 
     public void setClientCertificate(String certFile) {
@@ -181,9 +202,15 @@ public class ServiceClientImplAxis implements ServiceClient {
         log.debug("clientPrivateKey=" + keyFile);
         clientPrivateKey = keyFile;
     }
-
+    
     public void setClientPrivateKeyPassword(String privateKeyPassword) {
         clientPrivateKeyPassword = privateKeyPassword;
+    }
+
+    public void setClientProxy( String clientProxy ) {
+
+        this.clientProxy = clientProxy;
+        
     }
 
     public void setTargetEndpoint(String endpointURL) {
@@ -223,17 +250,6 @@ public class ServiceClientImplAxis implements ServiceClient {
         AXISSocketFactory.setCurrentProperties(properties);
         System.setProperties(properties);
 
-    }
-
-    public String getClientProxy() {
-
-        return clientProxy;
-    }
-
-    public void setClientProxy( String clientProxy ) {
-
-        this.clientProxy = clientProxy;
-        
     }
 
 }
