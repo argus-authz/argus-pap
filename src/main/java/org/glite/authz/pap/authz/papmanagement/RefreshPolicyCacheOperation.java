@@ -42,7 +42,7 @@ public class RefreshPolicyCacheOperation extends BasePAPOperation<Boolean> {
             DistributionModule.refreshCache(pap);
 
         } catch (Throwable t) {
-            throw new PAPException("Error contact remote pap '" + pap.getAlias() + "' for cache refresh!", t);
+            throw new PAPException("Error contacting remote pap '" + pap.getAlias() + "' for cache refresh!", t);
         }
 
         return true;
