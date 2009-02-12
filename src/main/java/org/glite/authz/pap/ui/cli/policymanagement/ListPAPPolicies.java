@@ -64,6 +64,8 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         if (!policiesFound)
             System.out.println(ListPolicies.noPoliciesFoundMessage(true, true, showBlacklist, showServiceclass));
 
+        System.out.println();
+        
         return ExitStatus.SUCCESS.ordinal();
 
     }
