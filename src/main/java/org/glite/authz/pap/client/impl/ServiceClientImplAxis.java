@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Properties;
 
 import javax.xml.rpc.ServiceException;
+import javax.xml.rpc.encoding.TypeMapping;
 
 import org.apache.axis.AxisProperties;
 import org.apache.axis.client.Service;
@@ -16,6 +17,8 @@ import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.H
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagementServiceLocator;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagementServiceLocator;
+import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
+import org.glite.authz.pap.services.provisioning.axis_skeletons.ProvisioningServiceLocator;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagementServiceLocator;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
@@ -24,7 +27,7 @@ import org.slf4j.LoggerFactory;
 
 public class ServiceClientImplAxis implements ServiceClient {
 
-    public static final Logger log = LoggerFactory.getLogger(ServiceClientImplAxis.class);
+    public final Logger log = LoggerFactory.getLogger(ServiceClientImplAxis.class);
 
     private static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
     private static final String DEFAULT_SSL_KEY = "/etc/grid-security/hostkey.pem";
@@ -115,13 +118,14 @@ public class ServiceClientImplAxis implements ServiceClient {
 
         initializeAxisProperties();
         XACMLPolicyManagementServiceLocator loc = new XACMLPolicyManagementServiceLocator();
+        TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
         
-        loc.getTypeMappingRegistry().getDefaultTypeMapping().register(org.opensaml.xacml.policy.PolicyType.class,
+        typeMapping.register(org.opensaml.xacml.policy.PolicyType.class,
                 org.opensaml.xacml.policy.PolicyType.SCHEMA_TYPE_NAME,
                 new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
                 new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
         
-        loc.getTypeMappingRegistry().getDefaultTypeMapping().register(org.opensaml.xacml.policy.PolicySetType.class,
+        typeMapping.register(org.opensaml.xacml.policy.PolicySetType.class,
                 org.opensaml.xacml.policy.PolicySetType.SCHEMA_TYPE_NAME,
                 new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
                 new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
@@ -134,6 +138,34 @@ public class ServiceClientImplAxis implements ServiceClient {
 
         } catch (ServiceException e) {
             throw new PAPException("Error contacting XACML Policy management service: " + e.getMessage(), e);
+
+        }
+    }
+    
+    public Provisioning getProvisioningService(String url) {
+
+        initializeAxisProperties();
+        ProvisioningServiceLocator loc = new ProvisioningServiceLocator();
+        TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
+        
+        typeMapping.register(org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.class,
+                org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
+                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
+                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+
+        typeMapping.register(org.opensaml.saml2.core.Response.class,
+                org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
+                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
+                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+
+        try {
+            return loc.getProvisioningService( new URL(url) );
+
+        } catch (MalformedURLException e) {
+            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
+
+        } catch (ServiceException e) {
+            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
 
         }
     }
