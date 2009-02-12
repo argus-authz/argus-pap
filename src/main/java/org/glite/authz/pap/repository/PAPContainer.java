@@ -92,6 +92,10 @@ public class PAPContainer {
         return policySetList;
     }
 
+    public int getNumberOfPolicies() {
+        return policyDAO.getNumberOfPolicies(papId);
+    }
+
     public PAP getPAP() {
         return this.pap;
     }
@@ -137,17 +141,17 @@ public class PAPContainer {
         
         policyDAO.delete(papId, policyId);
     }
-
+    
     public void storePolicy(PolicyType policy) {
         policyDAO.store(papId, policy);
     }
     
-    public void updatePolicy(PolicyType policy) {
-        policyDAO.update(papId, policy);
-    }
-
     public void storePolicySet(PolicySetType policySet) {
         policySetDAO.store(papId, policySet);
+    }
+
+    public void updatePolicy(PolicyType policy) {
+        policyDAO.update(papId, policy);
     }
     
     public void updatePolicySet(PolicySetType policySet) {

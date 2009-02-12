@@ -17,6 +17,8 @@ public interface PolicyDAO {
     public List<PolicyType> getAll(String papId);
 
     public PolicyType getById(String papId, String policyId);
+    
+    public int getNumberOfPolicies(String papId);
 
     public void store(String papId, PolicyType policy);
 

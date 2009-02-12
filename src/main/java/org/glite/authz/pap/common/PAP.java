@@ -1,5 +1,7 @@
 package org.glite.authz.pap.common;
 
+import java.util.Date;
+
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
@@ -11,32 +13,29 @@ public class PAP  {
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
     public static final String localPAPAlias = "Local";
 
-    public static PAP makeLocalPAP() {
-        return new PAP(localPAPAlias, localPAPAlias, "localhost", true);
-    }
-    
     private String alias;
     private String dn;
     private String hostname;
     private String papId;
     private String path;
+    private Date policyLastModificationTime = null;
     private String port;
     private String protocol;
     private boolean visibilityPublic;
-
+    
     public PAP(PAPData papData) {
         this(papData.getAlias(), papData.getDn(), papData.getHostname(), papData.getPort(), papData.getPath(), papData
                 .getProtocol(), papData.isVisibilityPublic());
     }
-    
+
     public PAP(String alias) {
     	this(alias, null, null, null, null, null, false);
     }
-    
+
     public PAP(String alias, String dn, String hostname) {
         this(alias, dn, hostname, false);
     }
-    
+
     public PAP(String alias, String dn, String hostname, boolean isPublic) {
         this(alias, dn, hostname, null, null, null, isPublic);
     }
@@ -71,7 +70,11 @@ public class PAP  {
             this.protocol = protocol;
     }
     
-	public boolean equals(PAP pap) {
+    public static PAP makeLocalPAP() {
+        return new PAP(localPAPAlias, localPAPAlias, "localhost", true);
+    }
+    
+    public boolean equals(PAP pap) {
     	
     	if (pap == null)
     		return false;
@@ -92,16 +95,16 @@ public class PAP  {
     	
     	return true;
 	}
-
-	public String getAlias() {
+    
+    public String getAlias() {
         return alias;
     }
-
-    public String getDn() {
+    
+	public String getDn() {
         return dn;
     }
-    
-    public String getEndpoint() {
+
+	public String getEndpoint() {
         return protocol + "://" + hostname + ":" + port + path;
     }
 
@@ -112,11 +115,15 @@ public class PAP  {
     public String getPapId() {
         return papId;
     }
-    
+
     public String getPath() {
         return path;
     }
-
+    
+    public Date getPolicyLastModificationTime() {
+        return policyLastModificationTime;
+    }
+    
     public String getPort() {
         return port;
     }
@@ -132,7 +139,7 @@ public class PAP  {
     public void setAlias(String alias) {
         this.alias = alias;
     }
-    
+
     public void setDn(String dn) {
         this.dn = dn;
     }
@@ -140,13 +147,17 @@ public class PAP  {
     public void setHostname(String hostname) {
         this.hostname = hostname;
     }
-
+    
     public void setPapId(String papId) {
         this.papId = papId;
     }
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void setPolicyLastModificationTime(Date policyLastModificationTime) {
+        this.policyLastModificationTime = policyLastModificationTime;
     }
 
     public void setPort(String port) {
