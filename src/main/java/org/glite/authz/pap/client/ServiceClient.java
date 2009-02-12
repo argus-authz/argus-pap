@@ -14,6 +14,8 @@ public interface ServiceClient {
     
     public String getClientPrivateKeyPassword();
     
+    public String getClientProxy();
+    
     public PAPManagement getPAPManagementService(String url);
 
     public XACMLPolicyManagement getXACMLPolicyManagementService(String url);
@@ -33,5 +35,7 @@ public interface ServiceClient {
     public void setClientPrivateKeyPassword(String privateKeyPassword);
     
     public void setTargetEndpoint(String endpointURL);
+    
+    public void setClientProxy(String clientProxy);
     
 }

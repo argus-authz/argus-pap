@@ -35,6 +35,8 @@ public class ServiceClientImplAxis implements ServiceClient {
     private String clientCertificate = null;
     private String clientPrivateKey = null;
     private String clientPrivateKeyPassword = null;
+    private String clientProxy = null;
+    
 
     public ServiceClientImplAxis() {}
 
@@ -199,23 +201,39 @@ public class ServiceClientImplAxis implements ServiceClient {
 
         // TODO will get cert and key from the configuration, with those as
         // default
+        
+        if (clientProxy != null)
+            properties.setProperty( "gridProxyFile", clientProxy );
+        else{
 
-        if (clientCertificate == null)
-            properties.setProperty("sslCertFile", DEFAULT_SSL_CERT_FILE);
-        else
-            properties.setProperty("sslCertFile", clientCertificate);
+            if (clientCertificate == null)
+                properties.setProperty("sslCertFile", DEFAULT_SSL_CERT_FILE);
+            else
+                properties.setProperty("sslCertFile", clientCertificate);
 
-        if (clientPrivateKey == null)
-            properties.setProperty("sslKey", DEFAULT_SSL_KEY);
-        else
-            properties.setProperty("sslKey", clientPrivateKey);
+            if (clientPrivateKey == null)
+                properties.setProperty("sslKey", DEFAULT_SSL_KEY);
+            else
+                properties.setProperty("sslKey", clientPrivateKey);
 
-        if (clientPrivateKeyPassword != null)
-            properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
+            if (clientPrivateKeyPassword != null)
+                properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
+        }
 
         AXISSocketFactory.setCurrentProperties(properties);
         System.setProperties(properties);
 
+    }
+
+    public String getClientProxy() {
+
+        return clientProxy;
+    }
+
+    public void setClientProxy( String clientProxy ) {
+
+        this.clientProxy = clientProxy;
+        
     }
 
 }

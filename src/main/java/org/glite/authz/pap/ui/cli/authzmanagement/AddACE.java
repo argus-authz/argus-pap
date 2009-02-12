@@ -7,14 +7,18 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPPrincipal;
 import org.glite.authz.pap.ui.cli.CLIException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class AddACE extends AuthZManagementCLI {
     
+    private static final Logger log = LoggerFactory.getLogger( AddACE.class );
+    
     private static final String USAGE = "<principal> <permissions> [options]";
     private static final String[] commandNameValues = { "add-ace", "aace" };
     private static final String DESCRIPTION = "Adds an entry to the ACL for the PAP global context.";
-    private static final String LONG_DESCRIPTION =  "<principal> can be either an X509 DN or a VOMS FQAN." +
+    private static final String LONG_DESCRIPTION =  "<principal> can be either an X509 DN or a VOMS FQAN. ANYONE can be used to assign permissions to any authenticated user." +
     		"\n<permissions> is a | separated list of PAP permissions that will be assigned to <principal>." +
     		"\nThe ALL shortcut can be used to assign all permission to a principal." +
     		"\n\nExample:\n" +

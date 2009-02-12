@@ -28,33 +28,46 @@ public abstract class ServiceCLI {
     }
     
     private static final HelpFormatter helpFormatter = new HelpFormatter();
+    
+    private static final String OPT_PROXY = "proxy";
+    private static final String OPT_PROXY_DESCRIPTION = "Specifies a user proxy to be used for authentication.";
+    private static final String OPT_PROXY_LONG = "proxy";
+    
     private static final String OPT_CERT = "cert";
     private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
     private static final String OPT_CERT_LONG = "cert";
+    
     private static final String OPT_HOST = "host";
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). " +
     		"This option defines the PAP endpoint to be contacted as follows: https://hostname:port/pap/services";
     private static final String OPT_HOST_LONG = "host";
+    
     private static final String OPT_KEY = "key";
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
     private static final String OPT_KEY_LONG = "key";
+    
     private static final String OPT_PASSWORD = "password";
     private static final String OPT_PASSWORD_DESCRIPTION = "Specifies the password used to decrypt the user's private key.";
     private static final String OPT_PASSWORD_LONG = "password";
+    
     private static final String OPT_PORT = "p";
     private static final String OPT_PORT_DESCRIPTION = "Specifies the port on which the target PAP is listening " +
     		"(default is " + PAP.DEFAULT_PORT + ")";
     private static final String OPT_PORT_LONG = "port";
+    
     private static final String OPT_URL = "url";
     private static final String OPT_URL_LONG = "url";
+    
     private static final String OPT_VERBOSE = "v";
     private static final String OPT_VERBOSE_DESCRIPTION = "Verbose mode.";
     private static final String OPT_VERBOSE_LONG = "verbose";
+    
     protected static final String DEFAULT_SERVICE_URL = "https://%s:%s%s";
     
     protected static final String OPT_HELP = "h";
     protected static final String OPT_HELP_DESCRIPTION = "Print this message.";
     protected static final String OPT_HELP_LONG = "help";
+    
     protected static final String OPT_PRIVATE_LONG = "private";
     protected static final String OPT_PUBLIC_LONG = "public";
     
@@ -138,6 +151,9 @@ public abstract class ServiceCLI {
             
         }
         
+        if (commandLine.hasOption( OPT_PROXY ))
+            serviceClient.setClientProxy( commandLine.getOptionValue( OPT_PROXY ) );
+        
         if (commandLine.hasOption(OPT_CERT)) 
             serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
         
@@ -205,12 +221,15 @@ public abstract class ServiceCLI {
         options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_PORT_LONG)
                 .withDescription(OPT_PORT_DESCRIPTION).create(OPT_PORT));
         
+        options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_PROXY_LONG)
+                .withDescription(OPT_PROXY_DESCRIPTION).create(OPT_PROXY));
         options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_CERT_LONG)
                 .withDescription(OPT_CERT_DESCRIPTION).create(OPT_CERT));
         options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_KEY_LONG)
                 .withDescription(OPT_KEY_DESCRIPTION).create(OPT_KEY));
         options.addOption(OptionBuilder.hasArg().withLongOpt(OPT_PASSWORD_LONG)
                 .withDescription(OPT_PASSWORD_DESCRIPTION).create(OPT_PASSWORD));
+        
         options.addOption(OptionBuilder.withLongOpt(OPT_VERBOSE_LONG)
                 .withDescription(OPT_VERBOSE_DESCRIPTION).create(OPT_VERBOSE));
         

@@ -8,7 +8,9 @@ public class PAPAdminFactory {
 
     public static VOMSFQAN getFQAN( String fqan ) {
 
-        fqan = fqan.replaceAll( "\\/Role=NULL\\/Capability=NULL", "" );
+        fqan = fqan.replaceAll( "\\/Role=NULL", "" );
+        fqan = fqan.replaceAll( "\\/Capability=NULL", "" );
+        
         return new VOMSFQAN( fqan );
     }
 
