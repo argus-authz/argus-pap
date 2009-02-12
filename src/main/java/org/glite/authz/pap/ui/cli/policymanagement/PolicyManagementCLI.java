@@ -6,6 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
+import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.glite.authz.pap.ui.cli.ServiceCLI;
@@ -33,8 +34,10 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 
 	protected static final String XACML_POLICY_MANAGEMENT_SERVICE_NAME = "XACMLPolicyManagementService";
 	protected static final String HIGHLEVEL_POLICY_MANAGEMENT_SERVICE_NAME = "HighLevelPolicyManagementService";
+	
 	protected XACMLPolicyManagement xacmlPolicyMgmtClient;
 	protected HighLevelPolicyManagement highlevelPolicyMgmtClient;
+	protected PAPManagement papMgmtClient;
 
 	public PolicyManagementCLI(String[] commandNameValues, String usage,
 			String description, String longDescription) {
