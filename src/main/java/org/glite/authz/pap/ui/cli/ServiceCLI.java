@@ -19,6 +19,7 @@ import org.glite.authz.pap.common.PAP;
 public abstract class ServiceCLI {
     
     public static enum ExitStatus {
+        // Attention keep that order because elements ordinal number is used. 
         SUCCESS,                // value = 0
         PARTIAL_SUCCESS,        // value = 1
         FAILURE,                // value = 2
