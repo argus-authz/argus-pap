@@ -32,7 +32,9 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 
-    private int listPAPPolicies(String papAlias) {
+    private int listPAPPolicies(String papAlias, String papInfo) {
+
+        System.out.println(papInfo);
 
         PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papAlias, !getPoliciesOneByOne);
 
@@ -125,8 +127,9 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         boolean failure = false;
         boolean partialSuccess = false;
 
-        for (String papAlias : papAliasArray) {
-            if (ExitStatus.SUCCESS.ordinal() == listPAPPolicies(papAlias)) {
+        for (int i = 0; i < papAliasArray.length; i++) {
+
+            if (ExitStatus.SUCCESS.ordinal() == listPAPPolicies(papAliasArray[i], papInfoArray[i])) {
                 failure = false;
                 partialSuccess = true;
             } else {
