@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 import org.glite.authz.pap.authz.AuthorizationEngine;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.distribution.DistributionModule;
+import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
@@ -20,7 +21,7 @@ public final class PAPService {
     protected static void setStartupMonitoringProperties(){
         
         // TODO: find a more reliable naming scheme
-        PAPConfiguration.instance().setMonitoringProperty( "ServiceStartupTime", new Date() );
+        PAPConfiguration.instance().setMonitoringProperty( MonitoredProperties.SERVICE_STARTUP_TIME_PROP_NAME, new Date() );
         
         
     }
