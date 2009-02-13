@@ -6,7 +6,6 @@ import java.util.List;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
@@ -287,7 +286,7 @@ public class PAPContainer {
     
     private void updatePAPPolicyLastModificationTime() {
         pap.setPolicyLastModificationTime(new Date());
-        PAPManager.getInstance().updateTrustedPAP(pap.getAlias(), pap);
+        RepositoryManager.getDAOFactory().getPAPDAO().update(pap);
         notifyPolicyLastModificationTimeUpdate();
     }
     
