@@ -1,5 +1,6 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -22,19 +23,30 @@ import org.opensaml.xacml.policy.TargetType;
 
 public class TargetWizard {
     
-    public static TargetType createTarget(List<AttributeWizard> targetAttributeWizardList) {
+    public static TargetType buildTarget(List<AttributeWizard> targetAttributeWizardList) {
+        
+        if (targetAttributeWizardList == null) {
+            targetAttributeWizardList = new ArrayList<AttributeWizard>(0);
+        }
         
         List<AttributeType> sbjAttr = getSubjectAttributes(targetAttributeWizardList);
         List<AttributeType> rsrcAttr = getResourceAttributes(targetAttributeWizardList);
+        List<AttributeType> envAttr = getEnvironmentAttributes(targetAttributeWizardList);
+        List<AttributeType> actionAttr = getActions(targetAttributeWizardList);
+        
+        if (sbjAttr.size() + rsrcAttr.size() + envAttr.size() + actionAttr.size() != targetAttributeWizardList.size())
+            throw new WizardException("BUG: error building the Targert");
 
         SubjectsType subjects = SubjectsHelper.build(SubjectHelper.build(SubjectMatchHelper
                 .buildListWithDesignator(sbjAttr, Functions.STRING_EQUAL)));
 
+        ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(ResourceMatchHelper
+                .buildWithDesignator(rsrcAttr, Functions.STRING_EQUAL)));
+        
+        
         ActionsType actions = ActionsHelper.buildAnyAction();
         
 
-        ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(ResourceMatchHelper
-                .buildWithDesignator(rsrcAttr, Functions.STRING_EQUAL)));
 
         TargetType target = TargetHelper.build(subjects, actions, resources, null);
 
@@ -74,24 +86,14 @@ public class TargetWizard {
 
         return attributeWizardList;
     }
-    
-    private static List<AttributeType> getSubjectAttributes(List<AttributeWizard> list) {
+
+    private static List<AttributeType> getActions(List<AttributeWizard> list) {
         List<AttributeType> resultList = new LinkedList<AttributeType>();
 
         for (AttributeWizard attribute : list) {
-            if (attribute.isSubjectAttribute())
+            if (attribute.isActionAttribute()) {
                 resultList.add(attribute.getAttributeType());
-        }
-
-        return resultList;
-    }
-    
-    private static List<AttributeType> getResourceAttributes(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isResourceAttribute())
-                resultList.add(attribute.getAttributeType());
+            }
         }
 
         return resultList;
@@ -101,11 +103,35 @@ public class TargetWizard {
         List<AttributeType> resultList = new LinkedList<AttributeType>();
 
         for (AttributeWizard attribute : list) {
-            if (attribute.isEnvironmentAttribute())
+            if (attribute.isEnvironmentAttribute()) {
                 resultList.add(attribute.getAttributeType());
+            }
         }
 
         return resultList;
     }
+    
+    private static List<AttributeType> getResourceAttributes(List<AttributeWizard> list) {
+        List<AttributeType> resultList = new LinkedList<AttributeType>();
 
+        for (AttributeWizard attribute : list) {
+            if (attribute.isResourceAttribute()) {
+                resultList.add(attribute.getAttributeType());
+            }
+        }
+
+        return resultList;
+    }
+    
+    private static List<AttributeType> getSubjectAttributes(List<AttributeWizard> list) {
+        List<AttributeType> resultList = new LinkedList<AttributeType>();
+
+        for (AttributeWizard attribute : list) {
+            if (attribute.isSubjectAttribute()) {
+                resultList.add(attribute.getAttributeType());
+            }
+        }
+
+        return resultList;
+    }
 }

@@ -43,19 +43,23 @@ public class PolicyWizard {
     public PolicyWizard(List<AttributeWizard> targetAttributeWizardList,
             List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
         
-        if (targetAttributeWizardList == null)
+        if (targetAttributeWizardList == null) {
             targetAttributeWizardList = new LinkedList<AttributeWizard>();
+        }
+        
         this.targetAttributeWizardList = targetAttributeWizardList;
         
         policyWizardType = getPolicyWizardType(targetAttributeWizardList);
         
-        if (orExceptionsAttributeWizardList == null)
+        if (orExceptionsAttributeWizardList == null) {
             orExceptionsAttributeWizardList = new LinkedList<List<AttributeWizard>>();
+        }
+        
         this.orExceptionsAttributeWizardList = orExceptionsAttributeWizardList;
         
         policy = PolicyHelper.build(generateId(), PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
         
-        TargetType target = TargetWizard.createTarget(targetAttributeWizardList);
+        TargetType target = TargetWizard.buildTarget(targetAttributeWizardList);
         
         RuleType rule = RuleWizard.build(orExceptionsAttributeWizardList, effect);
         
@@ -403,6 +407,42 @@ public class PolicyWizard {
             policyIdVisibilityPrefix = VISIBILITY_PRIVATE_PREFIX;
         else
             policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
+    }
+    
+    private List<AttributeWizard> getPolicyTartgetAttributes(List<AttributeWizard> attributeWizardList) {
+        
+        List<AttributeWizard> policyTargetAttributeList = new LinkedList<AttributeWizard>();
+        
+        if (attributeWizardList == null) {
+            return policyTargetAttributeList;
+        }
+        
+        for (AttributeWizard attribute : attributeWizardList) {
+            if (attribute.isEnvironmentAttribute()) {
+                policyTargetAttributeList.add(attribute);
+            } else if (attribute.isResourceAttribute()) {
+                policyTargetAttributeList.add(attribute);
+            }
+        }
+        
+        return policyTargetAttributeList;
+    }
+    
+private List<AttributeWizard> getRuleTartgetAttributes(List<AttributeWizard> attributeWizardList) {
+        
+        List<AttributeWizard> policyTargetAttributeList = new LinkedList<AttributeWizard>();
+        
+        if (attributeWizardList == null) {
+            return policyTargetAttributeList;
+        }
+        
+        for (AttributeWizard attribute : attributeWizardList) {
+            if (attribute.isSubjectAttribute()) {
+                policyTargetAttributeList.add(attribute);
+            }
+        }
+        
+        return policyTargetAttributeList;
     }
     
 }

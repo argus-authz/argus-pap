@@ -27,45 +27,31 @@ import org.slf4j.LoggerFactory;
 
 public class RuleWizard {
 
+    private static final javax.xml.namespace.QName ENVIRONMENT_DESIGNATOR = AttributeDesignatorType.ENVIRONMENT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final Logger log = LoggerFactory.getLogger(RuleWizard.class);
+    private static final javax.xml.namespace.QName RESOURCE_DESIGNATOR = AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final String ruleId = "ExceptionsRule";
     private static final javax.xml.namespace.QName SUBJECT_DESIGNATOR = AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
-    private static final javax.xml.namespace.QName RESOURCE_DESIGNATOR = AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
-    private static final javax.xml.namespace.QName ENVIRONMENT_DESIGNATOR = AttributeDesignatorType.ENVIRONMENT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
 
+    public static RuleType build(List<AttributeWizard> targetAttributeList,
+            List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
+        
+        RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
+        
+        ConditionType condition = buildCondition(orExceptionsAttributeWizardList);
+
+        exceptionsRule.setCondition(condition);
+
+        return exceptionsRule;
+    }
+    
+    @Deprecated
     public static RuleType build(List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
         
-        List<List<AttributeType>> orAttributeList = getAttributeTypeListList(orExceptionsAttributeWizardList);
-
-        ApplyType applyOr = ApplyHelper.buildFunctionOr();
-
-        for (List<AttributeType> andAttributeList : orAttributeList) {
-
-            if (andAttributeList.isEmpty())
-                continue;
-
-            if (andAttributeList.size() == 1) {
-                AttributeType attribute = andAttributeList.get(0);
-                applyOr.getExpressions().add(createFunctionAnyOf(attribute, getDesignator(attribute)));
-            } else {
-                ApplyType applyAnd = ApplyHelper.buildFunctionAnd();
-                for (AttributeType attribute : andAttributeList) {
-                    applyAnd.getExpressions().add(
-                            createFunctionAnyOf(attribute, getDesignator(attribute)));
-                }
-                applyOr.getExpressions().add(applyAnd);
-            }
-
-        }
-
-        ApplyType applyNot = ApplyHelper.buildFunctionNot();
-        applyNot.getExpressions().add(applyOr);
-
-        ConditionType condition = (ConditionType) Configuration.getBuilderFactory().getBuilder(
-                ConditionType.DEFAULT_ELEMENT_NAME).buildObject(ConditionType.DEFAULT_ELEMENT_NAME);
-        condition.setExpression(applyNot);
-
         RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
+        
+        ConditionType condition = buildCondition(orExceptionsAttributeWizardList);
+
         exceptionsRule.setCondition(condition);
 
         return exceptionsRule;
@@ -136,6 +122,41 @@ public class RuleWizard {
         return resultList;
     }
     
+    private static ConditionType buildCondition(List<List<AttributeWizard>> orExceptionsAttributeWizardList) {
+        
+        List<List<AttributeType>> orAttributeList = getAttributeTypeListList(orExceptionsAttributeWizardList);
+        
+        ApplyType applyOr = ApplyHelper.buildFunctionOr();
+
+        for (List<AttributeType> andAttributeList : orAttributeList) {
+
+            if (andAttributeList.isEmpty())
+                continue;
+
+            if (andAttributeList.size() == 1) {
+                AttributeType attribute = andAttributeList.get(0);
+                applyOr.getExpressions().add(createFunctionAnyOf(attribute, getDesignator(attribute)));
+            } else {
+                ApplyType applyAnd = ApplyHelper.buildFunctionAnd();
+                for (AttributeType attribute : andAttributeList) {
+                    applyAnd.getExpressions().add(
+                            createFunctionAnyOf(attribute, getDesignator(attribute)));
+                }
+                applyOr.getExpressions().add(applyAnd);
+            }
+
+        }
+
+        ApplyType applyNot = ApplyHelper.buildFunctionNot();
+        applyNot.getExpressions().add(applyOr);
+
+        ConditionType condition = (ConditionType) Configuration.getBuilderFactory().getBuilder(
+                ConditionType.DEFAULT_ELEMENT_NAME).buildObject(ConditionType.DEFAULT_ELEMENT_NAME);
+        condition.setExpression(applyNot);
+        
+        return condition;
+    }
+    
     private static ApplyType createFunctionAnyOf(AttributeType attribute, QName designatorType) {
 
         FunctionType functionStringEqual = FunctionHelper.build(Functions.STRING_EQUAL);
@@ -201,6 +222,27 @@ public class RuleWizard {
         return CtxAttributeTypeHelper.build(xacmlId, dataType, value);
     }
 
+    private static List<AttributeType> getAttributeTypeList(List<AttributeWizard> list) {
+        List<AttributeType> resultList = new LinkedList<AttributeType>();
+
+        for (AttributeWizard attribute : list) {
+            resultList.add(attribute.getAttributeType());
+        }
+
+        return resultList;
+    }
+    
+    private static List<List<AttributeType>> getAttributeTypeListList(
+            List<List<AttributeWizard>> listList) {
+        List<List<AttributeType>> resultList = new LinkedList<List<AttributeType>>();
+
+        for (List<AttributeWizard> list : listList) {
+            resultList.add(getAttributeTypeList(list));
+        }
+
+        return resultList;
+    }
+
     private static javax.xml.namespace.QName getDesignator(AttributeType attribute) {
 
         if (AttributeWizard.isSubjectAttribute(attribute))
@@ -215,27 +257,6 @@ public class RuleWizard {
             return SUBJECT_DESIGNATOR;
         }
 
-    }
-    
-    private static List<AttributeType> getAttributeTypeList(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            resultList.add(attribute.getAttributeType());
-        }
-
-        return resultList;
-    }
-
-    private static List<List<AttributeType>> getAttributeTypeListList(
-            List<List<AttributeWizard>> listList) {
-        List<List<AttributeType>> resultList = new LinkedList<List<AttributeType>>();
-
-        for (List<AttributeWizard> list : listList) {
-            resultList.add(getAttributeTypeList(list));
-        }
-
-        return resultList;
     }
 
 }
