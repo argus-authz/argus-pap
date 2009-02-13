@@ -12,6 +12,7 @@ public class PAP  {
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
     public static final String localPAPAlias = "Local";
+    public static final String LOCAL_PAP_ID = "Local";
 
     private String alias;
     private String dn;

@@ -3,7 +3,9 @@ package org.glite.authz.pap.repository;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
@@ -50,10 +52,13 @@ public class PAPContainer {
             throw e;
         }
         
+        notifyPoliciesAdded(1);
+        
     }
     
     public void deleteAllPolicies() {
-        policyDAO.deleteAll(papId);
+        int numOfDeletedPolicies = policyDAO.deleteAll(papId);
+        notifyPoliciesDeleted(numOfDeletedPolicies);
     }
     
     public void deleteAllPolicySets() {
@@ -62,6 +67,7 @@ public class PAPContainer {
 
     public void deletePolicy(String id) throws NotFoundException, RepositoryException {
         policyDAO.delete(papId, id);
+        notifyPoliciesDeleted(1);
     }
 
     public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
@@ -140,10 +146,12 @@ public class PAPContainer {
         }
         
         policyDAO.delete(papId, policyId);
+        notifyPoliciesDeleted(1);
     }
     
     public void storePolicy(PolicyType policy) {
         policyDAO.store(papId, policy);
+        notifyPoliciesAdded(1);
     }
     
     public void storePolicySet(PolicySetType policySet) {
@@ -183,6 +191,56 @@ public class PAPContainer {
         else
             removeReference(policySetId, referenceId, isPolicyReference);
         
+    }
+    
+    private void notifyPoliciesAdded(int numOfAddedPolicies) {
+        
+        String propName;
+        
+        if (PAP.LOCAL_PAP_ID.equals(papId)) {
+            propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
+        } else {
+            propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
+        }
+        
+        synchronized (this) {
+            Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            int numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+            
+            propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
+            
+            numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+        }
+    }
+    
+    private void notifyPoliciesDeleted(int numOfDeletedPolicies) {
+        
+        String propName;
+        
+        if (PAP.LOCAL_PAP_ID.equals(papId)) {
+            propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
+        } else {
+            propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
+        }
+        
+        synchronized (this) {
+            Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            int numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+            
+            propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
+            
+            numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+        }
     }
     
     private synchronized void removeReference(String policySetId, String referenceId, boolean isPolicyReference)

@@ -10,10 +10,8 @@ import java.util.Set;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.repository.RepositoryManager;
+import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.dao.PAPDAO;
-import org.glite.authz.pap.repository.dao.PolicyDAO;
-import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
@@ -100,12 +98,11 @@ public class FileSystemPAPDAO implements PAPDAO {
 
 		String papId = papsINIFile.getString(idKey(papAlias));
 		
-		PolicyDAO policyDAO = RepositoryManager.getDAOFactory().getPolicyDAO();
-		policyDAO.deleteAll(papId);
+		PAPContainer papContainer = new PAPContainer(get(papAlias));
 		
-		PolicySetDAO policySetDAO = RepositoryManager.getDAOFactory().getPolicySetDAO();
-		policySetDAO.deleteAll(papId);
-
+		papContainer.deleteAllPolicies();
+		papContainer.deleteAllPolicySets();
+		
 		File papDir = new File(getPAPDirAbsolutePath(papId));
 		papDir.delete();
 

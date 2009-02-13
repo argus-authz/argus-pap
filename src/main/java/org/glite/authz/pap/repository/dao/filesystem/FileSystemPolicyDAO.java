@@ -56,12 +56,14 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 		}
 	}
 
-	public void deleteAll(String papId) {
+	public int deleteAll(String papId) {
 
 		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
 		if (!papDir.exists())
 			throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+		
+		int numOfDeletedPolicies = 0;
 
 		for (File file : papDir.listFiles()) {
 
@@ -70,8 +72,11 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
 			if (file.getName().startsWith(policyFileNamePrefix)) {
 				file.delete();
+				numOfDeletedPolicies++;
 			}
 		}
+		
+		return numOfDeletedPolicies;
 	}
 
 	public boolean exists(String papId, String policyId) {
