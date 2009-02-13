@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 public class FileSystemRepositoryManager extends RepositoryManager {
 
 	protected static String fileSystemDatabaseDir;
-	private static final String LOCAL_PAP_ID = PAP.localPAPAlias;
+	private static final String LOCAL_PAP_ID = PAP.LOCAL_PAP_ALIAS;
 	private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
 	private static final String POLICY_FILENAME_PREFIX = "Policy_";
 	private static final String POLICYSET_FILENAME_PREFIX = "PolicySet_";

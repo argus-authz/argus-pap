@@ -11,7 +11,7 @@ public class PAP  {
     public static String DEFAULT_PORT = "4554";
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
-    public static final String localPAPAlias = "Local";
+    public static final String LOCAL_PAP_ALIAS = "Local";
     public static final String LOCAL_PAP_ID = "Local";
 
     private String alias;
@@ -72,7 +72,7 @@ public class PAP  {
     }
     
     public static PAP makeLocalPAP() {
-        return new PAP(localPAPAlias, localPAPAlias, "localhost", true);
+        return new PAP(LOCAL_PAP_ALIAS, LOCAL_PAP_ALIAS, "localhost", true);
     }
     
     public boolean equals(PAP pap) {

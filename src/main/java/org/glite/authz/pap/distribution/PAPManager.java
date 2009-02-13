@@ -206,7 +206,7 @@ public class PAPManager {
         // remove from the repository PAPs that are not in the distribution configuration
         for (String alias:papDAO.getAllAliases()) {
         	
-        	if (alias.equals(PAP.localPAPAlias))
+        	if (alias.equals(PAP.LOCAL_PAP_ALIAS))
         		continue;
         	
             if (exists(alias))
