@@ -46,14 +46,9 @@ public final class PAPService {
                 numberOfLocalPolicies + numOfRemotePolicies);
 
         // Property: policy last modification time
-        Date policyLastModificationTime = papManager.getLocalPAP().getPolicyLastModificationTime();
-        if (policyLastModificationTime == null) {
-            PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                    "Undefined");
-        } else {
-            PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                    policyLastModificationTime);
-        }
+        String policyLastModificationTimeString = papManager.getLocalPAP().getPolicyLastModificationTimeString();
+        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+                policyLastModificationTimeString);
     }
 
     public static void start(ServletContext context) {
@@ -83,11 +78,16 @@ public final class PAPService {
         // Start repository manager
         logger.info("Starting repository manager...");
         RepositoryManager.bootstrap();
+        
+        PAPManager.initialize();
+        
+        RepositoryManager.setLocalPoliciesFromConfigurationFileIfSetIntoConfiguration();
+        
+        setStartupMonitoringProperties();
 
         logger.info("Starting pap distribution module...");
         DistributionModule.getInstance().startDistributionModule();
 
-        setStartupMonitoringProperties();
     }
 
     public static void stop() {

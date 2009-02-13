@@ -1,10 +1,12 @@
 package org.glite.authz.pap.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
@@ -52,12 +54,14 @@ public class PAPContainer {
             throw e;
         }
         
-        notifyPoliciesAdded(1);
+        updatePAPPolicyLastModificationTime();
         
+        notifyPoliciesAdded(1);
     }
     
     public void deleteAllPolicies() {
         int numOfDeletedPolicies = policyDAO.deleteAll(papId);
+        updatePAPPolicyLastModificationTime();
         notifyPoliciesDeleted(numOfDeletedPolicies);
     }
     
@@ -67,6 +71,7 @@ public class PAPContainer {
 
     public void deletePolicy(String id) throws NotFoundException, RepositoryException {
         policyDAO.delete(papId, id);
+        updatePAPPolicyLastModificationTime();
         notifyPoliciesDeleted(1);
     }
 
@@ -146,11 +151,15 @@ public class PAPContainer {
         }
         
         policyDAO.delete(papId, policyId);
+        
+        updatePAPPolicyLastModificationTime();
+        
         notifyPoliciesDeleted(1);
     }
     
     public void storePolicy(PolicyType policy) {
         policyDAO.store(papId, policy);
+        updatePAPPolicyLastModificationTime();
         notifyPoliciesAdded(1);
     }
     
@@ -205,6 +214,11 @@ public class PAPContainer {
         
         synchronized (this) {
             Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            
+            if (numOfPoliciesInteger == null) {
+                return;
+            }
+            
             int numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
             numOfPoliciesInteger = new Integer(numOfPolicies);
             PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
@@ -230,6 +244,11 @@ public class PAPContainer {
         
         synchronized (this) {
             Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            
+            if (numOfPoliciesInteger == null) {
+                return;
+            }
+            
             int numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
             numOfPoliciesInteger = new Integer(numOfPolicies);
             PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
@@ -243,6 +262,16 @@ public class PAPContainer {
         }
     }
     
+    private void notifyPolicyLastModificationTimeUpdate() {
+        
+        if (!PAP.LOCAL_PAP_ID.equals(papId)) {
+            return;
+        }
+
+        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+                pap.getPolicyLastModificationTimeString());
+    }
+    
     private synchronized void removeReference(String policySetId, String referenceId, boolean isPolicyReference)
             throws NotFoundException, RepositoryException {
 
@@ -254,6 +283,12 @@ public class PAPContainer {
             PolicySetHelper.deletePolicySetReference(policySet, referenceId);
         
         policySetDAO.update(papId, policySet);
+    }
+    
+    private void updatePAPPolicyLastModificationTime() {
+        pap.setPolicyLastModificationTime(new Date());
+        PAPManager.getInstance().updateTrustedPAP(pap.getAlias(), pap);
+        notifyPolicyLastModificationTimeUpdate();
     }
     
 }

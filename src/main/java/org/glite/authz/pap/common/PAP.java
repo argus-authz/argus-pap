@@ -1,11 +1,19 @@
 package org.glite.authz.pap.common;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PAP  {
+    
+    private static final Logger log = LoggerFactory.getLogger(PAP.class);
+    
     public static String DEFAULT_DN = "invalid_dn";
     public static String DEFAULT_HOST = "localhost";
     public static String DEFAULT_PORT = "4554";
@@ -13,6 +21,8 @@ public class PAP  {
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
     public static final String LOCAL_PAP_ALIAS = "Local";
     public static final String LOCAL_PAP_ID = "Local";
+    
+    private static DateFormat df = new SimpleDateFormat("E MM/dd/yyyy HH:mm:ss");
 
     private String alias;
     private String dn;
@@ -125,6 +135,15 @@ public class PAP  {
         return policyLastModificationTime;
     }
     
+    public String getPolicyLastModificationTimeString() {
+        
+        if (policyLastModificationTime == null) {
+            return "Undefined";
+        }
+        
+        return df.format(policyLastModificationTime);
+    }
+    
     public String getPort() {
         return port;
     }
@@ -158,6 +177,20 @@ public class PAP  {
     }
 
     public void setPolicyLastModificationTime(Date policyLastModificationTime) {
+        this.policyLastModificationTime = policyLastModificationTime;
+    }
+    
+    public void setPolicyLastModificationTime(String policyLastModificationTimeString) {
+        Date policyLastModificationTime = null;
+        
+        if (policyLastModificationTimeString != null) {
+            try {
+                policyLastModificationTime = df.parse(policyLastModificationTimeString);
+            } catch (ParseException e) {
+                log.error(String.format("Invalid date format for PAP: papAlias=\"%s\" papId=\"%s\"", alias, papId), e);
+            }
+        }
+        
         this.policyLastModificationTime = policyLastModificationTime;
     }
 
