@@ -22,7 +22,7 @@ public class PAP  {
     public static final String LOCAL_PAP_ALIAS = "Local";
     public static final String LOCAL_PAP_ID = "Local";
     
-    private static DateFormat df = new SimpleDateFormat("E MM/dd/yyyy HH:mm:ss");
+    private static DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
 
     private String alias;
     private String dn;
