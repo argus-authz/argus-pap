@@ -14,27 +14,35 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 
- File : ProvisioningServiceClientFactoryImpl.java
+ File : ProvisioningServicePortTypeImpl.java
 
  Authors: Valerio Venturi <valerio.venturi@cnaf.infn.it>
 
  **************************************************************************/
 
-package org.glite.authz.pap.provisioning.client.impl;
+package org.glite.authz.pap.client.impl;
 
-import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
-import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
+import java.net.URL;
 
-/**
- * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
- * 
- */
-public class ProvisioningServiceClientFactoryImpl extends
-	ProvisioningServiceClientFactory {
+import javax.xml.rpc.ServiceException;
+import javax.xml.rpc.encoding.TypeMappingRegistry;
 
-    @Override
-    public ProvisioningServiceClient createPolicyProvisioningServiceClient() {
-	return new ProvisioningServiceClientImpl();
+import org.apache.axis.client.Service;
+import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
+
+public class ProvisioningServiceLocator {
+    
+    private final Service service;
+
+    public ProvisioningServiceLocator() {
+        service = new Service();
     }
-
+    
+    public Provisioning getProvisioningService(URL url) throws ServiceException {
+        return new ProvisioningServiceStub(url, service);
+    }
+    
+    public TypeMappingRegistry getTypeMappingRegistry() {
+        return service.getTypeMappingRegistry();
+    }
 }

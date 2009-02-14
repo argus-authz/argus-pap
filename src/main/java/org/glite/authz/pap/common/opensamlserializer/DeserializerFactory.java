@@ -20,7 +20,7 @@
  * 
  */
 
-package org.glite.authz.pap.provisioning.axis;
+package org.glite.authz.pap.common.opensamlserializer;
 
 import java.util.Iterator;
 
@@ -39,7 +39,7 @@ public class DeserializerFactory implements
      * @see javax.xml.rpc.encoding.DeserializerFactory#getDeserializerAs(java.lang.String)
      */
     public Deserializer getDeserializerAs(String arg0) {
-	return new org.glite.authz.pap.provisioning.axis.Deserializer();
+	return new org.glite.authz.pap.common.opensamlserializer.Deserializer();
     }
 
     /*
