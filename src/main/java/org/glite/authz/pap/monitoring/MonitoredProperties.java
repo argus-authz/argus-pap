@@ -2,6 +2,7 @@ package org.glite.authz.pap.monitoring;
 
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.glite.authz.pap.common.PAPConfiguration;
 
@@ -17,11 +18,11 @@ public class MonitoredProperties {
     public static final String USED_MEMORY_PROP_NAME = "UsedMemory";
     public static final String MAX_MEMORY_PROP_NAME = "MaxMemory";
 
-    Hashtable<String, String> props;
+    TreeMap<String, String> props;
 
     private MonitoredProperties() {
 
-        props = new Hashtable<String, String>();
+        props = new TreeMap<String, String>();
 
         PAPConfiguration conf = PAPConfiguration.instance();
 
