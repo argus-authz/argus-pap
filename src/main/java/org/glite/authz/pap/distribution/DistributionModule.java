@@ -73,7 +73,7 @@ public class DistributionModule extends Thread {
         log.debug(String.format("Storing policies for PAP %s (id=%s)", pap.getAlias(), pap.getPapId()));
 
         PAPManager papManager = PAPManager.getInstance();
-        PAPContainer papContainer = papManager.getTrustedPAPContainer(pap.getAlias());
+        PAPContainer papContainer = papManager.getRemotePAPContainer(pap.getAlias());
 
         papContainer.deleteAllPolicies();
         papContainer.deleteAllPolicySets();
@@ -110,7 +110,7 @@ public class DistributionModule extends Thread {
                 
                 log.info("Starting refreshing cache process...");
                 
-                for (PAP pap : PAPManager.getInstance().getAllTrustedPAPs()) {
+                for (PAP pap : PAPManager.getInstance().getOrderedRemotePAPsArray()) {
 
                     if (this.isInterrupted())
                         break;

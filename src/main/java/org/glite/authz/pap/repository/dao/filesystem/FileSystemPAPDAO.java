@@ -135,11 +135,11 @@ public class FileSystemPAPDAO implements PAPDAO {
 
 	public List<PAP> getAll() {
 
-		List<String> aliasList = getAllAliases();
+		String[] aliasArray = getAllAliases();
 
-		List<PAP> papList = new ArrayList<PAP>(aliasList.size());
+		List<PAP> papList = new ArrayList<PAP>(aliasArray.length);
 
-		for (String alias : aliasList) {
+		for (String alias : aliasArray) {
 			papList.add(getPAPFromINIFile(alias));
 		}
 
@@ -147,7 +147,7 @@ public class FileSystemPAPDAO implements PAPDAO {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<String> getAllAliases() {
+	public String[] getAllAliases() {
 
 		Set<String> aliasSet = new HashSet<String>();
 
@@ -163,13 +163,16 @@ public class FileSystemPAPDAO implements PAPDAO {
 			aliasSet.add(alias);
 		}
 
-		List<String> aliasList = new ArrayList<String>();
+		int size = aliasSet.size();
+		String[] aliasArray = new String[size];
 
+		int i = 0;
 		for (String alias : aliasSet) {
-			aliasList.add(alias);
+			aliasArray[i] = alias;
+			i++;
 		}
 
-		return aliasList;
+		return aliasArray;
 	}
 
 	public void store(PAP pap) {

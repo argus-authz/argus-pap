@@ -41,7 +41,7 @@ public class ProvisioningServiceDAO {
         
         papContainerList.add(papManager.getLocalPAPContainer());
         
-        List<PAPContainer> publicPAPContainerList = papManager.getPublicTrustedPAPsContainer();
+        List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
         boolean useRootPolicySet = !publicPAPContainerList.isEmpty();
         
         if (useRootPolicySet) {
@@ -74,7 +74,7 @@ public class ProvisioningServiceDAO {
         
         resultList.add(rootPolicySet);
         
-        List<PAPContainer> papContainerList = papManager.getAllPAPContainer();
+        PAPContainer[] papContainerList = papManager.getOrderedPAPContainerArray();
 
         // Add references to the remote PAPs
         for (PAPContainer papContainer : papContainerList) {
@@ -89,7 +89,7 @@ public class ProvisioningServiceDAO {
         }
 
         log.debug("PDP query executed: retrieved " + resultList.size()
-                + " elemens (Policy/PolicySet) relate to " + papManager.getAllTrustedPAPsContainer().size()
+                + " elemens (Policy/PolicySet) relate to " + papManager.getOrderedRemotePAPsContainerArray().length
                 + " PAPs");
 
         return resultList;

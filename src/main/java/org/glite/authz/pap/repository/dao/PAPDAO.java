@@ -10,7 +10,7 @@ public interface PAPDAO {
     
     public List<PAP> getAll();
     
-    public List<String> getAllAliases();
+    public String[] getAllAliases();
 
     public PAP get(String papAlias);
     

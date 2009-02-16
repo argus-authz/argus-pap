@@ -29,12 +29,12 @@ public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
     @Override
     protected PAPData[] doExecute() {
         
-        List<PAP> papList = PAPManager.getInstance().getAllTrustedPAPs();
+        PAP[] papArray = PAPManager.getInstance().getOrderedRemotePAPsArray();
         
-        PAPData[] papArray = new PAPData[papList.size()];
+        PAPData[] papDataArray = new PAPData[papArray.length];
         
-        for (int i=0; i<papArray.length; i++) {
-            PAP pap = papList.get(i);
+        for (int i=0; i<papDataArray.length; i++) {
+            PAP pap = papArray[i];
             
             PAPData papData = new PAPData();
             
@@ -47,10 +47,10 @@ public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
             papData.setProtocol(pap.getProtocol());
             papData.setVisibilityPublic(pap.isVisibilityPublic());
             
-            papArray[i] = papData;
+            papDataArray[i] = papData;
         }
 
-        return papArray;
+        return papDataArray;
     }
 
     @Override

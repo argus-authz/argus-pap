@@ -28,7 +28,7 @@ public class UpdateTrustedPAPOperation extends BasePAPOperation<Boolean> {
     protected Boolean doExecute() {
 
         try {
-            PAPManager.getInstance().updateTrustedPAP( pap.getPapId(), pap );
+            PAPManager.getInstance().updatePAP( pap.getPapId(), pap );
         } catch (NotFoundException e) {
             return false;
         }

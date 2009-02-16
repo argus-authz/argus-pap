@@ -1,10 +1,7 @@
 package org.glite.authz.pap.distribution;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import org.glite.authz.pap.common.PAP;
@@ -16,11 +13,16 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionConfiguration {
 
-    private static final String CONFIGURATION_STANZA = "distribution-configuration";
+	private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
+	private static final String CONFIGURATION_STANZA = "distribution-configuration";
+	private static final String REMOTE_PAPS_STANZA = "remote-paps";
+	
     private static DistributionConfiguration instance = null;
+    private PAPConfiguration papConfiguration;
 
-    private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
-    private static final String REMOTE_PAPS_STANZA = "remote-paps";
+    private DistributionConfiguration() {
+        papConfiguration = PAPConfiguration.instance();
+    }
 
     public static DistributionConfiguration getInstance() {
         if (instance == null)
@@ -40,11 +42,13 @@ public class DistributionConfiguration {
         return aliasKey(papAlias) + "." + "hostname";
     }
 
-    private static String minKeyLengthKey() {
+    @SuppressWarnings("unused")
+	private static String minKeyLengthKey() {
         return CONFIGURATION_STANZA + "." + "min-key-length";
     }
 
-    private static String minKeyLengthKey(String papAlias) {
+    @SuppressWarnings("unused")
+	private static String minKeyLengthKey(String papAlias) {
         return aliasKey(papAlias) + "." + "min-key-length";
     }
 
@@ -72,12 +76,6 @@ public class DistributionConfiguration {
         return aliasKey(papAlias) + "." + "public";
     }
 
-    private PAPConfiguration papConfiguration;
-
-    public DistributionConfiguration() {
-        papConfiguration = PAPConfiguration.instance();
-    }
-
     public String[] getPAPOrderArray() throws AliasNotFoundException {
 
         String[] papOrderArray = papConfiguration.getStringArray(papOrderKey());
@@ -85,11 +83,8 @@ public class DistributionConfiguration {
         if (papOrderArray == null) {
             papOrderArray = new String[0];
         }
-
-        for (String alias : papOrderArray) {
-            if (!aliasExists(alias))
-                throw new DistributionConfigurationException("Undefined PAP alias \"" + alias + "\" in \"pap-order\"");
-        }
+        
+        validatePAPOrder(papOrderArray);
 
         return papOrderArray;
     }
@@ -97,31 +92,33 @@ public class DistributionConfiguration {
     public long getPollIntervallInMilliSecs() {
 
         long pollIntervalInSecs = papConfiguration.getLong(pollIntervallKey());
+        
         log.info("Polling interval for remote PAPs is set to: " + pollIntervalInSecs + " seconds");
 
         return pollIntervalInSecs * 1000;
-
     }
 
-    public List<PAP> getRemotePAPList() {
+    public PAP[] getRemotePAPArray() {
 
-        List<String> aliasList = getAliasOrderedListFromConfiguration();
+        Set<String> aliasSet = getAliasSet();
 
-        List<PAP> papList = new LinkedList<PAP>();
+        PAP[] papArray = new PAP[aliasSet.size()];
 
-        for (String papAlias : aliasList) {
+        int idx = 0;
+        for (String papAlias : aliasSet) {
             
             if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
                 continue;
             }
             
             PAP pap = getPAPFromProperties(papAlias);
-            papList.add(pap);
+            papArray[idx] = pap;
+            idx++;
             
-            log.info("Adding remote PAP: " + pap);
+            log.info("Adding remote PAP \"" + pap + "\" from configuarion");
         }
 
-        return papList;
+        return papArray;
     }
 
     public void removePAP(String papAlias) {
@@ -164,6 +161,8 @@ public class DistributionConfiguration {
             papConfiguration.saveStartupConfiguration();
             return;
         }
+        
+        validatePAPOrder(aliasArray);
 
         if (aliasArray.length == 0) {
             papConfiguration.clearDistributionProperty(papOrderKey());
@@ -171,15 +170,9 @@ public class DistributionConfiguration {
             return;
         }
 
-        if (!aliasExists(aliasArray[0]))
-            throw new AliasNotFoundException("Unknown alias \"" + aliasArray[0] + "\"");
-
         StringBuilder sb = new StringBuilder(aliasArray[0]);
 
         for (int i = 1; i < aliasArray.length; i++) {
-
-            if (!aliasExists(aliasArray[i]))
-                throw new AliasNotFoundException("Unknown alias \"" + aliasArray[i] + "\"");
 
             sb.append(", " + aliasArray[i]);
         }
@@ -191,6 +184,23 @@ public class DistributionConfiguration {
         papConfiguration.saveStartupConfiguration();
     }
 
+    private boolean aliasExists(String alias) {
+
+        if (isEmpty(alias))
+            return false;
+        
+        if (PAP.LOCAL_PAP_ALIAS.equals(alias)) {
+            return true;
+        }
+
+        String value = papConfiguration.getString(dnKey(alias));
+
+        if (isEmpty(value))
+            return false;
+
+        return true;
+    }
+
     private void clearPAPProperties(String papAlias) {
         papConfiguration.clearDistributionProperty(dnKey(papAlias));
         papConfiguration.clearDistributionProperty(hostnameKey(papAlias));
@@ -200,36 +210,6 @@ public class DistributionConfiguration {
         papConfiguration.clearDistributionProperty(visibilityPublicKey(papAlias));
     }
 
-    private List<String> getAliasOrderedListFromConfiguration() throws AliasNotFoundException {
-
-        Set<String> aliasSet = getAliasSet();
-
-        List<String> aliasList = new ArrayList<String>(aliasSet.size());
-
-        String[] aliasOrderArray = getPAPOrderArray();
-        
-        // from the set of PAP aliases get an ordered list as defined in the aliasOrderArray
-        for (String alias : aliasOrderArray) {
-            
-            if (PAP.LOCAL_PAP_ALIAS.equals(alias)) {
-                aliasList.add(alias);
-                continue;
-            }
-            
-            if (aliasSet.remove(alias)) {
-                aliasList.add(alias);
-            } else {
-                throw new AliasNotFoundException("BUG alias not found: \"" + alias + "\"");
-            }
-        }
-
-        // order can be partially defined so get the remaining aliases
-        for (String alias : aliasSet) {
-            aliasList.add(alias);
-        }
-
-        return aliasList;
-    }
 
     @SuppressWarnings("unchecked")
     private Set<String> getAliasSet() {
@@ -280,23 +260,6 @@ public class DistributionConfiguration {
         return false;
     }
 
-    private boolean aliasExists(String alias) {
-
-        if (isEmpty(alias))
-            return false;
-        
-        if (PAP.LOCAL_PAP_ALIAS.equals(alias)) {
-            return true;
-        }
-
-        String value = papConfiguration.getString(dnKey(alias));
-
-        if (isEmpty(value))
-            return false;
-
-        return true;
-    }
-
     private void setPAPProperties(PAP pap) {
 
         String papAlias = pap.getAlias();
@@ -307,6 +270,28 @@ public class DistributionConfiguration {
         papConfiguration.setDistributionProperty(pathKey(papAlias), pap.getPath());
         papConfiguration.setDistributionProperty(protocolKey(papAlias), pap.getProtocol());
         papConfiguration.setDistributionProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
+    }
+    
+    private void validatePAPOrder(String[] aliasArray) {
+ 
+    	if (aliasArray == null) {
+    		throw new DistributionConfigurationException("aliasArray is null");
+    	}
+    	
+    	Set<String> aliasSet = new HashSet<String>(aliasArray.length);
+    	
+    	for (String alias : aliasArray) {
+    		
+    		if (aliasSet.contains(alias)) {
+    			throw new DistributionConfigurationException(String.format("Error in remote PAPs order: alias \"%s\" appears more than one time", alias));
+    		}
+    		
+    		aliasSet.add(alias);
+    		
+    		if (!aliasExists(alias)) {
+    			throw new AliasNotFoundException(String.format("Error in remote PAPs order: unknown alias \"%s\"", alias));
+    		}
+    	}
     }
 
 }
