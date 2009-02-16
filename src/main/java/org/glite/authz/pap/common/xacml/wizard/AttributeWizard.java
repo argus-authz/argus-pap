@@ -10,10 +10,12 @@ import org.slf4j.LoggerFactory;
 public class AttributeWizard {
 
     public enum AttributeWizardType {
-        DEFAULT("default", "DEFAULT", DataType.STRING, TargetElement.SUBJECT), DN("dn", "DN", DataType.STRING,
-                TargetElement.SUBJECT), FQAN("fqan", "FQAN", DataType.STRING, TargetElement.SUBJECT), GA("ga", "GA",
-                DataType.STRING, TargetElement.SUBJECT), RESOURCE_URI("resource_uri", "RESOURCE_URI", DataType.STRING,
-                TargetElement.RESOURCE), SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE);
+        DEFAULT("default", "DEFAULT", DataType.STRING, TargetElement.SUBJECT),
+        DN("dn", "DN", DataType.X_500_NAME, TargetElement.SUBJECT),
+        FQAN("fqan", "FQAN", DataType.STRING, TargetElement.SUBJECT),
+        GA("ga", "GA", DataType.STRING, TargetElement.SUBJECT),
+        RESOURCE_URI("resource_uri", "RESOURCE_URI", DataType.STRING, TargetElement.RESOURCE),
+        SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE);
 
         public enum TargetElement {
             ACTION, ENVIRONMENT, RESOURCE, SUBJECT
@@ -108,13 +110,13 @@ public class AttributeWizard {
     }
 
     public AttributeWizard(String identifier, String value) {
-        
+
         attributeWizardType = AttributeWizardType.getById(identifier);
-        
+
         if (attributeWizardType == null) {
             throw new UnsupportedAttributeException("id=" + identifier);
         }
-        
+
         this.value = value;
     }
 

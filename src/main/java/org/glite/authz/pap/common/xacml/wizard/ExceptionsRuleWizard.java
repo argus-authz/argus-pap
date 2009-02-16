@@ -1,0 +1,56 @@
+package org.glite.authz.pap.common.xacml.wizard;
+
+import java.util.List;
+
+import org.glite.authz.pap.common.xacml.utils.RuleHelper;
+import org.opensaml.xacml.policy.ConditionType;
+import org.opensaml.xacml.policy.EffectType;
+import org.opensaml.xacml.policy.RuleType;
+import org.opensaml.xacml.policy.TargetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+public class ExceptionsRuleWizard {
+
+    @SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(ExceptionsRuleWizard.class);
+    private static final String ruleId = "ExceptionsRule";
+
+    public static RuleType getXACML(List<AttributeWizard> targetAttributeWizardList,
+            List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
+
+        RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
+
+        TargetType target = TargetWizard.getXACML(targetAttributeWizardList);
+
+        ConditionType condition = ConditionWizard.getXACML(orExceptionsAttributeWizardList);
+
+        exceptionsRule.setTarget(target);
+        exceptionsRule.setCondition(condition);
+
+        return exceptionsRule;
+    }
+    
+    public static List<AttributeWizard> getTargetAttributeWizardList(RuleType rule) {
+        
+        if (!ruleId.equals(rule.getRuleId())) {
+            throw new UnsupportedPolicyException("Unrecognized RuleId");
+        }
+        
+        List<AttributeWizard> resultList = TargetWizard.getAttributeWizardList(rule.getTarget());
+        
+        return resultList;
+    }
+
+    public static List<List<AttributeWizard>> getConditionAttributeWizardListList(RuleType rule) {
+
+        if (!ruleId.equals(rule.getRuleId())) {
+            throw new UnsupportedPolicyException("Unrecognized RuleId");
+        }
+        
+        List<List<AttributeWizard>> resultList = ConditionWizard.getAttributeWizardListList(rule.getCondition());
+
+        return resultList;
+    }
+
+}
