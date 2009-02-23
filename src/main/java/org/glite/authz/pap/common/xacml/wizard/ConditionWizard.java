@@ -192,7 +192,7 @@ public class ConditionWizard {
         List<AttributeType> resultList = new LinkedList<AttributeType>();
 
         for (AttributeWizard attribute : list) {
-            resultList.add(attribute.getAttributeType());
+            resultList.add(attribute.getXACML());
         }
 
         return resultList;

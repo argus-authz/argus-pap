@@ -26,17 +26,28 @@ import org.opensaml.xacml.policy.SubjectsType;
 import org.opensaml.xacml.policy.TargetType;
 
 public class TargetWizard {
-
-    public static TargetType getXACML(List<AttributeWizard> targetAttributeWizardList) {
-
+    
+    private final TargetType target;
+    private final List<AttributeWizard> targetAttributeWizardList;
+    
+    
+    public TargetWizard(TargetType target) {
+        this.target = target;
+        this.targetAttributeWizardList = buildAttributeWizardList(target);
+    }
+    
+    public TargetWizard(List<AttributeWizard> targetAttributeWizardList) {
+        
         if (targetAttributeWizardList == null) {
             targetAttributeWizardList = new ArrayList<AttributeWizard>(0);
         }
+        
+        this.targetAttributeWizardList = targetAttributeWizardList;
 
-        List<AttributeType> sbjAttr = getSubjectAttributes(targetAttributeWizardList);
-        List<AttributeType> rsrcAttr = getResourceAttributes(targetAttributeWizardList);
-        List<AttributeType> envAttr = getEnvironmentAttributes(targetAttributeWizardList);
-        List<AttributeType> actionAttr = getActions(targetAttributeWizardList);
+        List<AttributeType> sbjAttr = WizardUtils.getSubjectAttributes(targetAttributeWizardList);
+        List<AttributeType> rsrcAttr = WizardUtils.getResourceAttributes(targetAttributeWizardList);
+        List<AttributeType> envAttr = WizardUtils.getEnvironmentAttributes(targetAttributeWizardList);
+        List<AttributeType> actionAttr = WizardUtils.getActions(targetAttributeWizardList);
 
         if (sbjAttr.size() + rsrcAttr.size() + envAttr.size() + actionAttr.size() != targetAttributeWizardList.size())
             throw new TargetWizardException("BUG: error building the Target");
@@ -52,12 +63,19 @@ public class TargetWizard {
 
         EnvironmentsType environments = null;
         
-        TargetType target = TargetHelper.build(subjects, actions, resources, environments);
+        target = TargetHelper.build(subjects, actions, resources, environments);
 
-        return target;
     }
 
-    public static List<AttributeWizard> getAttributeWizardList(TargetType target) {
+    public TargetType getXACML() {
+        return target;
+    }
+    
+    public List<AttributeWizard> getAttributeWizardList() {
+        return targetAttributeWizardList;
+    }
+
+    private static List<AttributeWizard> buildAttributeWizardList(TargetType target) {
 
         List<AttributeWizard> attributeWizardList = new LinkedList<AttributeWizard>();
         List<AttributeType> attributeList = new LinkedList<AttributeType>();
@@ -89,51 +107,4 @@ public class TargetWizard {
         return attributeWizardList;
     }
 
-    private static List<AttributeType> getActions(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isActionAttribute()) {
-                resultList.add(attribute.getAttributeType());
-            }
-        }
-
-        return resultList;
-    }
-
-    private static List<AttributeType> getEnvironmentAttributes(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isEnvironmentAttribute()) {
-                resultList.add(attribute.getAttributeType());
-            }
-        }
-
-        return resultList;
-    }
-
-    private static List<AttributeType> getResourceAttributes(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isResourceAttribute()) {
-                resultList.add(attribute.getAttributeType());
-            }
-        }
-
-        return resultList;
-    }
-
-    private static List<AttributeType> getSubjectAttributes(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isSubjectAttribute()) {
-                resultList.add(attribute.getAttributeType());
-            }
-        }
-
-        return resultList;
-    }
 }

@@ -166,7 +166,7 @@ public class AttributeWizard {
         return value;
     }
 
-    public AttributeType getAttributeType() {
+    public AttributeType getXACML() {
         return CtxAttributeTypeHelper.build(attributeWizardType.xacmlId, attributeWizardType.dataType, value);
     }
 

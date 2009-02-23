@@ -6,7 +6,6 @@ import org.glite.authz.pap.common.xacml.utils.RuleHelper;
 import org.opensaml.xacml.policy.ConditionType;
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.RuleType;
-import org.opensaml.xacml.policy.TargetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,11 +20,11 @@ public class ExceptionsRuleWizard {
 
         RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
 
-        TargetType target = TargetWizard.getXACML(targetAttributeWizardList);
+        TargetWizard targetWizard = new TargetWizard(targetAttributeWizardList);
 
         ConditionType condition = ConditionWizard.getXACML(orExceptionsAttributeWizardList);
 
-        exceptionsRule.setTarget(target);
+        exceptionsRule.setTarget(targetWizard.getXACML());
         exceptionsRule.setCondition(condition);
 
         return exceptionsRule;
@@ -37,7 +36,9 @@ public class ExceptionsRuleWizard {
             throw new UnsupportedPolicyException("Unrecognized RuleId");
         }
         
-        List<AttributeWizard> resultList = TargetWizard.getAttributeWizardList(rule.getTarget());
+        TargetWizard targetWizard = new TargetWizard(rule.getTarget());
+        
+        List<AttributeWizard> resultList = targetWizard.getAttributeWizardList();
         
         return resultList;
     }
