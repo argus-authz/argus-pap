@@ -15,7 +15,8 @@ public class AttributeWizard {
         FQAN("fqan", "FQAN", DataType.STRING, TargetElement.SUBJECT),
         GA("ga", "GA", DataType.STRING, TargetElement.SUBJECT),
         RESOURCE_URI("resource_uri", "RESOURCE_URI", DataType.STRING, TargetElement.RESOURCE),
-        SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE);
+        SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE),
+        ACTION("action", "ACTION_ID", DataType.STRING, TargetElement.ACTION);
 
         public enum TargetElement {
             ACTION, ENVIRONMENT, RESOURCE, SUBJECT
@@ -217,5 +218,27 @@ public class AttributeWizard {
     public String toFormattedString() {
         return getId() + "=\"" + getValue() + "\"";
     }
-
+    
+    public boolean equals(Object attributeWizardObject) {
+        
+        
+        if (!(attributeWizardObject instanceof AttributeWizard)) {
+            return false;
+        }
+        
+        AttributeWizard attributeWizard = (AttributeWizard) attributeWizardObject;
+        
+        if (!this.getId().equals(attributeWizard.getId())) {
+            return false;
+        }
+        
+        if (!this.getXacmlId().equals(attributeWizard.getXacmlId())) {
+            return false;
+        }
+        
+        if (!this.value.equals(attributeWizard.getValue())) {
+            return false;
+        }
+        return true;
+    }
 }

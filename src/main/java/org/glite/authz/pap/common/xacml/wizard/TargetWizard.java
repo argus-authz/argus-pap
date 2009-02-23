@@ -106,5 +106,35 @@ public class TargetWizard {
 
         return attributeWizardList;
     }
-
+    
+    public boolean equals(Object targetWizardObject) {
+        
+        if (!(targetWizardObject instanceof TargetWizard)) {
+            return false;
+        }
+        
+        TargetWizard targetWizard = (TargetWizard) targetWizardObject;
+        
+        List<AttributeWizard> attributeWizardList = targetWizard.getAttributeWizardList();
+        if (targetAttributeWizardList.size() != attributeWizardList.size()) {
+            return false;
+        }
+        
+        for (AttributeWizard thisAttributeWizard : targetAttributeWizardList) {
+            
+            boolean found = false;
+            
+            for (AttributeWizard attributeWizard : attributeWizardList) {
+                if (thisAttributeWizard.equals(attributeWizard)) {
+                    found = true;
+                    break;
+                }
+            }
+            
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
