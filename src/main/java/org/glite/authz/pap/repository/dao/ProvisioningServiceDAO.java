@@ -8,6 +8,7 @@ import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -40,7 +41,7 @@ public class ProvisioningServiceDAO {
         
         papContainerList.add(papManager.getLocalPAPContainer());
         
-        List<PAPContainer> publicPAPContainerList = papManager.getTrustedPAPContainerPublic();
+        List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
         boolean useRootPolicySet = !publicPAPContainerList.isEmpty();
         
         if (useRootPolicySet) {
@@ -73,19 +74,22 @@ public class ProvisioningServiceDAO {
         
         resultList.add(rootPolicySet);
         
-        List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
-        
-        papContainerList.add(papManager.getLocalPAPContainer());
-        papContainerList.addAll(papManager.getTrustedPAPContainerAll());
+        PAPContainer[] papContainerList = papManager.getOrderedPAPContainerArray();
 
         // Add references to the remote PAPs
         for (PAPContainer papContainer : papContainerList) {
-            PolicySetType papPolicySetNoReferences = getPolicySetNoReferences(papContainer, papContainer.getPAPRootPolicySetId());
-            PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
+            log.info("Adding PAP: " + papContainer.getPAP().getAlias());
+            
+            try {
+                PolicySetType papPolicySetNoReferences = getPolicySetNoReferences(papContainer, papContainer.getPAPRootPolicySetId());
+                PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
+            } catch (NotFoundException e) {
+                continue;
+            }
         }
 
         log.debug("PDP query executed: retrieved " + resultList.size()
-                + " elemens (Policy/PolicySet) relate to " + papManager.getTrustedPAPContainerAll().size()
+                + " elemens (Policy/PolicySet) relate to " + papManager.getOrderedRemotePAPsContainerArray().length
                 + " PAPs");
 
         return resultList;
@@ -162,7 +166,7 @@ public class ProvisioningServiceDAO {
     
     private PolicySetType makeRootPolicySet() {
         PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_"
-                + PAP.localPAPAlias, PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+                + PAP.LOCAL_PAP_ALIAS, PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         return rootPolicySet;
     }
 }

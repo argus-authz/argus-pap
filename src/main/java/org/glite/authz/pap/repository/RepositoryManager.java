@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 public abstract class RepositoryManager {
     
     private static final Logger log = LoggerFactory.getLogger(RepositoryManager.class);
+    private static boolean initialized = false;
     
     protected RepositoryManager() {}
     
@@ -31,19 +32,7 @@ public abstract class RepositoryManager {
         
         FileSystemRepositoryManager.initialize();
         
-        PAPManager.getInstance().createLocalPAPIfNotExists();
-        
-        boolean usePolicyConfigFile;
-        
-        try {
-            usePolicyConfigFile = PAPConfiguration.instance().getBoolean("use-policy-config-file");
-        } catch (NoSuchElementException e) {
-            usePolicyConfigFile = false;
-        }
-        
-        if (usePolicyConfigFile) {
-        	setLocalPoliciesFromConfigurationFile();
-        }
+        initialized = true;
         
         // FillRepository.fillFromConfiguration();
     }
@@ -55,7 +44,24 @@ public abstract class RepositoryManager {
     /**
      * Initialize the repository reading policies from the configuration file.
      */
-    private static void setLocalPoliciesFromConfigurationFile() {
+    public static void setLocalPoliciesFromConfigurationFileIfSetIntoConfiguration() {
+        
+        if (!initialized) {
+            throw new RepositoryException("Trying to use the repository before initilization. Please use the bootstrap() method.");
+        }
+        
+        boolean usePolicyConfigFile;
+        
+        try {
+            usePolicyConfigFile = PAPConfiguration.instance().getBoolean("use-policy-config-file");
+        } catch (NoSuchElementException e) {
+            usePolicyConfigFile = false;
+        }
+        
+        if (!usePolicyConfigFile) {
+            return;
+        }
+        
         PolicyFileEncoder pse = new PolicyFileEncoder();
 
         File policyConfigurationFile = new File(PAPConfiguration.instance().getPapPolicyConfigurationFileName());

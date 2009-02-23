@@ -10,15 +10,18 @@ import java.util.Set;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.repository.RepositoryManager;
+import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.dao.PAPDAO;
-import org.glite.authz.pap.repository.dao.PolicyDAO;
-import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class FileSystemPAPDAO implements PAPDAO {
+    
+    @SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(FileSystemPAPDAO.class);
 
 	private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
 	private static FileSystemPAPDAO instance = null;
@@ -80,6 +83,10 @@ public class FileSystemPAPDAO implements PAPDAO {
 	private static String pathKey(String papAlias) {
 		return aliasKey(papAlias) + "." + "path";
 	}
+	
+	private static String policyLastModificationTimeKey(String papAlias) {
+	    return aliasKey(papAlias) + "." + "policyLastModificationTime";
+	}
 
 	private static String portKey(String papAlias) {
 		return aliasKey(papAlias) + "." + "port";
@@ -100,12 +107,11 @@ public class FileSystemPAPDAO implements PAPDAO {
 
 		String papId = papsINIFile.getString(idKey(papAlias));
 		
-		PolicyDAO policyDAO = RepositoryManager.getDAOFactory().getPolicyDAO();
-		policyDAO.deleteAll(papId);
+		PAPContainer papContainer = new PAPContainer(get(papAlias));
 		
-		PolicySetDAO policySetDAO = RepositoryManager.getDAOFactory().getPolicySetDAO();
-		policySetDAO.deleteAll(papId);
-
+		papContainer.deleteAllPolicies();
+		papContainer.deleteAllPolicySets();
+		
 		File papDir = new File(getPAPDirAbsolutePath(papId));
 		papDir.delete();
 
@@ -129,11 +135,11 @@ public class FileSystemPAPDAO implements PAPDAO {
 
 	public List<PAP> getAll() {
 
-		List<String> aliasList = getAllAliases();
+		String[] aliasArray = getAllAliases();
 
-		List<PAP> papList = new ArrayList<PAP>(aliasList.size());
+		List<PAP> papList = new ArrayList<PAP>(aliasArray.length);
 
-		for (String alias : aliasList) {
+		for (String alias : aliasArray) {
 			papList.add(getPAPFromINIFile(alias));
 		}
 
@@ -141,7 +147,7 @@ public class FileSystemPAPDAO implements PAPDAO {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<String> getAllAliases() {
+	public String[] getAllAliases() {
 
 		Set<String> aliasSet = new HashSet<String>();
 
@@ -157,13 +163,16 @@ public class FileSystemPAPDAO implements PAPDAO {
 			aliasSet.add(alias);
 		}
 
-		List<String> aliasList = new ArrayList<String>();
+		int size = aliasSet.size();
+		String[] aliasArray = new String[size];
 
+		int i = 0;
 		for (String alias : aliasSet) {
-			aliasList.add(alias);
+			aliasArray[i] = alias;
+			i++;
 		}
 
-		return aliasList;
+		return aliasArray;
 	}
 
 	public void store(PAP pap) {
@@ -192,15 +201,16 @@ public class FileSystemPAPDAO implements PAPDAO {
 		saveToINIFile(pap);
 	}
 
-	private void clearPAPProperties(String papAlias) {
-		papsINIFile.clearProperty(dnKey(papAlias));
-		papsINIFile.clearProperty(hostnameKey(papAlias));
-		papsINIFile.clearProperty(portKey(papAlias));
-		papsINIFile.clearProperty(pathKey(papAlias));
-		papsINIFile.clearProperty(protocolKey(papAlias));
-		papsINIFile.clearProperty(idKey(papAlias));
-		papsINIFile.clearProperty(visibilityPublicKey(papAlias));
-	}
+    private void clearPAPProperties(String papAlias) {
+        papsINIFile.clearProperty(dnKey(papAlias));
+        papsINIFile.clearProperty(hostnameKey(papAlias));
+        papsINIFile.clearProperty(portKey(papAlias));
+        papsINIFile.clearProperty(pathKey(papAlias));
+        papsINIFile.clearProperty(protocolKey(papAlias));
+        papsINIFile.clearProperty(idKey(papAlias));
+        papsINIFile.clearProperty(visibilityPublicKey(papAlias));
+        papsINIFile.clearProperty(policyLastModificationTimeKey(papAlias));
+    }
 
 	private boolean existsInINIFile(String papAlias) {
 		return keyExists(dnKey(papAlias));
@@ -224,10 +234,12 @@ public class FileSystemPAPDAO implements PAPDAO {
 		String protocol = papsINIFile.getString(protocolKey(papAlias));
 		String path = papsINIFile.getString(pathKey(papAlias));
 		String id = papsINIFile.getString(idKey(papAlias));
+		String policyLastModificationTimeString = papsINIFile.getString(policyLastModificationTimeKey(papAlias));
 		boolean visibilityPublic = papsINIFile.getBoolean(visibilityPublicKey(papAlias));
 
 		PAP pap = new PAP(papAlias, dn, host, port, path, protocol, visibilityPublic);
 		pap.setPapId(id);
+		pap.setPolicyLastModificationTime(policyLastModificationTimeString);
 
 		return pap;
 	}
@@ -264,6 +276,7 @@ public class FileSystemPAPDAO implements PAPDAO {
 		if (pap == null)
 			throw new RepositoryException("BUG: PAP is null");
 
+		clearPAPProperties(pap.getAlias());
 		setPAPProperties(pap);
 
 		try {
@@ -284,5 +297,8 @@ public class FileSystemPAPDAO implements PAPDAO {
 		papsINIFile.setProperty(protocolKey(papAlias), pap.getProtocol());
 		papsINIFile.setProperty(idKey(papAlias), pap.getPapId());
 		papsINIFile.setProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
+		if (pap.getPolicyLastModificationTime() != null) {
+		    papsINIFile.setProperty(policyLastModificationTimeKey(papAlias), pap.getPolicyLastModificationTimeString());
+		}
 	}
 }

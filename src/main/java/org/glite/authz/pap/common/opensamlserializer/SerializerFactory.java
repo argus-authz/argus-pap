@@ -20,7 +20,7 @@
  * 
  */
 
-package org.glite.authz.pap.provisioning.axis;
+package org.glite.authz.pap.common.opensamlserializer;
 
 import java.util.Iterator;
 import javax.xml.rpc.encoding.Serializer;
@@ -38,7 +38,7 @@ public class SerializerFactory implements
      * @see javax.xml.rpc.encoding.SerializerFactory#getSerializerAs(java.lang.String)
      */
     public Serializer getSerializerAs(String arg0) {
-	return new org.glite.authz.pap.provisioning.axis.Serializer();
+	return new org.glite.authz.pap.common.opensamlserializer.Serializer();
     }
 
     /*

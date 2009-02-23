@@ -20,7 +20,7 @@
  * 
  */
 
-package org.glite.authz.pap.provisioning.axis;
+package org.glite.authz.pap.common.opensamlserializer;
 
 import java.io.IOException;
 import java.util.List;

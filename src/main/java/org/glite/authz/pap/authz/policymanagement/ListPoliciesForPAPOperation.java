@@ -31,9 +31,9 @@ public class ListPoliciesForPAPOperation extends
     @Override
     protected PolicyType[] doExecute() {
 
-        PAPContainer pap = PAPManager.getInstance().getTrustedPAPContainer(papAlias);
+        PAPContainer papContainer = PAPManager.getInstance().getRemotePAPContainer(papAlias);
         
-        List<PolicyType> policyList = pap.getAllPolicies();
+        List<PolicyType> policyList = papContainer.getAllPolicies();
         PolicyType[] policyArray = new PolicyType[policyList.size()];
         
         for (int i=0; i<policyList.size(); i++) {

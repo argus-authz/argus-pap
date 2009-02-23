@@ -8,7 +8,6 @@ import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.encoding.TypeMapping;
 
 import org.apache.axis.AxisProperties;
-import org.apache.axis.client.Service;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
@@ -18,7 +17,6 @@ import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.H
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagementServiceLocator;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
-import org.glite.authz.pap.services.provisioning.axis_skeletons.ProvisioningServiceLocator;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagementServiceLocator;
 import org.glite.security.trustmanager.axis.AXISSocketFactory;
@@ -127,18 +125,20 @@ public class ServiceClientImplAxis implements ServiceClient {
     public Provisioning getProvisioningService(String url) {
 
         initializeAxisProperties();
+        
         ProvisioningServiceLocator loc = new ProvisioningServiceLocator();
+        
         TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
         
         typeMapping.register(org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.class,
                 org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
-                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
-                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
 
         typeMapping.register(org.opensaml.saml2.core.Response.class,
                 org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
-                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
-                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
 
         try {
             return loc.getProvisioningService( new URL(url) );
@@ -150,11 +150,6 @@ public class ServiceClientImplAxis implements ServiceClient {
             throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
 
         }
-    }
-
-    public Service getService() {
-        initializeAxisProperties();
-        return new Service();
     }
 
     public String getTargetEndpoint() {
@@ -169,13 +164,13 @@ public class ServiceClientImplAxis implements ServiceClient {
         
         typeMapping.register(org.opensaml.xacml.policy.PolicyType.class,
                 org.opensaml.xacml.policy.PolicyType.SCHEMA_TYPE_NAME,
-                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
-                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
         
         typeMapping.register(org.opensaml.xacml.policy.PolicySetType.class,
                 org.opensaml.xacml.policy.PolicySetType.SCHEMA_TYPE_NAME,
-                new org.glite.authz.pap.provisioning.axis.SerializerFactory(),
-                new org.glite.authz.pap.provisioning.axis.DeserializerFactory());
+                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
 
         try {
             return loc.getXACMLPolicyManagementService( new URL(url) );

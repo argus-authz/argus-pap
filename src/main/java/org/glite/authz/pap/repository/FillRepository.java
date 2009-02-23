@@ -18,7 +18,7 @@ public class FillRepository {
     private FillRepository() {}
     
     public static void fillLocalPAP(int numberOfPolicySets, int numberOfPolicies) {
-        fillPAP(PAP.localPAPAlias, numberOfPolicySets, numberOfPolicies);
+        fillPAP(PAP.LOCAL_PAP_ALIAS, numberOfPolicySets, numberOfPolicies);
     }
     
     public static void fillPAP(String papId, int numberOfPolicySets, int numberOfPolicies) {
@@ -29,7 +29,7 @@ public class FillRepository {
         PAPContainer container = null;
         
         if (pm.exists(pap.getPapId())) {
-            container = pm.getTrustedPAPContainer(pap.getPapId());
+            container = pm.getRemotePAPContainer(pap.getPapId());
             log.info("Deleting all policies and policy sets for PAP: " + papId);
             container.deleteAllPolicies();
             container.deleteAllPolicySets();

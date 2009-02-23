@@ -96,7 +96,7 @@ public class PAPConfiguration {
 
     }
 
-    public static PAPConfiguration initialize( ServletContext context ) {
+    static PAPConfiguration initialize( ServletContext context ) {
 
         if ( instance == null ) {
             String papConfDir = context
@@ -109,7 +109,7 @@ public class PAPConfiguration {
         return instance;
     }
 
-    public static PAPConfiguration initialize() {
+    public PAPConfiguration initialize() {
 
         if ( instance == null )
             return initialize( null, null );

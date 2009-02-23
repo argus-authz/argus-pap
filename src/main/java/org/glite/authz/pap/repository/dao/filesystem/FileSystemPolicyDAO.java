@@ -20,24 +20,24 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 	private static final String policyFileNamePrefix = FileSystemRepositoryManager.getPolicyFileNamePrefix();
 	private static final PolicyHelper policyHelper = PolicyHelper.getInstance();
 
-	// TODO: maybe it's better to create different exception classes instead of different exception messages
-	private static String policyExceptionMsg(String policyId) {
-		return String.format("policyId=\"%s\"", policyId);
+	private FileSystemPolicyDAO() {}
+
+	public static FileSystemPolicyDAO getInstance() {
+		return new FileSystemPolicyDAO();
 	}
 
 	private static String papDirNotFoundExceptionMsg(String papDirPAth) {
 		return "Not found PAP directory: " + papDirPAth;
 	}
 
+	// TODO: maybe it's better to create different exception classes instead of different exception messages
+	private static String policyExceptionMsg(String policyId) {
+		return String.format("policyId=\"%s\"", policyId);
+	}
+
 	private static String policyNotFoundExceptionMsg(String policyId) {
 		String msg = "Not found: " + policyExceptionMsg(policyId);
 		return msg;
-	}
-
-	private FileSystemPolicyDAO() {}
-
-	public static FileSystemPolicyDAO getInstance() {
-		return new FileSystemPolicyDAO();
 	}
 
 	public void delete(String papId, String policyId) {
@@ -56,12 +56,14 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 		}
 	}
 
-	public void deleteAll(String papId) {
+	public int deleteAll(String papId) {
 
 		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
 		if (!papDir.exists())
 			throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+		
+		int numOfDeletedPolicies = 0;
 
 		for (File file : papDir.listFiles()) {
 
@@ -70,8 +72,11 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
 			if (file.getName().startsWith(policyFileNamePrefix)) {
 				file.delete();
+				numOfDeletedPolicies++;
 			}
 		}
+		
+		return numOfDeletedPolicies;
 	}
 
 	public boolean exists(String papId, String policyId) {
@@ -114,6 +119,28 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 		return policyHelper.buildFromFile(policyFile);
 	}
 
+	public int getNumberOfPolicies(String papId) {
+	    
+	    File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+	    
+        if (!papDir.exists())
+            return 0;
+        
+        int numOfPolicies = 0;
+        
+        for (File file : papDir.listFiles()) {
+
+            if (file.isDirectory())
+                continue;
+
+            if (file.getName().startsWith(policyFileNamePrefix)) {
+                numOfPolicies++;
+            }
+        }
+        
+        return numOfPolicies;
+    }
+
 	public void store(String papId, PolicyType policy) {
 
 		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
@@ -131,7 +158,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 		PolicyHelper.toFile(policyFileName, policy);
 	}
 
-	public void update(String papId, PolicyType policy) {
+    public void update(String papId, PolicyType policy) {
 
 		String policyId = policy.getPolicyId();
 

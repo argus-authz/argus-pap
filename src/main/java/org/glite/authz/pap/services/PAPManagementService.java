@@ -3,13 +3,16 @@ package org.glite.authz.pap.services;
 import java.rmi.RemoteException;
 
 import org.glite.authz.pap.authz.papmanagement.AddTrustedPAPOperation;
+import org.glite.authz.pap.authz.papmanagement.GetOrderOperation;
 import org.glite.authz.pap.authz.papmanagement.GetTrustedPAPOperation;
 import org.glite.authz.pap.authz.papmanagement.ListTrustedPAPsOperation;
 import org.glite.authz.pap.authz.papmanagement.RefreshPolicyCacheOperation;
 import org.glite.authz.pap.authz.papmanagement.RemoveTrustedPAPOperation;
+import org.glite.authz.pap.authz.papmanagement.SetOrderOperation;
 import org.glite.authz.pap.authz.papmanagement.TrustedPAPExistsOperation;
 import org.glite.authz.pap.authz.papmanagement.UpdateTrustedPAPOperation;
-import org.glite.authz.pap.distribution.PAPManager;
+import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.distribution.PAPManagerException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.slf4j.Logger;
@@ -49,9 +52,7 @@ public class PAPManagementService implements PAPManagement {
 	public String[] getOrder() throws RemoteException {
 		try {
 
-			String[] papOrderArray = null;
-			papOrderArray = PAPManager.getInstance().getTrustedPAPOrder();
-			return papOrderArray;
+			return GetOrderOperation.instance().execute();
 
 		} catch (RuntimeException e) {
 			ServiceClassExceptionManager.log(log, e);
@@ -115,8 +116,7 @@ public class PAPManagementService implements PAPManagement {
 	public boolean setOrder(String[] aliasArray) throws RemoteException {
 		try {
 
-			PAPManager.getInstance().setTrustedPAPOrder(aliasArray);
-			return true;
+			return SetOrderOperation.instance(aliasArray).execute();
 
 		} catch (RuntimeException e) {
 			ServiceClassExceptionManager.log(log, e);
@@ -127,6 +127,11 @@ public class PAPManagementService implements PAPManagement {
 	public boolean updateTrustedPAP(PAPData papData) throws RemoteException {
 		log.info("updateTrustedPAP(" + papData.getPapId() + "," + papData + ");");
 		try {
+
+			if (PAP.LOCAL_PAP_ALIAS.equals(papData.getAlias())) {
+				throw new PAPManagerException(String.format("Invalid request. \"%s\" cannot be updated",
+					PAP.LOCAL_PAP_ALIAS));
+			}
 
 			return UpdateTrustedPAPOperation.instance(papData).execute();
 

@@ -124,7 +124,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
     }
 
     public PolicyType[] listPAPPolicies(String papAlias) throws RemoteException {
-        log.info(String.format("lisPAPtPolicies(\"%s\");", papAlias));
+        log.info(String.format("lisPAPPolicies(\"%s\");", papAlias));
         try {
 
             return ListPoliciesForPAPOperation.instance(papAlias).execute();

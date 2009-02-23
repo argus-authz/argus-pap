@@ -108,6 +108,11 @@ public class ListPAPPolicies extends PolicyManagementCLI {
                 papInfoArray[i] = String.format("%s: ", papAliasArray[i]);
             }
         }
+        
+        if (papAliasArray.length == 0) {
+            System.out.println("No remote PAPs has been found.");
+            return ExitStatus.SUCCESS.ordinal();
+        }
 
         if (commandLine.hasOption(OPT_SHOW_XACML_LONG))
             xacmlOutput = true;

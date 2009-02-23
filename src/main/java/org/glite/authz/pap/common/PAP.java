@@ -1,42 +1,52 @@
 package org.glite.authz.pap.common;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class PAP  {
+    
+    private static final Logger log = LoggerFactory.getLogger(PAP.class);
+    
     public static String DEFAULT_DN = "invalid_dn";
     public static String DEFAULT_HOST = "localhost";
     public static String DEFAULT_PORT = "4554";
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
-    public static final String localPAPAlias = "Local";
-
-    public static PAP makeLocalPAP() {
-        return new PAP(localPAPAlias, localPAPAlias, "localhost", true);
-    }
+    public static final String LOCAL_PAP_ALIAS = "Local";
+    public static final String LOCAL_PAP_ID = "Local";
     
+    private static DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+
     private String alias;
     private String dn;
     private String hostname;
     private String papId;
     private String path;
+    private Date policyLastModificationTime = null;
     private String port;
     private String protocol;
     private boolean visibilityPublic;
-
+    
     public PAP(PAPData papData) {
         this(papData.getAlias(), papData.getDn(), papData.getHostname(), papData.getPort(), papData.getPath(), papData
                 .getProtocol(), papData.isVisibilityPublic());
     }
-    
+
     public PAP(String alias) {
     	this(alias, null, null, null, null, null, false);
     }
-    
+
     public PAP(String alias, String dn, String hostname) {
         this(alias, dn, hostname, false);
     }
-    
+
     public PAP(String alias, String dn, String hostname, boolean isPublic) {
         this(alias, dn, hostname, null, null, null, isPublic);
     }
@@ -71,7 +81,11 @@ public class PAP  {
             this.protocol = protocol;
     }
     
-	public boolean equals(PAP pap) {
+    public static PAP makeLocalPAP() {
+        return new PAP(LOCAL_PAP_ALIAS, LOCAL_PAP_ALIAS, "localhost", true);
+    }
+    
+    public boolean equals(PAP pap) {
     	
     	if (pap == null)
     		return false;
@@ -92,16 +106,16 @@ public class PAP  {
     	
     	return true;
 	}
-
-	public String getAlias() {
+    
+    public String getAlias() {
         return alias;
     }
-
-    public String getDn() {
+    
+	public String getDn() {
         return dn;
     }
-    
-    public String getEndpoint() {
+
+	public String getEndpoint() {
         return protocol + "://" + hostname + ":" + port + path;
     }
 
@@ -112,11 +126,24 @@ public class PAP  {
     public String getPapId() {
         return papId;
     }
-    
+
     public String getPath() {
         return path;
     }
-
+    
+    public Date getPolicyLastModificationTime() {
+        return policyLastModificationTime;
+    }
+    
+    public String getPolicyLastModificationTimeString() {
+        
+        if (policyLastModificationTime == null) {
+            return "Undefined";
+        }
+        
+        return df.format(policyLastModificationTime);
+    }
+    
     public String getPort() {
         return port;
     }
@@ -132,7 +159,7 @@ public class PAP  {
     public void setAlias(String alias) {
         this.alias = alias;
     }
-    
+
     public void setDn(String dn) {
         this.dn = dn;
     }
@@ -140,13 +167,31 @@ public class PAP  {
     public void setHostname(String hostname) {
         this.hostname = hostname;
     }
-
+    
     public void setPapId(String papId) {
         this.papId = papId;
     }
 
     public void setPath(String path) {
         this.path = path;
+    }
+
+    public void setPolicyLastModificationTime(Date policyLastModificationTime) {
+        this.policyLastModificationTime = policyLastModificationTime;
+    }
+    
+    public void setPolicyLastModificationTime(String policyLastModificationTimeString) {
+        Date policyLastModificationTime = null;
+        
+        if (policyLastModificationTimeString != null) {
+            try {
+                policyLastModificationTime = df.parse(policyLastModificationTimeString);
+            } catch (ParseException e) {
+                log.error(String.format("Invalid date format for PAP: papAlias=\"%s\" papId=\"%s\"", alias, papId), e);
+            }
+        }
+        
+        this.policyLastModificationTime = policyLastModificationTime;
     }
 
     public void setPort(String port) {

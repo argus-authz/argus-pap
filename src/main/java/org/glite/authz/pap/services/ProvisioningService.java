@@ -29,6 +29,7 @@ import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
 import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
 import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
+import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.opensaml.saml2.common.Extensions;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;
@@ -36,16 +37,16 @@ import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ProvisioningService {
+public class ProvisioningService implements Provisioning {
 
-    final Logger logger = LoggerFactory.getLogger(ProvisioningService.class);
-
+    private final Logger log = LoggerFactory.getLogger(ProvisioningService.class);
+    
     public Response XACMLPolicyQuery(XACMLPolicyQueryType query)
 	    throws java.rmi.RemoteException {
 
 	// log the received query
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Received XACLMPolicyQuery "
+	if (log.isDebugEnabled()) {
+	    log.debug("Received XACLMPolicyQuery "
 		    + ProvisioningServiceUtils.xmlObjectToString(query));
 	}
 
@@ -54,13 +55,13 @@ public class ProvisioningService {
 	try {
 	    ProvisioningServiceUtils.checkQuery(query);
 	} catch (VersionMismatchException e) {
-	    logger.error(e.getMessage(), e);
+	    log.error(e.getMessage(), e);
 	    return ProvisioningServiceUtils.createResponse(query, e);
 	} catch (MissingIssuerException e) {
-	    logger.error(e.getMessage(), e);
+	    log.error(e.getMessage(), e);
 	    return ProvisioningServiceUtils.createResponse(query, e);
 	} catch (WrongFormatIssuerException e) {
-	    logger.error(e.getMessage(), e);
+	    log.error(e.getMessage(), e);
 	    return ProvisioningServiceUtils.createResponse(query, e);
 	}
 
@@ -89,8 +90,8 @@ public class ProvisioningService {
 		resultList);
 
 	// log the outgoing response
-	if (logger.isDebugEnabled()) {
-	    logger.debug("Sending Response : "
+	if (log.isDebugEnabled()) {
+	    log.debug("Sending Response : "
 		    + ProvisioningServiceUtils.xmlObjectToString(response));
 	}
 

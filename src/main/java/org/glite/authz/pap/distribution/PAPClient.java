@@ -7,10 +7,10 @@ import java.util.List;
 import javax.xml.namespace.QName;
 import javax.xml.rpc.ServiceException;
 
+import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
-import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
-import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
-import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
+import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.joda.time.DateTime;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.common.SAMLVersion;
@@ -35,24 +35,23 @@ import org.slf4j.LoggerFactory;
 public class PAPClient {
 
     private static final Logger log = LoggerFactory.getLogger(PAPClient.class);
-    private ProvisioningServiceClient client;
-    private final ProvisioningServicePortType provisioningClient;
+    private final Provisioning provisioningClient;
     private final String url;
 
     private XACMLPolicyQueryType xacmlPolicyQuery;
     
     public PAPClient(String url) {
         
-        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory.getProvisioningServiceClientFactory();
-        client = factory.createPolicyProvisioningServiceClient();
-        xacmlPolicyQuery = makeStandardPAPQuery();
-        
         if (!url.endsWith("/"))
             url += "/";
-        
         this.url = url + "ProvisioningService";
         
-        provisioningClient = client.getProvisioningServicePortType(this.url);
+        xacmlPolicyQuery = makeStandardPAPQuery();
+        
+        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
+        ServiceClient serviceClient = serviceClientFactory.createServiceClient();
+        provisioningClient = serviceClient.getProvisioningService(this.url);
+        
     }
 
     public static void main(String[] args) throws RemoteException, ServiceException {
@@ -106,7 +105,7 @@ public class PAPClient {
         
         log.info("Requesting policies to remote PAP endpoint: " + url);
         
-        Response response = provisioningClient.xacmlPolicyQuery(xacmlPolicyQuery);
+        Response response = provisioningClient.XACMLPolicyQuery(xacmlPolicyQuery);
         
         List<XACMLObject> resultList = getXACMLObjectList(response);
         

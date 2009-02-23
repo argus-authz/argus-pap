@@ -1,9 +1,12 @@
 package org.glite.authz.pap.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
@@ -50,10 +53,15 @@ public class PAPContainer {
             throw e;
         }
         
+        updatePAPPolicyLastModificationTime();
+        
+        notifyPoliciesAdded(1);
     }
     
     public void deleteAllPolicies() {
-        policyDAO.deleteAll(papId);
+        int numOfDeletedPolicies = policyDAO.deleteAll(papId);
+        updatePAPPolicyLastModificationTime();
+        notifyPoliciesDeleted(numOfDeletedPolicies);
     }
     
     public void deleteAllPolicySets() {
@@ -62,6 +70,8 @@ public class PAPContainer {
 
     public void deletePolicy(String id) throws NotFoundException, RepositoryException {
         policyDAO.delete(papId, id);
+        updatePAPPolicyLastModificationTime();
+        notifyPoliciesDeleted(1);
     }
 
     public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
@@ -90,6 +100,10 @@ public class PAPContainer {
             }
         }
         return policySetList;
+    }
+
+    public int getNumberOfPolicies() {
+        return policyDAO.getNumberOfPolicies(papId);
     }
 
     public PAP getPAP() {
@@ -136,18 +150,24 @@ public class PAPContainer {
         }
         
         policyDAO.delete(papId, policyId);
-    }
-
-    public void storePolicy(PolicyType policy) {
-        policyDAO.store(papId, policy);
+        
+        updatePAPPolicyLastModificationTime();
+        
+        notifyPoliciesDeleted(1);
     }
     
-    public void updatePolicy(PolicyType policy) {
-        policyDAO.update(papId, policy);
+    public void storePolicy(PolicyType policy) {
+        policyDAO.store(papId, policy);
+        updatePAPPolicyLastModificationTime();
+        notifyPoliciesAdded(1);
     }
-
+    
     public void storePolicySet(PolicySetType policySet) {
         policySetDAO.store(papId, policySet);
+    }
+
+    public void updatePolicy(PolicyType policy) {
+        policyDAO.update(papId, policy);
     }
     
     public void updatePolicySet(PolicySetType policySet) {
@@ -181,6 +201,76 @@ public class PAPContainer {
         
     }
     
+    private void notifyPoliciesAdded(int numOfAddedPolicies) {
+        
+        String propName;
+        
+        if (PAP.LOCAL_PAP_ID.equals(papId)) {
+            propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
+        } else {
+            propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
+        }
+        
+        synchronized (this) {
+            Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            
+            if (numOfPoliciesInteger == null) {
+                return;
+            }
+            
+            int numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+            
+            propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
+            
+            numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+        }
+    }
+    
+    private void notifyPoliciesDeleted(int numOfDeletedPolicies) {
+        
+        String propName;
+        
+        if (PAP.LOCAL_PAP_ID.equals(papId)) {
+            propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
+        } else {
+            propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
+        }
+        
+        synchronized (this) {
+            Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            
+            if (numOfPoliciesInteger == null) {
+                return;
+            }
+            
+            int numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+            
+            propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
+            
+            numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+            numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
+            numOfPoliciesInteger = new Integer(numOfPolicies);
+            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+        }
+    }
+    
+    private void notifyPolicyLastModificationTimeUpdate() {
+        
+        if (!PAP.LOCAL_PAP_ID.equals(papId)) {
+            return;
+        }
+
+        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+                pap.getPolicyLastModificationTimeString());
+    }
+    
     private synchronized void removeReference(String policySetId, String referenceId, boolean isPolicyReference)
             throws NotFoundException, RepositoryException {
 
@@ -192,6 +282,12 @@ public class PAPContainer {
             PolicySetHelper.deletePolicySetReference(policySet, referenceId);
         
         policySetDAO.update(papId, policySet);
+    }
+    
+    private void updatePAPPolicyLastModificationTime() {
+        pap.setPolicyLastModificationTime(new Date());
+        RepositoryManager.getDAOFactory().getPAPDAO().update(pap);
+        notifyPolicyLastModificationTimeUpdate();
     }
     
 }

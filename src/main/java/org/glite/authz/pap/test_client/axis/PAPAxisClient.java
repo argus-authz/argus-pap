@@ -13,10 +13,10 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
-import org.glite.authz.pap.provisioning.client.ProvisioningServiceClient;
-import org.glite.authz.pap.provisioning.client.ProvisioningServiceClientFactory;
-import org.glite.authz.pap.provisioning.client.ProvisioningServicePortType;
+import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.DefaultBootstrap;
@@ -73,11 +73,12 @@ public class PAPAxisClient {
     private void setupDefaults() {
 
         papMode = false;
-        url = "https://pbox3.cnaf.infn.it:8443/glite-authz-pap/services/ProvisioningService";
-        //url = "https://localhost:4554/glite-authz-pap/services/ProvisioningService";
+        //url = "https://pbox3.cnaf.infn.it:8443/glite-authz-pap/services/ProvisioningService";
+        url = "https://localhost:4554/glite-authz-pap/services/ProvisioningService";
 
     }
 
+    @SuppressWarnings("static-access")
     private void setupCLParser() {
 
         options = new Options();
@@ -218,24 +219,22 @@ public class PAPAxisClient {
         printXMLObject("PolicyQuery:", policyQuery);
 
         /* get the client */
-        ProvisioningServiceClientFactory factory = ProvisioningServiceClientFactory
-                .getProvisioningServiceClientFactory();
-
-        ProvisioningServiceClient client = factory.createPolicyProvisioningServiceClient();
-
-        ProvisioningServicePortType port = client.getProvisioningServicePortType(url);
-
+        ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
+        ServiceClient serviceClient = serviceClientFactory.createServiceClient();
+        
         if (certificate != null)
-            port.setClientCertificate(certificate);
+            serviceClient.setClientCertificate(certificate);
 
         if (key != null)
-            port.setClientPrivateKey(key);
+            serviceClient.setClientPrivateKey(key);
 
         if (keyPasswd != null)
-            port.setClientPrivateKeyPassword(keyPasswd);
+            serviceClient.setClientPrivateKeyPassword(keyPasswd);
+        
+        Provisioning provisioningClient = serviceClient.getProvisioningService(this.url);
 
         /* call the service */
-        response = port.xacmlPolicyQuery(policyQuery);
+        response = provisioningClient.XACMLPolicyQuery(policyQuery);
 
         printXMLObject("Response:", response);
 

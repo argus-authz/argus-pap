@@ -10,13 +10,15 @@ public interface PolicyDAO {
 
     public void delete(String papId, String policyId) throws NotFoundException, RepositoryException;
 
-    public void deleteAll(String papId);
+    public int deleteAll(String papId);
 
     public boolean exists(String papId, String policyId);
 
     public List<PolicyType> getAll(String papId);
 
     public PolicyType getById(String papId, String policyId);
+    
+    public int getNumberOfPolicies(String papId);
 
     public void store(String papId, PolicyType policy);
 
