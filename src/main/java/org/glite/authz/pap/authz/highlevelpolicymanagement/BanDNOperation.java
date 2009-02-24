@@ -31,11 +31,11 @@ public class BanDNOperation extends BasePAPOperation<String> {
 
         PolicyWizard policyWizard = BanAttributePolicyWizard.getPolicyWizard(AttributeWizardType.DN, dn, isPublic, description);
         
-        String policyId = policyWizard.getPolicyType().getPolicyId();
+        String policyId = policyWizard.getXACML().getPolicyId();
         
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
         
-        localPAP.addPolicy(BlacklistPolicySet.POLICY_SET_ID, policyWizard.getPolicyType());
+        localPAP.addPolicy(BlacklistPolicySet.POLICY_SET_ID, policyWizard.getXACML());
         
         log.info("Added BlackList policy: " + policyId);
         

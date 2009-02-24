@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.opensaml.xacml.ctx.AttributeType;
 
 public class WizardUtils {
@@ -23,47 +24,12 @@ public class WizardUtils {
         return prefix + "_" + generateUUID();
     }
     
-    public static List<AttributeType> getActions(List<AttributeWizard> list) {
+    public static List<AttributeType> getAttributes(List<AttributeWizard> list, AttributeWizardType.TargetElement type) {
+        
         List<AttributeType> resultList = new LinkedList<AttributeType>();
-
+        
         for (AttributeWizard attribute : list) {
-            if (attribute.isActionAttribute()) {
-                resultList.add(attribute.getXACML());
-            }
-        }
-
-        return resultList;
-    }
-    
-    public static List<AttributeType> getEnvironmentAttributes(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isEnvironmentAttribute()) {
-                resultList.add(attribute.getXACML());
-            }
-        }
-
-        return resultList;
-    }
-
-    public static List<AttributeType> getResourceAttributes(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isResourceAttribute()) {
-                resultList.add(attribute.getXACML());
-            }
-        }
-
-        return resultList;
-    }
-
-    public static List<AttributeType> getSubjectAttributes(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            if (attribute.isSubjectAttribute()) {
+            if (type.equals(attribute.getTargetElementType())) {
                 resultList.add(attribute.getXACML());
             }
         }

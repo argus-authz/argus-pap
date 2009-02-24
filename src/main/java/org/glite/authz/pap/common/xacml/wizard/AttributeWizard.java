@@ -83,6 +83,10 @@ public class AttributeWizard {
         public String getXACMLID() {
             return xacmlId;
         }
+        
+        public TargetElement getTargetElement() {
+            return targetElement;
+        }
 
     }
 
@@ -173,6 +177,10 @@ public class AttributeWizard {
 
     public AttributeWizardType getAttributeWizardType() {
         return attributeWizardType;
+    }
+    
+    public AttributeWizardType.TargetElement getTargetElementType() {
+        return attributeWizardType.getTargetElement();
     }
 
     public String getDataType() {

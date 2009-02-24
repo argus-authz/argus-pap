@@ -34,7 +34,7 @@ public class UnbanDNOperation extends BasePAPOperation<UnbanResult> {
         List<PolicyWizard> banPolicyList = BanAttributePolicyWizard.getBanPolicies(AttributeWizardType.DN, dn, policyList);
         
         for (PolicyWizard policyWizard : banPolicyList) {
-            localPAP.removePolicyAndReferences(policyWizard.getPolicyType().getPolicyId());
+            localPAP.removePolicyAndReferences(policyWizard.getXACML().getPolicyId());
         }
         
         UnbanResult unbanResult = new UnbanResult();

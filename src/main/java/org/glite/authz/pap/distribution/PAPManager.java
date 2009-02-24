@@ -88,8 +88,8 @@ public class PAPManager {
 		PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
 			PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
 
-		localPAPContainer.storePolicySet((new BlacklistPolicySet()).getPolicySetType());
-		localPAPContainer.storePolicySet((new ServiceClassPolicySet()).getPolicySetType());
+		localPAPContainer.storePolicySet((new BlacklistPolicySet()).getXACML());
+		localPAPContainer.storePolicySet((new ServiceClassPolicySet()).getXACML());
 
 		PolicySetHelper.addPolicySetReference(localPolicySet, BlacklistPolicySet.POLICY_SET_ID);
 		PolicySetHelper.addPolicySetReference(localPolicySet, ServiceClassPolicySet.POLICY_SET_ID);

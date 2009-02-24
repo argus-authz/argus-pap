@@ -5,35 +5,36 @@ import java.util.List;
 
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.opensaml.xacml.XACMLObject;
+import org.opensaml.xacml.policy.ObligationsType;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.policy.TargetType;
 
-public class PolicySetWizard2 {
+public abstract class PolicySetWizard2_DELETEME {
     
     protected enum InsertionType {
-        AS_REFERENCE, WHOLE_OBJECT
+        WHOLE_OBJECT, AS_REFERENCE
     }
 
     protected static final InsertionType INSERTION_TYPE = InsertionType.AS_REFERENCE;
 
-    private final TargetWizard targetWizard;
     protected final List<XACMLObject> policyList;
+    protected final List<PolicySetWizard2_DELETEME> policySetWizardList;
     protected final PolicySetType policySet;
-    
-    protected final List<PolicySetWizard2> policySetWizardList;
-    
-    public PolicySetWizard2(List<AttributeWizard> targetAttributeWizardList) {
-        if (targetAttributeWizardList == null) {
-            targetAttributeWizardList = new LinkedList<AttributeWizard>();
-        }
-        
-        targetWizard = new TargetWizard(targetAttributeWizardList);
-        
-        policySet = PolicySetHelper.build(WizardUtils.generateId(null), PolicySetHelper.COMB_ALG_FIRST_APPLICABLE, targetWizard.getXACML(), null);
-        
+
+    protected PolicySetWizard2_DELETEME(String policySetId, String policyCombiningAlgorithmId, TargetType target,
+            ObligationsType obligations) {
+
         policyList = new LinkedList<XACMLObject>();
-        policySetWizardList = new LinkedList<PolicySetWizard2>();
-        
+        policySetWizardList = new LinkedList<PolicySetWizard2_DELETEME>();
+
+        if ((target == null) && (obligations == null))
+            policySet = PolicySetHelper.buildWithAnyTarget(policySetId, policyCombiningAlgorithmId);
+        else
+            policySet = PolicySetHelper.build(policySetId, policyCombiningAlgorithmId, target,
+                    obligations);
+
+        policyList.add(policySet);
     }
 
     public void addPolicy(PolicyType policy) {
@@ -44,45 +45,30 @@ public class PolicySetWizard2 {
         }
     }
 
-    public void addPolicy(PolicyWizard policyWizard) {
-        addPolicy(policyWizard.getXACML());
+    public void addPolicy(PolicyWizard policyWiz) {
+        addPolicy(policyWiz.getXACML());
     }
 
-    public void addPolicySet(PolicySetWizard2 policySetWizard) {
+    public void addPolicySet(PolicySetWizard2_DELETEME policySetWiz) {
         if (INSERTION_TYPE == InsertionType.AS_REFERENCE) {
-            addPolicySetAsReference(policySetWizard);
+            addPolicySetAsReference(policySetWiz);
         } else {
-            addPolicySetAsWholeObject(policySetWizard);
+            addPolicySetAsWholeObject(policySetWiz);
         }
+    }
+
+    public PolicySetType getPolicySetType() {
+        return policySet;
     }
 
     public List<XACMLObject> getPolicyTreeAsList() {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>(policyList);
 
-        for (PolicySetWizard2 elem : policySetWizardList) {
+        for (PolicySetWizard2_DELETEME elem : policySetWizardList) {
             resultList.addAll(elem.getPolicyTreeAsList());
         }
 
         return resultList;
-    }
-    
-    public TargetWizard getTargetWizard() {
-        return targetWizard;
-    }
-    
-    public boolean equals(Object policySetWizardObject) {
-        
-        if (!(policySetWizardObject instanceof PolicySetWizard2)) {
-            return false;
-        }
-        
-        PolicySetWizard2 policySetWizard = (PolicySetWizard2) policySetWizardObject;
-        
-        return targetWizard.equals(policySetWizard.getTargetWizard()); 
-    }
-
-    public PolicySetType getXACML() {
-        return policySet;
     }
     
     public String toString() {
@@ -104,10 +90,14 @@ public class PolicySetWizard2 {
 
     protected void addPolicyAsWholeObject(PolicyWizard policyWiz) {
         addPolicy(policyWiz.getXACML());
+
     }
 
-    protected void addPolicySetAsReference(PolicySetWizard2 childPolicySetWizard) {
-        PolicySetHelper.addPolicySetReference(this.policySet, childPolicySetWizard.getXACML().getPolicySetId());
+    protected void addPolicySetAsReference(PolicySetWizard2_DELETEME childPolicySetWizard) {
+        PolicySetType childPolicySet = childPolicySetWizard.getPolicySetType();
+
+        PolicySetHelper.addPolicySetReference(this.policySet, childPolicySet.getPolicySetId());
+
         policySetWizardList.add(childPolicySetWizard);
     }
 
@@ -115,7 +105,10 @@ public class PolicySetWizard2 {
         PolicySetHelper.addPolicySet(this.policySet, policySet);
     }
 
-    protected void addPolicySetAsWholeObject(PolicySetWizard2 policySetWiz) {
-        addPolicySetAsWholeObject(policySetWiz.getXACML());
+    protected void addPolicySetAsWholeObject(PolicySetWizard2_DELETEME policySetWiz) {
+        addPolicySetAsWholeObject(policySetWiz.getPolicySetType());
     }
 }
+
+
+

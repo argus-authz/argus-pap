@@ -34,11 +34,11 @@ public class DNJobPriorityOperation extends BasePAPOperation<String> {
         PolicyWizard policyWizard = JobPriorityPolicyWizard.getPolicyWizard(AttributeWizardType.DN, dn, serviceClass, isPublic,
                 description);
 
-        String policyId = policyWizard.getPolicyType().getPolicyId();
+        String policyId = policyWizard.getXACML().getPolicyId();
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-        localPAP.addPolicy(ServiceClassPolicySet.POLICY_SET_ID, policyWizard.getPolicyType());
+        localPAP.addPolicy(ServiceClassPolicySet.POLICY_SET_ID, policyWizard.getXACML());
 
         log.info("Added ServiceClass policy: " + policyId);
 
