@@ -26,7 +26,7 @@ public class RemoveAllPolicies extends PolicyManagementCLI {
         
         XACMLPolicyCLIUtils.initOpenSAML();
         
-        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, null, false);
+        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, null, true);
         
         policyIter.init();
         

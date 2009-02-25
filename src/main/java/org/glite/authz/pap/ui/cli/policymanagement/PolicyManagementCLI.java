@@ -13,15 +13,8 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
-    protected static final String OPT_BLACKLIST = "bl";
-    protected static final String OPT_BLACKLIST_LONG = "blacklist";
-    protected static final String OPT_BLACKLIST_DESCRIPTION = "List only \"blacklist\" policies.";
-    protected static final String OPT_SERVICECLASS = "sc";
-    protected static final String OPT_SERVICECLASS_LONG = "serviceclass";
 	protected static final String OPT_SHOW_XACML_LONG = "show-xacml";
 	protected static final String OPT_SHOW_XACML_DESCRIPTION = "XACML output.";
-	protected static final String OPT_PLAIN_FORMAT_LONG = "plain-format";
-	protected static final String OPT_PLAIN_FORMAT_DESCRIPTION = "Do not group policies by \"resource_uri\" and \"service_class\".";
 	protected static final String OPT_LIST_ONE_BY_ONE = "obo";
 	protected static final String OPT_LIST_ONE_BY_ONE_LONG = "one-by-one";
 	protected static final String OPT_LIST_ONE_BY_ONE_DESCRIPTION = "Ask the server one policy at a time instead of all in once";

@@ -22,10 +22,6 @@ public class ListPAPPolicies extends PolicyManagementCLI {
     private boolean getPoliciesOneByOne = false;
     private String[] papAliasArray;
     private String[] papInfoArray;
-    private boolean plainFormat = false;
-    private boolean showBlacklist = true;
-
-    private boolean showServiceclass = true;
     private boolean xacmlOutput = false;
 
     public ListPAPPolicies() {
@@ -36,7 +32,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
 
         System.out.println(papInfo);
 
-        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papAlias, !getPoliciesOneByOne);
+        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papAlias, getPoliciesOneByOne);
 
         try {
 
@@ -55,17 +51,13 @@ public class ListPAPPolicies extends PolicyManagementCLI {
 
         boolean policiesFound;
 
-        if (xacmlOutput || plainFormat)
-            policiesFound = ListPolicies.listUsingPlaingFormat(policyIter, xacmlOutput, true, true, showBlacklist,
-                    showServiceclass);
-        else
-            policiesFound = ListPolicies.listUsingGroupedFormat(policyIter, true, true, showBlacklist, showServiceclass, false);
+        policiesFound = ListPolicies.listUsingGroupedFormat(policyIter, true, true, false);
 
         if (!policiesFound)
-            System.out.println(ListPolicies.noPoliciesFoundMessage(true, true, showBlacklist, showServiceclass));
+            System.out.println(ListPolicies.noPoliciesFoundMessage(true, true));
 
         System.out.println();
-        
+
         return ExitStatus.SUCCESS.ordinal();
 
     }
@@ -77,9 +69,6 @@ public class ListPAPPolicies extends PolicyManagementCLI {
 
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_XACML_DESCRIPTION)
                 .withLongOpt(OPT_SHOW_XACML_LONG).create());
-
-        options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_PLAIN_FORMAT_DESCRIPTION).withLongOpt(
-                OPT_PLAIN_FORMAT_LONG).create());
 
         return options;
     }
@@ -108,7 +97,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
                 papInfoArray[i] = String.format("%s: ", papAliasArray[i]);
             }
         }
-        
+
         if (papAliasArray.length == 0) {
             System.out.println("No remote PAPs has been found.");
             return ExitStatus.SUCCESS.ordinal();
@@ -116,15 +105,6 @@ public class ListPAPPolicies extends PolicyManagementCLI {
 
         if (commandLine.hasOption(OPT_SHOW_XACML_LONG))
             xacmlOutput = true;
-
-        if (commandLine.hasOption(OPT_PLAIN_FORMAT_LONG))
-            plainFormat = true;
-
-        if (commandLine.hasOption(OPT_BLACKLIST))
-            showServiceclass = false;
-
-        if (commandLine.hasOption(OPT_SERVICECLASS))
-            showBlacklist = false;
 
         if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE))
             getPoliciesOneByOne = true;

@@ -69,7 +69,7 @@ public class PolicySetWizard {
 
     }
 
-    public PolicySetWizard(PolicySetType policySet, List<PolicyType> policyList, List<PolicySetType> childPolicySetList) {
+    public PolicySetWizard(PolicySetType policySet, PolicyType[] policyList, PolicySetType[] childPolicySetList) {
 
         this.policySet = policySet;
         targetWizard = new TargetWizard(policySet.getTarget());
