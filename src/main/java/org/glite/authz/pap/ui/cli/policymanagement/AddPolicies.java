@@ -2,6 +2,7 @@ package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.io.File;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -85,7 +86,7 @@ public class AddPolicies extends PolicyManagementCLI {
         
         XACMLPolicyCLIUtils.initOpenSAML();
         
-        List<XACMLObject> policyList = policyFileEncoder.parse(file);
+        List<XACMLObject> policyList = new ArrayList<XACMLObject>(0); //policyFileEncoder.parse(file);
         
         for (XACMLObject xacmlObject:policyList) {
             

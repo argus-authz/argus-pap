@@ -2,6 +2,7 @@ package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.io.File;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
@@ -49,15 +50,15 @@ public class UpdatePolicy extends PolicyManagementCLI {
         }
         
         XACMLPolicyCLIUtils.initOpenSAML();
-        List<XACMLObject> policyList;
+        List<XACMLObject> policyList = new ArrayList<XACMLObject>(0);
         
-        try {
-            policyList = policyFileEncoder.parse(file);
-        } catch (EncodingException e) {
-            System.out.println("Syntax error. Skipping file: " + fileName);
-            System.out.println(e.getMessage());
-            return ExitStatus.FAILURE.ordinal();
-        }
+//        try {
+//            policyList = policyFileEncoder.parse(file);
+//        } catch (EncodingException e) {
+//            System.out.println("Syntax error. Skipping file: " + fileName);
+//            System.out.println(e.getMessage());
+//            return ExitStatus.FAILURE.ordinal();
+//        }
         
         PolicyType policy = null;
         int npolicies = 0;
