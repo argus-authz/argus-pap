@@ -11,10 +11,11 @@ public class AttributeWizard {
 
     public enum AttributeWizardType {
         DEFAULT("default", "DEFAULT", DataType.STRING, TargetElement.SUBJECT),
+        CA("ca", "CA", DataType.X_500_NAME, TargetElement.SUBJECT),
         DN("dn", "DN", DataType.X_500_NAME, TargetElement.SUBJECT),
         FQAN("fqan", "FQAN", DataType.STRING, TargetElement.SUBJECT),
         GA("ga", "GA", DataType.STRING, TargetElement.SUBJECT),
-        RESOURCE_URI("resource_uri", "RESOURCE_URI", DataType.STRING, TargetElement.RESOURCE),
+        RESOURCE_URI("resource", "RESOURCE_URI", DataType.STRING, TargetElement.RESOURCE),
         SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE),
         ACTION("action", "ACTION_ID", DataType.STRING, TargetElement.ACTION);
 
