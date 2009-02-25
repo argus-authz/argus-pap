@@ -147,6 +147,10 @@ public class PolicySetWizard {
     // TODO: implement me
     }
 
+    public void addObligation(ObligationWizard obligationWizard) {
+    // TODO: implement me
+    }
+
     public void addPolicy(PolicyType policy) {
         if (INSERTION_TYPE == InsertionType.AS_REFERENCE) {
             addPolicyAsReference(policy);

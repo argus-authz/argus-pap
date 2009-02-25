@@ -1,10 +1,14 @@
 PARSER_BEGIN(BWParser)
 package org.glite.authz.pap.encoder;
 import java.lang.String;
-import org.glite.authz.pap.ui.wizard.*;
+import org.glite.authz.pap.common.xacml.wizard.*;
 import org.opensaml.xacml.XACMLObject;
+import org.opensaml.xacml.policy.EffectType;
 import java.util.List;
-import java.util.Vector;
+import java.util.LinkedList;
+import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.opensaml.xacml.policy.PolicyType;
 
 class BWParser {
 //     public static String main(String args[]) throws ParseException {
@@ -45,21 +49,14 @@ SKIP :
 
 TOKEN:
 {
-   <ALLOW:    "allow">
-|  <DENY:     "deny">
-|  <FQAN:     "fqan">
-|  <DN:       "dn">
-|  <GA:       "ga">
-|  <RESOURCE: "resource_uri">
-|  <CERT:     "certificate">
-|  <SERVICE:  "service_class_assignment">
-|  <PILOT:    "pilot">
-|  <NO:       "no">
-|  <YES:      "yes">
-|  <BW:       "blacklist">
-|  <CLASS:    "service_class">
-|  <EXCEPT:   "except">
-|  <PRIVATE:  "private">
+   <PERMIT:      "permit">
+|  <DENY:        "deny">
+|  <DESCRIPTION: "description">
+|  <OBLIGATION:  "obligation">
+|  <ACTION:      "action">
+|  <RULE:        "rule">
+|  <RESOURCE:    "resource">
+|  <PRIVATE:     "private">
 |  <STRING:         "\""
       (   (~["\"","\\","\n","\r"])
         | ("\\"
@@ -69,8 +66,7 @@ TOKEN:
             )
           )
       )*
-      "\""
->
+      "\"">
 |  < ID:
       "'"
       (   (~["'","\\","\n","\r"])
@@ -81,256 +77,147 @@ TOKEN:
             )
           )
       )*
-      "'"
->
+      "'">
 | <ID2: (["a"-"z", "_", "A"-"Z", "0"-"9"])+>
 | <HEX:    "0x" (["0"-"9", "a"-"f", "A"-"F"])+>
 | <NUMBER: (["0"-"9"])+>
 }
 
 
-List<XACMLObject> Text() :
+List<PolicySetWizard> Text() :
 {
-  Policy policy = null;
-  Policies allpolicies = new Policies();
-  String output = new String();
+  PolicySetWizard psw = null;
+  List<PolicySetWizard> sets = new LinkedList<PolicySetWizard>();
 }
 { 
-  (policy=SectionType() { 
-    allpolicies.policies.add(policy); 
-    })*
-  { return allpolicies.Output(); }
-}
-
-Policies Section() :
-{
-  Policies policies=new Policies();
-  Policy policy=null;
-}
-{
-  ( policy=SectionType()
-    {policies.policies.add(policy); }
-  )+
-  { return policies; }
+  (psw=Resource() { sets.add(psw); 
+})+
+  { return sets; }
 }
 
 
-Policy SectionType() :
+PolicySetWizard Resource() :
 {
-  Policy policy = null;
+  List<MixIn> policyContents = new LinkedList<MixIn>();
+  MixIn content=null;
+  String t = null;
 }
 {
-        
-  <RESOURCE> policy = BW_Policy()
-  { return policy; }
-| <CLASS> policy = ServiceClassPolicy()
-  { return policy; }
-}
-
-Policies BW_Policies() :
-{
-  Policy policy = null;
-  Policies policies = new Policies();
-}
-{
-  (<RESOURCE> policy=BW_Policy() {policies.policies.add(policy);})+
-  {
-    return policies;
-  }
+  <RESOURCE> t=TextString() "{" ( content=ResourceContents() { policyContents.add(content); })+ "}" {
+    PolicySetWizard psw = new PolicySetWizard(new AttributeWizard("resource_uri", t));
+    for (MixIn mixedin : policyContents) {
+      if (mixedin.policy != null) {
+        psw.addPolicy(mixedin.policy);
+      }
+      if (mixedin.obligation != null)
+        psw.addObligation(mixedin.obligation);
+      if (mixedin.description != null)
+        psw.setDescription(mixedin.description);
+    }     
+    return psw;
+  } 
 }
 
-Policy BW_Policy() :
+MixIn ResourceContents() :
 {
-  String resource=null;
-  Conds conds = null;
-  Policy policy = new Policy();
+  Token t1 = null;
+  String t2 = null;
+  String t3 = null;
+  String t4 = null;
+  List<AttributeWizard> obligationContent = new LinkedList<AttributeWizard>();
+  List<MixIn> mixinContent = new LinkedList<MixIn>();  
+  AttributeWizard attr = null;
+  MixIn mixin;
 }
 {
-  resource=TextString() "{" conds=Conditions() "}"
-  {
-    policy.name = resource;
-    policy.type = Policy.POLICY_TYPE_BW;
-    policy.conds = conds;
-    policy.policies = null;
-    return policy;
-  }
-}
-
-Policies ServiceClassPolicies() :
-{
-  Policy policy = null;
-  Policies policies = new Policies();
-}
-{
-  (
-    policy=ServiceClassPolicy()
-    {
-      policies.policies.add(policy);
+    <DESCRIPTION> t1=<STRING> {return new MixIn(t1.toString()); }
+|   <OBLIGATION> t2=TextString() "{" (attr=ObligationContent() {obligationContent.add(attr); })+ "}" {
+      return new MixIn(new ObligationWizard(t2, obligationContent)); 
     }
-  )+
-  {
-    return policies;
-  }
+|   <ACTION> t3=TextString() "{" (mixin=ActionContent() {mixinContent.add(mixin);} )+ "}" {
+      PolicyWizard pw = new PolicyWizard(new AttributeWizard("action", t3));
+      for (MixIn mixedin : mixinContent) {
+        if (mixedin.rule != null)
+          pw.addRule(mixedin.rule);
+        if (mixedin.obligation != null)
+          pw.addObligation(mixedin.obligation);
+        if (mixedin.description != null)
+          pw.setDescription(mixedin.description);
+      }     
+      return new MixIn(pw);
+    }
 
-}
+|   <PRIVATE> <ACTION> t4=TextString() "{" ( mixin=ActionContent() {mixinContent.add(mixin);} )+ "}" {
+      PolicyWizard pw2 = new PolicyWizard(new AttributeWizard("action", t4));
+      for (MixIn mixedin : mixinContent) {
+        if (mixedin.rule != null)
+          pw2.addRule(mixedin.rule);
+        if (mixedin.obligation != null)
+          pw2.addObligation(mixedin.obligation);
+        if (mixedin.description != null)
+          pw2.setDescription(mixedin.description);
+      }     
+      pw2.setPrivate(true);
+      return new MixIn(pw2);
+    }
+}     
 
-Policy ServiceClassPolicy() :
+AttributeWizard ObligationContent() :
 {
-  String resource=null;
-  Conds conds = null;
-  Policy policy = new Policy();
-  Policies policies = null;
+  String t1 = null, t2=null;
 }
 {
-  resource=TextString() "{" policies=BW_Policies() "}"
-  {
-    policy.name = resource;
-    policy.type = Policy.POLICY_TYPE_CLASS;
-    policy.conds = null;
-    policy.policies = policies;
-    return policy;
-  }
-}
-
-Conds Conditions() :
-{
-  FullCondition fc = null;
-  Conds conds = new Conds();
-}
-{
-  (fc=Condition() {conds.fullconditions.add(fc);})*
-  { return conds; }
-}
-
-FullCondition Condition() :
-{
-  FullCondition fc = null;
-}
-{
-  <PRIVATE> fc = PublicCondition()
-  {
-    fc.isprivate = true;
-    return fc;
-  }
-| fc = PublicCondition()
-  {
-    fc.isprivate = false;
-    return fc;
+  t1=TextString() "=" t2=TextString() {
+    return new AttributeWizard(t1, t2);
   }
 }
 
-FullCondition PublicCondition() :
+MixIn ActionContent() :
 {
-  boolean result = false;
-  ConditionRow item = null;
-  ConditionList excepts = new ConditionList();
-  FullCondition fc = new FullCondition();
-  ConditionRow except = null;
+  String t1 = null;
+  String t2 = null;
+  String t3 = null;
+  String description = null;
+  List<AttributeWizard> ruleContent = new LinkedList<AttributeWizard>();
+  List<AttributeWizard> obligationContent = new LinkedList<AttributeWizard>();
+  EffectType effect = null;
+  AttributeWizard attr = null;
 }
 {
-  result=AllowOrDeny() item=ItemsRow() ((except = Exception() {excepts.rows.add(except);})*)
-  {
-    fc.allow = result;
-    fc.simples = item;
-    fc.excepts = excepts;
-    return fc;
+  <DESCRIPTION> t1=TextString() { 
+    return new MixIn(t1); 
+  }
+
+| <OBLIGATION> t2=TextString() "{" 
+    ( attr=ObligationContent() {obligationContent.add(attr); }
+     )+ 
+  "}" {
+    return new MixIn(new ObligationWizard(t2, obligationContent));
+  }
+| <RULE> effect=RuleEffect() "{" 
+     ( 
+       attr=RuleContent() {ruleContent.add(attr);} 
+     )+ 
+  "}" {
+    return new MixIn(new RuleWizard(ruleContent, effect));
   }
 }
 
-boolean AllowOrDeny() :
+EffectType RuleEffect() :
 {boolean result;}
 {
-  <DENY>
-  {
-    return false;
-  }
-| <ALLOW>
-  {
-    return true;
-  }
+  <DENY>   { return EffectType.Deny; }
+| <PERMIT> { return EffectType.Permit; }
 }
 
-ConditionRow Exception() :
+AttributeWizard RuleContent() :
 {
-  ConditionRow row = null;
-}
-{
-  <EXCEPT> row = ItemsRow()
-  {
-    return row;
-  }
-}
-
-ConditionRow ItemsRow() :
-{ 
-  SingleCondition sc=null;
-  ConditionRow row = new ConditionRow();
+  String t1=null, t2=null;
 }
 {
-  (sc = Item()
-  { row.singles.add(sc);})*
-  { return row;}
-}
-
-SingleCondition Item() :
-{ boolean value = false;
-  String s1 = null;
-  String s2 = null;
-  SingleCondition sc = new SingleCondition();
-}
-{
-  <FQAN> "=" s1=TextString()
-  {
-    sc.type = SingleCondition.TYPE_FQAN;
-    sc.value1 = s1;
-    return sc;
+  t1=TextString() "=" t2=TextString() {
+    return new AttributeWizard(t1, t2);
   }
-| <DN> "=" s1=TextString()
-  {
-    sc.type = SingleCondition.TYPE_DN;
-    sc.value1 = s1;
-    return sc;
-  }
-| <CERT> "=" "(" s1=TextString() ":" s2=Number() ")"
-  {
-    sc.type = SingleCondition.TYPE_CERT;
-    sc.value1 = s1;
-    sc.value2 = s2;
-    return sc;
-  }
-| <RESOURCE> "=" s1=TextString()
-  {
-    sc.type = SingleCondition.TYPE_RESOURCE;
-    sc.value1 = s1;
-    return sc;
-  }
-| s1=TextString() "=" s2=TextString()
-  {
-    sc.type = SingleCondition.TYPE_GA;
-    sc.value1 = s1;
-    sc.value2 = s2;
-    return sc;
-  }
-}
-
-boolean YesOrNo() :
-{}
-{
-  <YES>
-  { return true; }
-| <NO>
-  { return false; }
-}
-
-String Number() :
-{
-  Token t = null;
-}
-{ 
-  t = <NUMBER>
-  { return t.toString(); }
-| t = <HEX>
-  { return t.toString(); }
 }
 
 String TextString():
