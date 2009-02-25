@@ -1,6 +1,7 @@
 package org.glite.authz.pap.repository;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -73,12 +74,12 @@ public abstract class RepositoryManager {
             return;
         }
         
-        List<XACMLObject> policyList;
-        try {
-            policyList = pse.parse(policyConfigurationFile);
-        } catch (EncodingException e) {
-            throw new RepositoryException(e);
-        }
+        List<XACMLObject> policyList = new ArrayList<XACMLObject>(0);
+//        try {
+//            policyList = pse.parse(policyConfigurationFile);
+//        } catch (EncodingException e) {
+//            throw new RepositoryException(e);
+//        }
         
         PAPContainer localPapContainer = PAPManager.getInstance().getLocalPAPContainer();
         
