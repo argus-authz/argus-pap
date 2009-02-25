@@ -19,12 +19,10 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
     private static final javax.xml.namespace.QName elementQName = SubjectMatchType.DEFAULT_ELEMENT_NAME;
 
     public static SubjectMatchType build() {
-        return (SubjectMatchType) Configuration.getBuilderFactory().getBuilder(elementQName)
-                .buildObject(elementQName);
+        return (SubjectMatchType) Configuration.getBuilderFactory().getBuilder(elementQName).buildObject(elementQName);
     }
 
-    public static List<SubjectMatchType> buildListWithDesignator(List<AttributeType> attributeList,
-            String matchFunctionId) {
+    public static List<SubjectMatchType> buildListWithDesignator(List<AttributeType> attributeList, String matchFunctionId) {
 
         List<SubjectMatchType> resultList = new ArrayList<SubjectMatchType>(attributeList.size());
 
@@ -35,15 +33,20 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
     }
 
     public static SubjectMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
+
+        if (attribute == null) {
+            return null;
+        }
+
         SubjectMatchType subjectMatch = build();
 
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
                 AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
 
         subjectMatch.setSubjectAttributeDesignator(designator);
-        
-        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute
-                .getDataType(), CtxAttributeTypeHelper.getFirstValue(attribute));
+
+        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute.getDataType(),
+                CtxAttributeTypeHelper.getFirstValue(attribute));
 
         subjectMatch.setAttributeValue(policyAttributeValue);
         subjectMatch.setMatchId(matchFunctionId);
@@ -52,32 +55,30 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
     }
 
     public static AttributeType getAttribute(SubjectMatchType subjectMatch) {
-        
+
         AttributeValueType policyAttributeValue = subjectMatch.getAttributeValue();
-        
+
         AttributeDesignatorType designator = subjectMatch.getSubjectAttributeDesignator();
         if (designator == null) { // TODO: throw exception
             log.error("DESIGNATOR IS MISSING");
         }
-        
-        return CtxAttributeTypeHelper.build(designator.getAttributeId(), policyAttributeValue.getDataType(),
-                policyAttributeValue.getValue());
-        
+
+        return CtxAttributeTypeHelper.build(designator.getAttributeId(), policyAttributeValue.getDataType(), policyAttributeValue
+                .getValue());
+
     }
-    
+
     public static List<AttributeType> getAttributeList(List<SubjectMatchType> subjectMatchList) {
-        
+
         List<AttributeType> attributeList = new LinkedList<AttributeType>();
-        
+
         if (subjectMatchList == null)
             return attributeList;
-        
-        for (SubjectMatchType subjectMatch:subjectMatchList) {
+
+        for (SubjectMatchType subjectMatch : subjectMatchList) {
             attributeList.add(getAttribute(subjectMatch));
         }
-        
         return attributeList;
-        
     }
 
     public static SubjectMatchHelper getInstance() {
@@ -85,5 +86,4 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
     }
 
     private SubjectMatchHelper() {}
-
 }

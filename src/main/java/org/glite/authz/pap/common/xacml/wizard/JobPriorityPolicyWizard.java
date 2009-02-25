@@ -16,7 +16,7 @@ public class JobPriorityPolicyWizard {
         List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
         
         targetList.add(new AttributeWizard(attributeWizardType, attributeValue));
-        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_URI, "*"));
+        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*"));
         targetList.add(new AttributeWizard(AttributeWizardType.SERVICE_CLASS, serviceClass));
         
         PolicyWizard policyWizard = new PolicyWizard(targetList, null, EffectType.Permit);

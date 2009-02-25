@@ -12,25 +12,31 @@ public class ActionsHelper extends XMLObjectHelper<ActionsType> {
 
     private ActionsHelper() {}
 
-    public static ActionsType buildAnyAction() {
+    public static ActionsType build() {
         return (ActionsType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
-    }
-
-    public static ActionsType build(List<ActionType> actionList) {
-
-        ActionsType actions = buildAnyAction();
-
-        for (ActionType action : actionList) {
-            actions.getActions().add(action);
-        }
-        return actions;
     }
 
     public static ActionsType build(ActionType action) {
 
-        ActionsType actions = buildAnyAction();
+        if (action == null) {
+            return null;
+        }
 
-        if (action != null) {
+        ActionsType actions = build();
+        actions.getActions().add(action);
+        
+        return actions;
+    }
+
+    public static ActionsType build(List<ActionType> actionList) {
+        
+        if (actionList.isEmpty()) {
+            return null;
+        }
+
+        ActionsType actions = build();
+
+        for (ActionType action : actionList) {
             actions.getActions().add(action);
         }
         return actions;

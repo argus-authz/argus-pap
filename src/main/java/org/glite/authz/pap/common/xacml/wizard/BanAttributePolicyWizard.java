@@ -17,7 +17,7 @@ public class BanAttributePolicyWizard {
         List<AttributeWizard> targetList = new LinkedList<AttributeWizard>();
 
         targetList.add(new AttributeWizard(attributeWizardType, attributeValue));
-        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_URI, "*"));
+        targetList.add(new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*"));
 
         PolicyWizard policyWizard = new PolicyWizard(targetList, null, EffectType.Deny);
 

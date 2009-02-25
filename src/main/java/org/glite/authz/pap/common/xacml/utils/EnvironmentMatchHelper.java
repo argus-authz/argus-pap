@@ -22,6 +22,10 @@ public class EnvironmentMatchHelper extends XMLObjectHelper<EnvironmentMatchType
 
     public static EnvironmentMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
         
+        if (attribute == null) {
+            return null;
+        }
+        
         EnvironmentMatchType environmentMatch = build();
         
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
@@ -61,8 +65,9 @@ public class EnvironmentMatchHelper extends XMLObjectHelper<EnvironmentMatchType
         
         List<AttributeType> attributeList = new LinkedList<AttributeType>();
         
-        if (environmentMatchList == null)
+        if (environmentMatchList == null) {
             return attributeList;
+        }
         
         for (EnvironmentMatchType subjectMatch:environmentMatchList) {
             attributeList.add(getAttribute(subjectMatch));

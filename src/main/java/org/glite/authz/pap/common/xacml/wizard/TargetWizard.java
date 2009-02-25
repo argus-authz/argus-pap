@@ -18,6 +18,7 @@ import org.glite.authz.pap.common.xacml.utils.SubjectHelper;
 import org.glite.authz.pap.common.xacml.utils.SubjectMatchHelper;
 import org.glite.authz.pap.common.xacml.utils.SubjectsHelper;
 import org.glite.authz.pap.common.xacml.utils.TargetHelper;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.TargetWizardException;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -29,20 +30,24 @@ import org.opensaml.xacml.policy.ResourcesType;
 import org.opensaml.xacml.policy.SubjectType;
 import org.opensaml.xacml.policy.SubjectsType;
 import org.opensaml.xacml.policy.TargetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TargetWizard {
+
+    private static final Logger log = LoggerFactory.getLogger(TargetWizard.class);
 
     private final TargetType target;
     private final List<AttributeWizard> targetAttributeWizardList;
 
     public TargetWizard(AttributeWizard attributeWizard) {
-        
+
         targetAttributeWizardList = new ArrayList<AttributeWizard>(1);
         targetAttributeWizardList.add(attributeWizard);
 
         target = createTarget(targetAttributeWizardList);
     }
-    
+
     public TargetWizard(List<AttributeWizard> targetAttributeWizardList) {
 
         if (targetAttributeWizardList == null) {
@@ -57,46 +62,58 @@ public class TargetWizard {
         this.target = target;
         this.targetAttributeWizardList = buildAttributeWizardList(target);
     }
-    
+
     private static List<AttributeWizard> buildAttributeWizardList(TargetType target) {
 
         List<AttributeWizard> attributeWizardList = new LinkedList<AttributeWizard>();
         List<AttributeType> attributeList = new LinkedList<AttributeType>();
 
         // get subjects
-        List<SubjectType> subjectList = target.getSubjects().getSubjects();
+        SubjectsType subjects = target.getSubjects();
 
-        if (!subjectList.isEmpty()) {
+        if (subjects != null) {
+            List<SubjectType> subjectList = subjects.getSubjects();
 
-            if (subjectList.size() > 1) {
-                throw new UnsupportedPolicyException("Only one SubjectType is allowed");
+            if (!subjectList.isEmpty()) {
+
+                if (subjectList.size() > 1) {
+                    throw new UnsupportedPolicyException("Only one SubjectType is allowed");
+                }
+
+                attributeList.addAll(SubjectMatchHelper.getAttributeList(subjectList.get(0).getSubjectMatches()));
             }
-
-            attributeList.addAll(SubjectMatchHelper.getAttributeList(subjectList.get(0).getSubjectMatches()));
         }
 
         // get resources
-        List<ResourceType> resourceList = target.getResources().getResources();
+        ResourcesType resources = target.getResources();
 
-        if (!resourceList.isEmpty()) {
+        if (resources != null) {
+            List<ResourceType> resourceList = resources.getResources();
 
-            if (resourceList.size() > 1) {
-                throw new UnsupportedPolicyException("Only one ResourceSubjectType is allowed");
+            if (!resourceList.isEmpty()) {
+
+                if (resourceList.size() > 1) {
+                    throw new UnsupportedPolicyException("Only one ResourceSubjectType is allowed");
+                }
+
+                attributeList.addAll(ResourceMatchHelper.getAttributeList(resourceList.get(0).getResourceMatches()));
             }
-
-            attributeList.addAll(ResourceMatchHelper.getAttributeList(resourceList.get(0).getResourceMatches()));
         }
 
         // get actions
-        List<ActionType> actionList = target.getActions().getActions();
+        ActionsType actions = target.getActions();
 
-        if (!actionList.isEmpty()) {
+        if (actions != null) {
+            List<ActionType> actionList = actions.getActions();
 
-            if (actionList.size() > 1) {
-                throw new UnsupportedPolicyException("Only one ActionSubjectType is allowed");
+            if (!actionList.isEmpty()) {
+
+                if (actionList.size() > 1) {
+                    throw new UnsupportedPolicyException("Only one ActionSubjectType is allowed");
+                }
+
+                attributeList.addAll(ActionMatchHelper.getAttributeList(actionList.get(0).getActionMatches()));
             }
-
-            attributeList.addAll(ActionMatchHelper.getAttributeList(actionList.get(0).getActionMatches()));
         }
 
         // build AttributeWizard list
@@ -106,7 +123,7 @@ public class TargetWizard {
 
         return attributeWizardList;
     }
-    
+
     private static TargetType createTarget(List<AttributeWizard> targetAttributeWizardList) {
         List<AttributeType> sbjAttr = WizardUtils.getAttributes(targetAttributeWizardList,
                 AttributeWizardType.TargetElement.SUBJECT);
@@ -123,14 +140,14 @@ public class TargetWizard {
                 Functions.STRING_EQUAL)));
         ActionsType actions = ActionsHelper.build(ActionHelper.build(ActionMatchHelper.buildWithDesignator(actionAttr,
                 Functions.STRING_EQUAL)));
-        EnvironmentsType environments = EnvironmentsHelper.build(EnvironmentHelper.build(EnvironmentMatchHelper.buildWithDesignator(envAttr,
-                Functions.STRING_EQUAL)));
+        EnvironmentsType environments = EnvironmentsHelper.build(EnvironmentHelper.build(EnvironmentMatchHelper
+                .buildWithDesignator(envAttr, Functions.STRING_EQUAL)));
 
         TargetType target = TargetHelper.build(subjects, actions, resources, environments);
-        
+
         return target;
     }
-    
+
     public List<AttributeWizard> getAttributeWizardList() {
         return targetAttributeWizardList;
     }
@@ -140,15 +157,19 @@ public class TargetWizard {
     }
 
     public boolean isEqual(TargetType target) {
-        
+
+        if (target == null) {
+            return false;
+        }
+
         TargetWizard targetWizard;
-        
+
         try {
             targetWizard = new TargetWizard(target);
         } catch (TargetWizardException e) {
             return false;
         }
-        
+
         return isEqual(targetWizard);
     }
 
@@ -156,6 +177,8 @@ public class TargetWizard {
 
         List<AttributeWizard> attributeWizardList = targetWizard.getAttributeWizardList();
         if (targetAttributeWizardList.size() != attributeWizardList.size()) {
+            log.debug(String.format("DIFFERENT SIZE: %d!=%d", targetAttributeWizardList.size(), attributeWizardList.size()));
+            log.debug(XMLObjectHelper.toString(target));
             return false;
         }
 
@@ -171,6 +194,7 @@ public class TargetWizard {
             }
 
             if (!found) {
+                log.debug(thisAttributeWizard.toFormattedString() + " NOT FOUND");
                 return false;
             }
         }

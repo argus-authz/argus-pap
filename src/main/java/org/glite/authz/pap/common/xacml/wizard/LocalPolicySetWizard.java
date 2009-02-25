@@ -58,7 +58,7 @@ public class LocalPolicySetWizard {
 	private void addBlackListPolicy(PolicyWizard policy) {
 		
 		List<PolicyWizard> policyList;
-		String resourceValue = getAttributeValue(policy.getTargetAttributeWizardList(), AttributeWizardType.RESOURCE_URI);
+		String resourceValue = getAttributeValue(policy.getTargetAttributeWizardList(), AttributeWizardType.RESOURCE_PS);
 		 
 		 if (resourceGroupMap.containsKey(resourceValue)) {
 			 policyList = resourceGroupMap.get(resourceValue);
@@ -75,7 +75,7 @@ public class LocalPolicySetWizard {
 
 		List<PolicyWizard> policyList;
 		Map<String, List<PolicyWizard>> resourceMap;
-		String resourceValue = getAttributeValue(policy.getTargetAttributeWizardList(), AttributeWizardType.RESOURCE_URI);
+		String resourceValue = getAttributeValue(policy.getTargetAttributeWizardList(), AttributeWizardType.RESOURCE_PS);
 		String serviceClassValue = getAttributeValue(policy.getTargetAttributeWizardList(), AttributeWizardType.SERVICE_CLASS);
 		
 		if (serviceClassGroupMap.containsKey(serviceClassValue)) {

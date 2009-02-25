@@ -10,28 +10,29 @@ public class ActionHelper extends XMLObjectHelper<ActionType> {
     private static final javax.xml.namespace.QName elementQName = ActionType.DEFAULT_ELEMENT_NAME;
     private static ActionHelper instance = new ActionHelper();
 
+    private ActionHelper() {}
+
     public static ActionType build() {
         return (ActionType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
     public static ActionType build(List<ActionMatchType> actionMatchList) {
-        
-        if (actionMatchList.isEmpty())
+
+        if (actionMatchList.isEmpty()) {
             return null;
-        
+        }
+
         ActionType action = build();
-        
+
         for (ActionMatchType actionMatch : actionMatchList) {
             action.getActionMatches().add(actionMatch);
         }
-        
+
         return action;
     }
 
     public static ActionHelper getInstance() {
         return instance;
     }
-
-    private ActionHelper() {}
 
 }

@@ -12,21 +12,11 @@ public class EnvironmentsHelper extends XMLObjectHelper<EnvironmentsType> {
 
     private EnvironmentsHelper() {}
 
-    public static EnvironmentsType buildAnyEnvironment() {
-        return (EnvironmentsType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
-    }
-
-    public static EnvironmentsType build(List<EnvironmentType> environmentList) {
-
-        EnvironmentsType environments = buildAnyEnvironment();
-
-        for (EnvironmentType environment : environmentList) {
-            environments.getEnvrionments().add(environment);
-        }
-        return environments;
-    }
-
     public static EnvironmentsType build(EnvironmentType environment) {
+
+        if (environment == null) {
+            return null;
+        }
 
         EnvironmentsType environments = buildAnyEnvironment();
 
@@ -36,8 +26,25 @@ public class EnvironmentsHelper extends XMLObjectHelper<EnvironmentsType> {
         return environments;
     }
 
+    public static EnvironmentsType build(List<EnvironmentType> environmentList) {
+
+        if (environmentList.isEmpty()) {
+            return null;
+        }
+
+        EnvironmentsType environments = buildAnyEnvironment();
+
+        for (EnvironmentType environment : environmentList) {
+            environments.getEnvrionments().add(environment);
+        }
+        return environments;
+    }
+
+    public static EnvironmentsType buildAnyEnvironment() {
+        return (EnvironmentsType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
+    }
+
     public static EnvironmentsHelper getInstance() {
         return instance;
     }
-
 }

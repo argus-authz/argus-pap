@@ -22,6 +22,10 @@ public class ActionMatchHelper extends XMLObjectHelper<ActionMatchType> {
 
     public static ActionMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
         
+        if (attribute == null) {
+            return null;
+        }
+        
         ActionMatchType actionMatch = build();
         
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
@@ -61,19 +65,17 @@ public class ActionMatchHelper extends XMLObjectHelper<ActionMatchType> {
         
         List<AttributeType> attributeList = new LinkedList<AttributeType>();
         
-        if (actionMatchList == null)
+        if (actionMatchList == null) {
             return attributeList;
+        }
         
         for (ActionMatchType subjectMatch:actionMatchList) {
             attributeList.add(getAttribute(subjectMatch));
         }
-        
         return attributeList;
-        
     }
 
     public static ActionMatchHelper getInstance() {
         return instance;
     }
-
 }

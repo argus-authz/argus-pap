@@ -41,8 +41,8 @@ public class PolicyWizard {
     private final List<AttributeWizard> targetAttributeWizardList;
 
     protected final String actionValue;
-    protected final TargetWizard targetWizard;
     protected final PolicyType policy;
+    protected final TargetWizard targetWizard;
 
     public PolicyWizard(AttributeWizard attributeWizard) {
 
@@ -62,7 +62,7 @@ public class PolicyWizard {
         TargetWizard targetWizard = new TargetWizard(targetAttributeWizardList);
 
         policy.setTarget(targetWizard.getXACML());
-        policy.setVersion("1");
+        setVersion(1);
     }
 
     @Deprecated
@@ -117,8 +117,15 @@ public class PolicyWizard {
 
         policyWizardType = getPolicyWizardType(targetAttributeWizardList);
 
-        if (policy.getDescription() != null)
-            this.description = policy.getDescription().getValue();
+        if (policy.getDescription() != null) {
+            description = policy.getDescription().getValue();
+        }
+
+        try {
+            new Integer(policy.getVersion());
+        } catch (NumberFormatException e) {
+            throw new UnsupportedPolicyException("Wrong version format", e);
+        }
 
         this.policy = policy;
     }
@@ -165,21 +172,49 @@ public class PolicyWizard {
         return PolicyWizardType.BLACKLIST;
     }
 
-    public void addObligation(String obligationId, List<AttributeWizard> attributeWizardList) {
-    // TODO: implement me
+    private static void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
+
+        if (targetAttributeWizardList == null) {
+            throw new UnsupportedPolicySetWizardException("targetAttributeWizardList is null");
+        }
+
+        if (targetAttributeWizardList.size() != 1) {
+            throw new UnsupportedPolicySetWizardException("Only one resource attribute is supported (found "
+                    + targetAttributeWizardList.size() + " attributes)");
+        }
+
+        AttributeWizard aw = targetAttributeWizardList.get(0);
+
+        if (!aw.isActionAttribute()) {
+            throw new UnsupportedPolicySetWizardException("Only one action attribute is supported");
+        }
     }
 
     public void addObligation(ObligationWizard obligationWizard) {
     // TODO: implement me
     }
 
-    public void addRule(EffectType effect) {
-        RuleWizard ruleWizard = new RuleWizard(effect);
+    public void addObligation(String obligationId, List<AttributeWizard> attributeWizardList) {
+    // TODO: implement me
+    }
+
+    public void addRule(AttributeWizard attribute, EffectType effect) {
+        List<AttributeWizard> targetAttributeList = new ArrayList<AttributeWizard>(1);
+        targetAttributeList.add(attribute);
+        RuleWizard ruleWizard = new RuleWizard(targetAttributeList, effect);
         policy.getRules().add(ruleWizard.getXACML());
     }
 
-    public void addRule(RuleWizard ruleWizard) {
-        policy.getRules().add(ruleWizard.getXACML());
+    public void addRule(int index, AttributeWizard attribute, EffectType effect) {
+        List<AttributeWizard> targetAttributeList = new ArrayList<AttributeWizard>(1);
+        targetAttributeList.add(attribute);
+        RuleWizard ruleWizard = new RuleWizard(targetAttributeList, effect);
+        policy.getRules().add(index, ruleWizard.getXACML());
+    }
+
+    public void addRule(int index, List<AttributeWizard> targetAttributeList, EffectType effect) {
+        RuleWizard ruleWizard = new RuleWizard(targetAttributeList, effect);
+        policy.getRules().add(index, ruleWizard.getXACML());
     }
 
     public void addRule(List<AttributeWizard> targetAttributeList, EffectType effect) {
@@ -187,10 +222,7 @@ public class PolicyWizard {
         policy.getRules().add(ruleWizard.getXACML());
     }
 
-    public void addRule(AttributeWizard attribute, EffectType effect) {
-        List<AttributeWizard> targetAttributeList = new ArrayList<AttributeWizard>(1);
-        targetAttributeList.add(attribute);
-        RuleWizard ruleWizard = new RuleWizard(targetAttributeList, effect);
+    public void addRule(RuleWizard ruleWizard) {
         policy.getRules().add(ruleWizard.getXACML());
     }
 
@@ -216,8 +248,16 @@ public class PolicyWizard {
         return targetAttributeWizardList;
     }
 
+    public int getVersion() {
+        return Integer.valueOf(policy.getVersion());
+    }
+
     public PolicyType getXACML() {
         return policy;
+    }
+
+    public void increaseVersion() {
+        setVersion(getVersion() + 1);
     }
 
     public boolean isBanPolicy(String attributeValue, AttributeWizardType bannedAttribute) {
@@ -233,7 +273,7 @@ public class PolicyWizard {
 
         for (AttributeWizard attribute : targetAttributeWizardList) {
 
-            if (AttributeWizardType.RESOURCE_URI.equals(attribute.getAttributeWizardType())) {
+            if (AttributeWizardType.RESOURCE_PS.equals(attribute.getAttributeWizardType())) {
                 if (!("*".equals(attribute.getValue())))
                     return false;
             } else if (bannedAttribute.equals(attribute.getAttributeWizardType())) {
@@ -285,6 +325,10 @@ public class PolicyWizard {
         setPolicyIdVisibilityPrefix(isPrivate);
 
         policy.setPolicyId(composeId());
+    }
+
+    public void setVersion(int version) {
+        policy.setVersion(Integer.toString(version));
     }
 
     public String toFormattedString() {
@@ -373,7 +417,7 @@ public class PolicyWizard {
             AttributeWizard attributeWizard = targetAttributeWizardList.get(i);
             AttributeWizardType awt = attributeWizard.getAttributeWizardType();
 
-            if (AttributeWizardType.RESOURCE_URI.equals(awt) || AttributeWizardType.SERVICE_CLASS.equals(awt))
+            if (AttributeWizardType.RESOURCE_PS.equals(awt) || AttributeWizardType.SERVICE_CLASS.equals(awt))
                 continue;
 
             if (i > 0)
@@ -500,24 +544,6 @@ public class PolicyWizard {
             policyIdVisibilityPrefix = VISIBILITY_PRIVATE_PREFIX;
         else
             policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
-    }
-
-    private static void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
-
-        if (targetAttributeWizardList == null) {
-            throw new UnsupportedPolicySetWizardException("targetAttributeWizardList is null");
-        }
-
-        if (targetAttributeWizardList.size() != 1) {
-            throw new UnsupportedPolicySetWizardException("Only one resource attribute is supported (found "
-                    + targetAttributeWizardList.size() + " attributes)");
-        }
-
-        AttributeWizard aw = targetAttributeWizardList.get(0);
-
-        if (!aw.isActionAttribute()) {
-            throw new UnsupportedPolicySetWizardException("Only one action attribute is supported");
-        }
     }
 
 }

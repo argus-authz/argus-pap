@@ -2,12 +2,13 @@ package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
 
-import org.glite.authz.pap.authz.highlevelpolicymanagement.BanDNOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.BanFQANOperation;
+import org.glite.authz.pap.authz.highlevelpolicymanagement.BanOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.DNJobPriorityOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.FQANJobPriorityOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanDNOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanFQANOperation;
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.slf4j.Logger;
@@ -21,8 +22,12 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         log.info(String.format("Received banDN(dn=\"%s\", isPublic=%s);", dn, String.valueOf(isPublic)));
 
         try {
-
-            return BanDNOperation.instance(dn, isPublic, description).execute();
+            
+            AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.DN, dn);
+            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
+            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
+            
+            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic, description).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -35,7 +40,11 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
         try {
 
-            return BanFQANOperation.instance(fqan, isPublic, description).execute();
+            AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.FQAN, fqan);
+            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
+            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
+            
+            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic, description).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

@@ -10,14 +10,17 @@ public class EnvironmentHelper extends XMLObjectHelper<EnvironmentType> {
     private static final javax.xml.namespace.QName elementQName = EnvironmentType.DEFAULT_ELEMENT_NAME;
     private static EnvironmentHelper instance = new EnvironmentHelper();
 
+    private EnvironmentHelper() {}
+
     public static EnvironmentType build() {
         return (EnvironmentType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
     public static EnvironmentType build(List<EnvironmentMatchType> actionMatchList) {
         
-        if (actionMatchList.isEmpty())
+        if (actionMatchList.isEmpty()) {
             return null;
+        }
         
         EnvironmentType environment = build();
         
@@ -31,7 +34,5 @@ public class EnvironmentHelper extends XMLObjectHelper<EnvironmentType> {
     public static EnvironmentHelper getInstance() {
         return instance;
     }
-
-    private EnvironmentHelper() {}
 
 }
