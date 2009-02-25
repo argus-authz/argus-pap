@@ -1,7 +1,6 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -9,7 +8,7 @@ import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
-import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicyWizardException;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
 import org.opensaml.xacml.policy.DescriptionType;
 import org.opensaml.xacml.policy.EffectType;
@@ -63,41 +62,6 @@ public class PolicyWizard {
 
         policy.setTarget(targetWizard.getXACML());
         setVersion(1);
-    }
-
-    @Deprecated
-    public PolicyWizard(List<AttributeWizard> targetAttributeWizardList,
-            List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
-
-        if (targetAttributeWizardList == null) {
-            targetAttributeWizardList = new LinkedList<AttributeWizard>();
-        }
-        this.targetAttributeWizardList = targetAttributeWizardList;
-
-        if (orExceptionsAttributeWizardList == null) {
-            orExceptionsAttributeWizardList = new LinkedList<List<AttributeWizard>>();
-        }
-        this.orExceptionsAttributeWizardList = orExceptionsAttributeWizardList;
-
-        List<AttributeWizard> policyTargetAttributes = getPolicyTartgetAttributes(targetAttributeWizardList);
-        List<AttributeWizard> ruleTargetAttributes = getRuleTartgetAttributes(targetAttributeWizardList);
-
-        if ((policyTargetAttributes.size() + ruleTargetAttributes.size()) != targetAttributeWizardList.size()) {
-            throw new PolicyWizardException("BUG: error extrating target attributes for policy and rule");
-        }
-
-        policyWizardType = getPolicyWizardType(targetAttributeWizardList);
-
-        policy = PolicyHelper.build(generateId(), PolicyHelper.RULE_COMBALG_DENY_OVERRIDS);
-
-        targetWizard = new TargetWizard(targetAttributeWizardList);
-        actionValue = null;
-
-        RuleType rule = ExceptionsRuleWizard.getXACML(ruleTargetAttributes, orExceptionsAttributeWizardList, effect);
-
-        policy.setTarget(targetWizard.getXACML());
-        policy.getRules().add(rule);
-
     }
 
     public PolicyWizard(PolicyType policy) throws UnsupportedPolicyException {
@@ -494,42 +458,6 @@ public class PolicyWizard {
         policyIdUniqueNumber = generateUUID();
 
         return composeId();
-    }
-
-    private List<AttributeWizard> getPolicyTartgetAttributes(List<AttributeWizard> attributeWizardList) {
-
-        List<AttributeWizard> policyTargetAttributeList = new LinkedList<AttributeWizard>();
-
-        if (attributeWizardList == null) {
-            return policyTargetAttributeList;
-        }
-
-        for (AttributeWizard attribute : attributeWizardList) {
-            if (attribute.isEnvironmentAttribute()) {
-                policyTargetAttributeList.add(attribute);
-            } else if (attribute.isResourceAttribute()) {
-                policyTargetAttributeList.add(attribute);
-            }
-        }
-
-        return policyTargetAttributeList;
-    }
-
-    private List<AttributeWizard> getRuleTartgetAttributes(List<AttributeWizard> attributeWizardList) {
-
-        List<AttributeWizard> policyTargetAttributeList = new LinkedList<AttributeWizard>();
-
-        if (attributeWizardList == null) {
-            return policyTargetAttributeList;
-        }
-
-        for (AttributeWizard attribute : attributeWizardList) {
-            if (attribute.isSubjectAttribute()) {
-                policyTargetAttributeList.add(attribute);
-            }
-        }
-
-        return policyTargetAttributeList;
     }
 
     private void setPolicyIdPrefix(PolicyWizardType wizardType) {

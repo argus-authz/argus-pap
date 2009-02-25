@@ -3,6 +3,7 @@ package org.glite.authz.pap.common.xacml.wizard;
 import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.DataType;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType.TargetElement;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

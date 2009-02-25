@@ -11,6 +11,7 @@ import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.FunctionHelper;
 import org.glite.authz.pap.common.xacml.utils.Functions;
 import org.glite.authz.pap.common.xacml.utils.PolicyAttributeValueHelper;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.ctx.AttributeValueType;
 import org.opensaml.xacml.policy.ApplyType;

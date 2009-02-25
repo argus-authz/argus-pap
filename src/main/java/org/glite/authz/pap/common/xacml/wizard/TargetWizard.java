@@ -21,6 +21,7 @@ import org.glite.authz.pap.common.xacml.utils.TargetHelper;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.TargetWizardException;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.policy.ActionType;
 import org.opensaml.xacml.policy.ActionsType;

@@ -3,8 +3,6 @@ package org.glite.authz.pap.services;
 import java.rmi.RemoteException;
 
 import org.glite.authz.pap.authz.highlevelpolicymanagement.BanOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.DNJobPriorityOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.FQANJobPriorityOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanDNOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanFQANOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
@@ -57,8 +55,8 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         log.info(String.format("Received dnJobPriority(dn=\"%s\", serviceClass=\"%s\", isPublic=%s);", dn, serviceClass, String
                 .valueOf(isPublic)));
         try {
-
-            return DNJobPriorityOperation.instance(dn, serviceClass, isPublic, description).execute();
+            
+            return "";
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -73,7 +71,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
         try {
 
-            return FQANJobPriorityOperation.instance(fqan, serviceClass, isPublic, description).execute();
+            return "";
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

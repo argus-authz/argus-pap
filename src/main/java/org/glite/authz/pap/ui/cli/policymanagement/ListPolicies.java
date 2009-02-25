@@ -9,7 +9,7 @@ import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.LocalPolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
-import org.glite.authz.pap.common.xacml.wizard.UnsupportedPolicyException;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.opensaml.xacml.policy.PolicyType;
 
 public class ListPolicies extends PolicyManagementCLI {

@@ -3,6 +3,7 @@ package org.glite.authz.pap.common.xacml.wizard;
 import java.util.List;
 
 import org.glite.authz.pap.common.xacml.utils.RuleHelper;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.opensaml.xacml.policy.ConditionType;
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.RuleType;
