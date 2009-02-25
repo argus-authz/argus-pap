@@ -104,7 +104,7 @@ PolicySetWizard Resource() :
 }
 {
   <RESOURCE> t=TextString() "{" ( content=ResourceContents() { policyContents.add(content); })+ "}" {
-    PolicySetWizard psw = new PolicySetWizard(new AttributeWizard("resource_uri", t));
+    PolicySetWizard psw = new PolicySetWizard(new AttributeWizard("resource", t));
     for (MixIn mixedin : policyContents) {
       if (mixedin.policy != null) {
         psw.addPolicy(mixedin.policy);

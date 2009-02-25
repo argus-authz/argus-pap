@@ -56,7 +56,7 @@ class BWParser implements BWParserConstants {
       }
     }
     jj_consume_token(23);
-    PolicySetWizard psw = new PolicySetWizard(new AttributeWizard("resource_uri", t));
+    PolicySetWizard psw = new PolicySetWizard(new AttributeWizard("resource", t));
     for (MixIn mixedin : policyContents) {
       if (mixedin.policy != null) {
         psw.addPolicy(mixedin.policy);
