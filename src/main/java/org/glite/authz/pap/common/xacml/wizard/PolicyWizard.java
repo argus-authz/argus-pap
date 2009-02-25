@@ -45,7 +45,7 @@ public class PolicyWizard {
     protected final PolicyType policy;
 
     public PolicyWizard(AttributeWizard attributeWizard) {
-        
+
         List<AttributeWizard> targetAttributeWizardList = new ArrayList<AttributeWizard>(1);
         targetAttributeWizardList.add(attributeWizard);
 
@@ -58,7 +58,7 @@ public class PolicyWizard {
         policyWizardType = getPolicyWizardType(targetAttributeWizardList);
 
         policy = PolicyHelper.build(generateId(), PolicyHelper.RULE_COMBALG_FIRST_APPLICABLE);
-        
+
         TargetWizard targetWizard = new TargetWizard(targetAttributeWizardList);
 
         policy.setTarget(targetWizard.getXACML());
@@ -106,13 +106,13 @@ public class PolicyWizard {
 
         targetWizard = new TargetWizard(policy.getTarget());
         targetAttributeWizardList = targetWizard.getAttributeWizardList();
-        
+
         if (targetAttributeWizardList.size() == 0) {
             targetAttributeWizardList.add(new AttributeWizard("action", "*"));
         }
 
         validateTargetAttributewizardList(targetAttributeWizardList);
-        
+
         actionValue = targetAttributeWizardList.get(0).getValue();
 
         policyWizardType = getPolicyWizardType(targetAttributeWizardList);
@@ -169,11 +169,15 @@ public class PolicyWizard {
     // TODO: implement me
     }
 
+    public void addObligation(ObligationWizard obligationWizard) {
+    // TODO: implement me
+    }
+
     public void addRule(EffectType effect) {
         RuleWizard ruleWizard = new RuleWizard(effect);
         policy.getRules().add(ruleWizard.getXACML());
     }
-    
+
     public void addRule(RuleWizard ruleWizard) {
         policy.getRules().add(ruleWizard.getXACML());
     }
@@ -182,7 +186,7 @@ public class PolicyWizard {
         RuleWizard ruleWizard = new RuleWizard(targetAttributeList, effect);
         policy.getRules().add(ruleWizard.getXACML());
     }
-    
+
     public void addRule(AttributeWizard attribute, EffectType effect) {
         List<AttributeWizard> targetAttributeList = new ArrayList<AttributeWizard>(1);
         targetAttributeList.add(attribute);
