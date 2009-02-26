@@ -54,7 +54,7 @@ public class UnBanAttribute extends PolicyManagementCLI {
         
         if (unbanResult.getStatusCode() != 0) {
             
-            System.out.println("Error: blacklist policy not found for " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+            System.out.println("Error: ban policy not found for " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
             return ExitStatus.FAILURE.ordinal();
             
         } else {

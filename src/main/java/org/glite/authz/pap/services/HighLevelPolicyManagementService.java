@@ -4,8 +4,7 @@ import java.rmi.RemoteException;
 
 import org.glite.authz.pap.authz.highlevelpolicymanagement.BanOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.EraseRepositoryOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanDNOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanFQANOperation;
+import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
@@ -70,8 +69,12 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         log.info(String.format("Received unbanDN(\"%s\");", dn));
 
         try {
-
-            return UnbanDNOperation.instance(dn).execute();
+            
+            AttributeWizard bannedAttributeWizard = new AttributeWizard(AttributeWizardType.DN, dn);
+            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
+            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
+            
+            return UnbanOperation.instance(bannedAttributeWizard, resourceAttributeWizard, actionAttributeWizard).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -84,7 +87,11 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
         try {
 
-            return UnbanFQANOperation.instance(fqan).execute();
+            AttributeWizard bannedAttributeWizard = new AttributeWizard(AttributeWizardType.FQAN, fqan);
+            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
+            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
+            
+            return UnbanOperation.instance(bannedAttributeWizard, resourceAttributeWizard, actionAttributeWizard).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

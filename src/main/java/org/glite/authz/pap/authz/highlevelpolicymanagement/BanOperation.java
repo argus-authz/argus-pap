@@ -44,8 +44,7 @@ public class BanOperation extends BasePAPOperation<String> {
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-        // get the target policy set, it must be the very first policy set (if
-        // it exists)
+        // get the target policy set, it must be the very first policy set (if it exists)
         PolicySetType targetPolicySet = null;
         TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
 
@@ -69,7 +68,7 @@ public class BanOperation extends BasePAPOperation<String> {
         boolean updateOperationForPolicy = false;
         String policyId = null;
 
-        // get the target policy, it must be the very first policy (if it exists)
+        // get the target policy, it must be the very first policy
         List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
 
         if (policyIdList.size() > 0) {
@@ -81,6 +80,9 @@ public class BanOperation extends BasePAPOperation<String> {
                 if (targetPolicyWizard.isPublic() != isPublic) {
                     targetPolicyWizard = null;
                 } else {
+                    if (targetPolicyWizard.denyRuleForAttributeExists(banAttributeWizard)) {
+                        return null;
+                    }
                     policyId = policy.getPolicyId();
                     updateOperationForPolicy = true;
                     updateOperationForPolicySet = false;

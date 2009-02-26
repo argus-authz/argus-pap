@@ -26,13 +26,13 @@ public class BanAttribute extends PolicyManagementCLI {
     }
 
     private AttributeWizardType attributeToDeny;
-    
-    private BanAttribute(String[] commandNameValues, String usage, String description,
-            String longDescription, AttributeWizardType awt) {
+
+    private BanAttribute(String[] commandNameValues, String usage, String description, String longDescription,
+            AttributeWizardType awt) {
         super(commandNameValues, usage, description, longDescription);
         attributeToDeny = awt;
     }
-    
+
     @SuppressWarnings("static-access")
     @Override
     protected Options defineCommandOptions() {
@@ -55,32 +55,38 @@ public class BanAttribute extends PolicyManagementCLI {
 
         if (args.length != 2)
             throw new ParseException("Wrong number of arguments");
-        
+
         String attributeValue = args[1];
-        
+
         boolean isPublic = true;
         if (commandLine.hasOption(OPT_PRIVATE_LONG))
             isPublic = false;
-        
+
         String policyDescription = null;
         if (commandLine.hasOption(OPT_POLICY_DESCRIPTION_LONG))
             policyDescription = commandLine.getOptionValue(OPT_POLICY_DESCRIPTION_LONG);
 
-        if (verboseMode)
+        if (verboseMode) {
             System.out.print("Adding policy... ");
-        
-        String policyId;
-        
-        if (AttributeWizardType.DN.equals(attributeToDeny))
+        }
+
+        String policyId = null;
+
+        if (AttributeWizardType.DN.equals(attributeToDeny)) {
             policyId = highlevelPolicyMgmtClient.banDN(attributeValue, isPublic, policyDescription);
-        else
+        } else {
             policyId = highlevelPolicyMgmtClient.banFQAN(attributeValue, isPublic, policyDescription);
+        }
 
-        if (verboseMode)
-        	System.out.println("ok (id=" + policyId + ")");
-        
+        if (policyId == null) {
+            printOutputMessage(String.format("ban rule already exists"));
+        } else {
+            if (verboseMode) {
+                System.out.println("ok (id=" + policyId + ")");
+            }
+        }
+
         return ExitStatus.SUCCESS.ordinal();
-
     }
 
 }
