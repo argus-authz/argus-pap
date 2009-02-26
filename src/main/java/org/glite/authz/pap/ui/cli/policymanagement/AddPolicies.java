@@ -9,6 +9,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
+import org.glite.authz.pap.common.xacml.wizard.XACMLWizard;
 import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
 import org.glite.authz.pap.ui.cli.CLIException;
@@ -87,9 +88,17 @@ public class AddPolicies extends PolicyManagementCLI {
 
 		XACMLPolicyCLIUtils.initOpenSAML();
 
-		List<PolicySetWizard> policyList = policyFileEncoder.parse(file);
+		List<XACMLWizard> policyList = policyFileEncoder.parse(file);
 
-		for (PolicySetWizard policySetWizard : policyList) {
+		for (XACMLWizard xacmlWizard : policyList) {
+		    
+		    if (!(xacmlWizard instanceof PolicySetWizard)) {
+		        System.out.println("Error: \"resource\" element not defined");
+		        result = false;
+		        continue;
+		    }
+		    
+		    PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
 
 			PolicySetType policySet = policySetWizard.getXACML();
 			

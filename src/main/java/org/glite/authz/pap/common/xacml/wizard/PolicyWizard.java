@@ -253,6 +253,10 @@ public class PolicyWizard extends XACMLWizard {
     public void setVersion(int version) {
         policy.setVersion(Integer.toString(version));
     }
+    
+    public void setPolicyId(String policyId) {
+        policy.setPolicyId(policyId);
+    }
 
     public String toFormattedString() {
         return toFormattedString(false);

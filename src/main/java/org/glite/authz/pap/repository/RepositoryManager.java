@@ -7,6 +7,7 @@ import java.util.NoSuchElementException;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
+import org.glite.authz.pap.common.xacml.wizard.XACMLWizard;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
@@ -71,9 +72,9 @@ public abstract class RepositoryManager {
             return;
         }
 
-        List<PolicySetWizard> policyList;
+        List<XACMLWizard> wizardList;
         try {
-            policyList = pse.parse(policyConfigurationFile);
+            wizardList = pse.parse(policyConfigurationFile);
         } catch (EncodingException e) {
             throw new RepositoryException(e);
         }
@@ -83,7 +84,14 @@ public abstract class RepositoryManager {
         localPapContainer.deleteAllPolicies();
         localPapContainer.deleteAllPolicySets();
 
-        for (PolicySetWizard policySetWizard : policyList) {
+        for (XACMLWizard xacmlWizard : wizardList) {
+            
+            if (!(xacmlWizard instanceof PolicySetWizard)) {
+                EncodingException e = new EncodingException("\"action\" element is allowed only inside a \"resource\" element");
+                throw new RepositoryException(e);
+            }
+            
+            PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
             
             localPapContainer.addPolicySet(-1, policySetWizard.getXACML());
             

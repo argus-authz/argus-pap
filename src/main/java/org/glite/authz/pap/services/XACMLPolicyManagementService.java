@@ -255,7 +255,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 	}
 
 	public boolean updatePolicy(PolicyType policy) throws RemoteException {
-		log.info("updatePolicy();");
+		log.info(String.format("updatePolicy(id=\"%s\");", policy.getPolicyId()));
 
 		try {
 

@@ -247,10 +247,12 @@ public class PAPContainer {
 
     public void updatePolicy(PolicyType policy) {
         policyDAO.update(papId, policy);
+        updatePAPPolicyLastModificationTime();
     }
 
     public void updatePolicySet(PolicySetType policySet) {
         policySetDAO.update(papId, policySet);
+        updatePAPPolicyLastModificationTime();
     }
 
     private void notifyPoliciesAdded(int numOfAddedPolicies) {
