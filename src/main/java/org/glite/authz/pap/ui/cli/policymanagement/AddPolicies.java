@@ -8,113 +8,134 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
+import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
 import org.glite.authz.pap.ui.cli.CLIException;
+import org.opensaml.xacml.policy.PolicySetType;
 
 public class AddPolicies extends PolicyManagementCLI {
 
-    private static final String USAGE = "<file> [[file] ...] [options]";
-    private static final String[] commandNameValues = { "add-policies-from-file", "ap" };
-    private static final String DESCRIPTION = "Add policies defined in the given files.";
-    private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
+	private static final String USAGE = "<file> [[file] ...] [options]";
+	private static final String[] commandNameValues = { "add-policies-from-file", "ap" };
+	private static final String DESCRIPTION = "Add policies defined in the given files.";
+	private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
 
-    public AddPolicies() {
-        super(commandNameValues, USAGE, DESCRIPTION, null);
-    }
+	public AddPolicies() {
+		super(commandNameValues, USAGE, DESCRIPTION, null);
+	}
 
-    @Override
-    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
-        String[] args = commandLine.getArgs();
+	@Override
+	protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+			RemoteException {
+		String[] args = commandLine.getArgs();
 
-        if (args.length < 2)
-            throw new ParseException("No input files defined.");
+		if (args.length < 2)
+			throw new ParseException("No input files defined.");
 
-        for (int i = 1; i < args.length; i++) {
-            File file = new File(args[i]);
-            if (!file.exists())
-                throw new ParseException("File not found: " + file.getAbsolutePath());
-        }
+		for (int i = 1; i < args.length; i++) {
+			File file = new File(args[i]);
+			if (!file.exists())
+				throw new ParseException("File not found: " + file.getAbsolutePath());
+		}
 
-        boolean partialSuccess = false;
-        boolean failure = false;
+		boolean partialSuccess = false;
+		boolean failure = false;
 
-        for (int i = 1; i < args.length; i++) {
+		for (int i = 1; i < args.length; i++) {
 
-            String fileName = args[i];
+			String fileName = args[i];
 
-            try {
+			try {
 
-                boolean result = addPolicy(fileName);
+				boolean result = addPolicies(fileName);
 
-                if (result == true) {
-                    partialSuccess = true;
-                }
+				if (result == true) {
+					partialSuccess = true;
 
-            } catch (EncodingException e) {
-                failure = true;
-                System.out.println("Syntax error. Skipping file (no policies has been added):" + fileName);
-                System.out.println(e.getMessage());
-                continue;
-            }
+					if (verboseMode) {
+						System.out.println("Success: policies has been added from file " + fileName);
+					}
+				} else {
+					System.out.println("Error addind policies from file " + fileName);
+					failure = true;
+				}
 
-            if (verboseMode)
-                System.out.println("Success: policies has been added from file " + fileName);
-        }
+			} catch (EncodingException e) {
+				failure = true;
+				System.out.println("Syntax error. Skipping file (no policies has been added):" + fileName);
+				System.out.println(e.getMessage());
+				continue;
+			}
+		}
 
-        if (failure && !partialSuccess)
-            return ExitStatus.FAILURE.ordinal();
+		if (failure && !partialSuccess)
+			return ExitStatus.FAILURE.ordinal();
 
-        if (failure && partialSuccess)
-            return ExitStatus.PARTIAL_SUCCESS.ordinal();
+		if (failure && partialSuccess)
+			return ExitStatus.PARTIAL_SUCCESS.ordinal();
 
-        return ExitStatus.SUCCESS.ordinal();
+		return ExitStatus.SUCCESS.ordinal();
 
-    }
+	}
 
-    private boolean addPolicy(String fileName) throws EncodingException, RemoteException {
+	private boolean addPolicies(String fileName) throws EncodingException, RemoteException {
 
-        boolean result = true;
+		boolean result = true;
 
-        File file = new File(fileName);
+		File file = new File(fileName);
 
-        XACMLPolicyCLIUtils.initOpenSAML();
+		XACMLPolicyCLIUtils.initOpenSAML();
 
-        List<PolicySetWizard> policyList = policyFileEncoder.parse(file);
+		List<PolicySetWizard> policyList = policyFileEncoder.parse(file);
 
-        for (PolicySetWizard policySetWizard : policyList) {
+		for (PolicySetWizard policySetWizard : policyList) {
 
-//            PolicyType policy = (PolicyType) policySetWizard;
-//            PolicyWizard policywizard = new PolicyWizard(policy);
-//
-//            if (verboseMode) {
-//                System.out.print("Adding policy: ");
-//                System.out.println(policywizard.toFormattedString(0, 19));
-//            }
-//
-//            String policySetId;
-//
-//            if (policywizard.isBlacklistPolicy()) {
-//                policySetId = BlacklistPolicySet.POLICY_SET_ID;
-//            } else {
-//                policySetId = ServiceClassPolicySet.POLICY_SET_ID;
-//            }
-//
-//            // the effective PolicyId is the one returned by the server
-//            String policyId = xacmlPolicyMgmtClient.addPolicy(policySetId, policywizard.getPolicyIdPrefix(), policy);
-//
-//            if (policyId == null) {
-//                System.out.println("Error policy not added");
-//                result = false;
-//            }
-//
-//            policy.setPolicyId(policyId);
-        }
-        return result;
-    }
+			PolicySetType policySet = policySetWizard.getXACML();
+			
+			policySet.getPolicyIdReferences().clear();
+			
+			String policySetId = xacmlPolicyMgmtClient.addPolicySet(-1, policySet);
 
-    @Override
-    protected Options defineCommandOptions() {
-        return null;
-    }
+			if (policySetId == null) {
+				System.out.println(String.format(
+					"Error policy set not added: %s (id=%s). Skipping all the policies defined inside.",
+					policySetWizard.getTagAndValue(), policySetWizard.getPolicySetId()));
+				result = false;
+				continue;
+			}
+
+			if (verboseMode) {
+				System.out.println(String.format("Added policy set: %s (id=%s)", policySetWizard
+						.getTagAndValue(), policySetId));
+			}
+
+			for (PolicyWizard policyWizard : policySetWizard.getPolicyWizardList()) {
+				String policyId = xacmlPolicyMgmtClient.addPolicy(-1, policySetId,
+					policyWizard.getPolicyIdPrefix(), policyWizard.getXACML());
+
+				if (policyId == null) {
+					System.out.println(String.format("Error policy not added: %s (id=%s)", policyWizard
+							.getTagAndValue(), policyWizard.getPolicyId()));
+					result = false;
+					continue;
+				}
+
+				if (verboseMode) {
+					System.out.println(String.format("Added policy: %s (id=%s)", policyWizard
+							.getTagAndValue(), policyWizard.getPolicyId()));
+				}
+			}
+
+			if (verboseMode) {
+				System.out.println();
+			}
+		}
+		return result;
+	}
+
+	@Override
+	protected Options defineCommandOptions() {
+		return null;
+	}
 }

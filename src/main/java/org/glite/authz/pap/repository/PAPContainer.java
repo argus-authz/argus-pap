@@ -21,317 +21,305 @@ import org.slf4j.LoggerFactory;
 
 public class PAPContainer {
 
-    @SuppressWarnings("unused")
-    private static final Logger log = LoggerFactory.getLogger(PAPContainer.class);
-
-    private final PAP pap;
-    private final String papId;
-    private final PolicyDAO policyDAO;
-    private final PolicySetDAO policySetDAO;
-    private final String rootPolicySetId;
-
-    public PAPContainer(PAP pap) {
-        this.pap = pap;
-        papId = pap.getPapId();
-        rootPolicySetId = papId;
-        policySetDAO = DAOFactory.getDAOFactory().getPolicySetDAO();
-        policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
-    }
-
-    public void addPolicy(String policySetId, PolicyType policy) throws NotFoundException, AlreadyExistsException,
-            RepositoryException {
-
-        if (!policySetDAO.exists(papId, policySetId))
-            throw new NotFoundException("PolicySetId \"" + policySetId + "\" not found");
-
-        String policyId = policy.getPolicyId();
-
-        policyDAO.store(papId, policy);
-
-        try {
-            modifyReference(policySetId, policyId, true, true);
-        } catch (RepositoryException e) {
-            policyDAO.delete(papId, policyId);
-            throw e;
-        }
-
-        updatePAPPolicyLastModificationTime();
+	@SuppressWarnings("unused")
+	private static final Logger log = LoggerFactory.getLogger(PAPContainer.class);
 
-        notifyPoliciesAdded(1);
-    }
-
-    public void addPolicySet(String policySetId, PolicySetType policySet) {
-
-        if (!policySetDAO.exists(papId, policySetId)) {
-            throw new NotFoundException("PolicySetId \"" + policySetId + "\" not found");
-        }
-
-        String childPolicySetId = policySet.getPolicySetId();
-
-        policySetDAO.store(papId, policySet);
-
-        try {
-            modifyReference(policySetId, childPolicySetId, false, true);
-        } catch (RepositoryException e) {
-            policySetDAO.delete(papId, childPolicySetId);
-            throw e;
-        }
-
-        updatePAPPolicyLastModificationTime();
-    }
-
-    public void deleteAllPolicies() {
-        int numOfDeletedPolicies = policyDAO.deleteAll(papId);
-        updatePAPPolicyLastModificationTime();
-        notifyPoliciesDeleted(numOfDeletedPolicies);
-    }
+	private final PAP pap;
+	private final String papId;
+	private final PolicyDAO policyDAO;
+	private final PolicySetDAO policySetDAO;
+	private final String rootPolicySetId;
 
-    public void deleteAllPolicySets() {
-        policySetDAO.deleteAll(papId);
-    }
+	public PAPContainer(PAP pap) {
+		this.pap = pap;
+		papId = pap.getPapId();
+		rootPolicySetId = papId;
+		policySetDAO = DAOFactory.getDAOFactory().getPolicySetDAO();
+		policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
+	}
 
-    public void deletePolicy(String id) throws NotFoundException, RepositoryException {
-        policyDAO.delete(papId, id);
-        updatePAPPolicyLastModificationTime();
-        notifyPoliciesDeleted(1);
-    }
+	public void addPolicy(int index, String policySetId, PolicyType policy) {
+
+		if (!policySetDAO.exists(papId, policySetId))
+			throw new NotFoundException("PolicySetId \"" + policySetId + "\" not found");
+
+		String policyId = policy.getPolicyId();
+		
+		policyDAO.store(papId, policy);
+
+		PolicySetType policySet = policySetDAO.getById(papId, policySetId);
 
-    public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
-        policySetDAO.delete(papId, id);
-    }
+		if (PolicySetHelper.referenceIdExists(policySet, policyId))
+			throw new AlreadyExistsException("Reference id \"" + policyId + "\" alredy exists");
+
+		if (index < 0) {
+			PolicySetHelper.addPolicyReference(policySet, policyId);
+		} else {
+			PolicySetHelper.addPolicyReference(policySet, index, policyId);
+		}
 
-    public List<PolicyType> getAllPolicies() {
-        return policyDAO.getAll(papId);
-    }
+		policySetDAO.update(papId, policySet);
 
-    public List<PolicySetType> getAllPolicySets() {
-        List<PolicySetType> policySetList = policySetDAO.getAll(papId);
+		updatePAPPolicyLastModificationTime();
 
-        // place the PAP root PolicySet as the first element
-        for (PolicySetType policySetElement : policySetList) {
-            if (policySetElement.getPolicySetId().equals(rootPolicySetId)) {
+		notifyPoliciesAdded(1);
+	}
 
-                int currentIndex = policySetList.indexOf(policySetElement);
+	public void addPolicySet(int index, PolicySetType policySet) {
 
-                if (currentIndex != 0) { // swap elements
-                    PolicySetType tempPolicySet = policySetList.get(0);
-                    policySetList.set(0, policySetElement);
-                    policySetList.set(currentIndex, tempPolicySet);
-                }
-                break;
-            }
-        }
-        return policySetList;
-    }
+		String policySetId = policySet.getPolicySetId();
+		
+		policySetDAO.store(papId, policySet);
+
+		PolicySetType rootPolicySet = policySetDAO.getById(papId, rootPolicySetId);
 
-    public int getNumberOfPolicies() {
-        return policyDAO.getNumberOfPolicies(papId);
-    }
+		if (PolicySetHelper.referenceIdExists(rootPolicySet, policySetId)) {
+			throw new AlreadyExistsException("Reference id \"" + policySetId + "\" alredy exists");
+		}
 
-    public PAP getPAP() {
-        return this.pap;
-    }
+		if (index < 0) {
+			PolicySetHelper.addPolicySetReference(rootPolicySet, policySetId);
+		} else {
+			PolicySetHelper.addPolicySetReference(rootPolicySet, index, policySetId);
+		}
+
+		policySetDAO.update(papId, rootPolicySet);
 
-    public PolicySetType getPAPRootPolicySet() {
-        return policySetDAO.getById(papId, getPAPRootPolicySetId());
-    }
+		updatePAPPolicyLastModificationTime();
+	}
 
-    public String getPAPRootPolicySetId() {
-        return rootPolicySetId;
-    }
+	public void deleteAllPolicies() {
+		int numOfDeletedPolicies = policyDAO.deleteAll(papId);
+		updatePAPPolicyLastModificationTime();
+		notifyPoliciesDeleted(numOfDeletedPolicies);
+	}
 
-    public PolicyType getPolicy(String id) {
-        return policyDAO.getById(papId, id);
-    }
+	public void deleteAllPolicySets() {
+		policySetDAO.deleteAll(papId);
+	}
 
-    public PolicySetType getPolicySet(String id) {
-        return policySetDAO.getById(papId, id);
-    }
+	public void deletePolicy(String id) throws NotFoundException, RepositoryException {
+		policyDAO.delete(papId, id);
+		updatePAPPolicyLastModificationTime();
+		notifyPoliciesDeleted(1);
+	}
 
-    public PolicySetType getPolicySetFirstMatchByTarget(TargetWizard targetWizard) {
+	public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
+		policySetDAO.delete(papId, id);
+	}
 
-        List<String> idList = PolicySetHelper.getPolicySetIdReferencesValues(policySetDAO.getById(papId, rootPolicySetId));
+	public List<PolicyType> getAllPolicies() {
+		return policyDAO.getAll(papId);
+	}
 
-        PolicySetType policySet = null;
-        boolean found = false;
+	public List<PolicySetType> getAllPolicySets() {
+		List<PolicySetType> policySetList = policySetDAO.getAll(papId);
 
-        for (String idRef : idList) {
-            policySet = policySetDAO.getById(papId, idRef);
-            if (targetWizard.isEqual(policySet.getTarget())) {
-                found = true;
-                break;
-            }
-        }
+		// place the PAP root PolicySet as the first element
+		for (PolicySetType policySetElement : policySetList) {
+			if (policySetElement.getPolicySetId().equals(rootPolicySetId)) {
 
-        if (!found) {
-            return null;
-        }
+				int currentIndex = policySetList.indexOf(policySetElement);
 
-        return policySet;
-    }
+				if (currentIndex != 0) { // swap elements
+					PolicySetType tempPolicySet = policySetList.get(0);
+					policySetList.set(0, policySetElement);
+					policySetList.set(currentIndex, tempPolicySet);
+				}
+				break;
+			}
+		}
+		return policySetList;
+	}
 
-    public boolean hasPolicy(String id) {
-        return policyDAO.exists(papId, id);
-    }
+	public int getNumberOfPolicies() {
+		return policyDAO.getNumberOfPolicies(papId);
+	}
 
-    public boolean hasPolicySet(String id) {
-        return policySetDAO.exists(papId, id);
-    }
+	public PAP getPAP() {
+		return this.pap;
+	}
 
-    public void removePolicyAndReferences(String policyId) throws NotFoundException, RepositoryException {
+	public PolicySetType getPAPRootPolicySet() {
+		return policySetDAO.getById(papId, rootPolicySetId);
+	}
 
-        if (!policyDAO.exists(papId, policyId))
-            throw new NotFoundException("PolicyId \"" + policyId + "\" does not exists");
+	public String getPAPRootPolicySetId() {
+		return rootPolicySetId;
+	}
 
-        List<PolicySetType> policySetList = policySetDAO.getAll(papId);
+	public PolicyType getPolicy(String id) {
+		return policyDAO.getById(papId, id);
+	}
 
-        try {
-            for (PolicySetType policySet : policySetList) {
-                modifyReference(policySet.getPolicySetId(), policyId, true, false);
-            }
-        } catch (NotFoundException e) {
-            // nothing to do
-        }
+	public PolicySetType getPolicySet(String id) {
+		return policySetDAO.getById(papId, id);
+	}
 
-        policyDAO.delete(papId, policyId);
+	public PolicySetType getPolicySetFirstMatchByTarget(TargetWizard targetWizard) {
 
-        updatePAPPolicyLastModificationTime();
+		List<String> idList = PolicySetHelper.getPolicySetIdReferencesValues(policySetDAO.getById(papId,
+			rootPolicySetId));
 
-        notifyPoliciesDeleted(1);
-    }
+		PolicySetType policySet = null;
+		boolean found = false;
 
-    public void storePolicy(PolicyType policy) {
-        policyDAO.store(papId, policy);
-        updatePAPPolicyLastModificationTime();
-        notifyPoliciesAdded(1);
-    }
+		for (String idRef : idList) {
+			policySet = policySetDAO.getById(papId, idRef);
+			if (targetWizard.isEqual(policySet.getTarget())) {
+				found = true;
+				break;
+			}
+		}
 
-    public void storePolicySet(PolicySetType policySet) {
-        policySetDAO.store(papId, policySet);
-    }
+		if (!found) {
+			return null;
+		}
 
-    public void updatePolicy(PolicyType policy) {
-        policyDAO.update(papId, policy);
-    }
+		return policySet;
+	}
 
-    public void updatePolicySet(PolicySetType policySet) {
-        policySetDAO.update(papId, policySet);
-    }
+	public boolean hasPolicy(String id) {
+		return policyDAO.exists(papId, id);
+	}
 
-    private synchronized void addReference(String policySetId, String referenceId, boolean isPolicyReference)
-            throws NotFoundException, AlreadyExistsException, RepositoryException {
+	public boolean hasPolicySet(String id) {
+		return policySetDAO.exists(papId, id);
+	}
 
-        PolicySetType policySet = policySetDAO.getById(papId, policySetId);
+	public void removePolicyAndReferences(String policyId) throws NotFoundException, RepositoryException {
 
-        if (PolicySetHelper.referenceIdExists(policySet, referenceId))
-            throw new AlreadyExistsException("Reference id \"" + referenceId + "\" alredy exists");
+		if (!policyDAO.exists(papId, policyId)) {
+			throw new NotFoundException("PolicyId \"" + policyId + "\" does not exists");
+		}
 
-        if (isPolicyReference)
-            PolicySetHelper.addPolicyReference(policySet, referenceId);
-        else
-            PolicySetHelper.addPolicySetReference(policySet, referenceId);
+		List<PolicySetType> policySetList = policySetDAO.getAll(papId);
 
-        policySetDAO.update(papId, policySet);
+		for (PolicySetType policySet : policySetList) {
+			if (PolicySetHelper.deletePolicyReference(policySet, policyId)) {
+				policySetDAO.update(papId, policySet);
+			}
+		}
 
-    }
+		policyDAO.delete(papId, policyId);
 
-    private synchronized void modifyReference(String policySetId, String referenceId, boolean isPolicyReference,
-            boolean isAddOperation) throws NotFoundException, AlreadyExistsException, RepositoryException {
+		updatePAPPolicyLastModificationTime();
 
-        if (isAddOperation)
-            addReference(policySetId, referenceId, isPolicyReference);
-        else
-            removeReference(policySetId, referenceId, isPolicyReference);
+		notifyPoliciesDeleted(1);
+	}
 
-    }
+	public void removePolicySetAndReferences(String policySetId) {
 
-    private void notifyPoliciesAdded(int numOfAddedPolicies) {
+		if (!policySetDAO.exists(papId, policySetId)) {
+			throw new NotFoundException("PolicySetId \"" + policySetId + "\" does not exists");
+		}
 
-        String propName;
+		PolicySetType rootPolicySet = policySetDAO.getById(papId, rootPolicySetId);
+		
+		if (PolicySetHelper.deletePolicyReference(rootPolicySet, policySetId)) {
+			policySetDAO.update(papId, rootPolicySet);
+		}
 
-        if (PAP.LOCAL_PAP_ID.equals(papId)) {
-            propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
-        } else {
-            propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
-        }
+		policySetDAO.delete(papId, policySetId);
 
-        synchronized (this) {
-            Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+		updatePAPPolicyLastModificationTime();
+	}
 
-            if (numOfPoliciesInteger == null) {
-                return;
-            }
+	public void storePolicy(PolicyType policy) {
+		policyDAO.store(papId, policy);
+		updatePAPPolicyLastModificationTime();
+		notifyPoliciesAdded(1);
+	}
 
-            int numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
-            numOfPoliciesInteger = new Integer(numOfPolicies);
-            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+	public void storePolicySet(PolicySetType policySet) {
+		policySetDAO.store(papId, policySet);
+	}
 
-            propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
+	public void updatePolicy(PolicyType policy) {
+		policyDAO.update(papId, policy);
+	}
 
-            numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
-            numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
-            numOfPoliciesInteger = new Integer(numOfPolicies);
-            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
-        }
-    }
+	public void updatePolicySet(PolicySetType policySet) {
+		policySetDAO.update(papId, policySet);
+	}
 
-    private void notifyPoliciesDeleted(int numOfDeletedPolicies) {
+	private void notifyPoliciesAdded(int numOfAddedPolicies) {
 
-        String propName;
+		String propName;
 
-        if (PAP.LOCAL_PAP_ID.equals(papId)) {
-            propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
-        } else {
-            propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
-        }
+		if (PAP.LOCAL_PAP_ID.equals(papId)) {
+			propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
+		} else {
+			propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
+		}
 
-        synchronized (this) {
-            Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+		synchronized (this) {
+			Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(
+				propName);
 
-            if (numOfPoliciesInteger == null) {
-                return;
-            }
+			if (numOfPoliciesInteger == null) {
+				return;
+			}
 
-            int numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
-            numOfPoliciesInteger = new Integer(numOfPolicies);
-            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+			int numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
+			numOfPoliciesInteger = new Integer(numOfPolicies);
+			PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
 
-            propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
+			propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
 
-            numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
-            numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
-            numOfPoliciesInteger = new Integer(numOfPolicies);
-            PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
-        }
-    }
+			numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+			numOfPolicies = numOfPoliciesInteger.intValue() + numOfAddedPolicies;
+			numOfPoliciesInteger = new Integer(numOfPolicies);
+			PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+		}
+	}
 
-    private void notifyPolicyLastModificationTimeUpdate() {
+	private void notifyPoliciesDeleted(int numOfDeletedPolicies) {
 
-        if (!PAP.LOCAL_PAP_ID.equals(papId)) {
-            return;
-        }
+		String propName;
 
-        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                pap.getPolicyLastModificationTimeString());
-    }
+		if (PAP.LOCAL_PAP_ID.equals(papId)) {
+			propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
+		} else {
+			propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
+		}
 
-    private synchronized void removeReference(String policySetId, String referenceId, boolean isPolicyReference)
-            throws NotFoundException, RepositoryException {
+		synchronized (this) {
+			Integer numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(
+				propName);
 
-        PolicySetType policySet = policySetDAO.getById(papId, policySetId);
+			if (numOfPoliciesInteger == null) {
+				return;
+			}
 
-        if (isPolicyReference)
-            PolicySetHelper.deletePolicyReference(policySet, referenceId);
-        else
-            PolicySetHelper.deletePolicySetReference(policySet, referenceId);
+			int numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
+			numOfPoliciesInteger = new Integer(numOfPolicies);
+			PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
 
-        policySetDAO.update(papId, policySet);
-    }
+			propName = MonitoredProperties.NUM_OF_POLICIES_PROP_NAME;
 
-    private void updatePAPPolicyLastModificationTime() {
-        pap.setPolicyLastModificationTime(new Date());
-        RepositoryManager.getDAOFactory().getPAPDAO().update(pap);
-        notifyPolicyLastModificationTimeUpdate();
-    }
+			numOfPoliciesInteger = (Integer) PAPConfiguration.instance().getMonitoringProperty(propName);
+			numOfPolicies = numOfPoliciesInteger.intValue() - numOfDeletedPolicies;
+			numOfPoliciesInteger = new Integer(numOfPolicies);
+			PAPConfiguration.instance().setMonitoringProperty(propName, numOfPoliciesInteger);
+		}
+	}
+
+	private void notifyPolicyLastModificationTimeUpdate() {
+
+		if (!PAP.LOCAL_PAP_ID.equals(papId)) {
+			return;
+		}
+
+		PAPConfiguration.instance().setMonitoringProperty(
+			MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+			pap.getPolicyLastModificationTimeString());
+	}
+
+	private void updatePAPPolicyLastModificationTime() {
+		pap.setPolicyLastModificationTime(new Date());
+		RepositoryManager.getDAOFactory().getPAPDAO().update(pap);
+		notifyPolicyLastModificationTimeUpdate();
+	}
 
 }

@@ -125,6 +125,7 @@
 	</wsdl:message>
 
 	<wsdl:message name="addPolicyRequest">
+		<wsdl:part name="index" type="xsd:int"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policyIdPrefix" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
@@ -137,6 +138,13 @@
 	</wsdl:message>
 	<wsdl:message name="removePolicyAndReferencesResponse">
 		<wsdl:part name="removePolicyAndReferencesResponse" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addPolicySetRequest">
+		<wsdl:part name="index" type="xsd:int"></wsdl:part>
+		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addPolicySetResponse">
+		<wsdl:part name="addPolicySetResponse" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:portType name="XACMLPolicyManagement">
 		<wsdl:operation name="getPolicy">
@@ -206,6 +214,10 @@
 		<wsdl:operation name="addPolicy">
 			<wsdl:input message="tns:addPolicyRequest"></wsdl:input>
 			<wsdl:output message="tns:addPolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addPolicySet">
+			<wsdl:input message="tns:addPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:addPolicySetResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="removePolicyAndReferences">
 			<wsdl:input message="tns:removePolicyAndReferencesRequest"></wsdl:input>
@@ -380,6 +392,16 @@
 		<wsdl:operation name="addPolicy">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/addPolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addPolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/addPolicySet" />
 			<wsdl:input>
 				<soap:body use="literal" />
 			</wsdl:input>

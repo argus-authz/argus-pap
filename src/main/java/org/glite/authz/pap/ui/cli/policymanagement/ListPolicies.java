@@ -12,9 +12,12 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWi
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListPolicies extends PolicyManagementCLI {
 
+	private static final Logger log = LoggerFactory.getLogger(ListPolicies.class);
     private static final String OPT_SHOW_IDS_LONG = "show-ids";
     private static final String OPT_SHOW_IDS_DESCRIPTION = "The output format is the same as the one used for the "
             + "simplified policy language. Policy ids are not written, therefore the output can be saved to a file and "
@@ -125,6 +128,7 @@ public class ListPolicies extends PolicyManagementCLI {
                 System.out.println();
                 System.out.println(policySetWizard.toFormattedString(showIds));
             } catch (UnsupportedPolicySetWizardException e) {
+            	log.error("Unsupported Policy/PolicySet", e);
                 System.out.println("id=" + policySetId + ": " + GENERIC_XACML_ERROR_MESSAGE);
             }
 
@@ -132,37 +136,6 @@ public class ListPolicies extends PolicyManagementCLI {
         }
 
         return somethingHasBeenSelected;
-
-        // LocalPolicySetWizard localPolicySetWizard = new
-        // LocalPolicySetWizard();
-        //
-        // while (policyIter.hasNext()) {
-        //
-        // PolicyType policy = policyIter.next();
-        //
-        // try {
-        // PolicyWizard policyWizard = new PolicyWizard(policy);
-        //
-        // if (!policyMustBeShown(policyWizard.isPrivate(), showPrivate,
-        // showPublic))
-        // continue;
-        //
-        // localPolicySetWizard.addPolicy(policyWizard);
-        // somethingHasBeenSelected = true;
-        //
-        // } catch (UnsupportedPolicyException e) {
-        // System.out.println("id=" + policy.getPolicyId() + ": " +
-        // GENERIC_XACML_ERROR_MESSAGE);
-        // }
-        //
-        // }
-        //
-        // localPolicySetWizard.printFormattedBlacklistPolicies(System.out,
-        // noId);
-        // localPolicySetWizard.printFormattedServiceClassPolicies(System.out,
-        // noId);
-        //
-        // return somethingHasBeenSelected;
     }
 
     private static boolean policyMustBeShown(boolean isPrivate, boolean showPrivate, boolean showPublic) {

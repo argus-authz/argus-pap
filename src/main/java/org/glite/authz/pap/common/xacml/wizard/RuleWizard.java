@@ -69,7 +69,7 @@ public class RuleWizard {
         String indentString = Utils.fillWithSpaces(baseIndentation + internalIndentation);
         StringBuffer sb = new StringBuffer();
         
-        String effectString = rule.getEffect().toString();
+        String effectString = rule.getEffect().toString().toLowerCase();
         
         if (printIds) {
             sb.append(String.format("%sid=%s\n", baseIndentString, rule.getRuleId()));

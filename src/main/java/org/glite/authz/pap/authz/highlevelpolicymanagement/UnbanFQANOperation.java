@@ -34,7 +34,7 @@ public class UnbanFQANOperation extends BasePAPOperation<UnbanResult> {
         List<PolicyWizard> banPolicyList = BanAttributePolicyWizard.getBanPolicies(AttributeWizardType.FQAN, fqan, policyList);
         
         for (PolicyWizard policyWizard : banPolicyList) {
-            localPAP.removePolicyAndReferences(policyWizard.getXACML().getPolicyId());
+            localPAP.removePolicyAndReferences(policyWizard.getPolicyId());
         }
         
         UnbanResult unbanResult = new UnbanResult();
