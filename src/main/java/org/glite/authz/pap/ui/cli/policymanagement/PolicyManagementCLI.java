@@ -21,6 +21,11 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
 	protected static final String OPT_POLICY_DESCRIPTION = "d";
 	protected static final String OPT_POLICY_DESCRIPTION_LONG = "description";
 	protected static final String OPT_POLICY_DESCRIPTION_DESCRIPTION = "Description";
+	protected static final String OPT_SHOW_IDS = "si";
+	protected static final String OPT_SHOW_IDS_LONG = "show-ids";
+	protected static final String OPT_SHOW_IDS_DESCRIPTION = "Show policies id (needed for update or remove operations)";
+	protected static final String OPT_SHOW_RULES_ID_LONG = "show-rules-id";
+	protected static final String OPT_SHOW_RULES_ID_DESCRIPTION = "Show rules id";
 	
 	protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"
         + OPT_SHOW_XACML_LONG + ".";

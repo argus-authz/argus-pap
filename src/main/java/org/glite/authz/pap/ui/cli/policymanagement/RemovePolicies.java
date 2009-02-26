@@ -34,9 +34,9 @@ public class RemovePolicies extends PolicyManagementCLI {
 	        for (int i=1; i<args.length; i++) {
 	            
 	            String policyId = args[i];
-	            System.out.print("Removing policy \"" + policyId + "\"... ");
+	            System.out.print("Removing \"" + policyId + "\"... ");
 	            
-	            boolean policyRemoved = xacmlPolicyMgmtClient.removePolicyAndReferences(policyId);
+	            boolean policyRemoved = xacmlPolicyMgmtClient.removeObjectByIdAndReferences(policyId);
 	            
 	            if (!policyRemoved) {
 	            	System.out.println("NOT FOUND.");

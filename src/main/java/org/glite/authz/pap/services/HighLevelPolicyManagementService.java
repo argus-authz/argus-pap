@@ -3,6 +3,7 @@ package org.glite.authz.pap.services;
 import java.rmi.RemoteException;
 
 import org.glite.authz.pap.authz.highlevelpolicymanagement.BanOperation;
+import org.glite.authz.pap.authz.highlevelpolicymanagement.EraseRepositoryOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanDNOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanFQANOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
@@ -20,12 +21,13 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         log.info(String.format("Received banDN(dn=\"%s\", isPublic=%s);", dn, String.valueOf(isPublic)));
 
         try {
-            
+
             AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.DN, dn);
             AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
-            
-            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic, description).execute();
+
+            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic,
+                    description).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -41,8 +43,9 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.FQAN, fqan);
             AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
-            
-            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic, description).execute();
+
+            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic,
+                    description).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -50,28 +53,12 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         }
     }
 
-    public String dnJobPriority(String dn, String serviceClass, boolean isPublic, String description) throws RemoteException {
-
-        log.info(String.format("Received dnJobPriority(dn=\"%s\", serviceClass=\"%s\", isPublic=%s);", dn, serviceClass, String
-                .valueOf(isPublic)));
-        try {
-            
-            return "";
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
-        }
-    }
-
-    public String fqanJobPriority(String fqan, String serviceClass, boolean isPublic, String description) throws RemoteException {
-
-        log.info(String.format("Received fqanJobPriority(fqan=\"%s\", serviceClass=\"%s\", isPublic=%s);", fqan, serviceClass, String
-                .valueOf(isPublic)));
+    public void eraseRepository() throws RemoteException {
+        log.info("Received eraseRepository();");
 
         try {
 
-            return "";
+            EraseRepositoryOperation.instance().execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

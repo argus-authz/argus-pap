@@ -23,6 +23,8 @@ public class ListPAPPolicies extends PolicyManagementCLI {
     private String[] papAliasArray;
     private String[] papInfoArray;
     private boolean xacmlOutput = false;
+    private boolean showIds = false;
+    private boolean showRulesId = false;
 
     public ListPAPPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
@@ -51,10 +53,11 @@ public class ListPAPPolicies extends PolicyManagementCLI {
 
         boolean policiesFound;
 
-        policiesFound = ListPolicies.listUsingGroupedFormat(policyIter, true, true, false);
+        policiesFound = ListPolicies.listPolicies(policyIter, showIds, showRulesId, xacmlOutput);
 
-        if (!policiesFound)
-            System.out.println(ListPolicies.noPoliciesFoundMessage(true, true));
+        if (!policiesFound) {
+            printOutputMessage("No policies has benn found.");
+        }
 
         System.out.println();
 
@@ -102,12 +105,22 @@ public class ListPAPPolicies extends PolicyManagementCLI {
             System.out.println("No remote PAPs has been found.");
             return ExitStatus.SUCCESS.ordinal();
         }
-
-        if (commandLine.hasOption(OPT_SHOW_XACML_LONG))
+        
+        if (commandLine.hasOption(OPT_SHOW_XACML_LONG)) {
             xacmlOutput = true;
+        }
 
-        if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE))
+        if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE)) {
             getPoliciesOneByOne = true;
+        }
+        
+        if (commandLine.hasOption(OPT_SHOW_IDS)) {
+            showIds = true;
+        }
+        
+        if (commandLine.hasOption(OPT_SHOW_RULES_ID_LONG)) {
+            showRulesId = true;
+        }
 
         XACMLPolicyCLIUtils.initOpenSAML();
 

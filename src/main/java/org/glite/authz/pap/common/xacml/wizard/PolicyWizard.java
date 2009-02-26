@@ -7,6 +7,7 @@ import java.util.UUID;
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
@@ -202,6 +203,10 @@ public class PolicyWizard extends XACMLWizard {
 	public boolean isPrivate() {
 		return isPrivate;
 	}
+	
+	public boolean isPublic() {
+        return !isPrivate;
+    }
 
 	public void setDescription(String description) {
 		policy.setDescription(DescriptionTypeHelper.build(description));
@@ -217,6 +222,10 @@ public class PolicyWizard extends XACMLWizard {
 
 	public void setVersion(int version) {
 		policy.setVersion(Integer.toString(version));
+	}
+	
+	public String toXACMLString() {
+	    return XMLObjectHelper.toString(policy);
 	}
 
 	public String toFormattedString() {

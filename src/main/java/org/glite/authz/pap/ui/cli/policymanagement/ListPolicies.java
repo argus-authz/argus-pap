@@ -17,11 +17,7 @@ import org.slf4j.LoggerFactory;
 
 public class ListPolicies extends PolicyManagementCLI {
 
-	private static final Logger log = LoggerFactory.getLogger(ListPolicies.class);
-    private static final String OPT_SHOW_IDS_LONG = "show-ids";
-    private static final String OPT_SHOW_IDS_DESCRIPTION = "The output format is the same as the one used for the "
-            + "simplified policy language. Policy ids are not written, therefore the output can be saved to a file and "
-            + "given in input to the \"add-policies-from-file\" option.";
+    private static final Logger log = LoggerFactory.getLogger(ListPolicies.class);
     private static final String USAGE = "[options]";
     private static final String[] commandNameValues = { "list-policies", "lp" };
     private static final String DESCRIPTION = "List policies authored by the PAP.";
@@ -35,13 +31,11 @@ public class ListPolicies extends PolicyManagementCLI {
     protected Options defineCommandOptions() {
         Options options = new Options();
 
-        options.addOption(OptionBuilder.hasArg(false).withDescription("List only \"public\" policies.").withLongOpt(
-                OPT_PUBLIC_LONG).create());
-        options.addOption(OptionBuilder.hasArg(false).withDescription("List only \"private\" policies.").withLongOpt(
-                OPT_PRIVATE_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_XACML_DESCRIPTION)
                 .withLongOpt(OPT_SHOW_XACML_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_IDS_DESCRIPTION).withLongOpt(OPT_SHOW_IDS_LONG)
+                .create(OPT_SHOW_IDS));
+        options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_RULES_ID_DESCRIPTION).withLongOpt(OPT_SHOW_RULES_ID_LONG)
                 .create());
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_LIST_ONE_BY_ONE_DESCRIPTION).withLongOpt(
                 OPT_LIST_ONE_BY_ONE_LONG).create(OPT_LIST_ONE_BY_ONE));
@@ -51,26 +45,26 @@ public class ListPolicies extends PolicyManagementCLI {
 
     @Override
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
-        boolean showPrivate = true;
-        boolean showPublic = true;
         boolean xacmlOutput = false;
         boolean showIds = false;
+        boolean showRulesId = false;
         boolean getPoliciesOneByOne = false;
 
-        if (commandLine.hasOption(OPT_PRIVATE_LONG))
-            showPublic = false;
-
-        if (commandLine.hasOption(OPT_PUBLIC_LONG))
-            showPrivate = false;
-
-        if (commandLine.hasOption(OPT_SHOW_XACML_LONG))
+        if (commandLine.hasOption(OPT_SHOW_XACML_LONG)) {
             xacmlOutput = true;
+        }
 
-        if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE))
+        if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE)) {
             getPoliciesOneByOne = true;
+        }
 
-        if (commandLine.hasOption(OPT_SHOW_IDS_LONG))
+        if (commandLine.hasOption(OPT_SHOW_IDS)) {
             showIds = true;
+        }
+        
+        if (commandLine.hasOption(OPT_SHOW_RULES_ID_LONG)) {
+            showRulesId = true;
+        }
 
         XACMLPolicyCLIUtils.initOpenSAML();
 
@@ -78,23 +72,18 @@ public class ListPolicies extends PolicyManagementCLI {
 
         policyIter.init();
 
-        if (policyIter.getNumberOfPolicies() == 0) {
-            printOutputMessage("No policies has been found.");
-            return ExitStatus.SUCCESS.ordinal();
-        }
-
         boolean policiesFound;
 
-        policiesFound = listUsingGroupedFormat(policyIter, showPrivate, showPublic, showIds);
+        policiesFound = listPolicies(policyIter, showIds, showRulesId, xacmlOutput);
 
-        if (!policiesFound)
-            printOutputMessage(noPoliciesFoundMessage(showPrivate, showPublic));
+        if (!policiesFound) {
+            printOutputMessage("No policies has been found.");
+        }
 
         return ExitStatus.SUCCESS.ordinal();
     }
 
-    protected static boolean listUsingGroupedFormat(PAPPolicyIterator policyIter, boolean showPrivate, boolean showPublic,
-            boolean showIds) {
+    protected static boolean listPolicies(PAPPolicyIterator policyIter, boolean showIds, boolean showRulseId, boolean xacmlOutput) {
 
         boolean somethingHasBeenSelected = false;
 
@@ -126,9 +115,15 @@ public class ListPolicies extends PolicyManagementCLI {
             try {
                 PolicySetWizard policySetWizard = new PolicySetWizard(policySet, policyArray, null);
                 System.out.println();
-                System.out.println(policySetWizard.toFormattedString(showIds));
+
+                if (xacmlOutput) {
+                    System.out.println(policySetWizard.toXACMLString());
+                } else {
+                    System.out.println(policySetWizard.toFormattedString(showIds, showRulseId));
+                }
+                
             } catch (UnsupportedPolicySetWizardException e) {
-            	log.error("Unsupported Policy/PolicySet", e);
+                log.error("Unsupported Policy/PolicySet", e);
                 System.out.println("id=" + policySetId + ": " + GENERIC_XACML_ERROR_MESSAGE);
             }
 
@@ -137,36 +132,4 @@ public class ListPolicies extends PolicyManagementCLI {
 
         return somethingHasBeenSelected;
     }
-
-    private static boolean policyMustBeShown(boolean isPrivate, boolean showPrivate, boolean showPublic) {
-
-        boolean isPublic = !isPrivate;
-
-        if (!((showPrivate && isPrivate) || (showPublic && isPublic)))
-            return false;
-
-        return true;
-    }
-
-    protected static String noPoliciesFoundMessage(boolean showPrivate, boolean showPublic) {
-
-        String visibilityMsg;
-
-        if (showPrivate && showPublic)
-            visibilityMsg = "";
-        else if (showPrivate)
-            visibilityMsg = "\"private\"";
-        else
-            visibilityMsg = "\"public\"";
-
-        String msg = "No " + visibilityMsg;
-
-        if (visibilityMsg.length() != 0)
-            msg += ", ";
-
-        msg += "policies has been found.";
-
-        return msg;
-    }
-
 }

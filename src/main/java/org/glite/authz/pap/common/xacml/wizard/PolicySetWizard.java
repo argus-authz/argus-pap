@@ -6,6 +6,7 @@ import java.util.List;
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicySetWizardException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
@@ -172,13 +173,33 @@ public class PolicySetWizard extends XACMLWizard {
 	public boolean targetEquals(PolicySetWizard policySetWizard) {
 		return targetWizard.equals(policySetWizard.getTargetWizard());
 	}
+	
+	public String toXACMLString() {
+	    
+	    StringBuffer sb = new StringBuffer();
+	    
+	    sb.append(XMLObjectHelper.toString(policySet));
+	    
+	    for (PolicyWizard policyWizard : policyWizardList) {
+	        
+	        sb.append('\n');
+	        
+	        sb.append(policyWizard.toXACMLString());
+	    }
+	    
+	    return sb.toString();
+	}
 
 	public String toFormattedString(boolean printIds) {
-		return toFormattedString(0, 4, printIds, false);
+        return toFormattedString(0, 4, printIds, false);
+    }
+	
+	public String toFormattedString(boolean printIds, boolean printRulesId) {
+		return toFormattedString(0, 4, printIds, printRulesId);
 	}
 
 	public String toFormattedString(int baseIndentation, int internalIndentation, boolean printIds,
-			boolean printRuleIds) {
+			boolean printRulesId) {
 
 		String baseIndentString = Utils.fillWithSpaces(baseIndentation);
 		String indentString = Utils.fillWithSpaces(baseIndentation + internalIndentation);
@@ -199,7 +220,7 @@ public class PolicySetWizard extends XACMLWizard {
 		for (PolicyWizard policyWizard : policyWizardList) {
 
 			sb.append(policyWizard.toFormattedString(baseIndentation + internalIndentation,
-				internalIndentation, printIds, printRuleIds));
+				internalIndentation, printIds, printRulesId));
 
 			sb.append('\n');
 

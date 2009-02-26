@@ -72,16 +72,23 @@ public class PAPManager {
 
     public void createLocalPAPIfNotExists() {
 
-        if (localPAPExists()) {
-            return;
+        PAP localPAP;
+        
+        if (!papDAO.exists(PAP.LOCAL_PAP_ALIAS)) {
+            
+            localPAP = new PAP(PAP.LOCAL_PAP_ALIAS, PAP.LOCAL_PAP_ALIAS, "localhost", true);
+
+            papDAO.store(localPAP);
+        } else {
+            localPAP = papDAO.get(PAP.LOCAL_PAP_ALIAS);
         }
 
-        PAP localPAP = new PAP(PAP.LOCAL_PAP_ALIAS, PAP.LOCAL_PAP_ALIAS, "localhost", true);
-        localPAP.setPapId(PAP.LOCAL_PAP_ID);
-
-        papDAO.store(localPAP);
-
+        // check if the root policy set exists
         PAPContainer localPAPContainer = getLocalPAPContainer();
+        
+        if (localPAPContainer.hasPolicySet(localPAPContainer.getPAPRootPolicySetId())) {
+            return;
+        }
 
         PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
                 PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
@@ -95,7 +102,7 @@ public class PAPManager {
         papDAO.delete(papAlias);
         return pap;
     }
-
+    
     public boolean exists(String papAlias) {
         return papDAO.exists(papAlias);
     }
@@ -288,13 +295,12 @@ public class PAPManager {
         if (!PAP.LOCAL_PAP_ALIAS.equals(newLocalPAP.getAlias())) {
             throw new RepositoryException("Invalid alias for local PAP. Cannot perform updateLocalPAP request.");
         }
-
-        if (!PAP.LOCAL_PAP_ID.equals(newLocalPAP.getPapId())) {
-            throw new RepositoryException("Invalid id for local PAP. Cannot perform updateLocalPAP request.");
-        }
+        
+        PAP oldLocalPAP = getLocalPAP();
+        
+        newLocalPAP.setPapId(oldLocalPAP.getPapId());
 
         papDAO.update(newLocalPAP);
-
     }
 
     private String[] buildOrderedAliasArray() {

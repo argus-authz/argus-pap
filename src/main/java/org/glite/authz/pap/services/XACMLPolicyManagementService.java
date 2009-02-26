@@ -14,7 +14,7 @@ import org.glite.authz.pap.authz.policymanagement.ListPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPoliciesOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPolicySetsForPAPOperation;
-import org.glite.authz.pap.authz.policymanagement.RemovePolicyAndReferencesOperation;
+import org.glite.authz.pap.authz.policymanagement.RemoveObjectByIdAndReferencesOperation;
 import org.glite.authz.pap.authz.policymanagement.RemovePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.RemovePolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.StorePolicyOperation;
@@ -190,11 +190,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 		}
 	}
 
-	public boolean removePolicy(String policyId) throws RemoteException {
-		log.info(String.format("removePolicy(\"%s\");", policyId));
+	public boolean removeObjectByIdAndReferences(String id) throws RemoteException {
+		log.info(String.format("removeObjectByIdAndReferences(\"%s\");", id));
+
 		try {
 
-			return RemovePolicyOperation.instance(policyId).execute();
+			return RemoveObjectByIdAndReferencesOperation.instance(id).execute();
 
 		} catch (RuntimeException e) {
 			ServiceClassExceptionManager.log(log, e);
@@ -202,12 +203,11 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 		}
 	}
 
-	public boolean removePolicyAndReferences(String policyId) throws RemoteException {
-		log.info(String.format("removePolicyAndReferences(\"%s\");", policyId));
-
+	public boolean removePolicy(String policyId) throws RemoteException {
+		log.info(String.format("removePolicy(\"%s\");", policyId));
 		try {
 
-			return RemovePolicyAndReferencesOperation.instance(policyId).execute();
+			return RemovePolicyOperation.instance(policyId).execute();
 
 		} catch (RuntimeException e) {
 			ServiceClassExceptionManager.log(log, e);
@@ -279,5 +279,4 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 			throw e;
 		}
 	}
-
 }
