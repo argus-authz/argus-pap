@@ -84,10 +84,10 @@ TOKEN:
 }
 
 
-List<PolicySetWizard> Text() :
+List<XACMLWizard> Text() :
 {
   PolicySetWizard psw = null;
-  List<PolicySetWizard> sets = new LinkedList<PolicySetWizard>();
+  List<XACMLWizard> sets = new LinkedList<XACMLWizard>();
 }
 { 
   (psw=Resource() { sets.add(psw); 

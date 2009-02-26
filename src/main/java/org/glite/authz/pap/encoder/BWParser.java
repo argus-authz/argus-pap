@@ -12,9 +12,9 @@ import org.opensaml.xacml.policy.PolicyType;
 
 class BWParser implements BWParserConstants {
 
-  static final public List<PolicySetWizard> Text() throws ParseException {
+  static final public List<XACMLWizard> Text() throws ParseException {
   PolicySetWizard psw = null;
-  List<PolicySetWizard> sets = new LinkedList<PolicySetWizard>();
+  List<XACMLWizard> sets = new LinkedList<XACMLWizard>();
     label_1:
     while (true) {
       psw = Resource();
