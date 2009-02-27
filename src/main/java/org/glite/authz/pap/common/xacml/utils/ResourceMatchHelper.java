@@ -14,19 +14,10 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
     private static final javax.xml.namespace.QName elementQName = ResourceMatchType.DEFAULT_ELEMENT_NAME;
     private static ResourceMatchHelper instance = new ResourceMatchHelper();
 
+    private ResourceMatchHelper() {}
+
     public static ResourceMatchType build() {
         return (ResourceMatchType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
-    }
-
-    public static List<ResourceMatchType> buildWithDesignator(List<AttributeType> attributeList, String matchFunctionId) {
-
-        List<ResourceMatchType> resultList = new ArrayList<ResourceMatchType>(attributeList.size());
-
-        for (AttributeType attribute : attributeList) {
-            resultList.add(buildWithDesignator(attribute, matchFunctionId));
-        }
-
-        return resultList;
     }
 
     public static ResourceMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
@@ -47,6 +38,17 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
         resourceMatch.setAttributeValue(policyAttributeValue);
 
         return resourceMatch;
+    }
+
+    public static List<ResourceMatchType> buildWithDesignator(List<AttributeType> attributeList, String matchFunctionId) {
+
+        List<ResourceMatchType> resultList = new ArrayList<ResourceMatchType>(attributeList.size());
+
+        for (AttributeType attribute : attributeList) {
+            resultList.add(buildWithDesignator(attribute, matchFunctionId));
+        }
+
+        return resultList;
     }
 
     public static AttributeType getAttribute(ResourceMatchType resourceMatch) {
@@ -76,7 +78,5 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
     public static ResourceMatchHelper getInstance() {
         return instance;
     }
-
-    private ResourceMatchHelper() {}
 
 }

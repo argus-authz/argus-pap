@@ -14,9 +14,11 @@ import org.slf4j.LoggerFactory;
 
 public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
 
-    private final static Logger log = LoggerFactory.getLogger(SubjectMatchHelper.class);
-    private static final SubjectMatchHelper instance = new SubjectMatchHelper();
     private static final javax.xml.namespace.QName elementQName = SubjectMatchType.DEFAULT_ELEMENT_NAME;
+    private static final SubjectMatchHelper instance = new SubjectMatchHelper();
+    private final static Logger log = LoggerFactory.getLogger(SubjectMatchHelper.class);
+
+    private SubjectMatchHelper() {}
 
     public static SubjectMatchType build() {
         return (SubjectMatchType) Configuration.getBuilderFactory().getBuilder(elementQName).buildObject(elementQName);
@@ -84,6 +86,4 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
     public static SubjectMatchHelper getInstance() {
         return instance;
     }
-
-    private SubjectMatchHelper() {}
 }

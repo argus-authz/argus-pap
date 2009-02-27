@@ -7,6 +7,8 @@ public class CtxAttributeTypeHelper extends XMLObjectHelper<AttributeType> {
     private static final javax.xml.namespace.QName elementQName = AttributeType.DEFAULT_ELEMENT_NAME;
     private static CtxAttributeTypeHelper instance = new CtxAttributeTypeHelper();
 
+    private CtxAttributeTypeHelper() {}
+    
     public static AttributeType build(String attributeId, String dataType, String value) {
 
         AttributeType attribute = (AttributeType) builderFactory.getBuilder(elementQName).buildObject(
@@ -19,7 +21,7 @@ public class CtxAttributeTypeHelper extends XMLObjectHelper<AttributeType> {
         return attribute;
 
     }
-    
+
     public static String getFirstValue(AttributeType attribute) {
         
         org.opensaml.xacml.ctx.AttributeValueType ctxAttributeValue = (org.opensaml.xacml.ctx.AttributeValueType) attribute
@@ -32,7 +34,5 @@ public class CtxAttributeTypeHelper extends XMLObjectHelper<AttributeType> {
     public static CtxAttributeTypeHelper getInstance() {
         return instance;
     }
-
-    private CtxAttributeTypeHelper() {}
 
 }

@@ -36,6 +36,7 @@ public class ActionMatchHelper extends XMLObjectHelper<ActionMatchType> {
         
         actionMatch.setActionAttributeDesignator(designator);
         actionMatch.setAttributeValue(policyAttributeValue);
+        actionMatch.setMatchId(matchFunctionId);
         
         return actionMatch;
     }
