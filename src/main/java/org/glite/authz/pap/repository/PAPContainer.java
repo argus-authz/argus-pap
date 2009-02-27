@@ -165,7 +165,7 @@ public class PAPContainer {
 
         for (String idRef : idList) {
             policySet = policySetDAO.getById(papId, idRef);
-            if (targetWizard.isEqual(policySet.getTarget())) {
+            if (targetWizard.isEquivalent(policySet.getTarget())) {
                 found = true;
                 break;
             }

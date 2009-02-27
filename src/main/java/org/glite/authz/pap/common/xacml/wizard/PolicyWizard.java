@@ -217,6 +217,36 @@ public class PolicyWizard extends XACMLWizard {
         return isBanPolicy(dn, AttributeWizardType.FQAN);
     }
 
+    public boolean isEquivalent(PolicyType policy) {
+        
+        if (!(targetWizard.isEquivalent(policy.getTarget()))) {
+            return false;
+        }
+        
+        List<RuleType> ruleList = policy.getRules();
+        
+        if (ruleList.size() != ruleWizardList.size()) {
+            return false;
+        }
+        
+        for (int i=0; i<ruleWizardList.size(); i++) {
+            if (!(ruleWizardList.get(i).isEquivalent(ruleList.get(i)))) {
+                return false;
+            }
+        }
+        
+        if (this.policy.getDescription() != null) {
+            if (!(this.policy.getDescription().equals(policy.getDescription()))) {
+                return false;
+            }
+        } else {
+            if (policy.getDescription() != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public boolean isPrivate() {
         return isPrivate;
     }
@@ -224,7 +254,7 @@ public class PolicyWizard extends XACMLWizard {
     public boolean isPublic() {
         return !isPrivate;
     }
-
+    
     public boolean removeDenyRuleForAttribute(AttributeWizard attributeWizard) {
 
         for (int i=0; i<ruleWizardList.size(); i++) {
@@ -242,6 +272,10 @@ public class PolicyWizard extends XACMLWizard {
         policy.setDescription(DescriptionTypeHelper.build(description));
     }
 
+    public void setPolicyId(String policyId) {
+        policy.setPolicyId(policyId);
+    }
+
     public void setPrivate(boolean isPrivate) {
         this.isPrivate = isPrivate;
 
@@ -249,13 +283,9 @@ public class PolicyWizard extends XACMLWizard {
 
         policy.setPolicyId(composeId());
     }
-
+    
     public void setVersion(int version) {
         policy.setVersion(Integer.toString(version));
-    }
-    
-    public void setPolicyId(String policyId) {
-        policy.setPolicyId(policyId);
     }
 
     public String toFormattedString() {

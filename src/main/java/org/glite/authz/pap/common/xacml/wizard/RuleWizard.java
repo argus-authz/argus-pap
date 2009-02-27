@@ -78,12 +78,29 @@ public class RuleWizard {
         return false;
     }
     
+    public String getRuleId() {
+        return rule.getRuleId();
+    }
+    
     public RuleType getXACML() {
         return rule;
     }
     
-    public String getRuleId() {
-        return rule.getRuleId();
+    public boolean isEquivalent(RuleType rule) {
+        
+        if (this.rule.getEffect() != rule.getEffect()) {
+            return false;
+        }
+        
+        if (rule.getCondition() != null) {
+            return false;
+        }
+        
+        if (!(targetWizard.isEquivalent(rule.getTarget()))) {
+            return false;
+        }
+        
+        return true;
     }
 
     public String toFormattedString(boolean printIds) {

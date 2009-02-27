@@ -46,7 +46,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         
         for (String policySetId : policySetIdList) {
             PolicySetType policySet = localPAP.getPolicySet(policySetId);
-            if (policySetTargetWizard.isEqual(policySet.getTarget())) {
+            if (policySetTargetWizard.isEquivalent(policySet.getTarget())) {
                 targetPolicySet = policySet;
                 break;
             }
@@ -64,7 +64,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         
         for (String policyId : policyIdList) {
             PolicyType policy = localPAP.getPolicy(policyId);
-            if (policyTargetWizard.isEqual(policy.getTarget())) {
+            if (policyTargetWizard.isEquivalent(policy.getTarget())) {
                 
                 PolicyWizard policyWizard = new PolicyWizard(policy);
                 

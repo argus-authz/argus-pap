@@ -53,7 +53,7 @@ public class BanOperation extends BasePAPOperation<String> {
         boolean updateOperationForPolicySet = false;
         if (policySetIdList.size() > 0) {
             PolicySetType policySet = localPAP.getPolicySet(policySetIdList.get(0));
-            if (policySetTargetWizard.isEqual(policySet.getTarget())) {
+            if (policySetTargetWizard.isEquivalent(policySet.getTarget())) {
                 targetPolicySet = policySet;
                 updateOperationForPolicySet = true;
             }
@@ -73,7 +73,7 @@ public class BanOperation extends BasePAPOperation<String> {
 
         if (policyIdList.size() > 0) {
             PolicyType policy = localPAP.getPolicy(policyIdList.get(0));
-            if (policyTargetWizard.isEqual(policy.getTarget())) {
+            if (policyTargetWizard.isEquivalent(policy.getTarget())) {
 
                 targetPolicyWizard = new PolicyWizard(policy);
 

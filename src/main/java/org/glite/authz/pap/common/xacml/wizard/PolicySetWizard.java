@@ -9,6 +9,7 @@ import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicySetWizardException;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
 import org.opensaml.xacml.policy.DescriptionType;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -41,8 +42,9 @@ public class PolicySetWizard extends XACMLWizard {
 		policyWizardList = new LinkedList<PolicyWizard>();
 		policySetWizardList = new LinkedList<PolicySetWizard>();
 
+		setVersion(1);
 	}
-
+	
 	public PolicySetWizard(PolicySetType policySet, PolicyType[] policyList,
 			PolicySetType[] childPolicySetList) {
 
@@ -52,6 +54,13 @@ public class PolicySetWizard extends XACMLWizard {
 		validateTargetAttributewizardList(targetWizard.getAttributeWizardList());
 		
 		resourceValue = targetWizard.getAttributeWizardList().get(0).getValue();
+		
+		try {
+            new Integer(policySet.getVersion());
+        } catch (NumberFormatException e) {
+            throw new UnsupportedPolicyException("Wrong version format", e);
+        }
+        
 		policyWizardList = new LinkedList<PolicyWizard>();
 		policySetWizardList = new LinkedList<PolicySetWizard>();
 
@@ -130,12 +139,12 @@ public class PolicySetWizard extends XACMLWizard {
 		PolicySetHelper.addPolicyReference(policySet, policyWizard.getPolicyId());
 		policyWizardList.add(policyWizard);
 	}
-
+	
 	public void addPolicySet(PolicySetWizard policySetWizard) {
 		PolicySetHelper.addPolicySetReference(policySet, policySetWizard.getXACML().getPolicySetId());
 		policySetWizardList.add(policySetWizard);
 	}
-
+	
 	public String getDescription() {
 		DescriptionType dt = policySet.getDescription();
 
@@ -145,7 +154,7 @@ public class PolicySetWizard extends XACMLWizard {
 
 		return dt.getValue();
 	}
-
+	
 	public String getPolicySetId() {
 		return policySet.getPolicySetId();
 	}
@@ -162,42 +171,42 @@ public class PolicySetWizard extends XACMLWizard {
 		return targetWizard;
 	}
 
+	public int getVersion() {
+        return Integer.valueOf(policySet.getVersion());
+    }
+
 	public PolicySetType getXACML() {
 		return policySet;
 	}
 
+	public void increaseVersion() {
+        setVersion(getVersion() + 1);
+    }
+	
 	public void setDescription(String value) {
 		policySet.setDescription(DescriptionTypeHelper.build(value));
 	}
+
+	public void setPolicySetId(String id) {
+	    policySet.setPolicySetId(id);
+	}
+	
+	public void setVersion(int version) {
+        policySet.setVersion(Integer.toString(version));
+    }
 
 	public boolean targetEquals(PolicySetWizard policySetWizard) {
 		return targetWizard.equals(policySetWizard.getTargetWizard());
 	}
 	
-	public String toXACMLString() {
-	    
-	    StringBuffer sb = new StringBuffer();
-	    
-	    sb.append(XMLObjectHelper.toString(policySet));
-	    
-	    for (PolicyWizard policyWizard : policyWizardList) {
-	        
-	        sb.append('\n');
-	        
-	        sb.append(policyWizard.toXACMLString());
-	    }
-	    
-	    return sb.toString();
-	}
-
 	public String toFormattedString(boolean printIds) {
         return toFormattedString(0, 4, printIds, false);
     }
-	
+
 	public String toFormattedString(boolean printIds, boolean printRulesId) {
 		return toFormattedString(0, 4, printIds, printRulesId);
 	}
-
+	
 	public String toFormattedString(int baseIndentation, int internalIndentation, boolean printIds,
 			boolean printRulesId) {
 
@@ -233,5 +242,21 @@ public class PolicySetWizard extends XACMLWizard {
 
 	public String toString() {
 		return PolicySetHelper.toString(policySet);
+	}
+
+	public String toXACMLString() {
+	    
+	    StringBuffer sb = new StringBuffer();
+	    
+	    sb.append(XMLObjectHelper.toString(policySet));
+	    
+	    for (PolicyWizard policyWizard : policyWizardList) {
+	        
+	        sb.append('\n');
+	        
+	        sb.append(policyWizard.toXACMLString());
+	    }
+	    
+	    return sb.toString();
 	}
 }

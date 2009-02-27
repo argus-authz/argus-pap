@@ -25,8 +25,8 @@ import org.slf4j.LoggerFactory;
 
 public class ConditionWizard {
     
-    private static final Logger log = LoggerFactory.getLogger(ConditionWizard.class);
     private static final javax.xml.namespace.QName ENVIRONMENT_DESIGNATOR = AttributeDesignatorType.ENVIRONMENT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
+    private static final Logger log = LoggerFactory.getLogger(ConditionWizard.class);
     private static final javax.xml.namespace.QName RESOURCE_DESIGNATOR = AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     private static final javax.xml.namespace.QName SUBJECT_DESIGNATOR = AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
     

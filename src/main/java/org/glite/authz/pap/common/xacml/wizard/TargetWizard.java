@@ -157,7 +157,7 @@ public class TargetWizard {
         return target;
     }
 
-    public boolean isEqual(TargetType target) {
+    public boolean isEquivalent(TargetType target) {
 
         if (target == null) {
             return false;
@@ -171,10 +171,10 @@ public class TargetWizard {
             return false;
         }
 
-        return isEqual(targetWizard);
+        return isEquivalent(targetWizard);
     }
 
-    public boolean isEqual(TargetWizard targetWizard) {
+    public boolean isEquivalent(TargetWizard targetWizard) {
 
         List<AttributeWizard> attributeWizardList = targetWizard.getAttributeWizardList();
         if (targetAttributeWizardList.size() != attributeWizardList.size()) {

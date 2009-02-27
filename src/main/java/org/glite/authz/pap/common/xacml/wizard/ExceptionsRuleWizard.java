@@ -16,19 +16,15 @@ public class ExceptionsRuleWizard {
     private static final Logger log = LoggerFactory.getLogger(ExceptionsRuleWizard.class);
     private static final String ruleId = "ExceptionsRule";
 
-    public static RuleType getXACML(List<AttributeWizard> targetAttributeWizardList,
-            List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
+    public static List<List<AttributeWizard>> getConditionAttributeWizardListList(RuleType rule) {
 
-        RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
+        if (!ruleId.equals(rule.getRuleId())) {
+            throw new UnsupportedPolicyException("Unrecognized RuleId");
+        }
+        
+        List<List<AttributeWizard>> resultList = ConditionWizard.getAttributeWizardListList(rule.getCondition());
 
-        TargetWizard targetWizard = new TargetWizard(targetAttributeWizardList);
-
-        ConditionType condition = ConditionWizard.getXACML(orExceptionsAttributeWizardList);
-
-        exceptionsRule.setTarget(targetWizard.getXACML());
-        exceptionsRule.setCondition(condition);
-
-        return exceptionsRule;
+        return resultList;
     }
     
     public static List<AttributeWizard> getTargetAttributeWizardList(RuleType rule) {
@@ -44,15 +40,19 @@ public class ExceptionsRuleWizard {
         return resultList;
     }
 
-    public static List<List<AttributeWizard>> getConditionAttributeWizardListList(RuleType rule) {
+    public static RuleType getXACML(List<AttributeWizard> targetAttributeWizardList,
+            List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
 
-        if (!ruleId.equals(rule.getRuleId())) {
-            throw new UnsupportedPolicyException("Unrecognized RuleId");
-        }
-        
-        List<List<AttributeWizard>> resultList = ConditionWizard.getAttributeWizardListList(rule.getCondition());
+        RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
 
-        return resultList;
+        TargetWizard targetWizard = new TargetWizard(targetAttributeWizardList);
+
+        ConditionType condition = ConditionWizard.getXACML(orExceptionsAttributeWizardList);
+
+        exceptionsRule.setTarget(targetWizard.getXACML());
+        exceptionsRule.setCondition(condition);
+
+        return exceptionsRule;
     }
 
 }
