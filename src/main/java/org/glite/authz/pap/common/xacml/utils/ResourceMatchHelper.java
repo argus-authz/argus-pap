@@ -36,6 +36,7 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
 
         resourceMatch.setResourceAttributeDesignator(designator);
         resourceMatch.setAttributeValue(policyAttributeValue);
+        resourceMatch.setMatchId(matchFunctionId);
 
         return resourceMatch;
     }

@@ -45,11 +45,10 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
                 AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
 
-        subjectMatch.setSubjectAttributeDesignator(designator);
-
         AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute.getDataType(),
                 CtxAttributeTypeHelper.getFirstValue(attribute));
 
+        subjectMatch.setSubjectAttributeDesignator(designator);
         subjectMatch.setAttributeValue(policyAttributeValue);
         subjectMatch.setMatchId(matchFunctionId);
 

@@ -36,6 +36,7 @@ public class EnvironmentMatchHelper extends XMLObjectHelper<EnvironmentMatchType
         
         environmentMatch.setEnvironmentAttributeDesignator(designator);
         environmentMatch.setAttributeValue(policyAttributeValue);
+        environmentMatch.setMatchId(matchFunctionId);
         
         return environmentMatch;
     }
