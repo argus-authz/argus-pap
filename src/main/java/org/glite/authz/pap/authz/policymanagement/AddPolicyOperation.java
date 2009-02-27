@@ -11,9 +11,9 @@ import org.opensaml.xacml.policy.PolicyType;
 public class AddPolicyOperation extends BasePAPOperation<String> {
 
 	int index;
-    String policySetId;
-    String policyIdPrefix;
     PolicyType policy;
+    String policyIdPrefix;
+    String policySetId;
 
     protected AddPolicyOperation(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
     	this.index = index;

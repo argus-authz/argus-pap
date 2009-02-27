@@ -17,9 +17,9 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
+    private final AttributeWizard actionAttributeWizard;
     private final AttributeWizard bannedAttributeWizard;
     private final AttributeWizard resourceAttributeWizard;
-    private final AttributeWizard actionAttributeWizard;
 
     protected UnbanOperation(AttributeWizard bannedAttributeWizard, AttributeWizard resourceAttributeWizard,
             AttributeWizard actionAttributeWizard) {

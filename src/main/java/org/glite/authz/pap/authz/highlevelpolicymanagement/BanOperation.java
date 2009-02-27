@@ -18,11 +18,11 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class BanOperation extends BasePAPOperation<String> {
 
-    AttributeWizard banAttributeWizard;
-    AttributeWizard resourceAttributeWizard;
     AttributeWizard actionAttributeWizard;
     String attributeValue;
+    AttributeWizard banAttributeWizard;
     boolean isPublic;
+    AttributeWizard resourceAttributeWizard;
 
     protected BanOperation(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
             AttributeWizard actionAttributeWizard, boolean isPublic) {
