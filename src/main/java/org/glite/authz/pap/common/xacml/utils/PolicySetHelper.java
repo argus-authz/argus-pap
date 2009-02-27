@@ -32,8 +32,9 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
     }
 
     public static void addPolicyReference(PolicySetType policySet, int index, String idValue) {
-        policySet.getPolicyIdReferences()
-                .add(index, IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
+        // policySet.getPolicyIdReferences()
+        // .add(index, IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
+        policySet.getPolicyChoiceGroup().add(index, IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
     }
 
     public static void addPolicyReference(PolicySetType policySet, String idValue) {
@@ -49,7 +50,9 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
     }
 
     public static void addPolicySetReference(PolicySetType policySet, int index, String idValue) {
-        policySet.getPolicySetIdReferences().add(index,
+        // policySet.getPolicySetIdReferences().add(index,
+        // IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
+        policySet.getPolicyChoiceGroup().add(index,
                 IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
     }
 

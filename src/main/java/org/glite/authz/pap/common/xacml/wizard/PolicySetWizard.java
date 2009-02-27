@@ -58,7 +58,7 @@ public class PolicySetWizard extends XACMLWizard {
 		try {
             new Integer(policySet.getVersion());
         } catch (NumberFormatException e) {
-            throw new UnsupportedPolicyException("Wrong version format", e);
+            throw new UnsupportedPolicyException(String.format("Wrong version format (policySetId=\"%s\")", policySet.getPolicySetId()), e);
         }
         
 		policyWizardList = new LinkedList<PolicyWizard>();

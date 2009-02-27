@@ -143,8 +143,17 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     public void addRule(int index, RuleWizard ruleWizard) {
-        policy.getRules().add(index, ruleWizard.getXACML());
+//        policy.getRules().add(index, ruleWizard.getXACML());
         ruleWizardList.add(index, ruleWizard);
+        
+        // workaround for a bug in opensaml (or xmltooling)
+        List<RuleType> ruleList = new LinkedList<RuleType>(policy.getRules());
+        ruleList.add(index, ruleWizard.getXACML());
+        policy.getRules().clear();
+        
+        for (RuleType rule : ruleList) {
+            policy.getRules().add(rule);
+        }
     }
 
     public void addRule(List<AttributeWizard> targetAttributeList, EffectType effect) {

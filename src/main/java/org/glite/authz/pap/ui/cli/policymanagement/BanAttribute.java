@@ -12,10 +12,17 @@ public class BanAttribute extends PolicyManagementCLI {
 
     private static String USAGE_DN = "<dn> [options]";
     private static String USAGE_FQAN = "<fqan> [options]";
+    private static String OPT_RESOURCE = "r";
+    private static String OPT_RESOURCE_LONG = "resource";
+    private static String OPT_RESOURCE_DESCRIPTION = "Specify a resource value.";
+    private static String OPT_ACTION = "a";
+    private static String OPT_ACTION_LONG = "action";
+    private static String OPT_ACTION_DESCRIPTION = "Specify an action value.";
+
     private static String[] COMMAND_NAME_VALUES_DN = { "ban-user", "bu" };
     private static String[] COMMAND_NAME_VALUES_FQAN = { "ban-fqan", "bf" };
-    private static String DESCRIPTION_DN = "Blacklist a DN on all the resources.";
-    private static String DESCRIPTION_FQAN = "Blacklist an FQAN on all the resources.";
+    private static String DESCRIPTION_DN = "Ban a DN.";
+    private static String DESCRIPTION_FQAN = "Ban an FQAN.";
 
     public static BanAttribute dn() {
         return new BanAttribute(COMMAND_NAME_VALUES_DN, USAGE_DN, DESCRIPTION_DN, null, AttributeWizardType.DN);
@@ -42,8 +49,9 @@ public class BanAttribute extends PolicyManagementCLI {
                 OPT_PUBLIC_LONG).create());
         options.addOption(OptionBuilder.hasArg(false).withDescription("Set the policy as private (it won't be distributed)")
                 .withLongOpt(OPT_PRIVATE_LONG).create());
-        options.addOption(OptionBuilder.hasArg().withDescription(OPT_POLICY_DESCRIPTION_DESCRIPTION).withLongOpt(
-                OPT_POLICY_DESCRIPTION_LONG).create(OPT_POLICY_DESCRIPTION));
+        options.addOption(OptionBuilder.hasArg().withDescription(OPT_ACTION_DESCRIPTION).withLongOpt(OPT_ACTION_LONG).create(OPT_ACTION));
+        options.addOption(OptionBuilder.hasArg().withDescription(OPT_RESOURCE_DESCRIPTION).withLongOpt(OPT_RESOURCE_LONG).create(
+                OPT_RESOURCE));
 
         return options;
     }
@@ -62,9 +70,20 @@ public class BanAttribute extends PolicyManagementCLI {
         if (commandLine.hasOption(OPT_PRIVATE_LONG))
             isPublic = false;
 
-        String policyDescription = null;
-        if (commandLine.hasOption(OPT_POLICY_DESCRIPTION_LONG))
-            policyDescription = commandLine.getOptionValue(OPT_POLICY_DESCRIPTION_LONG);
+        String resource = null;
+        String action = null;
+        
+        if (commandLine.hasOption(OPT_RESOURCE)) {
+            resource = commandLine.getOptionValue(OPT_RESOURCE);
+        } else {
+            resource = "*";
+        }
+        
+        if (commandLine.hasOption(OPT_ACTION)) {
+            action = commandLine.getOptionValue(OPT_ACTION);
+        } else {
+            action = "*";
+        }
 
         if (verboseMode) {
             System.out.print("Adding policy... ");
@@ -73,9 +92,9 @@ public class BanAttribute extends PolicyManagementCLI {
         String policyId = null;
 
         if (AttributeWizardType.DN.equals(attributeToDeny)) {
-            policyId = highlevelPolicyMgmtClient.banDN(attributeValue, isPublic, policyDescription);
+            policyId = highlevelPolicyMgmtClient.banDN(attributeValue, resource, action, isPublic);
         } else {
-            policyId = highlevelPolicyMgmtClient.banFQAN(attributeValue, isPublic, policyDescription);
+            policyId = highlevelPolicyMgmtClient.banFQAN(attributeValue, resource, action, isPublic);
         }
 
         if (policyId == null) {
@@ -90,3 +109,4 @@ public class BanAttribute extends PolicyManagementCLI {
     }
 
 }
+

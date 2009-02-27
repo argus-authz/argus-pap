@@ -16,17 +16,16 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     private static final Logger log = LoggerFactory.getLogger(HighLevelPolicyManagementService.class);
 
-    public String banDN(String dn, boolean isPublic, String description) throws RemoteException {
+    public String banDN(String dn, String resource, String action, boolean isPublic) throws RemoteException {
         log.info(String.format("Received banDN(dn=\"%s\", isPublic=%s);", dn, String.valueOf(isPublic)));
 
         try {
 
             AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.DN, dn);
-            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
-            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
+            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, resource);
+            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, action);
 
-            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic,
-                    description).execute();
+            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -34,17 +33,16 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         }
     }
 
-    public String banFQAN(String fqan, boolean isPublic, String description) throws RemoteException {
+    public String banFQAN(String fqan, String resource, String action, boolean isPublic) throws RemoteException {
         log.info(String.format("Received banFQAN(fqan=\"%s\", isPublic=%s);", fqan, String.valueOf(isPublic)));
 
         try {
 
             AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.FQAN, fqan);
-            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
-            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
+            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, resource);
+            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, action);
 
-            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic,
-                    description).execute();
+            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

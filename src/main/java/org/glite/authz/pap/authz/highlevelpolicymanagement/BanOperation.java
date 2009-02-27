@@ -22,22 +22,20 @@ public class BanOperation extends BasePAPOperation<String> {
     AttributeWizard resourceAttributeWizard;
     AttributeWizard actionAttributeWizard;
     String attributeValue;
-    String description;
     boolean isPublic;
 
     protected BanOperation(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
-            AttributeWizard actionAttributeWizard, boolean isPublic, String description) {
+            AttributeWizard actionAttributeWizard, boolean isPublic) {
 
         this.banAttributeWizard = banAttributeWizard;
         this.resourceAttributeWizard = resourceAttributeWizard;
         this.actionAttributeWizard = actionAttributeWizard;
-        this.description = description;
         this.isPublic = isPublic;
     }
 
     public static BanOperation instance(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
-            AttributeWizard actionAttributeWizard, boolean isPublic, String description) {
-        return new BanOperation(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic, description);
+            AttributeWizard actionAttributeWizard, boolean isPublic) {
+        return new BanOperation(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic);
     }
 
     protected String doExecute() {
