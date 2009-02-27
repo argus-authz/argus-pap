@@ -18,8 +18,8 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
     private boolean initialized = false;
     private String papId = null;
     private PolicyType[] policyArray = null;
-    private PolicySetType[] policySetArray = null;
     private String[] policyIdsArray = null;
+    private PolicySetType[] policySetArray = null;
 
     private XACMLPolicyManagement xacmlPolicyMgmtClient;
 

@@ -8,9 +8,9 @@ import org.apache.commons.cli.ParseException;
 
 public class RemoveAllPolicies extends PolicyManagementCLI {
 
-    private static final String USAGE = "[options]";
     private static final String[] commandNameValues = { "remove-all-policies", "rap" };
     private static final String DESCRIPTION = "Delete all policies.";
+    private static final String USAGE = "[options]";
 
     public RemoveAllPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

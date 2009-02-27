@@ -9,13 +9,18 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class Ping extends PAPManagementCLI {
 	
-	private static final String USAGE = "[options]";
-    private static final String[] commandNameValues = { "ping" };
+	private static final String[] commandNameValues = { "ping" };
     private static final String DESCRIPTION = "Ping a PAP (default endpoint is: " + 
     DEFAULT_SERVICE_URL + ").";
+    private static final String USAGE = "[options]";
 
 	public Ping() {
 		super(commandNameValues, USAGE, DESCRIPTION, null);
+	}
+
+	@Override
+	protected Options defineCommandOptions() {
+		return null;
 	}
 
 	@Override
@@ -33,10 +38,5 @@ public class Ping extends PAPManagementCLI {
 		
 		return ExitStatus.SUCCESS.ordinal();
   	}
-
-	@Override
-	protected Options defineCommandOptions() {
-		return null;
-	}
 
 }

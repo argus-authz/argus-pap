@@ -10,27 +10,19 @@ import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardTy
 
 public class BanAttribute extends PolicyManagementCLI {
 
-    private static String USAGE_DN = "<dn> [options]";
-    private static String USAGE_FQAN = "<fqan> [options]";
-    private static String OPT_RESOURCE = "r";
-    private static String OPT_RESOURCE_LONG = "resource";
-    private static String OPT_RESOURCE_DESCRIPTION = "Specify a resource value.";
-    private static String OPT_ACTION = "a";
-    private static String OPT_ACTION_LONG = "action";
-    private static String OPT_ACTION_DESCRIPTION = "Specify an action value.";
-
     private static String[] COMMAND_NAME_VALUES_DN = { "ban-user", "bu" };
     private static String[] COMMAND_NAME_VALUES_FQAN = { "ban-fqan", "bf" };
     private static String DESCRIPTION_DN = "Ban a DN.";
     private static String DESCRIPTION_FQAN = "Ban an FQAN.";
+    private static String OPT_ACTION = "a";
+    private static String OPT_ACTION_DESCRIPTION = "Specify an action value.";
+    private static String OPT_ACTION_LONG = "action";
+    private static String OPT_RESOURCE = "r";
 
-    public static BanAttribute dn() {
-        return new BanAttribute(COMMAND_NAME_VALUES_DN, USAGE_DN, DESCRIPTION_DN, null, AttributeWizardType.DN);
-    }
-
-    public static BanAttribute fqan() {
-        return new BanAttribute(COMMAND_NAME_VALUES_FQAN, USAGE_FQAN, DESCRIPTION_FQAN, null, AttributeWizardType.FQAN);
-    }
+    private static String OPT_RESOURCE_DESCRIPTION = "Specify a resource value.";
+    private static String OPT_RESOURCE_LONG = "resource";
+    private static String USAGE_DN = "<dn> [options]";
+    private static String USAGE_FQAN = "<fqan> [options]";
 
     private AttributeWizardType attributeToDeny;
 
@@ -38,6 +30,14 @@ public class BanAttribute extends PolicyManagementCLI {
             AttributeWizardType awt) {
         super(commandNameValues, usage, description, longDescription);
         attributeToDeny = awt;
+    }
+
+    public static BanAttribute dn() {
+        return new BanAttribute(COMMAND_NAME_VALUES_DN, USAGE_DN, DESCRIPTION_DN, null, AttributeWizardType.DN);
+    }
+
+    public static BanAttribute fqan() {
+        return new BanAttribute(COMMAND_NAME_VALUES_FQAN, USAGE_FQAN, DESCRIPTION_FQAN, null, AttributeWizardType.FQAN);
     }
 
     @SuppressWarnings("static-access")

@@ -22,9 +22,9 @@ public class ListPAPPolicies extends PolicyManagementCLI {
     private boolean getPoliciesOneByOne = false;
     private String[] papAliasArray;
     private String[] papInfoArray;
-    private boolean xacmlOutput = false;
     private boolean showIds = false;
     private boolean showRulesId = false;
+    private boolean xacmlOutput = false;
 
     public ListPAPPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

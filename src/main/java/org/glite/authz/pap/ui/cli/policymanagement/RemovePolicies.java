@@ -9,12 +9,17 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class RemovePolicies extends PolicyManagementCLI {
     
-    private static final String USAGE = "<policyId> [[policyId] ...] [options]";
     private static final String[] commandNameValues = { "remove-policy", "rp" };
     private static final String DESCRIPTION = "Remove policies.";
+    private static final String USAGE = "<policyId> [[policyId] ...] [options]";
 
     public RemovePolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
+    }
+
+    @Override
+    protected Options defineCommandOptions() {
+        return null;
     }
 
     @Override
@@ -61,11 +66,6 @@ public class RemovePolicies extends PolicyManagementCLI {
         
         return ExitStatus.SUCCESS.ordinal();
         
-    }
-
-    @Override
-    protected Options defineCommandOptions() {
-        return null;
     }
 
 }

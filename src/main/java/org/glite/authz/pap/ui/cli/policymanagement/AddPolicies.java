@@ -17,67 +17,13 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 public class AddPolicies extends PolicyManagementCLI {
 
-	private static final String USAGE = "<file> [[file] ...] [options]";
 	private static final String[] commandNameValues = { "add-policies-from-file", "ap" };
 	private static final String DESCRIPTION = "Add policies defined in the given files.";
+	private static final String USAGE = "<file> [[file] ...] [options]";
 	private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
 
 	public AddPolicies() {
 		super(commandNameValues, USAGE, DESCRIPTION, null);
-	}
-
-	@Override
-	protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
-			RemoteException {
-		String[] args = commandLine.getArgs();
-
-		if (args.length < 2)
-			throw new ParseException("No input files defined.");
-
-		for (int i = 1; i < args.length; i++) {
-			File file = new File(args[i]);
-			if (!file.exists())
-				throw new ParseException("File not found: " + file.getAbsolutePath());
-		}
-
-		boolean partialSuccess = false;
-		boolean failure = false;
-
-		for (int i = 1; i < args.length; i++) {
-
-			String fileName = args[i];
-
-			try {
-
-				boolean result = addPolicies(fileName);
-
-				if (result == true) {
-					partialSuccess = true;
-
-					if (verboseMode) {
-						System.out.println("Success: policies has been added from file " + fileName);
-					}
-				} else {
-					System.out.println("Error addind policies from file " + fileName);
-					failure = true;
-				}
-
-			} catch (EncodingException e) {
-				failure = true;
-				System.out.println("Syntax error. Skipping file (no policies has been added):" + fileName);
-				System.out.println(e.getMessage());
-				continue;
-			}
-		}
-
-		if (failure && !partialSuccess)
-			return ExitStatus.FAILURE.ordinal();
-
-		if (failure && partialSuccess)
-			return ExitStatus.PARTIAL_SUCCESS.ordinal();
-
-		return ExitStatus.SUCCESS.ordinal();
-
 	}
 
 	private boolean addPolicies(String fileName) throws EncodingException, RemoteException {
@@ -146,5 +92,59 @@ public class AddPolicies extends PolicyManagementCLI {
 	@Override
 	protected Options defineCommandOptions() {
 		return null;
+	}
+
+	@Override
+	protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+			RemoteException {
+		String[] args = commandLine.getArgs();
+
+		if (args.length < 2)
+			throw new ParseException("No input files defined.");
+
+		for (int i = 1; i < args.length; i++) {
+			File file = new File(args[i]);
+			if (!file.exists())
+				throw new ParseException("File not found: " + file.getAbsolutePath());
+		}
+
+		boolean partialSuccess = false;
+		boolean failure = false;
+
+		for (int i = 1; i < args.length; i++) {
+
+			String fileName = args[i];
+
+			try {
+
+				boolean result = addPolicies(fileName);
+
+				if (result == true) {
+					partialSuccess = true;
+
+					if (verboseMode) {
+						System.out.println("Success: policies has been added from file " + fileName);
+					}
+				} else {
+					System.out.println("Error addind policies from file " + fileName);
+					failure = true;
+				}
+
+			} catch (EncodingException e) {
+				failure = true;
+				System.out.println("Syntax error. Skipping file (no policies has been added):" + fileName);
+				System.out.println(e.getMessage());
+				continue;
+			}
+		}
+
+		if (failure && !partialSuccess)
+			return ExitStatus.FAILURE.ordinal();
+
+		if (failure && partialSuccess)
+			return ExitStatus.PARTIAL_SUCCESS.ordinal();
+
+		return ExitStatus.SUCCESS.ordinal();
+
 	}
 }
