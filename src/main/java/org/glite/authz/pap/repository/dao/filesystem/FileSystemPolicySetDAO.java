@@ -21,8 +21,8 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 
     // TODO: maybe it's better to create different exception classes instead of
     // different exception messages
-    private static String policySetExceptionMsg(String policyId) {
-        return String.format("policyId=\"%s\"", policyId);
+    private static String policySetExceptionMsg(String policySetId) {
+        return String.format("policySetId=\"%s\"", policySetId);
     }
 
     private static String papDirNotFoundExceptionMsg(String papDirPAth) {

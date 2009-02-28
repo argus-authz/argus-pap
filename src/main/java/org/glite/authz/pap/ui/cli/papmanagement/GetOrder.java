@@ -8,9 +8,9 @@ import org.apache.commons.cli.ParseException;
 
 public class GetOrder extends PAPManagementCLI {
     
-    private static final String USAGE = "";
     private static final String[] commandNameValues = { "get-paps-order", "gpo" };
     private static final String DESCRIPTION = "Get the defined order of the remote PAPs";
+    private static final String USAGE = "";
     
     public GetOrder() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

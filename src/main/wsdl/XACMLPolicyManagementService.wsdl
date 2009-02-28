@@ -6,14 +6,14 @@
 	targetNamespace="http://org.glite.authz/wsdl/pap/services/xacml_policy_management"
 	xmlns:xsd1="urn:oasis:names:tc:xacml:2.0:policy:schema:os">
 	<wsdl:types>
-	    <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
-			<xsd:import
-				namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+			<xsd:import namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
 				schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd">
 			</xsd:import>
 		</xsd:schema>
 		<xsd:schema targetNamespace="urn:policy:xacml:opensaml:org">
-            <xsd:import schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd" namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"></xsd:import>
+			<xsd:import schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd"
+				namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"></xsd:import>
 			<xsd:complexType name="PolicyList">
 				<xsd:sequence>
 					<xsd:element name="policy" type="xsd1:PolicyType"
@@ -23,8 +23,8 @@
 			</xsd:complexType>
 			<xsd:complexType name="PolicySetList">
 				<xsd:sequence>
-					<xsd:element name="policySet"
-						type="xsd1:PolicySetType" maxOccurs="unbounded" minOccurs="0">
+					<xsd:element name="policySet" type="xsd1:PolicySetType"
+						maxOccurs="unbounded" minOccurs="0">
 					</xsd:element>
 				</xsd:sequence>
 			</xsd:complexType>
@@ -35,7 +35,7 @@
 		<wsdl:part name="policyId" type="xsd:string" />
 	</wsdl:message>
 	<wsdl:message name="getPolicyResponse">
-        <wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
+		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="getPolicySetRequest">
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
@@ -123,8 +123,8 @@
 	<wsdl:message name="getPAPPolicySetResponse">
 		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
-
 	<wsdl:message name="addPolicyRequest">
+		<wsdl:part name="index" type="xsd:int"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policyIdPrefix" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
@@ -132,12 +132,21 @@
 	<wsdl:message name="addPolicyResponse">
 		<wsdl:part name="addPolicyResponse" type="xsd:string"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="removePolicyAndReferencesRequest">
-		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	<wsdl:message name="removeObjectByIdAndReferencesRequest">
+		<wsdl:part name="id" type="xsd:string"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="removePolicyAndReferencesResponse">
-		<wsdl:part name="removePolicyAndReferencesResponse" type="xsd:boolean"></wsdl:part>
+	<wsdl:message name="removeObjectByIdAndReferencesResponse">
+		<wsdl:part name="removeObjectByIdAndReferencesResponse"
+			type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
+	<wsdl:message name="addPolicySetRequest">
+		<wsdl:part name="index" type="xsd:int"></wsdl:part>
+		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addPolicySetResponse">
+		<wsdl:part name="addPolicySetResponse" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+
 	<wsdl:portType name="XACMLPolicyManagement">
 		<wsdl:operation name="getPolicy">
 			<wsdl:input message="tns:getPolicyRequest" />
@@ -164,7 +173,7 @@
 			<wsdl:output message="tns:hasPolicySetResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="listPolicies">
-            <wsdl:input message="tns:listPoliciesRequest"></wsdl:input>
+			<wsdl:input message="tns:listPoliciesRequest"></wsdl:input>
 			<wsdl:output message="tns:listPoliciesResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="listPAPPolicies">
@@ -187,6 +196,10 @@
 			<wsdl:input message="tns:removePolicySetRequest"></wsdl:input>
 			<wsdl:output message="tns:removePolicySetResponse"></wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="removeObjectByIdAndReferences">
+			<wsdl:input message="tns:removeObjectByIdAndReferencesRequest"></wsdl:input>
+			<wsdl:output message="tns:removeObjectByIdAndReferencesResponse"></wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="storePolicy">
 			<wsdl:input message="tns:storePolicyRequest"></wsdl:input>
 			<wsdl:output message="tns:storePolicyResponse"></wsdl:output>
@@ -207,16 +220,16 @@
 			<wsdl:input message="tns:addPolicyRequest"></wsdl:input>
 			<wsdl:output message="tns:addPolicyResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="removePolicyAndReferences">
-			<wsdl:input message="tns:removePolicyAndReferencesRequest"></wsdl:input>
-			<wsdl:output message="tns:removePolicyAndReferencesResponse"></wsdl:output>
+		<wsdl:operation name="addPolicySet">
+			<wsdl:input message="tns:addPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:addPolicySetResponse"></wsdl:output>
 		</wsdl:operation>
 	</wsdl:portType>
 
 	<wsdl:binding name="XACMLPolicyManagementSOAP" type="tns:XACMLPolicyManagement">
 		<soap:binding style="rpc"
 			transport="http://schemas.xmlsoap.org/soap/http" />
-			
+
 		<wsdl:operation name="getPolicy">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPolicy" />
@@ -387,9 +400,19 @@
 				<soap:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="removePolicyAndReferences">
+		<wsdl:operation name="addPolicySet">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removePolicyAndReferences" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/addPolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removeObjectByIdAndReferences">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removeObjectByIdAndReferences" />
 			<wsdl:input>
 				<soap:body use="literal" />
 			</wsdl:input>

@@ -12,14 +12,31 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class RefreshCache extends PAPManagementCLI {
     
-    private static final String USAGE = "[papId] [[papId]...]";
     private static final String[] commandNameValues = { "refresh-cache", "rc" };
     private static final String DESCRIPTION = "Invalidates the local policy cache and retrieves policies " +
     		"from remote PAPs. The arguments identify the PAPs that will be contacted. If no arguments are " +
     		"given, all the trusted PAPs are contacted.";
+    private static final String USAGE = "[papId] [[papId]...]";
     
     public RefreshCache() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
+    }
+    
+    private List<String> getAllPAPIds() throws RemoteException {
+        List<String> papIdList = new LinkedList<String>();
+        
+        PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
+        
+        for (PAPData papData : papDataArray) {
+            papIdList.add(papData.getPapId());
+        }
+        
+        return papIdList;
+    }
+    
+    @Override
+    protected Options defineCommandOptions() {
+        return null;
     }
     
     @Override
@@ -52,23 +69,6 @@ public class RefreshCache extends PAPManagementCLI {
         
         return ExitStatus.SUCCESS.ordinal();
         
-    }
-    
-    @Override
-    protected Options defineCommandOptions() {
-        return null;
-    }
-    
-    private List<String> getAllPAPIds() throws RemoteException {
-        List<String> papIdList = new LinkedList<String>();
-        
-        PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
-        
-        for (PAPData papData : papDataArray) {
-            papIdList.add(papData.getPapId());
-        }
-        
-        return papIdList;
     }
     
 }

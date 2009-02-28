@@ -7,6 +7,8 @@ public class DescriptionTypeHelper extends XMLObjectHelper<DescriptionType> {
     private static final javax.xml.namespace.QName elementQName = DescriptionType.DEFAULT_ELEMENT_NAME;
     private static DescriptionTypeHelper instance = new DescriptionTypeHelper();
 
+    private DescriptionTypeHelper() {}
+
     public static DescriptionType build(String value) {
 
         DescriptionType description = (DescriptionType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
@@ -20,7 +22,5 @@ public class DescriptionTypeHelper extends XMLObjectHelper<DescriptionType> {
     public static DescriptionTypeHelper getInstance() {
         return instance;
     }
-
-    private DescriptionTypeHelper() {}
 
 }

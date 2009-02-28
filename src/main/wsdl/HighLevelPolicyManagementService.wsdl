@@ -26,56 +26,39 @@
 
 	<wsdl:message name="banDNRequest">
 		<wsdl:part name="dn" type="xsd:string" />
+		<wsdl:part name="resource" type="xsd:string"></wsdl:part>
+		<wsdl:part name="action" type="xsd:string"></wsdl:part>
 		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
-		<wsdl:part name="description" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="banDNResponse">
 		<wsdl:part name="policyId" type="xsd:string" />
 	</wsdl:message>
-
 	<wsdl:message name="banFQANRequest">
 		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
+		<wsdl:part name="resource" type="xsd:string"></wsdl:part>
+		<wsdl:part name="action" type="xsd:string"></wsdl:part>
 		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
-		<wsdl:part name="description" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="banFQANResponse">
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
-
 	<wsdl:message name="unbanDNRequest">
 		<wsdl:part name="dn" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="unbanDNResponse">
-        <wsdl:part name="unbanResult" type="tns:UnbanResult"></wsdl:part>
+		<wsdl:part name="unbanResult" type="tns:UnbanResult"></wsdl:part>
 	</wsdl:message>
-
 	<wsdl:message name="unbanFQANRequest">
 		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="unbanFQANResponse">
 		<wsdl:part name="unbanresult" type="tns:UnbanResult"></wsdl:part>
 	</wsdl:message>
-
-	<wsdl:message name="dnJobPriorityRequest">
-		<wsdl:part name="dn" type="xsd:string"></wsdl:part>
-		<wsdl:part name="serviceClass" type="xsd:string"></wsdl:part>
-		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
-		<wsdl:part name="description" type="xsd:string"></wsdl:part>
+	<wsdl:message name="eraseRepositoryRequest">
 	</wsdl:message>
-	<wsdl:message name="dnJobPriorityResponse">
-		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	<wsdl:message name="eraseRepositoryResponse">
 	</wsdl:message>
 
-	<wsdl:message name="fqanJobPriorityRequest">
-		<wsdl:part name="fqan" type="xsd:string"></wsdl:part>
-		<wsdl:part name="serviceClass" type="xsd:string"></wsdl:part>
-		<wsdl:part name="isPublic" type="xsd:boolean"></wsdl:part>
-		<wsdl:part name="description" type="xsd:string"></wsdl:part>
-	</wsdl:message>
-	<wsdl:message name="fqanJobPriorityResponse">
-		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
-	</wsdl:message>
-	
 	<wsdl:portType name="HighLevelPolicyManagement">
 		<wsdl:operation name="banDN">
 			<wsdl:input message="tns:banDNRequest" />
@@ -93,13 +76,9 @@
 			<wsdl:input message="tns:unbanFQANRequest"></wsdl:input>
 			<wsdl:output message="tns:unbanFQANResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="dnJobPriority">
-			<wsdl:input message="tns:dnJobPriorityRequest"></wsdl:input>
-			<wsdl:output message="tns:dnJobPriorityResponse"></wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="fqanJobPriority">
-			<wsdl:input message="tns:fqanJobPriorityRequest"></wsdl:input>
-			<wsdl:output message="tns:fqanJobPriorityResponse"></wsdl:output>
+		<wsdl:operation name="eraseRepository">
+			<wsdl:input message="tns:eraseRepositoryRequest"></wsdl:input>
+			<wsdl:output message="tns:eraseRepositoryResponse"></wsdl:output>
 		</wsdl:operation>
 	</wsdl:portType>
 
@@ -121,7 +100,6 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-
 		<wsdl:operation name="banFQAN">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/banFQAN" />
@@ -136,7 +114,6 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-
 		<wsdl:operation name="unbanDN">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/unbanDN" />
@@ -151,7 +128,6 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		
 		<wsdl:operation name="unbanFQAN">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/unbanFQAN" />
@@ -166,10 +142,9 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		
-		<wsdl:operation name="dnJobPriority">
+		<wsdl:operation name="eraseRepository">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/dnJobPriority" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/eraseRepository" />
 			<wsdl:input>
 				<soap:body
 					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
@@ -181,21 +156,7 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		
-		<wsdl:operation name="fqanJobPriority">
-			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/fqanJobPriority" />
-			<wsdl:input>
-				<soap:body
-					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
-					use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body
-					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
-					use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
+
 
 	</wsdl:binding>
 

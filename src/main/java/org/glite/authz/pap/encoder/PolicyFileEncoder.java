@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.File;
 import java.lang.String;
 
+import org.glite.authz.pap.common.xacml.wizard.*;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import java.util.List;
@@ -33,7 +34,7 @@ public class PolicyFileEncoder {
         }
     }
 
-    private List<XACMLObject> doParse() throws EncodingException {
+    private List<XACMLWizard> doParse() throws EncodingException {
         try {
             return parser.Text();
         }
@@ -42,17 +43,17 @@ public class PolicyFileEncoder {
         }
     }
 
-    public  List<XACMLObject> parse(InputStream stream) throws EncodingException {
+    public  List<XACMLWizard> parse(InputStream stream) throws EncodingException {
         init(stream);
         return doParse();
     }
 
-    public  List<XACMLObject> parse(String text) throws EncodingException {
+    public  List<XACMLWizard> parse(String text) throws EncodingException {
         init(new ByteArrayInputStream(text.getBytes()));
         return doParse();
     }
 
-    public  List<XACMLObject> parse(File file) throws EncodingException {
+    public  List<XACMLWizard> parse(File file) throws EncodingException {
         try {
             init(new FileInputStream(file));
         } catch (FileNotFoundException e) {
@@ -61,52 +62,41 @@ public class PolicyFileEncoder {
         return doParse();
     }
 
-    private static void print(PolicySetType set) {
-        System.out.println("-----------------");
-        System.out.println("SET: " + PolicySetHelper.getInstance().toString(set));
-        
-    }
+//     private static void print(PolicySetWizard setw) {
+//         System.out.println(setw.toFormattedString(false));
+//     }
 
-    private static void print(PolicyType policy) {
-        System.out.println("-----------------");
-        System.out.println("POLICY: " + PolicyHelper.getInstance().toString(policy));
-    }
+//     public static void main(String[] args) {
+//         try{
+//             DefaultBootstrap.bootstrap();
+//             //            XMLConfigurator xmlConfigurator = new XMLConfigurator();
+//             //            xmlConfigurator.load( Configuration.class.getResourceAsStream( "/opensaml_bugfix.xml" ) ); 
+//         }
+//         catch (ConfigurationException e) {
+//             System.out.println(e.toString());
+//             return;
+//         }
+//         PolicyFileEncoder encoder = new PolicyFileEncoder();
 
-    public static void main(String[] args) {
-        try{
-            DefaultBootstrap.bootstrap();
-            XMLConfigurator xmlConfigurator = new XMLConfigurator();
-            xmlConfigurator.load( Configuration.class.getResourceAsStream( "/opensaml_bugfix.xml" ) ); 
-        }
-        catch (ConfigurationException e) {
-            System.out.println(e.toString());
-            return;
-        }
-        PolicyFileEncoder encoder = new PolicyFileEncoder();
+//         try {
+//             if (args.length > 0) {
+//                 int i = 0;
+//                 while (i < args.length) {
+//                     System.out.println("Try " + args[i]);
+//                     File f = new File(args[i++]);
+//                     List<PolicySetWizard> list = encoder.parse(f);
 
-        try {
-            if (args.length > 0) {
-                int i = 0;
-                while (i < args.length) {
-                    File f = new File(args[i++]);
-                    List<XACMLObject> list = encoder.parse(f);
-
-                    for (XACMLObject xacml: list) {
-                        System.out.println(xacml.getClass().getName());
-                        if (xacml instanceof org.opensaml.xacml.policy.PolicySetType) {
-                            print((org.opensaml.xacml.policy.PolicySetType)xacml);
-                        }
-                        else if (xacml instanceof org.opensaml.xacml.policy.PolicyType) {
-                            print((org.opensaml.xacml.policy.PolicyType)xacml);
-                        }
-                    }
-                }
-            }
-            else
-                System.out.println(encoder.parse(System.in));
-        }
-        catch (EncodingException e) {
-            System.out.println(e.toString());
-        }
-    }
+//                     for (PolicySetWizard xacml: list) {
+//                         System.out.println(xacml.getClass().getName());
+//                         print(xacml);
+//                     }
+//                 }
+//             }
+//             else
+//                 System.out.println(encoder.parse(System.in));
+//         }
+//         catch (EncodingException e) {
+//             System.out.println(e.toString());
+//         }
+//     }
 }

@@ -7,6 +7,8 @@ public class FunctionHelper extends XMLObjectHelper<FunctionType> {
     private static final javax.xml.namespace.QName elementQName = FunctionType.DEFAULT_ELEMENT_NAME;
     private static FunctionHelper instance = new FunctionHelper();
 
+    private FunctionHelper() {}
+
     public static FunctionType build(String functionId) {
         
         FunctionType function = (FunctionType) builderFactory.getBuilder(
@@ -20,7 +22,5 @@ public class FunctionHelper extends XMLObjectHelper<FunctionType> {
     public static FunctionHelper getInstance() {
         return instance;
     }
-
-    private FunctionHelper() {}
 
 }

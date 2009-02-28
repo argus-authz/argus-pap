@@ -3,31 +3,31 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
+import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicyType;
 
 public class AddPolicyOperation extends BasePAPOperation<String> {
 
-    String policySetId;
-    String policyIdPrefix;
+	int index;
     PolicyType policy;
+    String policyIdPrefix;
+    String policySetId;
 
-    protected AddPolicyOperation(String policySetId, String policyIdPrefix, PolicyType policy) {
-
+    protected AddPolicyOperation(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
+    	this.index = index;
         this.policySetId = policySetId;
         this.policyIdPrefix = policyIdPrefix;
         this.policy = policy;
     }
 
-    public static AddPolicyOperation instance(String policySetId, String policyIdPrefix, PolicyType policy) {
-        return new AddPolicyOperation(policySetId, policyIdPrefix, policy);
+    public static AddPolicyOperation instance(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
+        return new AddPolicyOperation(index, policySetId, policyIdPrefix, policy);
     }
 
     protected String doExecute() {
 
-        String policyId = null;
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
@@ -35,11 +35,12 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
             log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));
             return null;
         }
-
-        policyId = PolicyWizard.generateId(policyIdPrefix);
+        
+        String policyId = WizardUtils.generateId(policyIdPrefix);
+        
         policy.setPolicyId(policyId);
 
-        localPAP.addPolicy(policySetId, policy);
+        localPAP.addPolicy(index, policySetId, policy);
         
         log.info(String.format("Added policy (policyId=\"%s\")", policyId));
 
