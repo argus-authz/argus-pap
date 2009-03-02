@@ -17,277 +17,277 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemPolicyDAO implements PolicyDAO {
 
-	private static final Map<String, Map<String, PolicyType>> cache = new ConcurrentHashMap<String, Map<String, PolicyType>>();
-	private static final String FILE_EXT = FileSystemRepositoryManager.getFileNameExt();
-	private static FileSystemPolicyDAO instance = null;
-	@SuppressWarnings("unused")
-	private static final Logger log = LoggerFactory.getLogger(FileSystemPolicyDAO.class);
-	private static final String POLICY_FILE_NAME_PREFIX = FileSystemRepositoryManager
-			.getPolicyFileNamePrefix();
-	private static final PolicyHelper policyHelper = PolicyHelper.getInstance();
+    private static final Map<String, Map<String, PolicyType>> cache = new ConcurrentHashMap<String, Map<String, PolicyType>>();
+    private static final String FILE_EXT = FileSystemRepositoryManager.getFileNameExt();
+    private static FileSystemPolicyDAO instance = null;
+    @SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(FileSystemPolicyDAO.class);
+    private static final String POLICY_FILE_NAME_PREFIX = FileSystemRepositoryManager.getPolicyFileNamePrefix();
+    private static final PolicyHelper policyHelper = PolicyHelper.getInstance();
 
-	private FileSystemPolicyDAO() {}
+    private FileSystemPolicyDAO() {}
 
-	public static FileSystemPolicyDAO getInstance() {
-		if (instance == null) {
-			instance = new FileSystemPolicyDAO();
-		}
-		return instance;
-	}
+    public static FileSystemPolicyDAO getInstance() {
+        if (instance == null) {
+            instance = new FileSystemPolicyDAO();
+        }
+        return instance;
+    }
 
-	private static String getPolicyFileAbsolutePath(String papId, String policyId) {
-		return FileSystemRepositoryManager.getPAPDirAbsolutePath(papId) + getPolicyFileName(policyId);
-	}
+    private static String getPolicyFileAbsolutePath(String papId, String policyId) {
+        return FileSystemRepositoryManager.getPAPDirAbsolutePath(papId) + getPolicyFileName(policyId);
+    }
 
-	private static String getPolicyFileName(String policyId) {
-		return POLICY_FILE_NAME_PREFIX + policyId + FILE_EXT;
-	}
+    private static String getPolicyFileName(String policyId) {
+        return POLICY_FILE_NAME_PREFIX + policyId + FILE_EXT;
+    }
 
-	private static String getPolicyIdFromFileName(String fileName) {
-		int start = POLICY_FILE_NAME_PREFIX.length();
-		int end = fileName.length() - FILE_EXT.length();
-		return fileName.substring(start, end);
-	}
+    private static String getPolicyIdFromFileName(String fileName) {
+        int start = POLICY_FILE_NAME_PREFIX.length();
+        int end = fileName.length() - FILE_EXT.length();
+        return fileName.substring(start, end);
+    }
 
-	private static String papDirNotFoundExceptionMsg(String papDirPAth) {
-		return "Not found PAP directory: " + papDirPAth;
-	}
+    private static String papDirNotFoundExceptionMsg(String papDirPAth) {
+        return "Not found PAP directory: " + papDirPAth;
+    }
 
-	// TODO: maybe it's better to create different exception classes instead of
-	// different exception messages
-	private static String policyExceptionMsg(String policyId) {
-		return String.format("policyId=\"%s\"", policyId);
-	}
+    // TODO: maybe it's better to create different exception classes instead of
+    // different exception messages
+    private static String policyExceptionMsg(String policyId) {
+        return String.format("policyId=\"%s\"", policyId);
+    }
 
-	private static String policyNotFoundExceptionMsg(String policyId) {
-		String msg = "Not found: " + policyExceptionMsg(policyId);
-		return msg;
-	}
+    private static String policyNotFoundExceptionMsg(String policyId) {
+        String msg = "Not found: " + policyExceptionMsg(policyId);
+        return msg;
+    }
 
-	public synchronized void delete(String papId, String policyId) {
+    public synchronized void delete(String papId, String policyId) {
 
-		Map<String, PolicyType> papCache = cache.get(papId);
+        Map<String, PolicyType> papCache = cache.get(papId);
 
-		if (papCache != null) {
-			papCache.remove(policyId);
-		}
+        if (papCache != null) {
+            papCache.remove(policyId);
+        }
 
-		String policyFileName = getPolicyFileAbsolutePath(papId, policyId);
+        String policyFileName = getPolicyFileAbsolutePath(papId, policyId);
 
-		if (exists(papId, policyId)) {
+        if (exists(papId, policyId)) {
 
-			File policyFile = new File(policyFileName);
+            File policyFile = new File(policyFileName);
 
-			if (papCache.size() == 0) {
-				cache.remove(papId);
-			}
+            if (papCache.size() == 0) {
+                cache.remove(papId);
+            }
 
-			if (!policyFile.delete()) {
-				throw new RepositoryException("Cannot delete file: " + policyFile.getAbsolutePath());
-			}
+            if (!policyFile.delete()) {
+                throw new RepositoryException("Cannot delete file: " + policyFile.getAbsolutePath());
+            }
 
-		} else {
-			throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
-		}
-	}
+        } else {
+            throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
+        }
+    }
 
-	public synchronized int deleteAll(String papId) {
+    public synchronized int deleteAll(String papId) {
 
-		Map<String, PolicyType> papCache = cache.get(papId);
+        Map<String, PolicyType> papCache = cache.get(papId);
 
-		if (papCache != null) {
-			papCache.clear();
-			cache.remove(papId);
-		}
+        if (papCache != null) {
+            papCache.clear();
+            cache.remove(papId);
+        }
 
-		String papDirAbsolutePath = FileSystemRepositoryManager.getPAPDirAbsolutePath(papId);
+        String papDirAbsolutePath = FileSystemRepositoryManager.getPAPDirAbsolutePath(papId);
 
-		File papDir = new File(papDirAbsolutePath);
+        File papDir = new File(papDirAbsolutePath);
 
-		if (!papDir.exists()) {
-			throw new RepositoryException(papDirNotFoundExceptionMsg(papDirAbsolutePath));
-		}
+        if (!papDir.exists()) {
+            throw new RepositoryException(papDirNotFoundExceptionMsg(papDirAbsolutePath));
+        }
 
-		int numOfDeletedPolicies = 0;
+        int numOfDeletedPolicies = 0;
 
-		for (File file : papDir.listFiles()) {
+        for (File file : papDir.listFiles()) {
 
-			if (file.isDirectory()) {
-				continue;
-			}
+            if (file.isDirectory()) {
+                continue;
+            }
 
-			String fileName = file.getName();
-			if (fileName.startsWith(POLICY_FILE_NAME_PREFIX)) {
-				file.delete();
-				numOfDeletedPolicies++;
-			}
-		}
+            String fileName = file.getName();
+            if (fileName.startsWith(POLICY_FILE_NAME_PREFIX)) {
+                file.delete();
+                numOfDeletedPolicies++;
+            }
+        }
 
-		return numOfDeletedPolicies;
-	}
+        return numOfDeletedPolicies;
+    }
 
-	public boolean exists(String papId, String policyId) {
+    public boolean exists(String papId, String policyId) {
 
-		String policyFilePath = getPolicyFileAbsolutePath(papId, policyId);
+        String policyFilePath = getPolicyFileAbsolutePath(papId, policyId);
 
-		File policyFile = new File(policyFilePath);
+        File policyFile = new File(policyFilePath);
 
-		return policyFile.exists();
-	}
+        return policyFile.exists();
+    }
 
-	public List<PolicyType> getAll(String papId) {
+    public List<PolicyType> getAll(String papId) {
 
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
-		if (!papDir.exists()) {
-			throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
-		}
+        if (!papDir.exists()) {
+            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+        }
 
-		Map<String, PolicyType> papCache = getPAPCache(papId);
+        Map<String, PolicyType> papCache = getPAPCache(papId);
 
-		List<PolicyType> policyList = new LinkedList<PolicyType>();
+        List<PolicyType> policyList = new LinkedList<PolicyType>();
 
-		for (File file : papDir.listFiles()) {
+        for (File file : papDir.listFiles()) {
 
-			if (file.isDirectory()) {
-				continue;
-			}
+            if (file.isDirectory()) {
+                continue;
+            }
 
-			String fileName = file.getName();
+            String fileName = file.getName();
 
-			if (fileName.startsWith(POLICY_FILE_NAME_PREFIX)) {
+            if (fileName.startsWith(POLICY_FILE_NAME_PREFIX)) {
 
-				String policyId = getPolicyIdFromFileName(fileName);
-				PolicyType policy = papCache.get(policyId);
+                String policyId = getPolicyIdFromFileName(fileName);
+                PolicyType policy = papCache.get(policyId);
 
-				if (policy == null) {
-//					synchronized (this) {
-						policy = policyHelper.buildFromFile(file);
-//					}
-					papCache.put(policyId, policy);
-				}
-				policyList.add(policy);
-			}
-		}
-		return policyList;
-	}
-	
-	public PolicyType getById(String papId, String policyId) {
+                if (policy == null) {
+                    try {
+                        policy = policyHelper.buildFromFile(file);
+                    } catch (Throwable e) {
+                        throw new RepositoryException(e);
+                    }
+                    papCache.put(policyId, policy);
+                }
+                policyList.add(policy);
+            }
+        }
+        return policyList;
+    }
 
-		Map<String, PolicyType> papCache = getPAPCache(papId);
+    public PolicyType getById(String papId, String policyId) {
 
-		PolicyType policy = papCache.get(policyId);
-		
-		if (policy == null) {
+        Map<String, PolicyType> papCache = getPAPCache(papId);
 
-			File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
+        PolicyType policy = papCache.get(policyId);
 
-			if (!policyFile.exists()) {
-				if (papCache.size() == 0) {
-					cache.remove(papId);
-				}
-				throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
-			}
+        if (policy == null) {
 
-			try {
-//				synchronized (this) {
-					policy = policyHelper.buildFromFile(policyFile);
-//				}
-			} catch (Throwable e) {
-				throw new RepositoryException(e);
-			}
+            File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
 
-			papCache.put(policyId, policy);
-		}
+            if (!policyFile.exists()) {
+                if (papCache.size() == 0) {
+                    cache.remove(papId);
+                }
+                throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
+            }
 
-		// Return a clone of the object
-		return PolicyHelper.getInstance().clone(policy);
-	}
+            try {
+                policy = policyHelper.buildFromFile(policyFile);
+            } catch (Throwable e) {
+                throw new RepositoryException(e);
+            }
 
-	public int getNumberOfPolicies(String papId) {
+            papCache.put(policyId, policy);
+        }
 
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        // Return a clone of the object
+        return PolicyHelper.getInstance().clone(policy);
+    }
 
-		if (!papDir.exists()) {
-			return 0;
-		}
+    public int getNumberOfPolicies(String papId) {
 
-		int numOfPolicies = 0;
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
-		for (File file : papDir.listFiles()) {
+        if (!papDir.exists()) {
+            return 0;
+        }
 
-			if (file.isDirectory()) {
-				continue;
-			}
+        int numOfPolicies = 0;
 
-			if (file.getName().startsWith(POLICY_FILE_NAME_PREFIX)) {
-				numOfPolicies++;
-			}
-		}
-		return numOfPolicies;
-	}
+        for (File file : papDir.listFiles()) {
 
-	public synchronized void store(String papId, PolicyType policy) {
+            if (file.isDirectory()) {
+                continue;
+            }
 
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+            if (file.getName().startsWith(POLICY_FILE_NAME_PREFIX)) {
+                numOfPolicies++;
+            }
+        }
+        return numOfPolicies;
+    }
 
-		if (!papDir.exists()) {
-			throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
-		}
+    public synchronized void store(String papId, PolicyType policy) {
 
-		String policyId = policy.getPolicyId();
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
-		if (exists(papId, policyId)) {
-			throw new AlreadyExistsException("Already exists: policyId=" + policyId);
-		}
+        if (!papDir.exists()) {
+            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+        }
 
-		String policyFileName = getPolicyFileAbsolutePath(papId, policyId);
+        String policyId = policy.getPolicyId();
 
-		PolicyHelper.toFile(policyFileName, policy);
+        if (exists(papId, policyId)) {
+            throw new AlreadyExistsException("Already exists: policyId=" + policyId);
+        }
 
-		Map<String, PolicyType> papCache = getPAPCache(papId);
-		papCache.put(policyId, policy);
-	}
+        String policyFileName = getPolicyFileAbsolutePath(papId, policyId);
 
-	public synchronized void update(String papId, String policyVersion, PolicyType newPolicy) {
+        PolicyHelper.toFile(policyFileName, policy);
 
-		String policyId = newPolicy.getPolicyId();
+        Map<String, PolicyType> papCache = getPAPCache(papId);
+        papCache.put(policyId, policy);
+    }
 
-		File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
-		if (!policyFile.exists()) {
-			throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
-		}
+    public synchronized void update(String papId, String policyVersion, PolicyType newPolicy) {
 
-		Map<String, PolicyType> papCache = getPAPCache(papId);
-		PolicyType oldPolicy = papCache.get(policyId);
+        String policyId = newPolicy.getPolicyId();
 
-		if (oldPolicy == null) {
-			try {
-				oldPolicy = policyHelper.buildFromFile(policyFile);
-			} catch (Throwable e) {
-				throw new RepositoryException(e);
-			}
-		}
+        File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
+        if (!policyFile.exists()) {
+            throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
+        }
 
-		if (!(oldPolicy.getVersion().equals(policyVersion))) {
-			throw new RepositoryException(
-					String.format(
-								"Attempting to update the wrong version of PolicyId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
-								policyId, policyVersion, oldPolicy.getVersion()));
-		}
+        Map<String, PolicyType> papCache = getPAPCache(papId);
+        PolicyType oldPolicy = papCache.get(policyId);
 
-		PolicyHelper.toFile(policyFile, newPolicy);
+        if (oldPolicy == null) {
+            try {
+                oldPolicy = policyHelper.buildFromFile(policyFile);
+            } catch (Throwable e) {
+                throw new RepositoryException(e);
+            }
+        }
 
-		papCache.put(policyId, newPolicy);
-	}
+        if (!(oldPolicy.getVersion().equals(policyVersion))) {
+            throw new RepositoryException(
+                String.format("Attempting to update the wrong version of PolicyId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
+                              policyId,
+                              policyVersion,
+                              oldPolicy.getVersion()));
+        }
 
-	private Map<String, PolicyType> getPAPCache(String papId) {
-		Map<String, PolicyType> papCache = cache.get(papId);
+        PolicyHelper.toFile(policyFile, newPolicy);
 
-		if (papCache == null) {
-			papCache = new ConcurrentHashMap<String, PolicyType>();
-			cache.put(papId, papCache);
-		}
-		return papCache;
-	}
+        papCache.put(policyId, newPolicy);
+    }
+
+    private Map<String, PolicyType> getPAPCache(String papId) {
+        Map<String, PolicyType> papCache = cache.get(papId);
+
+        if (papCache == null) {
+            papCache = new ConcurrentHashMap<String, PolicyType>();
+            cache.put(papId, papCache);
+        }
+        return papCache;
+    }
 }
