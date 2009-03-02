@@ -22,6 +22,6 @@ public interface PolicyDAO {
 
     public void store(String papId, PolicyType policy);
 
-    public void update(String papId, PolicyType policy);
+    public void update(String papId, String policyVersion, PolicyType policy);
 
 }

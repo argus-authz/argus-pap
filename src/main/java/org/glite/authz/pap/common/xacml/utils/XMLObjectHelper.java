@@ -1,5 +1,6 @@
 package org.glite.authz.pap.common.xacml.utils;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -33,129 +34,155 @@ import org.w3c.dom.Element;
 
 public class XMLObjectHelper<T extends XMLObject> {
 
-    protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
-    protected static final MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
-    protected static final BasicParserPool ppMgr = new BasicParserPool();
-    protected static final UnmarshallerFactory unmarshallerFactory = Configuration
-            .getUnmarshallerFactory();
+	protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+	//protected static final MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
+	protected static final BasicParserPool ppMgr = new BasicParserPool();
+	//protected static final UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+	private static final Object lock = new Object();
 
-    static {
-        ppMgr.setNamespaceAware(true);
-    }
+	static {
+		ppMgr.setNamespaceAware(true);
+	}
 
-    protected XMLObjectHelper() {}
-    
-    public static XMLObject buildXMLObject(Element element) {
-        Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
-        XMLObject xmlObject;
+	protected XMLObjectHelper() {}
 
-        try {
-            xmlObject = unmarshaller.unmarshall(element);
-        } catch (UnmarshallingException e) {
-            throw new XMLObjectException(e);
-        }
+	public static XMLObject buildXMLObject(Element element) {
+		XMLObject xmlObject;
 
-        return xmlObject;
-    }
+		try {
+			xmlObject = unmarshall(element);
+		} catch (UnmarshallingException e) {
+			throw new XMLObjectException(e);
+		}
+		return xmlObject;
+	}
 
-    public static XMLObject buildXMLObject(InputStream inputStream) {
-        Document doc = readDocument(inputStream);
-        return buildXMLObject(doc.getDocumentElement());
-    }
-    
-    public static XMLObject buildXMLObjectFromFile(File file) {
-        Document doc = readDocument(file);
-        return buildXMLObject(doc.getDocumentElement());
-    }
+	public static XMLObject buildXMLObject(InputStream inputStream) {
+		Document doc = readDocument(inputStream);
+		return buildXMLObject(doc.getDocumentElement());
+	}
 
-    public static XMLObject buildXMLObjectFromFile(String fileName) {
-        return buildXMLObjectFromFile(new File(fileName));
-    }
+	public static XMLObject buildXMLObjectFromFile(File file) {
+		Document doc = readDocument(file);
+		return buildXMLObject(doc.getDocumentElement());
+	}
 
-    public static Element getDOM(XMLObject xmlObject) {
-        Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
+	public static XMLObject buildXMLObjectFromFile(String fileName) {
+		return buildXMLObjectFromFile(new File(fileName));
+	}
 
-        try {
-            marshaller.marshall(xmlObject);
-        } catch (MarshallingException e) {
-            throw new XMLObjectException(e);
-        }
+	public static Element getDOM(XMLObject xmlObject) {
+		Element element;
 
-        return xmlObject.getDOM();
-    }
+		try {
+			element = marshall(xmlObject);
+		} catch (MarshallingException e) {
+			throw new XMLObjectException(e);
+		}
 
-    public static void toFile(File file, XMLObject xmlObject) {
-        FileOutputStream fos;
+		return element;
+	}
 
-        try {
-            fos = new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            throw new XMLObjectException("Cannot write to file: " + file.getAbsolutePath(), e);
-        }
+	public static Element marshall(XMLObject xmlObject) throws MarshallingException {
+		Element element;
+		synchronized (lock) {
+			MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
+			Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
+			element = marshaller.marshall(xmlObject);
+		}
+		return element;
+	}
 
-        write(fos, xmlObject);
-    }
+	public static XMLObject unmarshall(Element element) throws UnmarshallingException {
+		XMLObject xmlObject;
+		synchronized (lock) {
+			UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+			Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
+			xmlObject = unmarshaller.unmarshall(element);
+		}
+		return xmlObject;
+	}
 
-    public static void toFile(String fileName, XMLObject xmlObject) {
-        File file = new File(fileName);
-        toFile(file, xmlObject);
-    }
+	public static void toFile(File file, XMLObject xmlObject) {
+		FileOutputStream fos;
 
-    public static String toString(XMLObject xmlObject) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        write(bos, xmlObject);
-        return bos.toString();
-    }
+		try {
+			fos = new FileOutputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new XMLObjectException("Cannot write to file: " + file.getAbsolutePath(), e);
+		}
 
-    public static void write(OutputStream outputStream, XMLObject xmlObject) {
-        try {
-            Transformer tr = TransformerFactory.newInstance().newTransformer();
-            tr.setOutputProperty(OutputKeys.INDENT, "yes");
-            tr.setOutputProperty(OutputKeys.METHOD, "xml");
-            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
-            tr.transform(new DOMSource(getDOM(xmlObject)), new StreamResult(outputStream));
-        } catch (TransformerConfigurationException e) {
-            throw new XMLObjectException(e);
-        } catch (TransformerException e) {
-            throw new XMLObjectException(e);
-        }
-    }
-    
-    private static Document readDocument(File file) {
-        FileInputStream fileInputStream;
-        try {
-            fileInputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            throw new XMLObjectException("File not found: " + file.getAbsolutePath(), e);
-        }
-        
-        return readDocument(fileInputStream);
-    }
+		write(fos, xmlObject);
+	}
 
-    private static Document readDocument(InputStream inputStream) {
-        Document doc;
-        try {
-            doc = ppMgr.parse(inputStream);
-        } catch (XMLParserException e) {
-            throw new XMLObjectException(e);
-        }
+	public static void toFile(String fileName, XMLObject xmlObject) {
+		File file = new File(fileName);
+		toFile(file, xmlObject);
+	}
 
-        return doc;
-    }
+	public static String toString(XMLObject xmlObject) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		write(bos, xmlObject);
+		return bos.toString();
+	}
 
-    @SuppressWarnings("unchecked")
-    public T build(Element element) {
-        T xmlObject = (T) buildXMLObject(element);
-        return xmlObject;
-    }
+	public static void write(OutputStream outputStream, XMLObject xmlObject) {
+		try {
+			Transformer tr = TransformerFactory.newInstance().newTransformer();
+			tr.setOutputProperty(OutputKeys.INDENT, "yes");
+			tr.setOutputProperty(OutputKeys.METHOD, "xml");
+			tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+			tr.transform(new DOMSource(getDOM(xmlObject)), new StreamResult(outputStream));
+		} catch (TransformerConfigurationException e) {
+			throw new XMLObjectException(e);
+		} catch (TransformerException e) {
+			throw new XMLObjectException(e);
+		}
+	}
 
-    public T buildFromFile(File file) {
-        Document doc = readDocument(file);
-        return build(doc.getDocumentElement());
-    }
+	private static Document readDocument(File file) {
+		FileInputStream fileInputStream;
+		try {
+			fileInputStream = new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new XMLObjectException("File not found: " + file.getAbsolutePath(), e);
+		}
 
-    public T buildFromFile(String fileName) {
-        File file = new File(fileName);
-        return buildFromFile(file);
-    }
+		return readDocument(fileInputStream);
+	}
+
+	private static Document readDocument(InputStream inputStream) {
+		Document doc;
+		try {
+			doc = ppMgr.parse(inputStream);
+		} catch (XMLParserException e) {
+			throw new XMLObjectException(e);
+		}
+
+		return doc;
+	}
+
+	@SuppressWarnings("unchecked")
+	public T build(Element element) {
+		T xmlObject = (T) buildXMLObject(element);
+		return xmlObject;
+	}
+
+	public T buildFromFile(File file) {
+		Document doc = readDocument(file);
+		return build(doc.getDocumentElement());
+	}
+
+	public T buildFromFile(String fileName) {
+		File file = new File(fileName);
+		return buildFromFile(file);
+	}
+
+	public T clone(T xmlObject) {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		write(bos, xmlObject);
+		ByteArrayInputStream ios = new ByteArrayInputStream(bos.toByteArray());
+		Document doc = readDocument(ios);
+		return build(doc.getDocumentElement());
+	}
 }

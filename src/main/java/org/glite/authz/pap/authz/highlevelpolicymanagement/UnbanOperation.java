@@ -73,7 +73,9 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
                     if (policyWizard.getNumberOfRules() == 0) {
                         localPAP.removePolicyAndReferences(policyId);
                     } else {
-                        localPAP.updatePolicy(policyWizard.getXACML());
+                    	String oldVersion = policyWizard.getVersionString();
+                    	policyWizard.increaseVersion();
+                        localPAP.updatePolicy(oldVersion, policyWizard.getXACML());
                     }
                     
                     unbanResult.setStatusCode(0);

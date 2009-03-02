@@ -27,14 +27,14 @@ public class PolicyWizard extends XACMLWizard {
     private static final String VISIBILITY_PRIVATE_PREFIX = "PRIVATE";
     private static final String VISIBILITY_PUBLIC_PREFIX = "PUBLIC";
 
-    private boolean isPrivate = false;
-    private String policyIdUniqueNumber;
-    private String policyIdVisibilityPrefix;
     protected final String actionValue;
-
     protected final PolicyType policy;
     protected final List<RuleWizard> ruleWizardList = new LinkedList<RuleWizard>();
     protected final TargetWizard targetWizard;
+
+    private boolean isPrivate = false;
+    private String policyIdUniqueNumber;
+    private String policyIdVisibilityPrefix;
 
     public PolicyWizard(AttributeWizard attributeWizard) {
 
@@ -203,6 +203,10 @@ public class PolicyWizard extends XACMLWizard {
 
     public int getVersion() {
         return Integer.valueOf(policy.getVersion());
+    }
+    
+    public String getVersionString() {
+        return policy.getVersion();
     }
 
     public PolicyType getXACML() {

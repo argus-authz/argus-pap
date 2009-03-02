@@ -98,12 +98,14 @@
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePolicyRequest">
+		<wsdl:part name="version" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePolicyResponse">
 		<wsdl:part name="updatePolicyResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePolicySetRequest">
+		<wsdl:part name="version" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePolicySetResponse">
@@ -148,6 +150,14 @@
 	</wsdl:message>
 
 	<wsdl:portType name="XACMLPolicyManagement">
+		<wsdl:operation name="addPolicy">
+			<wsdl:input message="tns:addPolicyRequest"></wsdl:input>
+			<wsdl:output message="tns:addPolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addPolicySet">
+			<wsdl:input message="tns:addPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:addPolicySetResponse"></wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="getPolicy">
 			<wsdl:input message="tns:getPolicyRequest" />
 			<wsdl:output message="tns:getPolicyResponse" />
@@ -215,14 +225,6 @@
 		<wsdl:operation name="updatePolicySet">
 			<wsdl:input message="tns:updatePolicySetRequest"></wsdl:input>
 			<wsdl:output message="tns:updatePolicySetResponse"></wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="addPolicy">
-			<wsdl:input message="tns:addPolicyRequest"></wsdl:input>
-			<wsdl:output message="tns:addPolicyResponse"></wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="addPolicySet">
-			<wsdl:input message="tns:addPolicySetRequest"></wsdl:input>
-			<wsdl:output message="tns:addPolicySetResponse"></wsdl:output>
 		</wsdl:operation>
 	</wsdl:portType>
 

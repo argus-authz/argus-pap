@@ -18,11 +18,10 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class BanOperation extends BasePAPOperation<String> {
 
-    AttributeWizard actionAttributeWizard;
-    String attributeValue;
-    AttributeWizard banAttributeWizard;
-    boolean isPublic;
-    AttributeWizard resourceAttributeWizard;
+    private AttributeWizard actionAttributeWizard;
+    private AttributeWizard banAttributeWizard;
+    private boolean isPublic;
+    private AttributeWizard resourceAttributeWizard;
 
     protected BanOperation(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
             AttributeWizard actionAttributeWizard, boolean isPublic) {
@@ -90,25 +89,27 @@ public class BanOperation extends BasePAPOperation<String> {
 
         if (targetPolicyWizard == null) {
             targetPolicyWizard = new PolicyWizard(actionAttributeWizard);
-            targetPolicyWizard.setVersion(0);
             targetPolicyWizard.setPrivate(!isPublic);
             policyId = targetPolicyWizard.getPolicyId();
             PolicySetHelper.addPolicyReference(targetPolicySet, 0, policyId);
         }
 
-        targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
-        targetPolicyWizard.increaseVersion();
-
         if (updateOperationForPolicySet) {
-            localPAP.updatePolicySet(targetPolicySet);
+        	String oldVersion = targetPolicySet.getVersion();
+        	PolicySetWizard.increaseVersion(targetPolicySet);
+            localPAP.updatePolicySet(oldVersion, targetPolicySet);
         } else {
             if (!updateOperationForPolicy) {
                 localPAP.addPolicySet(-1, targetPolicySet);
             }
         }
+        
+        targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
 
         if (updateOperationForPolicy) {
-            localPAP.updatePolicy(targetPolicyWizard.getXACML());
+        	String oldVersion = targetPolicyWizard.getVersionString();
+        	targetPolicyWizard.increaseVersion();
+            localPAP.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
         } else {
             localPAP.storePolicy(targetPolicyWizard.getXACML());
         }

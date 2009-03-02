@@ -25,6 +25,7 @@ package org.glite.authz.pap.common.opensamlserializer;
 import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.DeserializerImpl;
 import org.apache.axis.message.MessageElement;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.opensaml.Configuration;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.io.Unmarshaller;
@@ -38,36 +39,40 @@ import org.xml.sax.SAXException;
  */
 public class Deserializer extends DeserializerImpl {
 
-    public void onStartElement(java.lang.String namespace,
-	    java.lang.String localName, java.lang.String prefix,
-	    org.xml.sax.Attributes attributes, DeserializationContext context)
-	    throws SAXException {
+	private static final long serialVersionUID = 8668604610394087233L;
+	private static final Object lock = new Object();
 
-	try {
+	public void onStartElement(java.lang.String namespace, java.lang.String localName,
+			java.lang.String prefix, org.xml.sax.Attributes attributes, DeserializationContext context)
+			throws SAXException {
 
-	    MessageElement messageElement = context.getCurElement();
-	    Element element = messageElement.getAsDOM();
+		try {
 
-	    /* call OpenSAML serializing */
+//			synchronized (lock) {
 
-	    UnmarshallerFactory unmarshallerFactory = Configuration
-		    .getUnmarshallerFactory();
-	    Unmarshaller unmarshaller = unmarshallerFactory
-		    .getUnmarshaller(element);
+				MessageElement messageElement = context.getCurElement();
+				Element element = messageElement.getAsDOM();
 
-	    XMLObject xmlObject = unmarshaller.unmarshall(element);
+				/* call OpenSAML serializing */
 
-	    setValue(xmlObject);
+//				UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+//				Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
+//
+//				XMLObject xmlObject = unmarshaller.unmarshall(element);
+				XMLObject xmlObject = XMLObjectHelper.unmarshall(element);
+
+				setValue(xmlObject);
+//			}
+
+		}
+
+		catch (Exception exception) {
+
+			throw new SAXException("Error deserializing " + " : " + exception.getClass() + " : "
+					+ exception.getMessage());
+
+		}
 
 	}
-
-	catch (Exception exception) {
-
-	    throw new SAXException("Error deserializing " + " : "
-		    + exception.getClass() + " : " + exception.getMessage());
-
-	}
-
-    }
 
 }

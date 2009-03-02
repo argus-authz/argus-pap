@@ -92,6 +92,8 @@ public class PAPManager {
 
         PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
                 PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        
+        localPolicySet.setVersion("0");
 
         localPAPContainer.storePolicySet(localPolicySet);
     }
