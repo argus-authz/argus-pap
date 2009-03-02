@@ -11,6 +11,8 @@ public class TargetHelper extends XMLObjectHelper<TargetType> {
     private static final javax.xml.namespace.QName elementQName = TargetType.DEFAULT_ELEMENT_NAME;
     private static TargetHelper instance = new TargetHelper();
 
+    private TargetHelper() {}
+
     public static TargetType build() {
         return (TargetType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
@@ -18,23 +20,7 @@ public class TargetHelper extends XMLObjectHelper<TargetType> {
     public static TargetType build(SubjectsType subjects, ActionsType actions, ResourcesType resources,
             EnvironmentsType environments) {
 
-        TargetType target = (TargetType) builderFactory.getBuilder(elementQName)
-                .buildObject(elementQName);
-
-        if (subjects == null)
-            subjects = SubjectsHelper.build();
-
-        if (actions == null)
-            actions = ActionsHelper.buildAnyAction();
-
-        if (resources == null)
-            resources = (ResourcesType) builderFactory.getBuilder(ResourcesType.DEFAULT_ELEMENT_NAME)
-                    .buildObject(ResourcesType.DEFAULT_ELEMENT_NAME);
-
-        if (environments == null)
-            environments = (EnvironmentsType) builderFactory.getBuilder(
-                    EnvironmentsType.DEFAULT_ELEMENT_NAME).buildObject(
-                    EnvironmentsType.DEFAULT_ELEMENT_NAME);
+        TargetType target = (TargetType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
 
         target.setSubjects(subjects);
         target.setActions(actions);
@@ -46,6 +32,4 @@ public class TargetHelper extends XMLObjectHelper<TargetType> {
     public static TargetHelper getInstance() {
         return instance;
     }
-
-    private TargetHelper() {}
 }

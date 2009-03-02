@@ -1,241 +1,132 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
-import org.glite.authz.pap.common.xacml.utils.ApplyHelper;
-import org.glite.authz.pap.common.xacml.utils.AttributeDesignatorHelper;
-import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
-import org.glite.authz.pap.common.xacml.utils.FunctionHelper;
-import org.glite.authz.pap.common.xacml.utils.Functions;
-import org.glite.authz.pap.common.xacml.utils.PolicyAttributeValueHelper;
+import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.utils.RuleHelper;
-import org.opensaml.xacml.ctx.AttributeType;
-import org.opensaml.xacml.ctx.AttributeValueType;
-import org.opensaml.xacml.policy.ApplyType;
-import org.opensaml.xacml.policy.AttributeDesignatorType;
-import org.opensaml.xacml.policy.ConditionType;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.WizardException;
 import org.opensaml.xacml.policy.EffectType;
-import org.opensaml.xacml.policy.ExpressionType;
-import org.opensaml.xacml.policy.FunctionType;
 import org.opensaml.xacml.policy.RuleType;
-import org.opensaml.xml.Configuration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class RuleWizard {
-
-    private static final Logger log = LoggerFactory.getLogger(RuleWizard.class);
-    private static final String ruleId = "ExceptionsRule";
-    private static final javax.xml.namespace.QName SUBJECT_DESIGNATOR = AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
-    private static final javax.xml.namespace.QName RESOURCE_DESIGNATOR = AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
-    private static final javax.xml.namespace.QName ENVIRONMENT_DESIGNATOR = AttributeDesignatorType.ENVIRONMENT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME;
-
-    public static RuleType build(List<List<AttributeWizard>> orExceptionsAttributeWizardList, EffectType effect) {
+    
+    private final RuleType rule;
+    private final TargetWizard targetWizard;
+    
+    public RuleWizard(AttributeWizard attributeWizard, EffectType effect) {
+        this(getList(attributeWizard), effect);
+    }
+    
+    public RuleWizard(EffectType effect) {
+        this(getList(null), effect);
+    }
+    
+    public RuleWizard(List<AttributeWizard> targetAttributeWizardList, EffectType effect) {
         
-        List<List<AttributeType>> orAttributeList = getAttributeTypeListList(orExceptionsAttributeWizardList);
+        rule = RuleHelper.build(WizardUtils.generateId("Rule"), effect);
+        
+        if (targetAttributeWizardList == null) {
+            targetAttributeWizardList = new ArrayList<AttributeWizard>(0);
+        }
+        
+        targetWizard = new TargetWizard(targetAttributeWizardList);
+        
+        if (targetAttributeWizardList.size() == 0) {
+            return;
+        }
 
-        ApplyType applyOr = ApplyHelper.buildFunctionOr();
-
-        for (List<AttributeType> andAttributeList : orAttributeList) {
-
-            if (andAttributeList.isEmpty())
-                continue;
-
-            if (andAttributeList.size() == 1) {
-                AttributeType attribute = andAttributeList.get(0);
-                applyOr.getExpressions().add(createFunctionAnyOf(attribute, getDesignator(attribute)));
-            } else {
-                ApplyType applyAnd = ApplyHelper.buildFunctionAnd();
-                for (AttributeType attribute : andAttributeList) {
-                    applyAnd.getExpressions().add(
-                            createFunctionAnyOf(attribute, getDesignator(attribute)));
-                }
-                applyOr.getExpressions().add(applyAnd);
+        rule.setTarget(targetWizard.getXACML());
+    }
+    
+    public RuleWizard(RuleType rule) {
+        
+        if (rule == null) {
+            throw new WizardException("Invalid argument: RuleType is null.");
+        }
+        
+        this.rule = rule;
+        
+        targetWizard = new TargetWizard(rule.getTarget());
+    }
+    
+    private static List<AttributeWizard> getList(AttributeWizard attributeWizard) {
+        
+        if (attributeWizard == null) {
+            return new ArrayList<AttributeWizard>(0);
+        }
+        
+        List<AttributeWizard> list = new ArrayList<AttributeWizard>(1);
+        
+        list.add(attributeWizard);
+        
+        return list;
+    }
+    
+    public boolean deniesAttribute(AttributeWizard attributeWizard) {
+        
+        if (!(EffectType.Deny.equals(rule.getEffect()))) {
+            return false;
+        }
+        
+        for (AttributeWizard targetAttributeWizard : targetWizard.getAttributeWizardList()) {
+            if (targetAttributeWizard.equals(attributeWizard)) {
+                return true;
             }
-
         }
-
-        ApplyType applyNot = ApplyHelper.buildFunctionNot();
-        applyNot.getExpressions().add(applyOr);
-
-        ConditionType condition = (ConditionType) Configuration.getBuilderFactory().getBuilder(
-                ConditionType.DEFAULT_ELEMENT_NAME).buildObject(ConditionType.DEFAULT_ELEMENT_NAME);
-        condition.setExpression(applyNot);
-
-        RuleType exceptionsRule = RuleHelper.build(ruleId, effect);
-        exceptionsRule.setCondition(condition);
-
-        return exceptionsRule;
+        
+        return false;
     }
     
-    public static List<List<AttributeWizard>> getAttributeWizardList(RuleType rule) {
-        
-        if (!ruleId.equals(rule.getRuleId()))
-            throw new UnsupportedPolicyException("Unrecognized RuleId");
-        
-        List<List<AttributeWizard>> resultList = new LinkedList<List<AttributeWizard>>();
-        
-        
-        ConditionType condition = rule.getCondition();
-        if (condition == null)
-            throw new UnsupportedPolicyException("Condition not found");
-        
-        ExpressionType expression = condition.getExpression();
-        if (expression == null)
-            throw new UnsupportedPolicyException("Wrong \"Expression\" in \"Condition\"");
-        
-        ApplyType apply;
-        
-        if (expression instanceof ApplyType) {
-            apply = (ApplyType) expression;
-        } else {
-            throw new UnsupportedPolicyException("First expression is not an Apply NOT()");
-        }
-        
-        if (!Functions.NOT.equals(apply.getFunctionId())) 
-            throw new UnsupportedPolicyException("First expression is not an Apply NOT()");
-        
-        if (apply.getExpressions().size() != 1)
-            throw new UnsupportedPolicyException("Second expression is not a single Apply OR()");
-        
-        expression = apply.getExpressions().get(0);
-        if (expression instanceof ApplyType) {
-            apply = (ApplyType) expression;
-        } else {
-            throw new UnsupportedPolicyException("Second expression is not an Apply OR()");
-        }
-        
-        if (!Functions.OR.equals(apply.getFunctionId()))
-            throw new UnsupportedPolicyException("Second expression is not an Apply OR()");
-        
-        List<ExpressionType> expressionList = apply.getExpressions();
-        
-        for (int i=0; i<expressionList.size(); i++) {
-            expression = expressionList.get(i);
-            
-            if (!(expression instanceof ApplyType))
-                throw new UnsupportedPolicyException("Wrong expression inside the Apply OR()");
-            apply = (ApplyType) expression;
-            
-            List<AttributeWizard> andList = new LinkedList<AttributeWizard>();
-            if (Functions.ANY_OF.equals(apply.getFunctionId())) {
-                AttributeType attribute = getAttributeFromApplyAnyOf(apply);
-                andList.add(new AttributeWizard(attribute));
-            } else if (Functions.AND.equals(apply.getFunctionId())) {
-                for (AttributeType attribute:getAttributeFromApplyAnd(apply)) {
-                    andList.add(new AttributeWizard(attribute));
-                }
-            } else
-                throw new UnsupportedPolicyException("Wrong function inside the Apply OR()");
-            resultList.add(andList);
-        }
-        
-        return resultList;
+    public String getRuleId() {
+        return rule.getRuleId();
     }
     
-    private static ApplyType createFunctionAnyOf(AttributeType attribute, QName designatorType) {
-
-        FunctionType functionStringEqual = FunctionHelper.build(Functions.STRING_EQUAL);
-
-        if (attribute.getAttributeValues().size() != 1)
-            return null;
-
-        AttributeValueType attributeValue = (AttributeValueType) attribute.getAttributeValues().get(0);
-
-        org.opensaml.xacml.policy.AttributeValueType policyAttributeValue;
-        policyAttributeValue = PolicyAttributeValueHelper.build(attribute.getDataType(), attributeValue
-                .getValue());
-
-        ApplyType applyAnyOf = ApplyHelper.buildFunctionAnyOf();
-
-        applyAnyOf.getExpressions().add(functionStringEqual);
-        applyAnyOf.getExpressions().add(policyAttributeValue);
-        applyAnyOf.getExpressions().add(AttributeDesignatorHelper.build(designatorType, attribute));
-
-        return applyAnyOf;
+    public RuleType getXACML() {
+        return rule;
     }
     
-    private static List<AttributeType> getAttributeFromApplyAnd(ApplyType apply) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-        for (ExpressionType expression:apply.getExpressions()) {
-            if (!(expression instanceof ApplyType))
-                throw new UnsupportedPolicyException("Wrong expression inside the Apply AND()");
-            
-            apply = (ApplyType) expression;
-            
-            if (!Functions.ANY_OF.equals(apply.getFunctionId()))
-                throw new UnsupportedPolicyException("Wrong function inside the Apply AND()");
-            resultList.add(getAttributeFromApplyAnyOf(apply));
+    public boolean isEquivalent(RuleType rule) {
+        
+        if (this.rule.getEffect() != rule.getEffect()) {
+            return false;
         }
-        return resultList;
+        
+        if (rule.getCondition() != null) {
+            return false;
+        }
+        
+        if (!(targetWizard.isEquivalent(rule.getTarget()))) {
+            return false;
+        }
+        
+        return true;
     }
 
-    private static AttributeType getAttributeFromApplyAnyOf(ApplyType apply) {
-        
-        if (apply.getExpressions().size() != 3)
-            throw new UnsupportedPolicyException("Wrong number of expressions inside the Apply ANY-OF");
-        
-        ExpressionType expression = apply.getExpressions().get(0);
-        if (!(expression instanceof FunctionType))
-            throw new UnsupportedPolicyException("First Expression of Apply ANY-OF is not a function (STRING-EQUAL)");
-        
-        if (!Functions.STRING_EQUAL.equals(((FunctionType)expression).getFunctionId()))
-            throw new UnsupportedPolicyException("First Expression of Apply ANY-OF is not a function (STRING-EQUAL)");
-        
-        expression = apply.getExpressions().get(1);
-        if (!(expression instanceof org.opensaml.xacml.policy.AttributeValueType))
-            throw new UnsupportedPolicyException("Second Expression of Apply ANY-OF is not an AttributeValueType");
-        
-        String value = ((org.opensaml.xacml.policy.AttributeValueType) expression).getValue();
-        
-        expression = apply.getExpressions().get(2);
-        if (!(expression instanceof AttributeDesignatorType))
-            throw new UnsupportedPolicyException("Second Expression of Apply ANY-OF is not an AttributeDesignator");
-    
-        String dataType = ((AttributeDesignatorType) expression).getDataType();
-        String xacmlId = ((AttributeDesignatorType) expression).getAttributeId();
-        
-        return CtxAttributeTypeHelper.build(xacmlId, dataType, value);
-    }
-
-    private static javax.xml.namespace.QName getDesignator(AttributeType attribute) {
-
-        if (AttributeWizard.isSubjectAttribute(attribute))
-            return SUBJECT_DESIGNATOR;
-        else if (AttributeWizard.isResouceAttribute(attribute))
-            return RESOURCE_DESIGNATOR;
-        else if (AttributeWizard.isEnvironmentAttribute(attribute))
-            return ENVIRONMENT_DESIGNATOR;
-        else {
-            log.warn("Subject designator assigned by default: attributeId=" + attribute.getAttributeID()
-                    + " dataType=" + attribute.getDataType());
-            return SUBJECT_DESIGNATOR;
-        }
-
+    public String toFormattedString(boolean printIds) {
+        return toFormattedString(0, 4, printIds);
     }
     
-    private static List<AttributeType> getAttributeTypeList(List<AttributeWizard> list) {
-        List<AttributeType> resultList = new LinkedList<AttributeType>();
-
-        for (AttributeWizard attribute : list) {
-            resultList.add(attribute.getAttributeType());
+    public String toFormattedString(int baseIndentation, int internalIndentation, boolean printIds) {
+        
+        String baseIndentString = Utils.fillWithSpaces(baseIndentation);
+        String indentString = Utils.fillWithSpaces(baseIndentation + internalIndentation);
+        StringBuffer sb = new StringBuffer();
+        
+        String effectString = rule.getEffect().toString().toLowerCase();
+        
+        if (printIds) {
+            sb.append(String.format("%sid=%s\n", baseIndentString, rule.getRuleId()));
         }
-
-        return resultList;
-    }
-
-    private static List<List<AttributeType>> getAttributeTypeListList(
-            List<List<AttributeWizard>> listList) {
-        List<List<AttributeType>> resultList = new LinkedList<List<AttributeType>>();
-
-        for (List<AttributeWizard> list : listList) {
-            resultList.add(getAttributeTypeList(list));
+        
+        sb.append(String.format("%srule %s {\n", baseIndentString, effectString));
+        
+        for (AttributeWizard attributeWizard : targetWizard.getAttributeWizardList()) {
+            sb.append(String.format("%s%s\n", indentString, attributeWizard.toFormattedString()));
         }
-
-        return resultList;
+        
+        sb.append(baseIndentString + "}");
+        
+        return sb.toString();
     }
-
 }

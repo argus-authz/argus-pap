@@ -10,6 +10,8 @@ public class AttributeDesignatorHelper extends XMLObjectHelper<AttributeDesignat
     
     private static final AttributeDesignatorHelper instance = new AttributeDesignatorHelper();
 
+    private AttributeDesignatorHelper() {}
+
     public static AttributeDesignatorType build(QName designatorType, AttributeType attribute) {
         
         AttributeDesignatorType attributeDesignator = (AttributeDesignatorType) Configuration
@@ -24,7 +26,5 @@ public class AttributeDesignatorHelper extends XMLObjectHelper<AttributeDesignat
     public static AttributeDesignatorHelper getInstance() {
         return instance;
     }
-
-    private AttributeDesignatorHelper() {}
     
 }

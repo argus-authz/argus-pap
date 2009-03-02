@@ -1,4 +1,5 @@
-package org.glite.authz.pap.common.xacml.wizard;
+package org.glite.authz.pap.common.xacml.wizard.exceptions;
+
 
 public class UnsupportedPolicyException extends WizardException {
 

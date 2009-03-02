@@ -10,12 +10,19 @@ public class SubjectHelper extends XMLObjectHelper<SubjectType> {
     private static final javax.xml.namespace.QName elementQName = SubjectType.DEFAULT_ELEMENT_NAME;
     private static SubjectHelper instance = new SubjectHelper();
 
+    private SubjectHelper() {}
+
     public static SubjectType build() {
         return (SubjectType) builderFactory.getBuilder(
                 elementQName).buildObject(elementQName);
     }
 
     public static SubjectType build(List<SubjectMatchType> subjectMatchList) {
+        
+        if (subjectMatchList.isEmpty()) {
+            return null;
+        }
+        
         SubjectType subject = build();
         
         for (SubjectMatchType subjectMatch : subjectMatchList) {
@@ -28,7 +35,5 @@ public class SubjectHelper extends XMLObjectHelper<SubjectType> {
     public static SubjectHelper getInstance() {
         return instance;
     }
-
-    private SubjectHelper() {}
 
 }
