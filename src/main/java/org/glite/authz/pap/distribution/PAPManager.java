@@ -6,6 +6,8 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.wizard.BlacklistPolicySet;
+import org.glite.authz.pap.common.xacml.wizard.ServiceClassPolicySet;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
@@ -18,369 +20,369 @@ import org.slf4j.LoggerFactory;
 
 public class PAPManager {
 
-    private static PAPManager instance = null;
-    private static final Logger log = LoggerFactory.getLogger(PAPManager.class);
+	private static PAPManager instance = null;
+	private static final Logger log = LoggerFactory.getLogger(PAPManager.class);
 
-    private DistributionConfiguration distributionConfiguration;
-    private PAPDAO papDAO;
-    private String[] configurationAliasOrderedArray;
+	private DistributionConfiguration distributionConfiguration;
+	private PAPDAO papDAO;
+	private String[] configurationAliasOrderedArray;
 
-    private PAPManager() {
+	private PAPManager() {
 
-        papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
+		papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
 
-        createLocalPAPIfNotExists();
+		createLocalPAPIfNotExists();
 
-        distributionConfiguration = DistributionConfiguration.getInstance();
+		distributionConfiguration = DistributionConfiguration.getInstance();
 
-        configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
+		configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
 
-        synchronizeRepositoryWithConfiguration();
-    }
+		synchronizeRepositoryWithConfiguration();
+	}
 
-    public static PAPManager getInstance() {
+	public static PAPManager getInstance() {
 
-        if (instance == null) {
-            throw new PAPManagerException("Please initialize configuration before calling the instance method!");
-        }
+		if (instance == null) {
+			throw new PAPManagerException(
+					"Please initialize configuration before calling the instance method!");
+		}
 
-        return instance;
-    }
+		return instance;
+	}
 
-    public static void initialize() {
-        if (instance == null) {
-            instance = new PAPManager();
-        }
-    }
+	public static void initialize() {
+		if (instance == null) {
+			instance = new PAPManager();
+		}
+	}
 
-    public PAPContainer addTrustedPAP(PAP pap) {
+	public PAPContainer addTrustedPAP(PAP pap) {
 
-        String papAlias = pap.getAlias();
+		String papAlias = pap.getAlias();
 
-        if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
-            throw new AlreadyExistsException("Forbidden alias: " + papAlias);
-        }
+		if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
+			throw new AlreadyExistsException("Forbidden alias: " + papAlias);
+		}
 
-        if (exists(papAlias))
-            throw new AlreadyExistsException("PAP \"" + papAlias + "\" already exists");
+		if (exists(papAlias))
+			throw new AlreadyExistsException("PAP \"" + papAlias + "\" already exists");
 
-        distributionConfiguration.savePAP(pap);
-        papDAO.store(pap);
+		distributionConfiguration.savePAP(pap);
+		papDAO.store(pap);
 
-        return new PAPContainer(pap);
-    }
+		return new PAPContainer(pap);
+	}
 
-    public void createLocalPAPIfNotExists() {
+	public void createLocalPAPIfNotExists() {
 
-        PAP localPAP;
-        
-        if (!papDAO.exists(PAP.LOCAL_PAP_ALIAS)) {
-            
-            localPAP = new PAP(PAP.LOCAL_PAP_ALIAS, PAP.LOCAL_PAP_ALIAS, "localhost", true);
+		if (localPAPExists())
+			return;
 
-            papDAO.store(localPAP);
-        } else {
-            localPAP = papDAO.get(PAP.LOCAL_PAP_ALIAS);
-        }
+		PAP localPAP = new PAP(PAP.LOCAL_PAP_ALIAS, PAP.LOCAL_PAP_ALIAS, "localhost", true);
+		localPAP.setPapId(PAP.LOCAL_PAP_ID);
 
-        // check if the root policy set exists
-        PAPContainer localPAPContainer = getLocalPAPContainer();
-        
-        if (localPAPContainer.hasPolicySet(localPAPContainer.getPAPRootPolicySetId())) {
-            return;
-        }
+		papDAO.store(localPAP);
 
-        PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
-                PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+		PAPContainer localPAPContainer = getLocalPAPContainer();
 
-        localPAPContainer.storePolicySet(localPolicySet);
-    }
+		PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
+			PolicySetHelper.COMB_ALG_ORDERED_DENY_OVERRIDS);
 
-    public PAP deleteTrustedPAP(String papAlias) throws NotFoundException {
-        PAP pap = getPAP(papAlias);
-        distributionConfiguration.removePAP(papAlias);
-        papDAO.delete(papAlias);
-        return pap;
-    }
-    
-    public boolean exists(String papAlias) {
-        return papDAO.exists(papAlias);
-    }
+		localPAPContainer.storePolicySet((new BlacklistPolicySet()).getPolicySetType());
+		localPAPContainer.storePolicySet((new ServiceClassPolicySet()).getPolicySetType());
 
-    public PAPContainer[] getOrderedPAPContainerArray() {
+		PolicySetHelper.addPolicySetReference(localPolicySet, BlacklistPolicySet.POLICY_SET_ID);
+		PolicySetHelper.addPolicySetReference(localPolicySet, ServiceClassPolicySet.POLICY_SET_ID);
 
-        String[] aliasOrderedArray = buildOrderedAliasArray();
+		localPAPContainer.storePolicySet(localPolicySet);
+	}
 
-        PAPContainer[] papContainerArray = new PAPContainer[aliasOrderedArray.length];
+	public PAP deleteTrustedPAP(String papAlias) throws NotFoundException {
+		PAP pap = getPAP(papAlias);
+		distributionConfiguration.removePAP(papAlias);
+		papDAO.delete(papAlias);
+		return pap;
+	}
 
-        for (int i = 0; i < aliasOrderedArray.length; i++) {
-            papContainerArray[i] = new PAPContainer(getPAP(aliasOrderedArray[i]));
-        }
+	public boolean exists(String papAlias) {
+		return papDAO.exists(papAlias);
+	}
 
-        return papContainerArray;
+	public PAPContainer[] getOrderedPAPContainerArray() {
 
-    }
+		String[] aliasOrderedArray = buildOrderedAliasArray();
 
-    public PAP[] getOrderedRemotePAPsArray() {
+		PAPContainer[] papContainerArray = new PAPContainer[aliasOrderedArray.length];
 
-        String[] aliasOrderedArray = buildOrderedAliasArray();
+		for (int i = 0; i < aliasOrderedArray.length; i++) {
+			papContainerArray[i] = new PAPContainer(getPAP(aliasOrderedArray[i]));
+		}
 
-        PAP[] papArray = new PAP[aliasOrderedArray.length - 1];
+		return papContainerArray;
 
-        for (int i = 0, j = 0; i < aliasOrderedArray.length; i++) {
+	}
 
-            if (PAP.LOCAL_PAP_ALIAS.equals(aliasOrderedArray[i])) {
-                continue;
-            }
-            papArray[j] = getPAP(aliasOrderedArray[i]);
-            j++;
-        }
+	public PAP[] getOrderedRemotePAPsArray() {
 
-        return papArray;
-    }
+		String[] aliasOrderedArray = buildOrderedAliasArray();
 
-    public PAPContainer[] getOrderedRemotePAPsContainerArray() {
+		PAP[] papArray = new PAP[aliasOrderedArray.length - 1];
 
-        PAP[] papArray = getOrderedRemotePAPsArray();
+		for (int i = 0, j = 0; i < aliasOrderedArray.length; i++) {
 
-        int size = papArray.length;
+			if (PAP.LOCAL_PAP_ALIAS.equals(aliasOrderedArray[i])) {
+				continue;
+			}
+			papArray[j] = getPAP(aliasOrderedArray[i]);
+			j++;
+		}
 
-        PAPContainer[] papContainerArray = new PAPContainer[size];
+		return papArray;
+	}
 
-        for (int i = 0; i < size; i++) {
-            papContainerArray[i] = new PAPContainer(papArray[i]);
-        }
+	public PAPContainer[] getOrderedRemotePAPsContainerArray() {
 
-        return papContainerArray;
-    }
+		PAP[] papArray = getOrderedRemotePAPsArray();
 
-    public PAP getLocalPAP() {
-        return papDAO.get(PAP.LOCAL_PAP_ALIAS);
-    }
+		int size = papArray.length;
 
-    public PAPContainer getLocalPAPContainer() {
+		PAPContainer[] papContainerArray = new PAPContainer[size];
 
-        if (!localPAPExists()) {
-            throw new NotFoundException("Critical error (probably a BUG): local PAP not found.");
-        }
+		for (int i = 0; i < size; i++) {
+			papContainerArray[i] = new PAPContainer(papArray[i]);
+		}
 
-        return new PAPContainer(getLocalPAP());
-    }
+		return papContainerArray;
+	}
 
-    public PAP getPAP(String papAlias) throws NotFoundException {
-        return papDAO.get(papAlias);
-    }
+	public PAP getLocalPAP() {
+		return papDAO.get(PAP.LOCAL_PAP_ALIAS);
+	}
 
-    public List<PAP> getPublicRemotePAPs() {
+	public PAPContainer getLocalPAPContainer() {
 
-        String[] aliasOrderedArray = buildOrderedAliasArray();
-        List<PAP> resultList = new LinkedList<PAP>();
+		if (!localPAPExists()) {
+			throw new NotFoundException("Critical error (probably a BUG): local PAP not found.");
+		}
 
-        for (String alias : aliasOrderedArray) {
+		return new PAPContainer(getLocalPAP());
+	}
 
-            if (alias.equals(PAP.LOCAL_PAP_ALIAS)) {
-                continue;
-            }
+	public PAP getPAP(String papAlias) throws NotFoundException {
+		return papDAO.get(papAlias);
+	}
 
-            PAP pap = papDAO.get(alias);
+	public List<PAP> getPublicRemotePAPs() {
 
-            if (pap.isVisibilityPublic()) {
-                resultList.add(pap);
-            }
-        }
-        return resultList;
-    }
+		String[] aliasOrderedArray = buildOrderedAliasArray();
+		List<PAP> resultList = new LinkedList<PAP>();
 
-    public List<PAPContainer> getPublicRemotePAPsContainers() {
+		for (String alias : aliasOrderedArray) {
 
-        List<PAP> papPublicPAPList = getPublicRemotePAPs();
-        List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(papPublicPAPList.size());
+			if (alias.equals(PAP.LOCAL_PAP_ALIAS)) {
+				continue;
+			}
 
-        for (PAP pap : papPublicPAPList) {
-            papContainerList.add(new PAPContainer(pap));
-        }
-        return papContainerList;
-    }
+			PAP pap = papDAO.get(alias);
 
-    public PAPContainer getRemotePAPContainer(String papAlias) {
-        return new PAPContainer(getPAP(papAlias));
-    }
+			if (pap.isVisibilityPublic()) {
+				resultList.add(pap);
+			}
+		}
+		return resultList;
+	}
 
-    public String[] getRemotePAPConfigurationOrder() {
-        return configurationAliasOrderedArray;
-    }
+	public List<PAPContainer> getPublicRemotePAPsContainers() {
 
-    public void setPAPOrder(String[] aliasArray) {
-        distributionConfiguration.savePAPOrder(aliasArray);
-        // updated the internal list with the new order
-        configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
-    }
+		List<PAP> papPublicPAPList = getPublicRemotePAPs();
+		List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(papPublicPAPList.size());
 
-    public void updatePAP(String papAlias, PAP newpap) {
+		for (PAP pap : papPublicPAPList) {
+			papContainerList.add(new PAPContainer(pap));
+		}
+		return papContainerList;
+	}
 
-        if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
-            updateLocalPAP(newpap);
-            return;
-        }
+	public PAPContainer getRemotePAPContainer(String papAlias) {
+		return new PAPContainer(getPAP(papAlias));
+	}
 
-        papDAO.update(newpap);
-    }
+	public String[] getRemotePAPConfigurationOrder() {
+		return configurationAliasOrderedArray;
+	}
 
-    private void synchronizeRepositoryWithConfiguration() {
+	public void setPAPOrder(String[] aliasArray) {
+		distributionConfiguration.savePAPOrder(aliasArray);
+		// updated the internal list with the new order
+		configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
+	}
 
-        PAP[] papListFromConfiguration = DistributionConfiguration.getInstance().getRemotePAPArray();
+	public void updatePAP(String papAlias, PAP newpap) {
 
-        if (papListFromConfiguration.length == 0) {
-            log.info("No remote PAPs has been defined");
-        }
+		if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
+			updateLocalPAP(newpap);
+			return;
+		}
 
-        // make sure that all PAPs defined in the configuration are also in the
-        // repository
-        for (PAP papFromConfiguration : papListFromConfiguration) {
-            try {
+		papDAO.update(newpap);
+	}
 
-                String papAlias = papFromConfiguration.getAlias();
+	private void synchronizeRepositoryWithConfiguration() {
 
-                PAP papFromRepository = papDAO.get(papAlias);
+		PAP[] papListFromConfiguration = DistributionConfiguration.getInstance().getRemotePAPArray();
 
-                if (papFromConfiguration.equals(papFromRepository)) {
-                    continue;
-                }
+		if (papListFromConfiguration.length == 0) {
+			log.info("No remote PAPs has been defined");
+		}
 
-                // PAP in the repository but must be updated with the
-                // information
-                // of the PAP found in configuration. The cache must be removed
-                // so we can delete the PAP and store it again
-                log.info("Settings for PAP \"" + papAlias + "\" has been updated. Invalidating cache");
-                papDAO.delete(papAlias);
+		// make sure that all PAPs defined in the configuration are also in the
+		// repository
+		for (PAP papFromConfiguration : papListFromConfiguration) {
+			try {
 
-            } catch (NotFoundException e) {
-                // the PAP is not in the repository therefore go on and store it
-            }
+				String papAlias = papFromConfiguration.getAlias();
 
-            papDAO.store(papFromConfiguration);
-        }
+				PAP papFromRepository = papDAO.get(papAlias);
 
-        // remove from the repository PAPs that are not in the distribution
-        // configuration
-        for (String alias : papDAO.getAllAliases()) {
+				if (papFromConfiguration.equals(papFromRepository)) {
+					continue;
+				}
 
-            // do not remove the local PAP
-            if (alias.equals(PAP.LOCAL_PAP_ALIAS)) {
-                continue;
-            }
+				// PAP in the repository but must be updated with the information
+				// of the PAP found in configuration. The cache must be removed
+				// so we can delete the PAP and store it again
+				log.info("Settings for PAP \"" + papAlias + "\" has been updated. Invalidating cache");
+				papDAO.delete(papAlias);
 
-            boolean notFoundInConfiguration = true;
-            for (PAP papFromConfiguration : papListFromConfiguration) {
-                if (alias.equals(papFromConfiguration.getAlias())) {
-                    notFoundInConfiguration = false;
-                    break;
-                }
-            }
+			} catch (NotFoundException e) {
+				// the PAP is not in the repository therefore go on and store it
+			}
 
-            if (notFoundInConfiguration) {
-                papDAO.delete(alias);
-                log.info("Removed PAP \"" + alias
-                        + "\" from the repository because it hasn't been found in the configuration file.");
-            }
-        }
-    }
+			papDAO.store(papFromConfiguration);
+		}
 
-    private boolean localPAPExists() {
-        return papDAO.exists(PAP.LOCAL_PAP_ALIAS);
-    }
+		// remove from the repository PAPs that are not in the distribution
+		// configuration
+		for (String alias : papDAO.getAllAliases()) {
 
-    private void updateLocalPAP(PAP newLocalPAP) {
+			// do not remove the local PAP
+			if (alias.equals(PAP.LOCAL_PAP_ALIAS)) {
+				continue;
+			}
 
-        if (!PAP.LOCAL_PAP_ALIAS.equals(newLocalPAP.getAlias())) {
-            throw new RepositoryException("Invalid alias for local PAP. Cannot perform updateLocalPAP request.");
-        }
-        
-        PAP oldLocalPAP = getLocalPAP();
-        
-        newLocalPAP.setPapId(oldLocalPAP.getPapId());
+			boolean notFoundInConfiguration = true;
+			for (PAP papFromConfiguration : papListFromConfiguration) {
+				if (alias.equals(papFromConfiguration.getAlias())) {
+					notFoundInConfiguration = false;
+					break;
+				}
+			}
 
-        papDAO.update(newLocalPAP);
-    }
+			if (notFoundInConfiguration) {
+				papDAO.delete(alias);
+				log.info("Removed PAP \"" + alias
+						+ "\" from the repository because it hasn't been found in the configuration file.");
+			}
+		}
+	}
 
-    private String[] buildOrderedAliasArray() {
+	private boolean localPAPExists() {
+		return papDAO.exists(PAP.LOCAL_PAP_ALIAS);
+	}
 
-        String[] repositoryAliasArray = papDAO.getAllAliases();
+	private void updateLocalPAP(PAP newLocalPAP) {
 
-        int configurationArraySize = configurationAliasOrderedArray.length;
+		if (!PAP.LOCAL_PAP_ALIAS.equals(newLocalPAP.getAlias())) {
+			throw new RepositoryException(
+					"Invalid alias for local PAP. Cannot perform updateLocalPAP request.");
+		}
 
-        if (configurationArraySize > repositoryAliasArray.length) {
-            throw new PAPManagerException("BUG: configuration contains more PAPs then repository");
-        }
+		if (!PAP.LOCAL_PAP_ID.equals(newLocalPAP.getPapId())) {
+			throw new RepositoryException("Invalid id for local PAP. Cannot perform updateLocalPAP request.");
+		}
 
-        int localPAPAliasIdx = getAliasIndex(PAP.LOCAL_PAP_ALIAS, repositoryAliasArray);
+		papDAO.update(newLocalPAP);
 
-        if (localPAPAliasIdx == -1) {
-            throw new PAPManagerException("BUG: local PAP does not exist in the repository");
-        }
+	}
 
-        if (getAliasIndex(PAP.LOCAL_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
-            // local PAP goes for first
-            swapElementsOfArray(localPAPAliasIdx, 0, repositoryAliasArray);
-        }
+	private String[] buildOrderedAliasArray() {
 
-        for (int i = 0; i < configurationArraySize; i++) {
-            String alias = configurationAliasOrderedArray[i];
+		String[] repositoryAliasArray = papDAO.getAllAliases();
 
-            int aliasIndex = getAliasIndex(alias, repositoryAliasArray);
+		int configurationArraySize = configurationAliasOrderedArray.length;
 
-            if (aliasIndex == -1) {
-                throw new PAPManagerException(
-                        "BUG: initialization error. PAP defined in the configuration is not in the repository");
-            }
+		if (configurationArraySize > repositoryAliasArray.length) {
+			throw new PAPManagerException("BUG: configuration contains more PAPs then repository");
+		}
 
-            swapElementsOfArray(aliasIndex, i, repositoryAliasArray);
-        }
+		int localPAPAliasIdx = getAliasIndex(PAP.LOCAL_PAP_ALIAS, repositoryAliasArray);
 
-        return repositoryAliasArray;
-    }
+		if (localPAPAliasIdx == -1) {
+			throw new PAPManagerException("BUG: local PAP does not exist in the repository");
+		}
 
-    private int getAliasIndex(String alias, String[] aliasArray) {
+		if (getAliasIndex(PAP.LOCAL_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
+			// local PAP goes for first
+			swapElementsOfArray(localPAPAliasIdx, 0, repositoryAliasArray);
+		}
 
-        if (alias == null) {
-            return -1;
-        }
+		for (int i = 0; i < configurationArraySize; i++) {
+			String alias = configurationAliasOrderedArray[i];
 
-        for (int i = 0; i < aliasArray.length; i++) {
+			int aliasIndex = getAliasIndex(alias, repositoryAliasArray);
 
-            if (alias.equals(aliasArray[i])) {
-                return i;
-            }
-        }
+			if (aliasIndex == -1) {
+				throw new PAPManagerException(
+						"BUG: initialization error. PAP defined in the configuration is not in the repository");
+			}
 
-        return -1;
-    }
+			swapElementsOfArray(aliasIndex, i, repositoryAliasArray);
+		}
 
-    private void swapElementsOfArray(int idx1, int idx2, String[] array) {
+		return repositoryAliasArray;
+	}
 
-        if (idx1 == idx2) {
-            return;
-        }
+	private int getAliasIndex(String alias, String[] aliasArray) {
 
-        int size = array.length;
+		if (alias == null) {
+			return -1;
+		}
 
-        if (size == 0) {
-            return;
-        }
+		for (int i = 0; i < aliasArray.length; i++) {
 
-        if ((idx1 < 0) || (idx1 >= size)) {
-            return;
-        }
+			if (alias.equals(aliasArray[i])) {
+				return i;
+			}
+		}
 
-        if ((idx2 < 0) || (idx2 >= size)) {
-            return;
-        }
+		return -1;
+	}
 
-        String temp = array[idx1];
-        array[idx1] = array[idx2];
-        array[idx2] = temp;
+	private void swapElementsOfArray(int idx1, int idx2, String[] array) {
 
-        return;
-    }
+		if (idx1 == idx2) {
+			return;
+		}
+
+		int size = array.length;
+
+		if (size == 0) {
+			return;
+		}
+
+		if ((idx1 < 0) || (idx1 >= size)) {
+			return;
+		}
+
+		if ((idx2 < 0) || (idx2 >= size)) {
+			return;
+		}
+
+		String temp = array[idx1];
+		array[idx1] = array[idx2];
+		array[idx2] = temp;
+
+		return;
+	}
 
 }

@@ -1,5 +1,7 @@
 package org.glite.authz.pap.authz.papmanagement;
 
+import java.util.List;
+
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;

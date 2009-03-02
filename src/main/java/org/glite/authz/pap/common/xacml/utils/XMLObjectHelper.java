@@ -43,8 +43,6 @@ public class XMLObjectHelper<T extends XMLObject> {
         ppMgr.setNamespaceAware(true);
     }
 
-    protected XMLObjectHelper() {}
-    
     public static XMLObject buildXMLObject(Element element) {
         Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
         XMLObject xmlObject;
@@ -57,17 +55,17 @@ public class XMLObjectHelper<T extends XMLObject> {
 
         return xmlObject;
     }
-
+    
     public static XMLObject buildXMLObject(InputStream inputStream) {
         Document doc = readDocument(inputStream);
         return buildXMLObject(doc.getDocumentElement());
     }
-    
+
     public static XMLObject buildXMLObjectFromFile(File file) {
         Document doc = readDocument(file);
         return buildXMLObject(doc.getDocumentElement());
     }
-
+    
     public static XMLObject buildXMLObjectFromFile(String fileName) {
         return buildXMLObjectFromFile(new File(fileName));
     }
@@ -120,7 +118,7 @@ public class XMLObjectHelper<T extends XMLObject> {
             throw new XMLObjectException(e);
         }
     }
-    
+
     private static Document readDocument(File file) {
         FileInputStream fileInputStream;
         try {
@@ -131,7 +129,7 @@ public class XMLObjectHelper<T extends XMLObject> {
         
         return readDocument(fileInputStream);
     }
-
+    
     private static Document readDocument(InputStream inputStream) {
         Document doc;
         try {
@@ -142,6 +140,8 @@ public class XMLObjectHelper<T extends XMLObject> {
 
         return doc;
     }
+
+    protected XMLObjectHelper() {}
 
     @SuppressWarnings("unchecked")
     public T build(Element element) {

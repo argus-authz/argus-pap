@@ -7,8 +7,6 @@ public class CtxAttributeValueHelper extends XMLObjectHelper<AttributeValueType>
     private static final javax.xml.namespace.QName elementQName = AttributeValueType.DEFAULT_ELEMENT_NAME;
     private static CtxAttributeValueHelper instance = new CtxAttributeValueHelper();
 
-    private CtxAttributeValueHelper() {}
-
     public static AttributeValueType build(String value) {
         AttributeValueType attributeValue = (AttributeValueType) builderFactory.getBuilder(elementQName)
                 .buildObject(elementQName);
@@ -21,5 +19,7 @@ public class CtxAttributeValueHelper extends XMLObjectHelper<AttributeValueType>
     public static CtxAttributeValueHelper getInstance() {
         return instance;
     }
+
+    private CtxAttributeValueHelper() {}
 
 }

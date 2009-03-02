@@ -11,6 +11,9 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class AddPAP extends PAPManagementCLI {
 
+    private static final String LOPT_PUBLIC = "public";
+    private static final String LOPT_PRIVATE = "private";
+    private static final String USAGE = "<alias> <dn> <host> <port> [path] [options]";
     private static final String[] commandNameValues = { "add-pap", "apap" };
     private static final String DESCRIPTION = "Add a trusted PAP to get policies from.";
     private static final String LONG_DESCRIPTION =  "<alias> is a friendly name (it has to be unique) used to identify the PAP\n" +
@@ -21,9 +24,6 @@ public class AddPAP extends PAPManagementCLI {
 			"\nExample:\n" +
 			"\t pap-admin " + commandNameValues[0] + "cnaf_pap \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\" " +
 			"test.cnaf.infn.it " + PAP.DEFAULT_PORT;
-    private static final String LOPT_PRIVATE = "private";
-    private static final String LOPT_PUBLIC = "public";
-    private static final String USAGE = "<alias> <dn> <host> <port> [path] [options]";
     
     public AddPAP() {
         super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);

@@ -21,8 +21,6 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
     private static PolicySetHelper instance = new PolicySetHelper();
 
-    private PolicySetHelper() {}
-
     public static void addPolicy(PolicySetType policySet, int index, PolicyType policy) {
         policySet.getPolicies().add(index, policy);
     }
@@ -32,13 +30,13 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
     }
 
     public static void addPolicyReference(PolicySetType policySet, int index, String idValue) {
-        // policySet.getPolicyIdReferences()
-        // .add(index, IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
-        policySet.getPolicyChoiceGroup().add(index, IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
+        policySet.getPolicyIdReferences().add(index,
+                IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
     }
 
     public static void addPolicyReference(PolicySetType policySet, String idValue) {
-        policySet.getPolicyIdReferences().add(IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
+        policySet.getPolicyIdReferences().add(
+                IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, idValue));
     }
 
     public static void addPolicySet(PolicySetType policySet, int index, PolicySetType childPolicySet) {
@@ -50,23 +48,23 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
     }
 
     public static void addPolicySetReference(PolicySetType policySet, int index, String idValue) {
-        // policySet.getPolicySetIdReferences().add(index,
-        // IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
-        policySet.getPolicyChoiceGroup().add(index,
+        policySet.getPolicySetIdReferences().add(index,
                 IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
     }
 
     public static void addPolicySetReference(PolicySetType policySet, String idValue) {
-        policySet.getPolicySetIdReferences().add(IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
+        policySet.getPolicySetIdReferences().add(
+                IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
     }
 
-    public static PolicySetType build(String policySetId, String policyCombinerAlgorithmId, TargetType target) {
+    public static PolicySetType build(String policySetId, String policyCombinerAlgorithmId,
+            TargetType target) {
 
         return build(policySetId, policyCombinerAlgorithmId, target, null);
     }
 
-    public static PolicySetType build(String policySetId, String policyCombiningAlgorithmId, TargetType target,
-            ObligationsType obligations) {
+    public static PolicySetType build(String policySetId, String policyCombiningAlgorithmId,
+            TargetType target, ObligationsType obligations) {
         PolicySetType policySet = build();
         policySet.setPolicySetId(policySetId);
         policySet.setPolicyCombiningAlgoId(policyCombiningAlgorithmId);
@@ -85,23 +83,7 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
         return build(policySetId, policyCombinerAlgorithmId, null, null);
     }
-
-    public static boolean changePolicyReferenceValue(PolicySetType policySet, String oldValue, String newValue) {
-
-        List<String> policyIdList = getPolicyIdReferencesValues(policySet);
-
-        for (int i = 0; i < policyIdList.size(); i++) {
-
-            if (policyIdList.get(i).equals(oldValue)) {
-                policySet.getPolicyIdReferences().set(i,
-                        IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, newValue));
-                return true;
-            }
-        }
-
-        return false;
-    }
-
+    
     public static boolean deletePolicyReference(PolicySetType policySet, String policyId) {
         List<IdReferenceType> policyRefList = policySet.getPolicyIdReferences();
         for (IdReferenceType policyRef : policyRefList) {
@@ -132,17 +114,17 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
         return getChildrenOrderedList(policySet).size();
     }
 
-    public static List<String> getPolicyIdReferencesValues(PolicySetType policySet) {
-        List<IdReferenceType> refList = policySet.getPolicyIdReferences();
+    public static List<String> getPolicySetIdReferencesValues(PolicySetType policySet) {
+        List<IdReferenceType> refList = policySet.getPolicySetIdReferences();
         List<String> list = new ArrayList<String>(refList.size());
         for (IdReferenceType ref : refList) {
             list.add(ref.getValue());
         }
         return list;
     }
-
-    public static List<String> getPolicySetIdReferencesValues(PolicySetType policySet) {
-        List<IdReferenceType> refList = policySet.getPolicySetIdReferences();
+    
+    public static List<String> getPolicyIdReferencesValues(PolicySetType policySet) {
+        List<IdReferenceType> refList = policySet.getPolicyIdReferences();
         List<String> list = new ArrayList<String>(refList.size());
         for (IdReferenceType ref : refList) {
             list.add(ref.getValue());
@@ -180,7 +162,8 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
         List<XACMLObject> xacmlObjectChildren = new LinkedList<XACMLObject>();
         List<XMLObject> children = policySet.getOrderedChildren();
         for (XMLObject child : children) {
-            if ((child instanceof IdReferenceType) || (child instanceof PolicySetType) || (child instanceof PolicyType)) {
+            if ((child instanceof IdReferenceType) || (child instanceof PolicySetType)
+                    || (child instanceof PolicyType)) {
                 xacmlObjectChildren.add((XACMLObject) child);
             }
         }
@@ -195,5 +178,7 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
         }
         return false;
     }
+
+    private PolicySetHelper() {}
 
 }

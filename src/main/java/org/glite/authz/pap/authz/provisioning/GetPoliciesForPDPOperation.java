@@ -21,18 +21,18 @@ public class GetPoliciesForPDPOperation extends
     }
 
     @Override
-    protected List<XACMLObject> doExecute() {
-
-	return ProvisioningServiceDAO.getInstance().pdpQuery();
-    }
-
-    @Override
     protected void setupPermissions() {
 
 	addRequiredPermission(PAPPermission.of(
 		PermissionFlags.POLICY_READ_LOCAL,
 		PermissionFlags.POLICY_READ_REMOTE));
 
+    }
+
+    @Override
+    protected List<XACMLObject> doExecute() {
+
+	return ProvisioningServiceDAO.getInstance().pdpQuery();
     }
 
 }

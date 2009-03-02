@@ -11,11 +11,11 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class ListPAPs extends PAPManagementCLI {
     
-	private static final String[] commandNameValues = { "list-paps", "lpaps" };
-	private static final String DESCRIPTION = "List trusted PAPs.";
-    private static final String OPT_LONGLIST_FORMAT = "l";
-    private static final String OPT_LONGLIST_FORMAT_DESCRIPTION = "Use a long list format.";
+	private static final String OPT_LONGLIST_FORMAT = "l";
+	private static final String OPT_LONGLIST_FORMAT_DESCRIPTION = "Use a long list format.";
     private static final String USAGE = "";
+    private static final String[] commandNameValues = { "list-paps", "lpaps" };
+    private static final String DESCRIPTION = "List trusted PAPs.";
     
     public ListPAPs() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

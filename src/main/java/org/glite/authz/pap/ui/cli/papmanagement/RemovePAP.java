@@ -8,9 +8,9 @@ import org.apache.commons.cli.ParseException;
 
 public class RemovePAP extends PAPManagementCLI {
     
+    private static final String USAGE = "<papId>";
     private static final String[] commandNameValues = { "remove-pap", "rpap" };
     private static final String DESCRIPTION = "Remove a trusted PAP and delete the cached policies.";
-    private static final String USAGE = "<papId>";
     
     public RemovePAP() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

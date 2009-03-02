@@ -4,15 +4,13 @@ import org.opensaml.xacml.policy.ApplyType;
 
 public class ApplyHelper extends XMLObjectHelper<ApplyType> {
 
-    public static final String RULE_COMBALG_DENY_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides";
     public static final String RULE_COMBALG_FIRST_APPLICABLE = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:first-applicable";
+    public static final String RULE_COMBALG_DENY_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:deny-overrides";
     public static final String RULE_COMBALG_PERMIT_OVERRIDS = "urn:oasis:names:tc:xacml:1.0:rule-combining-algorithm:permit-overrides";
 
     private static final javax.xml.namespace.QName elementQName = ApplyType.DEFAULT_ELEMENT_NAME;
 
     private static ApplyHelper instance = new ApplyHelper();
-
-    private ApplyHelper() {}
 
     public static ApplyType buildFunctionAnd() {
 
@@ -72,5 +70,7 @@ public class ApplyHelper extends XMLObjectHelper<ApplyType> {
     public static ApplyHelper getInstance() {
         return instance;
     }
+
+    private ApplyHelper() {}
 
 }

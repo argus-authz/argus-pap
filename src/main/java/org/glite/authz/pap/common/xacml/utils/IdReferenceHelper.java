@@ -8,11 +8,9 @@ public class IdReferenceHelper extends XMLObjectHelper<IdReferenceType> {
         POLICY_ID_REFERENCE, POLICYSET_ID_REFERENCE;
     }
 
-    private static IdReferenceHelper instance = new IdReferenceHelper();
     private static final javax.xml.namespace.QName policyIdReferenceQName = IdReferenceType.POLICY_ID_REFERENCE_ELEMENT_NAME;
     private static final javax.xml.namespace.QName policyIdSetReferenceQName = IdReferenceType.POLICY_SET_ID_REFERENCE_ELEMENT_NAME;
-
-    private IdReferenceHelper() {}
+    private static IdReferenceHelper instance = new IdReferenceHelper();
 
     public static IdReferenceType build(Type type, String value) {
         IdReferenceType idReference;
@@ -44,5 +42,7 @@ public class IdReferenceHelper extends XMLObjectHelper<IdReferenceType> {
         }
         return false;
     }
+
+    private IdReferenceHelper() {}
 
 }

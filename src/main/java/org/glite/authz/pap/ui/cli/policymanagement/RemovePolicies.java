@@ -9,17 +9,12 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class RemovePolicies extends PolicyManagementCLI {
     
+    private static final String USAGE = "<policyId> [[policyId] ...] [options]";
     private static final String[] commandNameValues = { "remove-policy", "rp" };
     private static final String DESCRIPTION = "Remove policies.";
-    private static final String USAGE = "<policyId> [[policyId] ...] [options]";
 
     public RemovePolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
-    }
-
-    @Override
-    protected Options defineCommandOptions() {
-        return null;
     }
 
     @Override
@@ -39,9 +34,9 @@ public class RemovePolicies extends PolicyManagementCLI {
 	        for (int i=1; i<args.length; i++) {
 	            
 	            String policyId = args[i];
-	            System.out.print("Removing \"" + policyId + "\"... ");
+	            System.out.print("Removing policy \"" + policyId + "\"... ");
 	            
-	            boolean policyRemoved = xacmlPolicyMgmtClient.removeObjectByIdAndReferences(policyId);
+	            boolean policyRemoved = xacmlPolicyMgmtClient.removePolicyAndReferences(policyId);
 	            
 	            if (!policyRemoved) {
 	            	System.out.println("NOT FOUND.");
@@ -66,6 +61,11 @@ public class RemovePolicies extends PolicyManagementCLI {
         
         return ExitStatus.SUCCESS.ordinal();
         
+    }
+
+    @Override
+    protected Options defineCommandOptions() {
+        return null;
     }
 
 }

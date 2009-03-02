@@ -27,9 +27,8 @@ public class UpdatePolicyOperation extends BasePAPOperation <Boolean> {
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
         
-        if (!localPAP.hasPolicy(policy.getPolicyId())) {
+        if (!localPAP.hasPolicy(policy.getPolicyId()))
             return false;
-        }
         
         localPAP.updatePolicy(policy);
         

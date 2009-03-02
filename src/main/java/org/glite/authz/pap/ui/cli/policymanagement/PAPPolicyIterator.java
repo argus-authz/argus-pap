@@ -13,80 +13,39 @@ import org.slf4j.LoggerFactory;
 public class PAPPolicyIterator implements Iterator<PolicyType> {
 
     private static final Logger log = LoggerFactory.getLogger(PAPPolicyIterator.class);
-    private int curPos = 0;
-    private boolean getAllPoliciesInOnce;
-    private boolean initialized = false;
-    private String papId = null;
-    private PolicyType[] policyArray = null;
-    private String[] policyIdsArray = null;
-    private PolicySetType[] policySetArray = null;
-
     private XACMLPolicyManagement xacmlPolicyMgmtClient;
-
-    public PAPPolicyIterator(XACMLPolicyManagement xacmlPolicyMgmtClient, String papId, boolean getPoliciesOneByOne) {
-
+    private boolean getAllPoliciesInOnce;
+    private PolicyType[] policyArray = null;
+    private String papId = null;
+    private int curPos = 0;
+    private boolean initialized = false;
+    
+    private String[] policyIdsArray = null;
+    
+    public PAPPolicyIterator(XACMLPolicyManagement xacmlPolicyMgmtClient, String papId, boolean getAllPoliciesInOnce) {
         this.xacmlPolicyMgmtClient = xacmlPolicyMgmtClient;
-        getAllPoliciesInOnce = !getPoliciesOneByOne;
-
-        if (papId != null) {
-            if (papId.length() > 0) {
+        this.getAllPoliciesInOnce = getAllPoliciesInOnce;
+     
+        if (papId != null)
+            if (papId.length() > 0)
                 this.papId = papId;
-            }
-        }
-
-    }
-
-    public PolicyType[] getAllPolicies() {
-        return policyArray;
+        
     }
     
-    public PolicySetType[] getAllPolicySets() {
-        return policySetArray;
-    }
-
-    public int getNumberOfPolicies() throws RemoteException {
-
+    public PolicyType[] getAllPolicies() throws RemoteException {
+        
         if (!initialized)
             init();
-
-        int npolicies;
-
-        if (policyArray == null)
-            npolicies = policyIdsArray.length;
-        else
-            npolicies = policyArray.length;
-
-        return npolicies;
-
+        
+        return policyArray;
+        
     }
-
-    public String[] getPolicyIdsArray() {
-
-        if (!initialized)
-            return null;
-
-        String[] idsArray = null;
-
-        if (getAllPoliciesInOnce) {
-
-            int size = policyArray.length;
-            idsArray = new String[size];
-
-            for (int i = 0; i < size; i++) {
-                idsArray[i] = policyArray[i].getPolicyId();
-            }
-        } else {
-            idsArray = policyIdsArray;
-        }
-
-        return idsArray;
-    }
-
+    
     public boolean hasNext() {
-
+        
         if (!initialized)
             return false;
-
+        
         if (getAllPoliciesInOnce) {
             if (curPos < policyArray.length)
                 return true;
@@ -94,30 +53,17 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
             if (curPos < policyIdsArray.length)
                 return true;
         }
-
+        
         return false;
     }
-
-    public void init() throws RemoteException {
-
-        if (!initialized) {
-
-            if (getAllPoliciesInOnce)
-                readAllPolicies();
-            else
-                readPolicyIds();
-
-            initialized = true;
-        }
-    }
-
+    
     public PolicyType next() {
-
+        
         if (!initialized)
             return null;
-
+        
         PolicyType policy = null;
-
+        
         if (getAllPoliciesInOnce) {
             policy = policyArray[curPos];
         } else {
@@ -132,52 +78,99 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
                 return null;
             }
         }
-
+        
         curPos++;
-
+        
         return policy;
     }
+    
+    public int getNumberOfPolicies() throws RemoteException {
+        
+        if (!initialized)
+            init();
 
-    public void remove() {
-        // TODO Auto-generated method stub
-        log.error("Method remove() not yet implemented");
+        int npolicies;
+        
+        if (policyArray == null)
+            npolicies = policyIdsArray.length;
+        else
+            npolicies = policyArray.length;
+        
+        return npolicies;
+        
     }
-
+    
+    public String[] getPolicyIdsArray() {
+        
+        if (!initialized)
+            return null;
+        
+        String[] idsArray = null;
+        
+       if (getAllPoliciesInOnce) {
+           
+           int size = policyArray.length;
+           idsArray = new String[size];
+           
+           for (int i=0; i<size; i++) {
+               idsArray[i] = policyArray[i].getPolicyId();
+           }
+       } else {
+           idsArray = policyIdsArray;
+       }
+       
+       return idsArray;
+    }
+    
+    public void init() throws RemoteException {
+        
+        if (!initialized) {
+            
+            if (getAllPoliciesInOnce)
+                readAllPolicies();
+            else
+                readPolicyIds();
+            
+            initialized = true;
+        }
+    }
+    
     private void readAllPolicies() throws RemoteException {
-
-        if (papId == null) {
+        
+        if (papId == null)
             policyArray = xacmlPolicyMgmtClient.listPolicies();
-            policySetArray = xacmlPolicyMgmtClient.listPolicySets();
-        }
-        else {
+        else
             policyArray = xacmlPolicyMgmtClient.listPAPPolicies(papId);
-            policySetArray = xacmlPolicyMgmtClient.listPAPPolicySets(papId);
-        }
-
+        
     }
-
+    
     private void readPolicyIds() throws RemoteException {
         PolicySetType[] policySetArray;
-
+        
         if (papId == null)
             policySetArray = xacmlPolicyMgmtClient.listPolicySets();
         else
             policySetArray = xacmlPolicyMgmtClient.listPAPPolicySets(papId);
-
+        
         int npolicy = 0;
-        for (PolicySetType policySet : policySetArray) {
+        for (PolicySetType policySet:policySetArray) {
             npolicy += policySet.getPolicyIdReferences().size();
         }
-
+        
         policyIdsArray = new String[npolicy];
-
+        
         int i = 0;
-        for (PolicySetType policySet : policySetArray) {
-            for (IdReferenceType refId : policySet.getPolicyIdReferences()) {
+        for (PolicySetType policySet:policySetArray) {
+            for (IdReferenceType refId:policySet.getPolicyIdReferences()) {
                 policyIdsArray[i] = refId.getValue();
                 i++;
             }
         }
     }
 
+    public void remove() {
+        // TODO Auto-generated method stub
+        log.error("Method remove() not yet implemented");
+    }
+    
 }

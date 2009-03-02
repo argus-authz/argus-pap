@@ -10,17 +10,14 @@ public class ResourceHelper extends XMLObjectHelper<ResourceType> {
     private static final javax.xml.namespace.QName elementQName = ResourceType.DEFAULT_ELEMENT_NAME;
     private static ResourceHelper instance = new ResourceHelper();
 
-    private ResourceHelper() {}
-
     public static ResourceType build() {
         return (ResourceType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
     public static ResourceType build(List<ResourceMatchType> resourceMatchList) {
         
-        if (resourceMatchList.isEmpty()) {
+        if (resourceMatchList.isEmpty())
             return null;
-        }
         
         ResourceType resource = build();
         
@@ -34,5 +31,7 @@ public class ResourceHelper extends XMLObjectHelper<ResourceType> {
     public static ResourceHelper getInstance() {
         return instance;
     }
+
+    private ResourceHelper() {}
 
 }
