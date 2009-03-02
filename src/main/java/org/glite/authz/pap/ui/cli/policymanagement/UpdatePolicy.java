@@ -21,143 +21,153 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class UpdatePolicy extends PolicyManagementCLI {
 
-    private static final String[] commandNameValues = { "update-policy-from-file", "up" };
-    private static final String DESCRIPTION = "Update the policy identified by \"id\" with the new policy "
-            + "defined in \"file\"";
-    private static final String USAGE = "<id> <file> [options]";
-    private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
+	private static final String[] commandNameValues = { "update-policy-from-file", "up" };
+	private static final String DESCRIPTION = "Update the policy identified by \"id\" with the new policy "
+			+ "defined in \"file\"";
+	private static final String USAGE = "<id> <file> [options]";
+	private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
 
-    public UpdatePolicy() {
-        super(commandNameValues, USAGE, DESCRIPTION, null);
-    }
+	public UpdatePolicy() {
+		super(commandNameValues, USAGE, DESCRIPTION, null);
+	}
 
-    private int updatePolicy(String id, PolicyWizard policyWizard) throws RemoteException {
+	private int updatePolicy(String id, PolicyWizard policyWizard) throws RemoteException {
 
-        policyWizard.setPolicyId(id);
-        policyWizard.increaseVersion();
+		if (!xacmlPolicyMgmtClient.hasPolicy(id)) {
+			System.out.println("Error: action id \"" + id + "\" does not exists.");
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-        boolean success = xacmlPolicyMgmtClient.updatePolicy(policyWizard.getXACML());
+		PolicyType oldPolicy = xacmlPolicyMgmtClient.getPolicy(id);
 
-        if (!success) {
-            return ExitStatus.FAILURE.ordinal();
-        }
+		policyWizard.setPolicyId(id);
+		policyWizard.increaseVersion();
 
-        return ExitStatus.SUCCESS.ordinal();
-    }
+		boolean success = xacmlPolicyMgmtClient.updatePolicy(oldPolicy.getVersion(), policyWizard.getXACML());
 
-    private int updatePolicySet(String id, PolicySetWizard policySetWizard) throws RemoteException {
+		if (!success) {
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-        if (!xacmlPolicyMgmtClient.hasPolicySet(id)) {
-            System.out.println("Error: resource id \"" + id + "\" does not exists.");
-            return ExitStatus.FAILURE.ordinal();
-        }
+		return ExitStatus.SUCCESS.ordinal();
+	}
 
-        PolicySetType policySet = xacmlPolicyMgmtClient.getPolicySet(id);
+	private int updatePolicySet(String id, PolicySetWizard policySetWizard) throws RemoteException {
 
-        List<PolicyType> repoPolicyList = new LinkedList<PolicyType>();
-        for (String policyId : PolicySetHelper.getPolicyIdReferencesValues(policySet)) {
-            repoPolicyList.add(xacmlPolicyMgmtClient.getPolicy(policyId));
-        }
+		if (!xacmlPolicyMgmtClient.hasPolicySet(id)) {
+			System.out.println("Error: resource id \"" + id + "\" does not exists.");
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-        List<PolicyWizard> policyWizardList = policySetWizard.getPolicyWizardList();
+		PolicySetType policySet = xacmlPolicyMgmtClient.getPolicySet(id);
 
-        if (policyWizardList.size() != repoPolicyList.size()) {
-            System.out.println("Error: the set of actions is not the same, only order can be changed with the update operation");
-            return ExitStatus.FAILURE.ordinal();
-        }
+		List<PolicyType> repoPolicyList = new LinkedList<PolicyType>();
+		for (String policyId : PolicySetHelper.getPolicyIdReferencesValues(policySet)) {
+			repoPolicyList.add(xacmlPolicyMgmtClient.getPolicy(policyId));
+		}
 
-        for (PolicyWizard policyWizard : policyWizardList) {
+		List<PolicyWizard> policyWizardList = policySetWizard.getPolicyWizardList();
 
-            boolean foundToBeEquivalent = false;
+		if (policyWizardList.size() != repoPolicyList.size()) {
+			System.out
+					.println("Error: the set of actions is not the same, only order can be changed with the update operation");
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-            for (PolicyType policy : repoPolicyList) {
-                if (policyWizard.isEquivalent(policy)) {
-                    if (!PolicySetHelper.changePolicyReferenceValue(policySetWizard.getXACML(), policyWizard.getPolicyId(), policy
-                            .getPolicyId())) {
-                        break;
-                    }
-                    policyWizard.setPolicyId(policy.getPolicyId());
-                    foundToBeEquivalent = true;
-                    break;
-                }
-            }
+		for (PolicyWizard policyWizard : policyWizardList) {
 
-            if (!foundToBeEquivalent) {
-                System.out
-                        .println("Error: the set of actions is not the same, only order can be changed with the update operation");
-                return ExitStatus.FAILURE.ordinal();
-            }
-        }
-        
-        policySetWizard.setPolicySetId(id);
-        policySetWizard.increaseVersion();
-        xacmlPolicyMgmtClient.updatePolicySet(policySetWizard.getXACML());
+			boolean foundToBeEquivalent = false;
 
-        return ExitStatus.SUCCESS.ordinal();
-    }
+			for (PolicyType policy : repoPolicyList) {
+				if (policyWizard.isEquivalent(policy)) {
+					if (!PolicySetHelper.changePolicyReferenceValue(policySetWizard.getXACML(), policyWizard
+							.getPolicyId(), policy.getPolicyId())) {
+						break;
+					}
+					policyWizard.setPolicyId(policy.getPolicyId());
+					foundToBeEquivalent = true;
+					break;
+				}
+			}
 
-    @Override
-    protected Options defineCommandOptions() {
-        return null;
-    }
+			if (!foundToBeEquivalent) {
+				System.out
+						.println("Error: the set of actions is not the same, only order can be changed with the update operation");
+				return ExitStatus.FAILURE.ordinal();
+			}
+		}
 
-    @Override
-    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
+		policySetWizard.setPolicySetId(id);
+		String oldVersion = policySetWizard.getVersionString();
+		policySetWizard.increaseVersion();
+		xacmlPolicyMgmtClient.updatePolicySet(oldVersion, policySetWizard.getXACML());
 
-        String[] args = commandLine.getArgs();
+		return ExitStatus.SUCCESS.ordinal();
+	}
 
-        if (args.length != 3) {
-            throw new ParseException("Wrong number of arguments.");
-        }
+	@Override
+	protected Options defineCommandOptions() {
+		return null;
+	}
 
-        String id = args[1];
-        String fileName = args[2];
+	@Override
+	protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+			RemoteException {
 
-        File file = new File(fileName);
-        if (!file.exists()) {
-            System.out.println("Error: file \"" + file.getAbsolutePath() + "\" does not exists.");
-            return ExitStatus.FAILURE.ordinal();
-        }
+		String[] args = commandLine.getArgs();
 
-        XACMLPolicyCLIUtils.initOpenSAML();
+		if (args.length != 3) {
+			throw new ParseException("Wrong number of arguments.");
+		}
 
-        List<XACMLWizard> wizardList = new ArrayList<XACMLWizard>(0);
+		String id = args[1];
+		String fileName = args[2];
 
-        try {
-            wizardList = policyFileEncoder.parse(file);
-        } catch (EncodingException e) {
-            System.out.println("Syntax error in file: " + fileName);
-            System.out.println(e.getMessage());
-            return ExitStatus.FAILURE.ordinal();
-        }
+		File file = new File(fileName);
+		if (!file.exists()) {
+			System.out.println("Error: file \"" + file.getAbsolutePath() + "\" does not exists.");
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-        if (wizardList.size() == 0) {
-            System.out.println("Error: no policies has been defined in file \"" + fileName + "\"");
-            return ExitStatus.FAILURE.ordinal();
-        }
+		XACMLPolicyCLIUtils.initOpenSAML();
 
-        if (wizardList.size() > 1) {
-            System.out.println("Error: more than one element has been defined in file \"" + fileName + "\"");
-            return ExitStatus.FAILURE.ordinal();
-        }
+		List<XACMLWizard> wizardList = new ArrayList<XACMLWizard>(0);
 
-        XACMLWizard xacmlWizard = wizardList.get(0);
+		try {
+			wizardList = policyFileEncoder.parse(file);
+		} catch (EncodingException e) {
+			System.out.println("Syntax error in file: " + fileName);
+			System.out.println(e.getMessage());
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-        int status;
+		if (wizardList.size() == 0) {
+			System.out.println("Error: no policies has been defined in file \"" + fileName + "\"");
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-        if (xacmlWizard instanceof PolicySetWizard) {
-            status = updatePolicySet(id, (PolicySetWizard) xacmlWizard);
-        } else {
-            status = updatePolicy(id, (PolicyWizard) xacmlWizard);
-        }
+		if (wizardList.size() > 1) {
+			System.out.println("Error: more than one element has been defined in file \"" + fileName + "\"");
+			return ExitStatus.FAILURE.ordinal();
+		}
 
-        if (verboseMode) {
-            if (status == ExitStatus.SUCCESS.ordinal()) {
-                System.out.println("Success: policy has been updated.");
-            }
-        }
+		XACMLWizard xacmlWizard = wizardList.get(0);
 
-        return status;
-    }
+		int status;
+
+		if (xacmlWizard instanceof PolicySetWizard) {
+			status = updatePolicySet(id, (PolicySetWizard) xacmlWizard);
+		} else {
+			status = updatePolicy(id, (PolicyWizard) xacmlWizard);
+		}
+
+		if (verboseMode) {
+			if (status == ExitStatus.SUCCESS.ordinal()) {
+				System.out.println("Success: policy has been updated.");
+			}
+		}
+
+		return status;
+	}
 
 }

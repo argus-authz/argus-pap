@@ -20,6 +20,6 @@ public interface PolicySetDAO {
 
     public void store(String papId, PolicySetType policySet);
 
-    public void update(String papId, PolicySetType newPolicySet);
+    public void update(String papId, String policySetVersion, PolicySetType newPolicySet);
 
 }

@@ -64,7 +64,7 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
         return build(policySetId, policyCombinerAlgorithmId, target, null);
     }
-
+    
     public static PolicySetType build(String policySetId, String policyCombiningAlgorithmId, TargetType target,
             ObligationsType obligations) {
         PolicySetType policySet = build();

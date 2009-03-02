@@ -117,7 +117,7 @@ public class ListPolicies extends PolicyManagementCLI {
         }
 
         XACMLPolicyCLIUtils.initOpenSAML();
-
+        
         PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, null, getPoliciesOneByOne);
 
         policyIter.init();

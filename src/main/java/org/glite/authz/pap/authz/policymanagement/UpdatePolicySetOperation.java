@@ -10,15 +10,17 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 public class UpdatePolicySetOperation extends BasePAPOperation <Boolean> {
 
-    PolicySetType policySet;
+	String version;
+	PolicySetType policySet;
     
-    public UpdatePolicySetOperation(PolicySetType policySet) {
+    public UpdatePolicySetOperation(String version, PolicySetType policySet) {
 
+    	this.version = version;
         this.policySet = policySet;
     }
     
-    public static UpdatePolicySetOperation instance(PolicySetType policySet) {
-        return new UpdatePolicySetOperation(policySet);
+    public static UpdatePolicySetOperation instance(String version, PolicySetType policySet) {
+        return new UpdatePolicySetOperation(version, policySet);
     }
     
     @Override
@@ -30,7 +32,7 @@ public class UpdatePolicySetOperation extends BasePAPOperation <Boolean> {
             return false;
         }
         
-        localPAP.updatePolicySet(policySet);
+        localPAP.updatePolicySet(version, policySet);
         
         return true;
     }

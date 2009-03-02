@@ -114,6 +114,20 @@ public class PolicySetWizard extends XACMLWizard {
 
 	}
 
+	public static void increaseVersion(PolicySetType policySet) {
+		
+		int version;
+		
+		try {
+            version = (new Integer(policySet.getVersion())).intValue();
+            version++;
+        } catch (NumberFormatException e) {
+        	version = 1;
+        }
+        
+        policySet.setVersion(Integer.toString(version));
+	}
+
 	private static void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
 
 		if (targetAttributeWizardList.size() != 1) {
@@ -134,7 +148,7 @@ public class PolicySetWizard extends XACMLWizard {
 	public void addObligation(String obligationId, List<AttributeWizard> attributeWizardList) {
 	// TODO: implement me
 	}
-
+	
 	public void addPolicy(PolicyWizard policyWizard) {
 		PolicySetHelper.addPolicyReference(policySet, policyWizard.getPolicyId());
 		policyWizardList.add(policyWizard);
@@ -154,7 +168,7 @@ public class PolicySetWizard extends XACMLWizard {
 
 		return dt.getValue();
 	}
-	
+
 	public String getPolicySetId() {
 		return policySet.getPolicySetId();
 	}
@@ -174,11 +188,15 @@ public class PolicySetWizard extends XACMLWizard {
 	public int getVersion() {
         return Integer.valueOf(policySet.getVersion());
     }
+	
+	public String getVersionString() {
+        return policySet.getVersion();
+    }
 
 	public PolicySetType getXACML() {
 		return policySet;
 	}
-
+	
 	public void increaseVersion() {
         setVersion(getVersion() + 1);
     }

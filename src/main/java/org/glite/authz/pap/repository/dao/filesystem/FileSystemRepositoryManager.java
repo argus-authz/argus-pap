@@ -3,7 +3,6 @@ package org.glite.authz.pap.repository.dao.filesystem;
 import java.io.File;
 import java.io.IOException;
 
-import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
@@ -12,58 +11,36 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemRepositoryManager extends RepositoryManager {
 
-	protected static String fileSystemDatabaseDir;
-	private static final String LOCAL_PAP_ID = PAP.LOCAL_PAP_ALIAS;
+	private static String fileSystemDatabaseDir;
 	private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
 	private static final String POLICY_FILENAME_PREFIX = "Policy_";
 	private static final String POLICYSET_FILENAME_PREFIX = "PolicySet_";
-	private static final String ROOT_POLICYSET_ID = "Root";
 	private static final String XACML_FILENAME_EXTENSION = ".xml";
 
-	/*
-	 * Call the initialize() method before using this class. 
+	/**
+	 * Call the initialize() method before using this class.
 	 */
-	
+
 	private FileSystemRepositoryManager() {}
+
+	public static String getFileNameExt() {
+		return XACML_FILENAME_EXTENSION;
+	}
 
 	public static String getFileSystemDatabaseDir() {
 		return fileSystemDatabaseDir;
-	}
-
-	public static String getLocalPAPId() {
-		return LOCAL_PAP_ID;
 	}
 
 	public static String getPAPDirAbsolutePath(String papId) {
 		return fileSystemDatabaseDir + File.separator + papId + File.separator;
 	}
 
-	public static String getPolicyAbsolutePath(String papId, String policyId) {
-		return getPAPDirAbsolutePath(papId) + getPolicyFileName(policyId);
-	}
-
-	public static String getPolicyFileName(String policyId) {
-		return POLICY_FILENAME_PREFIX + policyId + XACML_FILENAME_EXTENSION;
-	}
-
 	public static String getPolicyFileNamePrefix() {
 		return POLICY_FILENAME_PREFIX;
 	}
 
-	public static String getPolicySetAbsolutePath(String papId, String policySetId) {
-		return getPAPDirAbsolutePath(papId) + getPolicySetFileName(policySetId);
-	}
-
-	public static String getPolicySetFileName(String policySetId) {
-		return POLICYSET_FILENAME_PREFIX + policySetId + XACML_FILENAME_EXTENSION;
-	}
-
 	public static String getPolicySetFileNamePrefix() {
 		return POLICYSET_FILENAME_PREFIX;
-	}
-
-	public static String getRootPolicySetId() {
-		return ROOT_POLICYSET_ID;
 	}
 
 	public static String getXACMLFileNameExtension() {
@@ -72,7 +49,7 @@ public class FileSystemRepositoryManager extends RepositoryManager {
 
 	public static void initialize() {
 		log.info("Initializing filesystem repository...");
-		
+
 		fileSystemDatabaseDir = PAPConfiguration.instance().getPAPRepositoryDir();
 
 		File rootDir = new File(fileSystemDatabaseDir);
