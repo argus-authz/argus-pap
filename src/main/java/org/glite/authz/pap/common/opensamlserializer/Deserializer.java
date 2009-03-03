@@ -26,10 +26,7 @@ import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.DeserializerImpl;
 import org.apache.axis.message.MessageElement;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
-import org.opensaml.Configuration;
 import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.Unmarshaller;
-import org.opensaml.xml.io.UnmarshallerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
@@ -40,7 +37,6 @@ import org.xml.sax.SAXException;
 public class Deserializer extends DeserializerImpl {
 
 	private static final long serialVersionUID = 8668604610394087233L;
-	private static final Object lock = new Object();
 
 	public void onStartElement(java.lang.String namespace, java.lang.String localName,
 			java.lang.String prefix, org.xml.sax.Attributes attributes, DeserializationContext context)
@@ -48,22 +44,12 @@ public class Deserializer extends DeserializerImpl {
 
 		try {
 
-//			synchronized (lock) {
-
 				MessageElement messageElement = context.getCurElement();
 				Element element = messageElement.getAsDOM();
 
-				/* call OpenSAML serializing */
-
-//				UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
-//				Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
-//
-//				XMLObject xmlObject = unmarshaller.unmarshall(element);
 				XMLObject xmlObject = XMLObjectHelper.unmarshall(element);
 
 				setValue(xmlObject);
-//			}
-
 		}
 
 		catch (Exception exception) {

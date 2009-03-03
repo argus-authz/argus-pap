@@ -1,21 +1,18 @@
 /**
- *
+ * 
  * Copyright [2006-2007] Istituto Nazionale di Fisica Nucleare (INFN)
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in
+ * compliance with the License. You may obtain a copy of the License at
+ * 
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is
+ * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and limitations under the License.
+ * 
  * File : Serializer.java
- *
+ * 
  * Authors: Valerio Venturi <valerio.venturi@cnaf.infn.it>
  * 
  */
@@ -30,10 +27,7 @@ import org.apache.axis.Constants;
 import org.apache.axis.encoding.SerializationContext;
 import org.apache.axis.wsdl.fromJava.Types;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
-import org.opensaml.Configuration;
 import org.opensaml.xml.XMLObject;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.io.MarshallerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 
@@ -43,83 +37,57 @@ import org.xml.sax.Attributes;
  */
 public class Serializer implements org.apache.axis.encoding.Serializer {
 
-	private static final long serialVersionUID = -4207218164610553717L;
-	private static final Object lock = new Object();
+    private static final long serialVersionUID = -4207218164610553717L;
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName,
-	 * org.xml.sax.Attributes, java.lang.Object,
-	 * org.apache.axis.encoding.SerializationContext)
-	 */
-	public void serialize(QName name, Attributes attributes, Object value, SerializationContext context)
-			throws IOException {
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName, org.xml.sax.Attributes,
+     * java.lang.Object, org.apache.axis.encoding.SerializationContext)
+     */
+    public void serialize(QName name, Attributes attributes, Object value, SerializationContext context) throws IOException {
 
-		try {
+        try {
 
-//			synchronized (lock) {
+            XMLObject xmlObject = (XMLObject) value;
 
-				XMLObject xmlObject = (XMLObject) value;
+            Element element = XMLObjectHelper.marshall(xmlObject);
 
-				/* call OpenSAML serializing */
+            if (attributes != null) {
+                for (int i = 0; i < attributes.getLength(); i++) {
+                    element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes.getValue(i));
+                }
+            }
 
-//				MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
-//				Marshaller marshaller = marshallerFactory.getMarshaller(xmlObject);
-//				Element element = marshaller.marshall(xmlObject);
-				Element element = XMLObjectHelper.marshall(xmlObject);
+            context.setWriteXMLType(null);
+            context.writeDOMElement(element);
 
-				/*
-				 * compute the signature value
-				 * 
-				 * List<Assertion> assertions = response.getAssertions(); if
-				 * (assertions.size() > 0) { Assertion assertion =
-				 * assertions.get(0); if (assertion != null) { Signature
-				 * signature = assertion.getSignature(); if (signature != null)
-				 * Signer.signObject(signature); } }
-				 */
+        } catch (Exception exception) {
 
-				/* */
+            throw new IOException("Error serializing " + value.getClass().getName() + " : " + exception.getClass().getName());
 
-				if (attributes != null) {
-					for (int i = 0; i < attributes.getLength(); i++) {
-						element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes
-								.getValue(i));
-					}
-				}
+        }
+    }
 
-				context.setWriteXMLType(null);
-				context.writeDOMElement(element);
-//			}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
+     * org.apache.axis.wsdl.fromJava.Types)
+     */
+    public Element writeSchema(Class javaType, Types types) throws Exception {
+        Element complexType = types.createElement("complexType");
+        return complexType;
+    }
 
-		} catch (Exception exception) {
-
-			throw new IOException("Error serializing " + value.getClass().getName() + " : "
-					+ exception.getClass().getName());
-
-		}
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
-	 * org.apache.axis.wsdl.fromJava.Types)
-	 */
-	public Element writeSchema(Class javaType, Types types) throws Exception {
-		Element complexType = types.createElement("complexType");
-		return complexType;
-	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
-	 */
-	public String getMechanismType() {
-		// TODO Auto-generated method stub
-		return Constants.AXIS_SAX;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
+     */
+    public String getMechanismType() {
+        // TODO Auto-generated method stub
+        return Constants.AXIS_SAX;
+    }
 
 }
