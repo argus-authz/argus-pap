@@ -86,7 +86,7 @@ TOKEN:
 
 List<XACMLWizard> Text() :
 {
-  PolicySetWizard psw = null;
+  XACMLWizard psw = null;
   List<XACMLWizard> sets = new LinkedList<XACMLWizard>();
 }
 { 
@@ -96,11 +96,17 @@ List<XACMLWizard> Text() :
 }
 
 
-PolicySetWizard Resource() :
+XACMLWizard Resource() :
 {
   List<MixIn> policyContents = new LinkedList<MixIn>();
   MixIn content=null;
   String t = null;
+  String t3 = null;
+  String t4 = null;
+  List<AttributeWizard> obligationContent = new LinkedList<AttributeWizard>();
+  List<MixIn> mixinContent = new LinkedList<MixIn>();  
+  AttributeWizard attr = null;
+  MixIn mixin;
 }
 {
   <RESOURCE> t=TextString() "{" ( content=ResourceContents() { policyContents.add(content); })+ "}" {
@@ -116,6 +122,33 @@ PolicySetWizard Resource() :
     }     
     return psw;
   } 
+|   <ACTION> t3=TextString() "{" (mixin=ActionContent() {mixinContent.add(mixin);} )+ "}" {
+      PolicyWizard pw = new PolicyWizard(new AttributeWizard("action", t3));
+      for (MixIn mixedin : mixinContent) {
+        if (mixedin.rule != null)
+          pw.addRule(mixedin.rule);
+        if (mixedin.obligation != null)
+          pw.addObligation(mixedin.obligation);
+        if (mixedin.description != null)
+          pw.setDescription(mixedin.description);
+      }     
+      return pw;
+    }
+
+|   <PRIVATE> <ACTION> t4=TextString() "{" ( mixin=ActionContent() {mixinContent.add(mixin);} )+ "}" {
+      PolicyWizard pw2 = new PolicyWizard(new AttributeWizard("action", t4));
+      for (MixIn mixedin : mixinContent) {
+        if (mixedin.rule != null)
+          pw2.addRule(mixedin.rule);
+        if (mixedin.obligation != null)
+          pw2.addObligation(mixedin.obligation);
+        if (mixedin.description != null)
+          pw2.setDescription(mixedin.description);
+      }     
+      pw2.setPrivate(true);
+      return pw2;
+    }
+
 }
 
 MixIn ResourceContents() :

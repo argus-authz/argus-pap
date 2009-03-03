@@ -13,14 +13,16 @@ import org.opensaml.xacml.policy.PolicyType;
 class BWParser implements BWParserConstants {
 
   static final public List<XACMLWizard> Text() throws ParseException {
-  PolicySetWizard psw = null;
+  XACMLWizard psw = null;
   List<XACMLWizard> sets = new LinkedList<XACMLWizard>();
     label_1:
     while (true) {
       psw = Resource();
                     sets.add(psw);
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case ACTION:
       case RESOURCE:
+      case PRIVATE:
         ;
         break;
       default:
@@ -32,30 +34,38 @@ class BWParser implements BWParserConstants {
     throw new Error("Missing return statement in function");
   }
 
-  static final public PolicySetWizard Resource() throws ParseException {
+  static final public XACMLWizard Resource() throws ParseException {
   List<MixIn> policyContents = new LinkedList<MixIn>();
   MixIn content=null;
   String t = null;
-    jj_consume_token(RESOURCE);
-    t = TextString();
-    jj_consume_token(22);
-    label_2:
-    while (true) {
-      content = ResourceContents();
+  String t3 = null;
+  String t4 = null;
+  List<AttributeWizard> obligationContent = new LinkedList<AttributeWizard>();
+  List<MixIn> mixinContent = new LinkedList<MixIn>();
+  AttributeWizard attr = null;
+  MixIn mixin;
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case RESOURCE:
+      jj_consume_token(RESOURCE);
+      t = TextString();
+      jj_consume_token(22);
+      label_2:
+      while (true) {
+        content = ResourceContents();
                                                                policyContents.add(content);
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case DESCRIPTION:
-      case OBLIGATION:
-      case ACTION:
-      case PRIVATE:
-        ;
-        break;
-      default:
-        jj_la1[1] = jj_gen;
-        break label_2;
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DESCRIPTION:
+        case OBLIGATION:
+        case ACTION:
+        case PRIVATE:
+          ;
+          break;
+        default:
+          jj_la1[1] = jj_gen;
+          break label_2;
+        }
       }
-    }
-    jj_consume_token(23);
+      jj_consume_token(23);
     PolicySetWizard psw = new PolicySetWizard(new AttributeWizard("resource", t));
     for (MixIn mixedin : policyContents) {
       if (mixedin.policy != null) {
@@ -67,6 +77,76 @@ class BWParser implements BWParserConstants {
         psw.setDescription(mixedin.description);
     }
     {if (true) return psw;}
+      break;
+    case ACTION:
+      jj_consume_token(ACTION);
+      t3 = TextString();
+      jj_consume_token(22);
+      label_3:
+      while (true) {
+        mixin = ActionContent();
+                                                         mixinContent.add(mixin);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DESCRIPTION:
+        case OBLIGATION:
+        case RULE:
+          ;
+          break;
+        default:
+          jj_la1[2] = jj_gen;
+          break label_3;
+        }
+      }
+      jj_consume_token(23);
+      PolicyWizard pw = new PolicyWizard(new AttributeWizard("action", t3));
+      for (MixIn mixedin : mixinContent) {
+        if (mixedin.rule != null)
+          pw.addRule(mixedin.rule);
+        if (mixedin.obligation != null)
+          pw.addObligation(mixedin.obligation);
+        if (mixedin.description != null)
+          pw.setDescription(mixedin.description);
+      }
+      {if (true) return pw;}
+      break;
+    case PRIVATE:
+      jj_consume_token(PRIVATE);
+      jj_consume_token(ACTION);
+      t4 = TextString();
+      jj_consume_token(22);
+      label_4:
+      while (true) {
+        mixin = ActionContent();
+                                                                    mixinContent.add(mixin);
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case DESCRIPTION:
+        case OBLIGATION:
+        case RULE:
+          ;
+          break;
+        default:
+          jj_la1[3] = jj_gen;
+          break label_4;
+        }
+      }
+      jj_consume_token(23);
+      PolicyWizard pw2 = new PolicyWizard(new AttributeWizard("action", t4));
+      for (MixIn mixedin : mixinContent) {
+        if (mixedin.rule != null)
+          pw2.addRule(mixedin.rule);
+        if (mixedin.obligation != null)
+          pw2.addObligation(mixedin.obligation);
+        if (mixedin.description != null)
+          pw2.setDescription(mixedin.description);
+      }
+      pw2.setPrivate(true);
+      {if (true) return pw2;}
+      break;
+    default:
+      jj_la1[4] = jj_gen;
+      jj_consume_token(-1);
+      throw new ParseException();
+    }
     throw new Error("Missing return statement in function");
   }
 
@@ -89,7 +169,7 @@ class BWParser implements BWParserConstants {
       jj_consume_token(OBLIGATION);
       t2 = TextString();
       jj_consume_token(22);
-      label_3:
+      label_5:
       while (true) {
         attr = ObligationContent();
                                                                 obligationContent.add(attr);
@@ -100,8 +180,8 @@ class BWParser implements BWParserConstants {
           ;
           break;
         default:
-          jj_la1[2] = jj_gen;
-          break label_3;
+          jj_la1[5] = jj_gen;
+          break label_5;
         }
       }
       jj_consume_token(23);
@@ -111,7 +191,7 @@ class BWParser implements BWParserConstants {
       jj_consume_token(ACTION);
       t3 = TextString();
       jj_consume_token(22);
-      label_4:
+      label_6:
       while (true) {
         mixin = ActionContent();
                                                          mixinContent.add(mixin);
@@ -122,8 +202,8 @@ class BWParser implements BWParserConstants {
           ;
           break;
         default:
-          jj_la1[3] = jj_gen;
-          break label_4;
+          jj_la1[6] = jj_gen;
+          break label_6;
         }
       }
       jj_consume_token(23);
@@ -143,7 +223,7 @@ class BWParser implements BWParserConstants {
       jj_consume_token(ACTION);
       t4 = TextString();
       jj_consume_token(22);
-      label_5:
+      label_7:
       while (true) {
         mixin = ActionContent();
                                                                     mixinContent.add(mixin);
@@ -154,8 +234,8 @@ class BWParser implements BWParserConstants {
           ;
           break;
         default:
-          jj_la1[4] = jj_gen;
-          break label_5;
+          jj_la1[7] = jj_gen;
+          break label_7;
         }
       }
       jj_consume_token(23);
@@ -172,7 +252,7 @@ class BWParser implements BWParserConstants {
       {if (true) return new MixIn(pw2);}
       break;
     default:
-      jj_la1[5] = jj_gen;
+      jj_la1[8] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -207,7 +287,7 @@ class BWParser implements BWParserConstants {
       jj_consume_token(OBLIGATION);
       t2 = TextString();
       jj_consume_token(22);
-      label_6:
+      label_8:
       while (true) {
         attr = ObligationContent();
                                 obligationContent.add(attr);
@@ -218,8 +298,8 @@ class BWParser implements BWParserConstants {
           ;
           break;
         default:
-          jj_la1[6] = jj_gen;
-          break label_6;
+          jj_la1[9] = jj_gen;
+          break label_8;
         }
       }
       jj_consume_token(23);
@@ -229,7 +309,7 @@ class BWParser implements BWParserConstants {
       jj_consume_token(RULE);
       effect = RuleEffect();
       jj_consume_token(22);
-      label_7:
+      label_9:
       while (true) {
         attr = RuleContent();
                            ruleContent.add(attr);
@@ -240,15 +320,15 @@ class BWParser implements BWParserConstants {
           ;
           break;
         default:
-          jj_la1[7] = jj_gen;
-          break label_7;
+          jj_la1[10] = jj_gen;
+          break label_9;
         }
       }
       jj_consume_token(23);
     {if (true) return new MixIn(new RuleWizard(ruleContent, effect));}
       break;
     default:
-      jj_la1[8] = jj_gen;
+      jj_la1[11] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -267,7 +347,7 @@ class BWParser implements BWParserConstants {
              {if (true) return EffectType.Permit;}
       break;
     default:
-      jj_la1[9] = jj_gen;
+      jj_la1[12] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -302,7 +382,7 @@ class BWParser implements BWParserConstants {
     {if (true) return t.toString();}
       break;
     default:
-      jj_la1[10] = jj_gen;
+      jj_la1[13] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -315,13 +395,13 @@ class BWParser implements BWParserConstants {
   static public Token token, jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[11];
+  static final private int[] jj_la1 = new int[14];
   static private int[] jj_la1_0;
   static {
       jj_la1_0();
    }
    private static void jj_la1_0() {
-      jj_la1_0 = new int[] {0x8000,0x13800,0xe0000,0x5800,0x5800,0x13800,0xe0000,0xe0000,0x5800,0x600,0xe0000,};
+      jj_la1_0 = new int[] {0x1a000,0x13800,0x5800,0x5800,0x1a000,0xe0000,0x5800,0x5800,0x13800,0xe0000,0xe0000,0x5800,0x600,0xe0000,};
    }
 
   public BWParser(java.io.InputStream stream) {
@@ -340,7 +420,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.InputStream stream) {
@@ -352,7 +432,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   public BWParser(java.io.Reader stream) {
@@ -368,7 +448,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   static public void ReInit(java.io.Reader stream) {
@@ -377,7 +457,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   public BWParser(BWParserTokenManager tm) {
@@ -392,7 +472,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   public void ReInit(BWParserTokenManager tm) {
@@ -400,7 +480,7 @@ class BWParser implements BWParserConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 11; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 14; i++) jj_la1[i] = -1;
   }
 
   static final private Token jj_consume_token(int kind) throws ParseException {
@@ -455,7 +535,7 @@ class BWParser implements BWParserConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 14; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
