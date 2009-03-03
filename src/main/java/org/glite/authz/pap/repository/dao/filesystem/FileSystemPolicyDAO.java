@@ -172,6 +172,46 @@ public class FileSystemPolicyDAO implements PolicyDAO {
         }
         return policyList;
     }
+    
+    public List<String> getAllAsStringList(String papId) {
+
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+
+        if (!papDir.exists()) {
+            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+        }
+
+//        Map<String, PolicyType> papCache = getPAPCache(papId);
+
+        List<String> policyList = new LinkedList<String>();
+
+        for (File file : papDir.listFiles()) {
+
+            if (file.isDirectory()) {
+                continue;
+            }
+
+            String fileName = file.getName();
+
+            if (fileName.startsWith(POLICY_FILE_NAME_PREFIX)) {
+
+                String policyId = getPolicyIdFromFileName(fileName);
+//                PolicyType policy = papCache.get(policyId);
+                String policy = null;
+
+                if (policy == null) {
+                    try {
+                        policy = policyHelper.readFromFileAsString(file);
+                    } catch (Throwable e) {
+                        throw new RepositoryException(e);
+                    }
+//                    papCache.put(policyId, policy);
+                }
+                policyList.add(policy);
+            }
+        }
+        return policyList;
+    }
 
     public PolicyType getById(String papId, String policyId) {
 
@@ -201,6 +241,36 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
         // Return a clone of the object
         return PolicyHelper.getInstance().clone(policy);
+    }
+    
+    public String getByIdAsString(String papId, String policyId) {
+
+        //Map<String, PolicyType> papCache = getPAPCache(papId);
+
+        //PolicyType policy = papCache.get(policyId);
+        String policyString = null;
+
+        if (policyString == null) {
+
+            File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
+
+            if (!policyFile.exists()) {
+//                if (papCache.size() == 0) {
+//                    cache.remove(papId);
+//                }
+                throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
+            }
+
+            try {
+                policyString = policyHelper.readFromFileAsString(policyFile);
+            } catch (Throwable e) {
+                throw new RepositoryException(e);
+            }
+            
+//            papCache.put(policyId, policy);
+        }
+
+        return policyString;
     }
 
     public int getNumberOfPolicies(String papId) {

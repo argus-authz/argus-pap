@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -34,8 +36,8 @@ import org.w3c.dom.Element;
 
 public class XMLObjectHelper<T extends XMLObject> {
 
-    protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
     private static final Object lock = new Object();
+    protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
     protected XMLObjectHelper() {}
 
@@ -86,16 +88,6 @@ public class XMLObjectHelper<T extends XMLObject> {
         return element;
     }
 
-    public static XMLObject unmarshall(Element element) throws UnmarshallingException {
-        XMLObject xmlObject;
-        synchronized (lock) {
-            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
-            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
-            xmlObject = unmarshaller.unmarshall(element);
-        }
-        return xmlObject;
-    }
-
     public static void toFile(File file, XMLObject xmlObject) {
         FileOutputStream fos;
 
@@ -117,6 +109,16 @@ public class XMLObjectHelper<T extends XMLObject> {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         write(bos, xmlObject);
         return bos.toString();
+    }
+
+    public static XMLObject unmarshall(Element element) throws UnmarshallingException {
+        XMLObject xmlObject;
+        synchronized (lock) {
+            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
+            xmlObject = unmarshaller.unmarshall(element);
+        }
+        return xmlObject;
     }
 
     public static void write(OutputStream outputStream, XMLObject xmlObject) {
@@ -156,6 +158,19 @@ public class XMLObjectHelper<T extends XMLObject> {
 
         return doc;
     }
+    
+    private static Document readDocument(Reader reader) {
+        Document doc;
+        try {
+            BasicParserPool ppMgr = new BasicParserPool();
+            ppMgr.setNamespaceAware(true);
+            doc = ppMgr.parse(reader);
+        } catch (XMLParserException e) {
+            throw new XMLObjectException(e);
+        }
+
+        return doc;
+    }
 
     @SuppressWarnings("unchecked")
     public T build(Element element) {
@@ -167,10 +182,16 @@ public class XMLObjectHelper<T extends XMLObject> {
         Document doc = readDocument(file);
         return build(doc.getDocumentElement());
     }
-
+    
     public T buildFromFile(String fileName) {
         File file = new File(fileName);
         return buildFromFile(file);
+    }
+
+    public T buildFromString(String s) {
+        StringReader sr = new StringReader(s);
+        Document doc = readDocument(sr);
+        return build(doc.getDocumentElement());
     }
 
     public T clone(T xmlObject) {
@@ -179,5 +200,32 @@ public class XMLObjectHelper<T extends XMLObject> {
         ByteArrayInputStream ios = new ByteArrayInputStream(bos.toByteArray());
         Document doc = readDocument(ios);
         return build(doc.getDocumentElement());
+    }
+
+    public String readFromFileAsString(File file) {
+        
+        T xmlObject = buildFromFile(file);
+        
+        return toString(xmlObject);
+        
+//        char[] buffer;
+//        
+//        BufferedReader bufferedReader;
+//        try {
+//            bufferedReader = new BufferedReader(new FileReader(file));
+//            buffer = new char[(int) file.length()];
+//            bufferedReader.read(buffer);
+//        } catch (FileNotFoundException e) {
+//            throw new XMLObjectException("File not found: " + file.getAbsolutePath(), e);
+//        } catch (IOException e) {
+//            throw new XMLObjectException("IO exception reading file: " + file.getAbsolutePath(), e);
+//        }
+//        
+//        return new String(buffer);
+    }
+
+    public String readFromFileAsString(String fileName) {
+        File file = new File(fileName);
+        return readFromFileAsString(file);
     }
 }
