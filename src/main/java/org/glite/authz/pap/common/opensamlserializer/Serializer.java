@@ -26,8 +26,11 @@ import javax.xml.namespace.QName;
 import org.apache.axis.Constants;
 import org.apache.axis.encoding.SerializationContext;
 import org.apache.axis.wsdl.fromJava.Types;
+import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.opensaml.xml.XMLObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 
@@ -37,57 +40,71 @@ import org.xml.sax.Attributes;
  */
 public class Serializer implements org.apache.axis.encoding.Serializer {
 
-    private static final long serialVersionUID = -4207218164610553717L;
+	private static final long serialVersionUID = -4207218164610553717L;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName, org.xml.sax.Attributes,
-     * java.lang.Object, org.apache.axis.encoding.SerializationContext)
-     */
-    public void serialize(QName name, Attributes attributes, Object value, SerializationContext context) throws IOException {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName,
+	 * org.xml.sax.Attributes, java.lang.Object,
+	 * org.apache.axis.encoding.SerializationContext)
+	 */
+	public void serialize(QName name, Attributes attributes, Object value, SerializationContext context)
+			throws IOException {
 
-        try {
+		try {
 
-            XMLObject xmlObject = (XMLObject) value;
+			if (value instanceof PolicyTypeString) {
+				String policyString = ((PolicyTypeString) value).getPolicyString();
+				String ps = policyString.substring("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".length());
+				
+				context.setWriteXMLType(null);
+				context.writeString(ps);
+			} else {
 
-            Element element = XMLObjectHelper.marshall(xmlObject);
+				XMLObject xmlObject = (XMLObject) value;
 
-            if (attributes != null) {
-                for (int i = 0; i < attributes.getLength(); i++) {
-                    element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes.getValue(i));
-                }
-            }
+				Element element = XMLObjectHelper.marshall(xmlObject);
 
-            context.setWriteXMLType(null);
-            context.writeDOMElement(element);
+				if (attributes != null) {
+					for (int i = 0; i < attributes.getLength(); i++) {
+						element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes
+								.getValue(i));
+					}
+				}
 
-        } catch (Exception exception) {
+				context.setWriteXMLType(null);
+				context.writeDOMElement(element);
+			}
 
-            throw new IOException("Error serializing " + value.getClass().getName() + " : " + exception.getClass().getName());
+		} catch (Exception exception) {
 
-        }
-    }
+			throw new IOException("Error serializing " + value.getClass().getName() + " : "
+					+ exception.getClass().getName());
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
-     * org.apache.axis.wsdl.fromJava.Types)
-     */
-    public Element writeSchema(Class javaType, Types types) throws Exception {
-        Element complexType = types.createElement("complexType");
-        return complexType;
-    }
+		}
+	}
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
-     */
-    public String getMechanismType() {
-        // TODO Auto-generated method stub
-        return Constants.AXIS_SAX;
-    }
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
+	 * org.apache.axis.wsdl.fromJava.Types)
+	 */
+	public Element writeSchema(Class javaType, Types types) throws Exception {
+		Element complexType = types.createElement("complexType");
+		return complexType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
+	 */
+	public String getMechanismType() {
+		// TODO Auto-generated method stub
+		return Constants.AXIS_SAX;
+	}
 
 }

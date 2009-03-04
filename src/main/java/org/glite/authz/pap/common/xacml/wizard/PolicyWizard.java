@@ -49,7 +49,7 @@ public class PolicyWizard extends XACMLWizard {
 
         setVersion(1);
     }
-
+    
     public PolicyWizard(PolicyType policy) throws UnsupportedPolicyException {
 
         decomposePolicyId(policy.getPolicyId());
@@ -72,6 +72,10 @@ public class PolicyWizard extends XACMLWizard {
         }
 
         this.policy = policy;
+    }
+
+    public PolicyWizard(String policyString) {
+    	this(PolicyHelper.getInstance().buildFromString(policyString));
     }
 
     public static String generateId(String prefix) {

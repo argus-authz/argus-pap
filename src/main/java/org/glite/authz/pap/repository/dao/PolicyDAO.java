@@ -15,10 +15,8 @@ public interface PolicyDAO {
     public boolean exists(String papId, String policyId);
 
     public List<PolicyType> getAll(String papId);
-    public List<String> getAllAsStringList(String papId);
 
     public PolicyType getById(String papId, String policyId);
-    public String getByIdAsString(String papId, String policyId);
     
     public int getNumberOfPolicies(String papId);
 

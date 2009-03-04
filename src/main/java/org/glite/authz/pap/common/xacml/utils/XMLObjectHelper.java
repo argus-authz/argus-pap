@@ -97,7 +97,7 @@ public class XMLObjectHelper<T extends XMLObject> {
             throw new XMLObjectException("Cannot write to file: " + file.getAbsolutePath(), e);
         }
 
-        write(fos, xmlObject);
+        write(fos, xmlObject, 4);
     }
 
     public static void toFile(String fileName, XMLObject xmlObject) {
@@ -106,8 +106,12 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     public static String toString(XMLObject xmlObject) {
+        return toString(xmlObject, 4);
+    }
+    
+    public static String toString(XMLObject xmlObject, int indent) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        write(bos, xmlObject);
+        write(bos, xmlObject, indent);
         return bos.toString();
     }
 
@@ -121,12 +125,12 @@ public class XMLObjectHelper<T extends XMLObject> {
         return xmlObject;
     }
 
-    public static void write(OutputStream outputStream, XMLObject xmlObject) {
+    public static void write(OutputStream outputStream, XMLObject xmlObject, int indent) {
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             tr.setOutputProperty(OutputKeys.INDENT, "yes");
             tr.setOutputProperty(OutputKeys.METHOD, "xml");
-            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(indent));
             tr.transform(new DOMSource(getDOM(xmlObject)), new StreamResult(outputStream));
         } catch (TransformerConfigurationException e) {
             throw new XMLObjectException(e);
@@ -196,7 +200,7 @@ public class XMLObjectHelper<T extends XMLObject> {
 
     public T clone(T xmlObject) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        write(bos, xmlObject);
+        write(bos, xmlObject, 0);
         ByteArrayInputStream ios = new ByteArrayInputStream(bos.toByteArray());
         Document doc = readDocument(ios);
         return build(doc.getDocumentElement());
