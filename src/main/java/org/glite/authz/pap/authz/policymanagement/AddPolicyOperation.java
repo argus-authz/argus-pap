@@ -39,13 +39,12 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
         String policyId = WizardUtils.generateId(policyIdPrefix);
         
         policy.setPolicyId(policyId);
-
+        
         localPAP.addPolicy(index, policySetId, policy);
         
         log.info(String.format("Added policy (policyId=\"%s\")", policyId));
 
         return policyId;
-
     }
 
     @Override

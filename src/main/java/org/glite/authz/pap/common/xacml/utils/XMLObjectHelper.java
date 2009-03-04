@@ -8,6 +8,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringReader;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
@@ -34,8 +36,8 @@ import org.w3c.dom.Element;
 
 public class XMLObjectHelper<T extends XMLObject> {
 
-    protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
     private static final Object lock = new Object();
+    protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
     protected XMLObjectHelper() {}
 
@@ -86,6 +88,33 @@ public class XMLObjectHelper<T extends XMLObject> {
         return element;
     }
 
+    public static void toFile(File file, XMLObject xmlObject) {
+        FileOutputStream fos;
+
+        try {
+            fos = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            throw new XMLObjectException("Cannot write to file: " + file.getAbsolutePath(), e);
+        }
+
+        write(fos, xmlObject, 4);
+    }
+
+    public static void toFile(String fileName, XMLObject xmlObject) {
+        File file = new File(fileName);
+        toFile(file, xmlObject);
+    }
+
+    public static String toString(XMLObject xmlObject) {
+        return toString(xmlObject, 4);
+    }
+    
+    public static String toString(XMLObject xmlObject, int indent) {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        write(bos, xmlObject, indent);
+        return bos.toString();
+    }
+
     public static XMLObject unmarshall(Element element) throws UnmarshallingException {
         XMLObject xmlObject;
         synchronized (lock) {
@@ -96,35 +125,12 @@ public class XMLObjectHelper<T extends XMLObject> {
         return xmlObject;
     }
 
-    public static void toFile(File file, XMLObject xmlObject) {
-        FileOutputStream fos;
-
-        try {
-            fos = new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            throw new XMLObjectException("Cannot write to file: " + file.getAbsolutePath(), e);
-        }
-
-        write(fos, xmlObject);
-    }
-
-    public static void toFile(String fileName, XMLObject xmlObject) {
-        File file = new File(fileName);
-        toFile(file, xmlObject);
-    }
-
-    public static String toString(XMLObject xmlObject) {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        write(bos, xmlObject);
-        return bos.toString();
-    }
-
-    public static void write(OutputStream outputStream, XMLObject xmlObject) {
+    public static void write(OutputStream outputStream, XMLObject xmlObject, int indent) {
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             tr.setOutputProperty(OutputKeys.INDENT, "yes");
             tr.setOutputProperty(OutputKeys.METHOD, "xml");
-            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
+            tr.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", String.valueOf(indent));
             tr.transform(new DOMSource(getDOM(xmlObject)), new StreamResult(outputStream));
         } catch (TransformerConfigurationException e) {
             throw new XMLObjectException(e);
@@ -156,6 +162,19 @@ public class XMLObjectHelper<T extends XMLObject> {
 
         return doc;
     }
+    
+    private static Document readDocument(Reader reader) {
+        Document doc;
+        try {
+            BasicParserPool ppMgr = new BasicParserPool();
+            ppMgr.setNamespaceAware(true);
+            doc = ppMgr.parse(reader);
+        } catch (XMLParserException e) {
+            throw new XMLObjectException(e);
+        }
+
+        return doc;
+    }
 
     @SuppressWarnings("unchecked")
     public T build(Element element) {
@@ -167,17 +186,50 @@ public class XMLObjectHelper<T extends XMLObject> {
         Document doc = readDocument(file);
         return build(doc.getDocumentElement());
     }
-
+    
     public T buildFromFile(String fileName) {
         File file = new File(fileName);
         return buildFromFile(file);
     }
 
+    public T buildFromString(String s) {
+        StringReader sr = new StringReader(s);
+        Document doc = readDocument(sr);
+        return build(doc.getDocumentElement());
+    }
+
     public T clone(T xmlObject) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        write(bos, xmlObject);
+        write(bos, xmlObject, 0);
         ByteArrayInputStream ios = new ByteArrayInputStream(bos.toByteArray());
         Document doc = readDocument(ios);
         return build(doc.getDocumentElement());
+    }
+
+    public String readFromFileAsString(File file) {
+        
+        T xmlObject = buildFromFile(file);
+        
+        return toString(xmlObject);
+        
+//        char[] buffer;
+//        
+//        BufferedReader bufferedReader;
+//        try {
+//            bufferedReader = new BufferedReader(new FileReader(file));
+//            buffer = new char[(int) file.length()];
+//            bufferedReader.read(buffer);
+//        } catch (FileNotFoundException e) {
+//            throw new XMLObjectException("File not found: " + file.getAbsolutePath(), e);
+//        } catch (IOException e) {
+//            throw new XMLObjectException("IO exception reading file: " + file.getAbsolutePath(), e);
+//        }
+//        
+//        return new String(buffer);
+    }
+
+    public String readFromFileAsString(String fileName) {
+        File file = new File(fileName);
+        return readFromFileAsString(file);
     }
 }

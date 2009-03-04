@@ -16,25 +16,27 @@ public interface ServiceClient {
     
     public String getClientProxy();
     
-    public PAPManagement getPAPManagementService(String url);
-
-    public XACMLPolicyManagement getXACMLPolicyManagementService(String url);
-    
     public HighLevelPolicyManagement getHighLevelPolicyManagementService(String url);
+
+    public String getHighLevelPolicyManagementServiceName();
     
     public PAPAuthorizationManagement getPAPAuthorizationManagementService(String url);
     
-    public Provisioning getProvisioningService(String url);
-    
-    public String getXACMLPolicyManagementServiceName();
-    
-    public String getHighLevelPolicyManagementServiceName();
-    
     public String getPAPAuthorizationManagementServiceName();
+    
+    public PAPManagement getPAPManagementService(String url);
     
     public String getPAPManagementServiceName();
     
+    public Provisioning getProvisioningService(String url);
+    
+    public String getProvisioningServiceName();
+    
     public String getTargetEndpoint();
+    
+    public XACMLPolicyManagement getXACMLPolicyManagementService(String url);
+    
+    public String getXACMLPolicyManagementServiceName();
 
     public void setClientCertificate(String certFile);
     
@@ -42,8 +44,8 @@ public interface ServiceClient {
 
     public void setClientPrivateKeyPassword(String privateKeyPassword);
     
-    public void setTargetEndpoint(String endpointURL);
-    
     public void setClientProxy(String clientProxy);
+    
+    public void setTargetEndpoint(String endpointURL);
     
 }

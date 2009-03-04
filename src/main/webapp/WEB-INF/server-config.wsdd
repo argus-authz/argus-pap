@@ -52,7 +52,7 @@
 		<typeMapping xmlns:ns="urn:policy:xacml:opensaml:org"
 			qname="ns:PolicyType" type="java:org.opensaml.xacml.policy.PolicyType"
 			serializer="org.glite.authz.pap.common.opensamlserializer.SerializerFactory"
-			deserializer="org.glite.authz.pap.common.opensamlserializer.DeserializerFactory"
+			deserializer="org.glite.authz.pap.common.opensamlserializer.PolicyTypeDeserializerFactory"
 			encodingStyle="" />
 		<arrayMapping xmlns:ns="urn:policy:xacml:opensaml:org"
 			qname="ns:PolicyList" type="java:org.opensaml.xacml.policy.PolicyType[]"

@@ -11,9 +11,7 @@
  * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and limitations under the License.
  * 
- * File : DeserializerFactory.java
- * 
- * Authors: Valerio Venturi <valerio.venturi@cnaf.infn.it>
+ * Authors: Alberto Forti (alberto.forti@cnaf.infn.it)
  * 
  */
 
@@ -23,17 +21,9 @@ import java.util.Iterator;
 
 import javax.xml.rpc.encoding.Deserializer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-/**
- * @author Valerio Venturi (valerio.venturi@cnaf.infn.it)
- * 
- */
-public class DeserializerFactory implements org.apache.axis.encoding.DeserializerFactory {
+public class PolicySetTypeDeserializerFactory implements org.apache.axis.encoding.DeserializerFactory {
     
-    private static final long serialVersionUID = 7198603279842211488L;
-    private static final Logger log = LoggerFactory.getLogger(DeserializerFactory.class);
+    private static final long serialVersionUID = -6659182757715603579L;
 
     /*
      * (non-Javadoc)
@@ -41,7 +31,7 @@ public class DeserializerFactory implements org.apache.axis.encoding.Deserialize
      * @see javax.xml.rpc.encoding.DeserializerFactory#getDeserializerAs(java.lang.String)
      */
     public Deserializer getDeserializerAs(String arg0) {
-        return new org.glite.authz.pap.common.opensamlserializer.Deserializer();
+        return new org.glite.authz.pap.common.opensamlserializer.PolicySetTypeDeserializer();
     }
 
     /*
@@ -49,6 +39,7 @@ public class DeserializerFactory implements org.apache.axis.encoding.Deserialize
      * 
      * @see javax.xml.rpc.encoding.DeserializerFactory#getSupportedMechanismTypes()
      */
+    @SuppressWarnings("unchecked")
     public Iterator getSupportedMechanismTypes() {
         // TODO Auto-generated method stub
         return null;
