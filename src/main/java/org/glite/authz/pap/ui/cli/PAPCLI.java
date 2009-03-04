@@ -30,6 +30,7 @@ import org.glite.authz.pap.ui.cli.policymanagement.RemoveAllPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.RemovePolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.UnBanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.UpdatePolicy;
+import org.glite.authz.pap.ui.cli.samlclient.SAMLClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,7 @@ public class PAPCLI {
     private final List<ServiceCLI> policyMgmtCommandList = new LinkedList<ServiceCLI>();
     private final List<ServiceCLI> papMgmtCommandList = new LinkedList<ServiceCLI>();
     private final List<ServiceCLI> authzMgmtCommandList = new LinkedList<ServiceCLI>();
+    private final List<ServiceCLI> testCommandList = new LinkedList<ServiceCLI>();
 
     protected int hfWidth = 80;
     protected final Options options = new Options();
@@ -190,10 +192,14 @@ public class PAPCLI {
         authzMgmtCommandList.add(new ListACL());
         authzMgmtCommandList.add(new AddACE());
         authzMgmtCommandList.add(new RemoveACE());
+        
+        // Test
+        testCommandList.add(new SAMLClient());
 
         serviceCLIList.addAll(policyMgmtCommandList);
         serviceCLIList.addAll(papMgmtCommandList);
         serviceCLIList.addAll(authzMgmtCommandList);
+        serviceCLIList.addAll(testCommandList);
 
     }
 
@@ -262,6 +268,12 @@ public class PAPCLI {
 
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Authorization management:");
         for (ServiceCLI serviceCLI : authzMgmtCommandList) {
+            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
+        }
+        pw.println();
+        
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Test utils:");
+        for (ServiceCLI serviceCLI : testCommandList) {
             helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
         }
 

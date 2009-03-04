@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.xacml.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -18,171 +19,177 @@ import org.slf4j.LoggerFactory;
 
 public class ProvisioningServiceDAO {
 
-	private static ProvisioningServiceDAO instance = null;
-	private static final Logger log = LoggerFactory.getLogger(ProvisioningServiceDAO.class);
+    private static ProvisioningServiceDAO instance = null;
+    private static final Logger log = LoggerFactory.getLogger(ProvisioningServiceDAO.class);
 
-	public static ProvisioningServiceDAO getInstance() {
-		if (instance == null)
-			instance = new ProvisioningServiceDAO();
-		return instance;
-	}
+    public static ProvisioningServiceDAO getInstance() {
+        if (instance == null)
+            instance = new ProvisioningServiceDAO();
+        return instance;
+    }
 
-	private final PAPManager papManager;
+    private final PAPManager papManager;
 
-	private ProvisioningServiceDAO() {
-		papManager = PAPManager.getInstance();
-	}
+    private ProvisioningServiceDAO() {
+        papManager = PAPManager.getInstance();
+    }
 
-	public List<XACMLObject> papQuery() {
+    public List<XACMLObject> papQuery() {
 
-		log.debug("Executing PAP query...");
+        log.debug("Executing PAP query...");
 
-		List<XACMLObject> resultList = new LinkedList<XACMLObject>();
-		PolicySetType rootPolicySet = makeRootPolicySet();
-		List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
+        List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-		papContainerList.add(papManager.getLocalPAPContainer());
+        List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
+        papContainerList.add(papManager.getLocalPAPContainer());
 
-		List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
-		boolean useRootPolicySet = !publicPAPContainerList.isEmpty();
+        List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
 
-		if (useRootPolicySet) {
-			resultList.add(rootPolicySet);
-			papContainerList.addAll(publicPAPContainerList);
-		}
+        boolean useRootPolicySet = !(publicPAPContainerList.isEmpty());
 
-		for (PAPContainer papContainer : papContainerList) {
-			String papId = papContainer.getPAP().getPapId();
+        PolicySetType rootPolicySet = makeRootPolicySet();
 
-			if (useRootPolicySet)
-				PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
+        if (useRootPolicySet) {
+            resultList.add(rootPolicySet);
+            papContainerList.addAll(publicPAPContainerList);
+        }
 
-			resultList.addAll(getPublic(papContainer));
+        for (PAPContainer papContainer : papContainerList) {
 
-		}
+            String papId = papContainer.getPAP().getPapId();
 
-		log.debug("PAP query executed: retrieved " + resultList.size() + " elements (Policy/PolicySet)");
+            if (useRootPolicySet) {
+                PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
+            }
+            resultList.addAll(getPublic(papContainer));
+        }
 
-		return resultList;
-	}
+        log.debug("PAP query executed: retrieved " + resultList.size() + " elements (Policy/PolicySet)");
 
-	public List<XACMLObject> pdpQuery() {
+        return resultList;
+    }
 
-		log.debug("Executing PDP query...");
+    public List<XACMLObject> pdpQuery() {
 
-		List<XACMLObject> resultList = new LinkedList<XACMLObject>();
+        log.debug("Executing PDP query...");
 
-		PolicySetType rootPolicySet = makeRootPolicySet();
+        List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-		resultList.add(rootPolicySet);
+        PolicySetType rootPolicySet = makeRootPolicySet();
 
-		PAPContainer[] papContainerList = papManager.getOrderedPAPContainerArray();
+        resultList.add(rootPolicySet);
 
-		// Add references to the remote PAPs
-		for (PAPContainer papContainer : papContainerList) {
-			log.info("Adding PAP: " + papContainer.getPAP().getAlias());
+        PAPContainer[] papContainerList = papManager.getOrderedPAPContainerArray();
 
-			try {
-				PolicySetType papPolicySetNoReferences = getPolicySetNoReferences(papContainer, papContainer
-						.getPAPRootPolicySetId());
-				PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
-			} catch (NotFoundException e) {
-				continue;
-			}
-		}
+        // Add references to the remote PAPs
+        for (PAPContainer papContainer : papContainerList) {
+            log.info("Adding PAP: " + papContainer.getPAP().getAlias());
 
-		log.debug("PDP query executed: retrieved " + resultList.size()
-				+ " elemens (Policy/PolicySet) relate to "
-				+ papManager.getOrderedRemotePAPsContainerArray().length + " PAPs");
+            try {
+                PolicySetType papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
+                                                                                  papContainer.getPAPRootPolicySetId());
+                
+                PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
+                
+                // TODO: consider to release PolicySetType if "papPolicySetNoReferences" is instance of PolicySetTypeString
+                
+            } catch (NotFoundException e) {
+                continue;
+            }
+        }
 
-		return resultList;
-	}
+        log.debug("PDP query executed: retrieved " + resultList.size() + " elemens (Policy/PolicySet) relate to "
+                + papManager.getOrderedRemotePAPsContainerArray().length + " PAPs");
 
-	private PolicySetType getPolicySetNoReferences(PAPContainer papContainer, String policySetId) {
+        return resultList;
+    }
 
-		PolicySetType policySet = papContainer.getPolicySet(policySetId);
+    private PolicySetType getPolicySetNoReferences(PAPContainer papContainer, String policySetId) {
 
-		// replace policy set references with policy sets
-		List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySet);
-		for (String policySetIdReference : idReferenceList) {
-			PolicySetHelper.addPolicySet(policySet, getPolicySetNoReferences(papContainer,
-				policySetIdReference));
-			PolicySetHelper.deletePolicySetReference(policySet, policySetIdReference);
-		}
+        PolicySetType policySet = papContainer.getPolicySet(policySetId);
 
-		// replace policy references with policies
-		idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
-		for (String policyIdReference : idReferenceList) {
-			PolicyType policy = papContainer.getPolicy(policyIdReference);
-			PolicySetHelper.addPolicy(policySet, policy);
-			if (policy instanceof PolicyTypeString) {
-				((PolicyTypeString) policy).releasePolicyType();
-			}
-			PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
-		}
+        // replace policy set references with policy sets
+        List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySet);
+        for (String policySetIdReference : idReferenceList) {
 
-		return policySet;
-	}
+            PolicySetHelper.addPolicySet(policySet, getPolicySetNoReferences(papContainer, policySetIdReference));
 
-	// pdpQuery() was modified in order to do not use references, therefore this
-	// method is no more used... consider to delete it before or later...
-	@SuppressWarnings("unused")
-	private List<XACMLObject> getAll(PAPContainer papContainer) {
-		List<XACMLObject> resultList = new LinkedList<XACMLObject>();
+            PolicySetHelper.deletePolicySetReference(policySet, policySetIdReference);
+        }
 
-		List<PolicySetType> policySetList = papContainer.getAllPolicySets();
-		log.debug("Adding " + policySetList.size() + " PolicySet elements from PAP \""
-				+ papContainer.getPAP().getPapId() + "\"");
+        // replace policy references with policies
+        idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
+        for (String policyIdReference : idReferenceList) {
 
-		List<PolicyType> policyList = papContainer.getAllPolicies();
-		log.debug("Adding " + policyList.size() + " Policy elements from PAP \""
-				+ papContainer.getPAP().getPapId() + "\"");
+            PolicyType policy = papContainer.getPolicy(policyIdReference);
 
-		resultList.addAll(policySetList);
-		resultList.addAll(policyList);
+            PolicySetHelper.addPolicy(policySet, policy);
 
-		return resultList;
-	}
+            if (policy instanceof PolicyTypeString) {
+                ((PolicyTypeString) policy).releasePolicyType();
+            }
 
-	private List<XACMLObject> getPublic(PAPContainer papContainer) {
-		List<XACMLObject> resultList = new LinkedList<XACMLObject>();
+            PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
+        }
 
-		List<PolicySetType> policySetList = papContainer.getAllPolicySets();
-		List<PolicyType> policyList = papContainer.getAllPolicies();
+        return policySet;
+    }
 
-		for (PolicyType policy : policyList) {
-			String policyId = policy.getPolicyId();
+    // pdpQuery() was modified in order to do not use references, therefore this
+    // method is no more used... consider to delete it before or later...
+    @SuppressWarnings("unused")
+    private List<XACMLObject> getAll(PAPContainer papContainer) {
+        List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-			if (policy instanceof PolicyTypeString) {
-				((PolicyTypeString) policy).releasePolicyType();
-			}
-			
-			if (!PolicyWizard.isPrivate(policyId)) {
-				continue;
-			}
+        List<PolicySetType> policySetList = papContainer.getAllPolicySets();
+        log.debug("Adding " + policySetList.size() + " PolicySet elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
 
-			policyList.remove(policy);
+        List<PolicyType> policyList = papContainer.getAllPolicies();
+        log.debug("Adding " + policyList.size() + " Policy elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
 
-			for (PolicySetType policySet : policySetList) {
-				if (PolicySetHelper.hasPolicyReferenceId(policySet, policyId))
-					PolicySetHelper.deletePolicyReference(policySet, policyId);
-			}
-		}
+        resultList.addAll(policySetList);
+        resultList.addAll(policyList);
 
-		log.debug("Adding " + policySetList.size() + " PolicySet elements from PAP \""
-				+ papContainer.getPAP().getPapId() + "\"");
-		resultList.addAll(policySetList);
+        return resultList;
+    }
 
-		log.debug("Adding " + policyList.size() + " Policy elements from PAP \""
-				+ papContainer.getPAP().getPapId() + "\"");
-		resultList.addAll(policyList);
+    private List<XACMLObject> getPublic(PAPContainer papContainer) {
+        List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-		return resultList;
-	}
+        List<PolicySetType> policySetList = papContainer.getAllPolicySets();
+        List<PolicyType> policyList = papContainer.getAllPolicies();
 
-	private PolicySetType makeRootPolicySet() {
-		PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_"
-				+ PAP.LOCAL_PAP_ALIAS, PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
-		return rootPolicySet;
-	}
+        for (PolicyType policy : policyList) {
+            String policyId = policy.getPolicyId();
+
+            if (policy instanceof PolicyTypeString) {
+                ((PolicyTypeString) policy).releasePolicyType();
+            }
+
+            if (!PolicyWizard.isPrivate(policyId)) {
+                continue;
+            }
+
+            policyList.remove(policy);
+
+            for (PolicySetType policySet : policySetList) {
+                if (PolicySetHelper.hasPolicyReferenceId(policySet, policyId))
+                    PolicySetHelper.deletePolicyReference(policySet, policyId);
+            }
+        }
+
+        log.debug("Adding " + policySetList.size() + " PolicySet elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
+        resultList.addAll(policySetList);
+
+        log.debug("Adding " + policyList.size() + " Policy elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
+        resultList.addAll(policyList);
+
+        return resultList;
+    }
+
+    private PolicySetType makeRootPolicySet() {
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_" + PAP.LOCAL_PAP_ALIAS,
+                                                                         PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        return rootPolicySet;
+    }
 }

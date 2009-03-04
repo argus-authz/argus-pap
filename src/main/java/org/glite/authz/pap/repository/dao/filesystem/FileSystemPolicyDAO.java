@@ -168,7 +168,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
                     }
                     papCache.put(policyId, policyString);
                 }
-                policyList.add(new PolicyTypeString(policyString));
+                policyList.add(new PolicyTypeString(policyId, policyString));
             }
         }
         return policyList;
@@ -200,7 +200,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             papCache.put(policyId, policyString);
         }
 
-        return new PolicyTypeString(policyString);
+        return new PolicyTypeString(policyId, policyString);
     }
     
     public int getNumberOfPolicies(String papId) {
@@ -268,7 +268,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             }
         }
         
-        PolicyType oldPolicy = new PolicyTypeString(oldPolicyString);
+        PolicyType oldPolicy = new PolicyTypeString(policyId, oldPolicyString);
 
         if (!(oldPolicy.getVersion().equals(policyVersion))) {
             throw new RepositoryException(

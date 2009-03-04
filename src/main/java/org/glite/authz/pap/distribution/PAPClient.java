@@ -42,16 +42,18 @@ public class PAPClient {
     
     public PAPClient(String url) {
         
-        if (!url.endsWith("/"))
-            url += "/";
-        this.url = url + "ProvisioningService";
-        
-        xacmlPolicyQuery = makeStandardPAPQuery();
-        
         ServiceClientFactory serviceClientFactory = ServiceClientFactory.getServiceClientFactory();
         ServiceClient serviceClient = serviceClientFactory.createServiceClient();
+        
+        if (!url.endsWith("/")) {
+            url += "/";
+        }
+        
+        this.url = url + serviceClient.getProvisioningServiceName();
+        
         provisioningClient = serviceClient.getProvisioningService(this.url);
         
+        xacmlPolicyQuery = makeStandardPAPQuery();
     }
 
     public static void main(String[] args) throws RemoteException, ServiceException {

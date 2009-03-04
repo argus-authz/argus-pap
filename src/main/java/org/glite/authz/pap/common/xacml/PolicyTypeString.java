@@ -20,261 +20,333 @@ import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.util.IDIndex;
 import org.opensaml.xml.validation.ValidationException;
 import org.opensaml.xml.validation.Validator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
 public class PolicyTypeString implements PolicyType {
 
-	private PolicyType policy = null;
-	private String policyString = null;
+    private static final Logger log = LoggerFactory.getLogger(PolicyTypeString.class);
+    private PolicyType policy = null;
+    private String policyString = null;
+    private String policyId = null;
 
-	public PolicyTypeString(String policyString) {
-		this.policyString = policyString;
-	}
+    public PolicyTypeString(String policyString) {
+        this.policyString = policyString;
+    }
 
-	public void addNamespace(Namespace arg0) {
-		init();
-		policy.addNamespace(arg0);
-	}
+    public PolicyTypeString(String policyId, String policyString) {
+        this.policyId = policyId;
+        this.policyString = policyString;
+    }
 
-	@SuppressWarnings("unchecked")
-	public void deregisterValidator(Validator arg0) {
-		init();
-		policy.deregisterValidator(arg0);
-	}
+    public void addNamespace(Namespace arg0) {
+        initPolicyType();
+        policy.addNamespace(arg0);
+        invalidatePolicyString();
+    }
 
-	public void detach() {
-		init();
-		policy.detach();
-	}
+    @SuppressWarnings("unchecked")
+    public void deregisterValidator(Validator arg0) {
+        initPolicyType();
+        policy.deregisterValidator(arg0);
+        invalidatePolicyString();
+    }
 
-	public List<CombinerParametersType> getCombinerParameters() {
-		init();
-		return policy.getCombinerParameters();
-	}
+    public void detach() {
+        initPolicyType();
+        policy.detach();
+        invalidatePolicyString();
+    }
 
-	public DescriptionType getDescription() {
-		init();
-		return policy.getDescription();
-	}
+    public List<CombinerParametersType> getCombinerParameters() {
+        initPolicyType();
+        invalidatePolicyString();
+        return policy.getCombinerParameters();
+    }
 
-	public Element getDOM() {
-		init();
-		return policy.getDOM();
-	}
+    public DescriptionType getDescription() {
+        initPolicyType();
+        return policy.getDescription();
+    }
 
-	public QName getElementQName() {
-		init();
-		return policy.getElementQName();
-	}
+    public Element getDOM() {
+        initPolicyType();
+        return policy.getDOM();
+    }
 
-	public IDIndex getIDIndex() {
-		init();
-		return policy.getIDIndex();
-	}
+    public QName getElementQName() {
+        initPolicyType();
+        return policy.getElementQName();
+    }
 
-	public Set<Namespace> getNamespaces() {
-		init();
-		return policy.getNamespaces();
-	}
+    public IDIndex getIDIndex() {
+        initPolicyType();
+        return policy.getIDIndex();
+    }
 
-	public String getNoNamespaceSchemaLocation() {
-		init();
-		return policy.getNoNamespaceSchemaLocation();
-	}
+    public Set<Namespace> getNamespaces() {
+        initPolicyType();
+        invalidatePolicyString();
+        return policy.getNamespaces();
+    }
 
-	public ObligationsType getObligations() {
-		init();
-		return policy.getObligations();
-	}
+    public String getNoNamespaceSchemaLocation() {
+        initPolicyType();
+        return policy.getNoNamespaceSchemaLocation();
+    }
 
-	public List<XMLObject> getOrderedChildren() {
-		init();
-		return policy.getOrderedChildren();
-	}
+    public ObligationsType getObligations() {
+        initPolicyType();
+        return policy.getObligations();
+    }
 
-	public XMLObject getParent() {
-		init();
-		return policy.getParent();
-	}
+    public List<XMLObject> getOrderedChildren() {
+        initPolicyType();
+        invalidatePolicyString();
+        return policy.getOrderedChildren();
+    }
 
-	public DefaultsType getPolicyDefaults() {
-		init();
-		return policy.getPolicyDefaults();
-	}
+    public XMLObject getParent() {
+        initPolicyType();
+        return policy.getParent();
+    }
 
-	public String getPolicyId() {
-		init();
-		return policy.getPolicyId();
-	}
+    public DefaultsType getPolicyDefaults() {
+        initPolicyType();
+        return policy.getPolicyDefaults();
+    }
 
-	public String getPolicyString() {
-		return policyString;
-	}
+    public String getPolicyId() {
+        if (policyId == null) {
+            initPolicyType();
+        }
+        return policyId;
+    }
 
-	public List<RuleCombinerParametersType> getRuleCombinerParameters() {
-		init();
-		return policy.getRuleCombinerParameters();
-	}
+    public String getPolicyString() {
+        initPolicyString();
+        return policyString;
+    }
 
-	public String getRuleCombiningAlgoId() {
-		init();
-		return policy.getRuleCombiningAlgoId();
-	}
+    public List<RuleCombinerParametersType> getRuleCombinerParameters() {
+        initPolicyType();
+        invalidatePolicyString();
+        return policy.getRuleCombinerParameters();
+    }
 
-	public List<RuleType> getRules() {
-		init();
-		return policy.getRules();
-	}
+    public String getRuleCombiningAlgoId() {
+        initPolicyType();
+        return policy.getRuleCombiningAlgoId();
+    }
 
-	public String getSchemaLocation() {
-		init();
-		return policy.getSchemaLocation();
-	}
+    public List<RuleType> getRules() {
+        initPolicyType();
+        invalidatePolicyString();
+        return policy.getRules();
+    }
 
-	public QName getSchemaType() {
-		init();
-		return policy.getSchemaType();
-	}
+    public String getSchemaLocation() {
+        initPolicyType();
+        return policy.getSchemaLocation();
+    }
 
-	public TargetType getTarget() {
-		init();
-		return policy.getTarget();
-	}
+    public QName getSchemaType() {
+        initPolicyType();
+        return policy.getSchemaType();
+    }
 
-	@SuppressWarnings("unchecked")
-	public List<Validator> getValidators() {
-		init();
-		return policy.getValidators();
-	}
+    public TargetType getTarget() {
+        initPolicyType();
+        return policy.getTarget();
+    }
 
-	public List<VariableDefinitionType> getVariableDefinitions() {
-		init();
-		return policy.getVariableDefinitions();
-	}
+    @SuppressWarnings("unchecked")
+    public List<Validator> getValidators() {
+        initPolicyType();
+        invalidatePolicyString();
+        return policy.getValidators();
+    }
 
-	public String getVersion() {
-		init();
-		return policy.getVersion();
-	}
+    public List<VariableDefinitionType> getVariableDefinitions() {
+        initPolicyType();
+        invalidatePolicyString();
+        return policy.getVariableDefinitions();
+    }
 
-	public boolean hasChildren() {
-		init();
-		return policy.hasChildren();
-	}
+    public String getVersion() {
+        initPolicyType();
+        return policy.getVersion();
+    }
 
-	public boolean hasParent() {
-		init();
-		return policy.hasParent();
-	}
+    public boolean hasChildren() {
+        initPolicyType();
+        return policy.hasChildren();
+    }
 
-	@SuppressWarnings("unchecked")
-	public void registerValidator(Validator arg0) {
-		init();
-		policy.registerValidator(arg0);
-	}
+    public boolean hasParent() {
+        initPolicyType();
+        return policy.hasParent();
+    }
 
-	public void releaseChildrenDOM(boolean arg0) {
-		init();
-		policy.releaseChildrenDOM(arg0);
-	}
+    @SuppressWarnings("unchecked")
+    public void registerValidator(Validator arg0) {
+        initPolicyType();
+        policy.registerValidator(arg0);
+        invalidatePolicyString();
+    }
 
-	public void releaseDOM() {
-		init();
-		policy.releaseDOM();
-	}
+    public void releaseChildrenDOM(boolean arg0) {
+        initPolicyType();
+        policy.releaseChildrenDOM(arg0);
+    }
 
-	public void releaseParentDOM(boolean arg0) {
-		init();
-		policy.releaseParentDOM(arg0);
-	}
+    public void releaseDOM() {
+        initPolicyType();
+        policy.releaseDOM();
+    }
 
-	public void releasePolicyType() {
-		policy = null;
-	}
-	
-	public void removeNamespace(Namespace arg0) {
-		init();
-		policy.removeNamespace(arg0);
-	}
+    public void releaseParentDOM(boolean arg0) {
+        initPolicyType();
+        policy.releaseParentDOM(arg0);
+    }
 
-	public XMLObject resolveID(String arg0) {
-		init();
-		return policy.resolveID(arg0);
-	}
+    public void releasePolicyType() {
+        invalidatePolicyType();
+    }
 
-	public XMLObject resolveIDFromRoot(String arg0) {
-		init();
-		return policy.resolveIDFromRoot(arg0);
-	}
+    public void removeNamespace(Namespace arg0) {
+        initPolicyType();
+        policy.removeNamespace(arg0);
+        invalidatePolicyString();
+    }
 
-	public void setDescription(DescriptionType arg0) {
-		init();
-		policy.setDescription(arg0);
-	}
+    public XMLObject resolveID(String arg0) {
+        initPolicyType();
+        return policy.resolveID(arg0);
+    }
 
-	public void setDOM(Element arg0) {
-		init();
-		policy.setDOM(arg0);
-	}
+    public XMLObject resolveIDFromRoot(String arg0) {
+        initPolicyType();
+        return policy.resolveIDFromRoot(arg0);
+    }
 
-	public void setNoNamespaceSchemaLocation(String arg0) {
-		init();
-		policy.setNoNamespaceSchemaLocation(arg0);
-	}
+    public void setDescription(DescriptionType arg0) {
+        initPolicyType();
+        policy.setDescription(arg0);
+        invalidatePolicyString();
+    }
 
-	public void setObligations(ObligationsType arg0) {
-		init();
-		policy.setObligations(arg0);
-	}
+    public void setDOM(Element arg0) {
+        initPolicyType();
+        policy.setDOM(arg0);
+        policyId = policy.getPolicyId();
+        invalidatePolicyString();
+    }
 
-	public void setParent(XMLObject arg0) {
-		init();
-		policy.setParent(arg0);
-	}
+    public void setNoNamespaceSchemaLocation(String arg0) {
+        initPolicyType();
+        policy.setNoNamespaceSchemaLocation(arg0);
+        invalidatePolicyString();
+    }
 
-	public void setPolicyDefaults(DefaultsType arg0) {
-		init();
-		policy.setPolicyDefaults(arg0);
-	}
+    public void setObligations(ObligationsType arg0) {
+        initPolicyType();
+        policy.setObligations(arg0);
+        invalidatePolicyString();
+    }
 
-	public void setPolicyId(String arg0) {
-		init();
-		policy.setPolicyId(arg0);
-	}
+    public void setParent(XMLObject arg0) {
+        initPolicyType();
+        policy.setParent(arg0);
+        invalidatePolicyString();
+    }
 
-	public void setPolicyString(String policyString) {
-		this.policyString = policyString;
-	}
+    public void setPolicyDefaults(DefaultsType arg0) {
+        initPolicyType();
+        policy.setPolicyDefaults(arg0);
+        invalidatePolicyString();
+    }
 
-	public void setRuleCombiningAlgoId(String arg0) {
-		init();
-		policy.setRuleCombiningAlgoId(arg0);
-	}
+    public void setPolicyId(String arg0) {
+        initPolicyType();
+        policy.setPolicyId(arg0);
+        policyId = policy.getPolicyId();
+        invalidatePolicyString();
+    }
 
-	public void setSchemaLocation(String arg0) {
-		init();
-		policy.setSchemaLocation(arg0);
-	}
+    public void setPolicyString(String policyString) {
+        this.policyString = policyString;
+        invalidatePolicyId();
+        invalidatePolicyType();
+    }
+    
+    public void setPolicyString(String policyId, String policyString) {
+        this.policyString = policyString;
+        this.policyId = policyId;
+        invalidatePolicyType();
+    }
 
-	public void setTarget(TargetType arg0) {
-		init();
-		policy.setTarget(arg0);
-	}
+    public void setRuleCombiningAlgoId(String arg0) {
+        initPolicyType();
+        policy.setRuleCombiningAlgoId(arg0);
+        invalidatePolicyString();
+    }
 
-	public void setVersion(String arg0) {
-		init();
-		policy.setVersion(arg0);
-	}
+    public void setSchemaLocation(String arg0) {
+        initPolicyType();
+        policy.setSchemaLocation(arg0);
+        invalidatePolicyString();
+    }
 
-	public void validate(boolean arg0) throws ValidationException {
-		init();
-		policy.validate(arg0);
-	}
+    public void setTarget(TargetType arg0) {
+        initPolicyType();
+        policy.setTarget(arg0);
+        invalidatePolicyString();
+    }
 
-	private void init() {
-		if (policy == null) {
-			policy = PolicyHelper.getInstance().buildFromString(policyString);
-		}
-	}
+    public void setVersion(String arg0) {
+        initPolicyType();
+        policy.setVersion(arg0);
+        invalidatePolicyString();
+    }
 
+    public void validate(boolean arg0) throws ValidationException {
+        initPolicyType();
+        policy.validate(arg0);
+    }
+
+    private void initPolicyString() {
+        if (policyString == null) {
+            log.debug("Initializing policyString, stacktrace: ", (new Throwable()));
+            policyString = PolicyHelper.toString(policy);
+        } else {
+            log.debug("policyString already initialized, skipping initialization step");
+        }
+    }
+
+    private void initPolicyType() {
+        if (policy == null) {
+            log.debug("Initializing policyType, stacktrace: ", (new Throwable()));
+            policy = PolicyHelper.getInstance().buildFromString(policyString);
+            policyId = policy.getPolicyId();
+        } else {
+            log.debug("policyType already initialized, skipping initialization step");
+        }
+    }
+
+    private void invalidatePolicyString() {
+        log.debug("Invalidating policyString");
+        policyString = null;
+    }
+
+    private void invalidatePolicyId() {
+        log.debug("Invalidating policyId");
+        policyId = null;
+    }
+
+    private void invalidatePolicyType() {
+        log.debug("Invalidating policyType");
+        policy = null;
+    }
 }

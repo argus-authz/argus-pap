@@ -19,7 +19,7 @@ PAP_CLIENT_CP="$PAP_DEPS$PAP_JAR:$GLITE_LOCATION/etc/pap/logging/client"
 PAP_STANDALONE_CP="$PAP_DEPS$PAP_JAR:$GLITE_LOCATION/etc/pap/logging/standalone"
 
 PAP_CLIENT_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE_LOCATION_VAR"
-PAP_STANDALONE_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE_LOCATION_VAR"
+PAP_STANDALONE_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE_LOCATION_VAR -Dcom.sun.management.jmxremote"
 
 # Uncomment the line below to enable remote standalone debugging
 # PAP_STANDALONE_VM_OPTIONS="-Xdebug -Xnoagent -Djava.compiler=NONE -Xrunjdwp:transport=dt_socket,address=9876,server=y,suspend=y"

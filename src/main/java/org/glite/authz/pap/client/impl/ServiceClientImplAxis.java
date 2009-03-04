@@ -152,6 +152,10 @@ public class ServiceClientImplAxis implements ServiceClient {
         }
     }
 
+    public String getProvisioningServiceName() {
+        return "ProvisioningService";
+    }
+
     public String getTargetEndpoint() {
         return serviceURL;
     }
@@ -192,12 +196,12 @@ public class ServiceClientImplAxis implements ServiceClient {
         log.debug("clientCertificate=" + certFile);
         clientCertificate = certFile;
     }
-
+    
     public void setClientPrivateKey(String keyFile) {
         log.debug("clientPrivateKey=" + keyFile);
         clientPrivateKey = keyFile;
     }
-    
+
     public void setClientPrivateKeyPassword(String privateKeyPassword) {
         clientPrivateKeyPassword = privateKeyPassword;
     }
