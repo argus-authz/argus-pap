@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.common.xacml.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -124,10 +123,6 @@ public class ProvisioningServiceDAO {
             PolicyType policy = papContainer.getPolicy(policyIdReference);
 
             PolicySetHelper.addPolicy(policySet, policy);
-
-            if (policy instanceof PolicyTypeString) {
-                ((PolicyTypeString) policy).releasePolicyType();
-            }
 
             PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
         }

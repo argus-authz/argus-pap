@@ -139,17 +139,17 @@ public class ProvisioningServiceUtils {
                 
                 policyStatement.getPolicySets().add((PolicySetType) xacmlObject);
                 
-                if (xacmlObject instanceof PolicySetTypeString) {
-                    ((PolicySetTypeString) xacmlObject).releasePolicySetType();
-                }
+//                if (xacmlObject instanceof PolicySetTypeString) {
+//                    ((PolicySetTypeString) xacmlObject).releasePolicySetType();
+//                }
 
             } else {
 
                 policyStatement.getPolicies().add((PolicyType) xacmlObject);
                 
-                if (xacmlObject instanceof PolicyTypeString) {
-                    ((PolicyTypeString) xacmlObject).releasePolicyType();
-                }
+//                if (xacmlObject instanceof PolicyTypeString) {
+//                    ((PolicyTypeString) xacmlObject).releasePolicyType();
+//                }
 
             }
 
