@@ -28,8 +28,14 @@ public class PolicyTypeString implements PolicyType {
 
     private static final Logger log = LoggerFactory.getLogger(PolicyTypeString.class);
     private PolicyType policy = null;
-    private String policyString = null;
     private String policyId = null;
+    private String policyString = null;
+
+    public PolicyTypeString(PolicyType policy) {
+        this.policy = policy;
+        policyId = policy.getPolicyId();
+        policyString = null;
+    }
 
     public PolicyTypeString(String policyString) {
         this.policyString = policyString;
@@ -41,291 +47,295 @@ public class PolicyTypeString implements PolicyType {
     }
 
     public void addNamespace(Namespace arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.addNamespace(arg0);
         invalidatePolicyString();
     }
 
     @SuppressWarnings("unchecked")
     public void deregisterValidator(Validator arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.deregisterValidator(arg0);
         invalidatePolicyString();
     }
 
     public void detach() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.detach();
         invalidatePolicyString();
     }
 
     public List<CombinerParametersType> getCombinerParameters() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getCombinerParameters();
     }
 
     public DescriptionType getDescription() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getDescription();
     }
 
     public Element getDOM() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getDOM();
     }
 
     public QName getElementQName() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getElementQName();
     }
 
     public IDIndex getIDIndex() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getIDIndex();
     }
 
     public Set<Namespace> getNamespaces() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getNamespaces();
     }
 
     public String getNoNamespaceSchemaLocation() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getNoNamespaceSchemaLocation();
     }
 
     public ObligationsType getObligations() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getObligations();
     }
 
     public List<XMLObject> getOrderedChildren() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getOrderedChildren();
     }
 
     public XMLObject getParent() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getParent();
     }
 
     public DefaultsType getPolicyDefaults() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getPolicyDefaults();
     }
 
     public String getPolicyId() {
         if (policyId == null) {
-            initPolicyType();
+            initPolicyTypeIfNotSet();
         }
         return policyId;
     }
 
     public String getPolicyString() {
-        initPolicyString();
+        initPolicyStringIfNotSet();
         return policyString;
     }
 
     public List<RuleCombinerParametersType> getRuleCombinerParameters() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getRuleCombinerParameters();
     }
 
     public String getRuleCombiningAlgoId() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getRuleCombiningAlgoId();
     }
 
     public List<RuleType> getRules() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getRules();
     }
 
     public String getSchemaLocation() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getSchemaLocation();
     }
 
     public QName getSchemaType() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getSchemaType();
     }
 
     public TargetType getTarget() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getTarget();
     }
 
     @SuppressWarnings("unchecked")
     public List<Validator> getValidators() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getValidators();
     }
 
     public List<VariableDefinitionType> getVariableDefinitions() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getVariableDefinitions();
     }
 
     public String getVersion() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.getVersion();
     }
 
     public boolean hasChildren() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.hasChildren();
     }
 
     public boolean hasParent() {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.hasParent();
     }
 
     @SuppressWarnings("unchecked")
     public void registerValidator(Validator arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.registerValidator(arg0);
         invalidatePolicyString();
     }
 
     public void releaseChildrenDOM(boolean arg0) {
-        initPolicyType();
-        policy.releaseChildrenDOM(arg0);
+        if (policy != null) {
+            policy.releaseChildrenDOM(arg0);
+        }
     }
 
     public void releaseDOM() {
-        if (policy!= null) {
-        	policy.releaseDOM();
-        	invalidatePolicyType();
+        if (policy != null) {
+            initPolicyStringIfNotSet();
+            log.debug("Invalidating policyType");
+            policy.releaseDOM();
+            policy = null;
         }
     }
 
     public void releaseParentDOM(boolean arg0) {
-        initPolicyType();
-        policy.releaseParentDOM(arg0);
+        if (policy != null) {
+            policy.releaseParentDOM(arg0);
+        }
     }
 
     public void removeNamespace(Namespace arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.removeNamespace(arg0);
         invalidatePolicyString();
     }
 
     public XMLObject resolveID(String arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.resolveID(arg0);
     }
 
     public XMLObject resolveIDFromRoot(String arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         return policy.resolveIDFromRoot(arg0);
     }
 
     public void setDescription(DescriptionType arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setDescription(arg0);
         invalidatePolicyString();
     }
 
     public void setDOM(Element arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setDOM(arg0);
         policyId = policy.getPolicyId();
         invalidatePolicyString();
     }
 
     public void setNoNamespaceSchemaLocation(String arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setNoNamespaceSchemaLocation(arg0);
         invalidatePolicyString();
     }
 
     public void setObligations(ObligationsType arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setObligations(arg0);
         invalidatePolicyString();
     }
 
     public void setParent(XMLObject arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setParent(arg0);
         invalidatePolicyString();
     }
 
     public void setPolicyDefaults(DefaultsType arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setPolicyDefaults(arg0);
         invalidatePolicyString();
     }
 
     public void setPolicyId(String arg0) {
-        initPolicyType();
+        policyId = arg0;
+        initPolicyTypeIfNotSet();
         policy.setPolicyId(arg0);
-        policyId = policy.getPolicyId();
         invalidatePolicyString();
     }
 
     public void setPolicyString(String policyString) {
         this.policyString = policyString;
         invalidatePolicyId();
-        invalidatePolicyType();
+        releaseDOM();
     }
-    
+
     public void setPolicyString(String policyId, String policyString) {
         this.policyString = policyString;
         this.policyId = policyId;
-        invalidatePolicyType();
+        releaseDOM();
     }
 
     public void setRuleCombiningAlgoId(String arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setRuleCombiningAlgoId(arg0);
         invalidatePolicyString();
     }
 
     public void setSchemaLocation(String arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setSchemaLocation(arg0);
         invalidatePolicyString();
     }
 
     public void setTarget(TargetType arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setTarget(arg0);
         invalidatePolicyString();
     }
 
     public void setVersion(String arg0) {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.setVersion(arg0);
         invalidatePolicyString();
     }
 
     public void validate(boolean arg0) throws ValidationException {
-        initPolicyType();
+        initPolicyTypeIfNotSet();
         policy.validate(arg0);
     }
 
-    private void initPolicyString() {
+    private void initPolicyStringIfNotSet() {
         if (policyString == null) {
-            log.debug("Initializing policyString, stacktrace: ", (new Throwable()));
+            log.debug("Initializing policyString");
             policyString = PolicyHelper.toString(policy);
         } else {
             log.debug("policyString already initialized, skipping initialization step");
         }
     }
 
-    private void initPolicyType() {
+    private void initPolicyTypeIfNotSet() {
         if (policy == null) {
-            log.debug("Initializing policyType, stacktrace: ", (new Throwable()));
+            log.debug("Initializing policyType: " + policyString);
             policy = PolicyHelper.getInstance().buildFromString(policyString);
             policyId = policy.getPolicyId();
         } else {
@@ -333,18 +343,13 @@ public class PolicyTypeString implements PolicyType {
         }
     }
 
-    private void invalidatePolicyString() {
-        log.debug("Invalidating policyString");
-        policyString = null;
-    }
-
     private void invalidatePolicyId() {
         log.debug("Invalidating policyId");
         policyId = null;
     }
-
-    private void invalidatePolicyType() {
-        log.debug("Invalidating policyType");
-        policy = null;
+    
+    private void invalidatePolicyString() {
+        log.debug("Invalidating policyString");
+        policyString = null;
     }
 }

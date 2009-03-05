@@ -38,25 +38,19 @@ public class TargetWizard {
 
     private static final Logger log = LoggerFactory.getLogger(TargetWizard.class);
 
-    private final TargetType target;
+    private TargetType target = null;
     private final List<AttributeWizard> targetAttributeWizardList;
 
     public TargetWizard(AttributeWizard attributeWizard) {
-
         targetAttributeWizardList = new ArrayList<AttributeWizard>(1);
         targetAttributeWizardList.add(attributeWizard);
-
-        target = createTarget(targetAttributeWizardList);
     }
 
     public TargetWizard(List<AttributeWizard> targetAttributeWizardList) {
-
         if (targetAttributeWizardList == null) {
             targetAttributeWizardList = new ArrayList<AttributeWizard>(0);
         }
-
         this.targetAttributeWizardList = targetAttributeWizardList;
-        target = createTarget(targetAttributeWizardList);
     }
 
     public TargetWizard(TargetType target) {
@@ -125,35 +119,12 @@ public class TargetWizard {
         return attributeWizardList;
     }
 
-    private static TargetType createTarget(List<AttributeWizard> targetAttributeWizardList) {
-        List<AttributeType> sbjAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                AttributeWizardType.TargetElement.SUBJECT);
-        List<AttributeType> rsrcAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                AttributeWizardType.TargetElement.RESOURCE);
-        List<AttributeType> envAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                AttributeWizardType.TargetElement.ENVIRONMENT);
-        List<AttributeType> actionAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                AttributeWizardType.TargetElement.ACTION);
-
-        SubjectsType subjects = SubjectsHelper.build(SubjectHelper.build(SubjectMatchHelper.buildListWithDesignator(sbjAttr,
-                Functions.STRING_EQUAL)));
-        ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(ResourceMatchHelper.buildWithDesignator(rsrcAttr,
-                Functions.STRING_EQUAL)));
-        ActionsType actions = ActionsHelper.build(ActionHelper.build(ActionMatchHelper.buildWithDesignator(actionAttr,
-                Functions.STRING_EQUAL)));
-        EnvironmentsType environments = EnvironmentsHelper.build(EnvironmentHelper.build(EnvironmentMatchHelper
-                .buildWithDesignator(envAttr, Functions.STRING_EQUAL)));
-
-        TargetType target = TargetHelper.build(subjects, actions, resources, environments);
-
-        return target;
-    }
-
     public List<AttributeWizard> getAttributeWizardList() {
         return targetAttributeWizardList;
     }
 
     public TargetType getXACML() {
+        initTargetTypeIfNotSet();
         return target;
     }
 
@@ -200,5 +171,44 @@ public class TargetWizard {
             }
         }
         return true;
+    }
+
+    public void releaseDOM() {
+        if (target != null) {
+            target.releaseDOM();
+            target = null;
+        }
+    }
+    
+    private void initTargetTypeIfNotSet() {
+        if (target == null) {
+            setTargetType();
+        }
+    }
+
+    private void setTargetType() {
+
+        releaseDOM();
+
+        List<AttributeType> sbjAttr = WizardUtils.getAttributes(targetAttributeWizardList,
+                                                                AttributeWizardType.TargetElement.SUBJECT);
+        List<AttributeType> rsrcAttr = WizardUtils.getAttributes(targetAttributeWizardList,
+                                                                 AttributeWizardType.TargetElement.RESOURCE);
+        List<AttributeType> envAttr = WizardUtils.getAttributes(targetAttributeWizardList,
+                                                                AttributeWizardType.TargetElement.ENVIRONMENT);
+        List<AttributeType> actionAttr = WizardUtils.getAttributes(targetAttributeWizardList,
+                                                                   AttributeWizardType.TargetElement.ACTION);
+
+        SubjectsType subjects = SubjectsHelper.build(SubjectHelper.build(SubjectMatchHelper.buildListWithDesignator(sbjAttr,
+                                                                                                                    Functions.STRING_EQUAL)));
+        ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(ResourceMatchHelper.buildWithDesignator(rsrcAttr,
+                                                                                                                     Functions.STRING_EQUAL)));
+        ActionsType actions = ActionsHelper.build(ActionHelper.build(ActionMatchHelper.buildWithDesignator(actionAttr,
+                                                                                                           Functions.STRING_EQUAL)));
+        EnvironmentsType environments = EnvironmentsHelper.build(EnvironmentHelper.build(EnvironmentMatchHelper.buildWithDesignator(envAttr,
+                                                                                                                                    Functions.STRING_EQUAL)));
+
+        target = TargetHelper.build(subjects, actions, resources, environments);
+
     }
 }

@@ -11,7 +11,9 @@ import org.opensaml.xacml.policy.RuleType;
 
 public class RuleWizard {
     
-    private final RuleType rule;
+    private EffectType effect = null;
+    private RuleType rule;
+    private String ruleId = null;
     private final TargetWizard targetWizard;
     
     public RuleWizard(AttributeWizard attributeWizard, EffectType effect) {
@@ -24,19 +26,13 @@ public class RuleWizard {
     
     public RuleWizard(List<AttributeWizard> targetAttributeWizardList, EffectType effect) {
         
-        rule = RuleHelper.build(WizardUtils.generateId("Rule"), effect);
-        
         if (targetAttributeWizardList == null) {
             targetAttributeWizardList = new ArrayList<AttributeWizard>(0);
         }
         
         targetWizard = new TargetWizard(targetAttributeWizardList);
-        
-        if (targetAttributeWizardList.size() == 0) {
-            return;
-        }
-
-        rule.setTarget(targetWizard.getXACML());
+        this.effect = effect;
+        ruleId = WizardUtils.generateId("Rule");
     }
     
     public RuleWizard(RuleType rule) {
@@ -46,7 +42,8 @@ public class RuleWizard {
         }
         
         this.rule = rule;
-        
+        ruleId = rule.getRuleId();
+        effect = rule.getEffect();
         targetWizard = new TargetWizard(rule.getTarget());
     }
     
@@ -79,16 +76,17 @@ public class RuleWizard {
     }
     
     public String getRuleId() {
-        return rule.getRuleId();
+        return ruleId;
     }
     
     public RuleType getXACML() {
+        initRuleTypeIfNotSet();
         return rule;
     }
     
     public boolean isEquivalent(RuleType rule) {
         
-        if (this.rule.getEffect() != rule.getEffect()) {
+        if (effect != rule.getEffect()) {
             return false;
         }
         
@@ -102,6 +100,13 @@ public class RuleWizard {
         
         return true;
     }
+    
+    public void releaseDOM() {
+        if (rule != null) {
+            rule.releaseDOM();
+            rule = null;
+        }
+    }
 
     public String toFormattedString(boolean printIds) {
         return toFormattedString(0, 4, printIds);
@@ -113,10 +118,10 @@ public class RuleWizard {
         String indentString = Utils.fillWithSpaces(baseIndentation + internalIndentation);
         StringBuffer sb = new StringBuffer();
         
-        String effectString = rule.getEffect().toString().toLowerCase();
+        String effectString = effect.toString().toLowerCase();
         
         if (printIds) {
-            sb.append(String.format("%sid=%s\n", baseIndentString, rule.getRuleId()));
+            sb.append(String.format("%sid=%s\n", baseIndentString, ruleId));
         }
         
         sb.append(String.format("%srule %s {\n", baseIndentString, effectString));
@@ -128,5 +133,20 @@ public class RuleWizard {
         sb.append(baseIndentString + "}");
         
         return sb.toString();
+    }
+    
+    private void initRuleTypeIfNotSet() {
+        if (rule == null) {
+            setRuleType();
+        }
+    }
+    
+    private void setRuleType() {
+        
+        releaseDOM();
+        
+        rule = RuleHelper.build(ruleId, effect);
+        
+        rule.setTarget(targetWizard.getXACML());
     }
 }

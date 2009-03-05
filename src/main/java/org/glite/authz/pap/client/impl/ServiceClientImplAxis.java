@@ -169,12 +169,12 @@ public class ServiceClientImplAxis implements ServiceClient {
         typeMapping.register(org.opensaml.xacml.policy.PolicyType.class,
                 org.opensaml.xacml.policy.PolicyType.SCHEMA_TYPE_NAME,
                 new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
+                new org.glite.authz.pap.common.opensamlserializer.PolicyTypeDeserializerFactory());
         
         typeMapping.register(org.opensaml.xacml.policy.PolicySetType.class,
                 org.opensaml.xacml.policy.PolicySetType.SCHEMA_TYPE_NAME,
                 new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
+                new org.glite.authz.pap.common.opensamlserializer.PolicySetTypeDeserializerFactory());
 
         try {
             return loc.getXACMLPolicyManagementService( new URL(url) );
