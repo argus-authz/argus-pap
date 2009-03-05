@@ -24,6 +24,8 @@ import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.DeserializerImpl;
 import org.apache.axis.message.MessageElement;
 import org.glite.authz.pap.common.xacml.PolicyTypeString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -33,6 +35,8 @@ import org.xml.sax.SAXException;
 public class PolicyTypeDeserializer extends DeserializerImpl {
 
 	private static final long serialVersionUID = 8668604610394087233L;
+	@SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(PolicyTypeDeserializer.class);
 
 	public void onStartElement(java.lang.String namespace, java.lang.String localName,
 			java.lang.String prefix, org.xml.sax.Attributes attributes, DeserializationContext context)
@@ -42,7 +46,7 @@ public class PolicyTypeDeserializer extends DeserializerImpl {
 
 				MessageElement messageElement = context.getCurElement();
 				String element = messageElement.getAsString();
-
+				
 				PolicyTypeString object = new PolicyTypeString(element);
 
 				setValue(object);

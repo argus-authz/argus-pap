@@ -30,6 +30,7 @@ import javax.xml.rpc.encoding.Serializer;
  * @author Valerio Venturi (valerio.venturi@cnaf.infn.it)
  * 
  */
+@SuppressWarnings("serial")
 public class SerializerFactory implements
 	org.apache.axis.encoding.SerializerFactory {
 
@@ -47,6 +48,7 @@ public class SerializerFactory implements
      * 
      * @see javax.xml.rpc.encoding.SerializerFactory#getSupportedMechanismTypes()
      */
+    @SuppressWarnings("unchecked")
     public Iterator getSupportedMechanismTypes() {
 	// TODO Auto-generated method stub
 	return null;
