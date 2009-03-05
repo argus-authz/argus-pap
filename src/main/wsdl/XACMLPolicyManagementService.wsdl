@@ -29,7 +29,13 @@
 				</xsd:sequence>
 			</xsd:complexType>
 		</xsd:schema>
-	</wsdl:types>
+        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://org.glite.authz/wsdl/pap/services/xacml_policy_management">
+        	<xsd:complexType name="StringArray">
+        		<xsd:sequence>
+        			<xsd:element name="stringElement" type="xsd:string" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+        		</xsd:sequence>
+        	</xsd:complexType></xsd:schema>
+    </wsdl:types>
 
 	<wsdl:message name="getPolicyRequest">
 		<wsdl:part name="policyId" type="xsd:string" />
@@ -148,11 +154,24 @@
 	<wsdl:message name="addPolicySetResponse">
 		<wsdl:part name="addPolicySetResponse" type="xsd:string"></wsdl:part>
 	</wsdl:message>
+	<wsdl:message name="addPoliciesRequest">
+		<wsdl:part name="index" type="xsd:int"></wsdl:part>
+		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
+		<wsdl:part name="policyIdPrefixArray" type="tns:StringArray"></wsdl:part>
+		<wsdl:part name="policyArray" type="tns1:PolicyList"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addPoliciesResponse">
+		<wsdl:part name="addPoliciesResponse" type="tns:StringArray"></wsdl:part>
+	</wsdl:message>
 
 	<wsdl:portType name="XACMLPolicyManagement">
 		<wsdl:operation name="addPolicy">
 			<wsdl:input message="tns:addPolicyRequest"></wsdl:input>
 			<wsdl:output message="tns:addPolicyResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addPolicies">
+			<wsdl:input message="tns:addPoliciesRequest"></wsdl:input>
+			<wsdl:output message="tns:addPoliciesResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="addPolicySet">
 			<wsdl:input message="tns:addPolicySetRequest"></wsdl:input>
@@ -395,6 +414,16 @@
 		<wsdl:operation name="addPolicy">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/addPolicy" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="addPolicies">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/addPolicies" />
 			<wsdl:input>
 				<soap:body use="literal" />
 			</wsdl:input>

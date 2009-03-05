@@ -202,17 +202,15 @@ public class PolicyTypeString implements PolicyType {
     }
 
     public void releaseDOM() {
-        initPolicyType();
-        policy.releaseDOM();
+        if (policy!= null) {
+        	policy.releaseDOM();
+        	invalidatePolicyType();
+        }
     }
 
     public void releaseParentDOM(boolean arg0) {
         initPolicyType();
         policy.releaseParentDOM(arg0);
-    }
-
-    public void releasePolicyType() {
-        invalidatePolicyType();
     }
 
     public void removeNamespace(Namespace arg0) {

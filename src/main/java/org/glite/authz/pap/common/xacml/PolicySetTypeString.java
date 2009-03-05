@@ -220,17 +220,15 @@ public class PolicySetTypeString implements PolicySetType {
 	}
 
 	public void releaseDOM() {
-	    initPolicySetType();
-        policySet.releaseDOM();
+	    if (policySet != null) {
+	    	policySet.releaseDOM();
+	    	invalidatePolicySetType();
+	    }
 	}
 
 	public void releaseParentDOM(boolean arg0) {
 	    initPolicySetType();
         policySet.releaseParentDOM(arg0);
-	}
-
-	public void releasePolicySetType() {
-		policySet = null;
 	}
 
 	public void removeNamespace(Namespace arg0) {

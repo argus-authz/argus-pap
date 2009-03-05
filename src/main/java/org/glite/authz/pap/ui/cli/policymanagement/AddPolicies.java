@@ -14,6 +14,7 @@ import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
 
 public class AddPolicies extends PolicyManagementCLI {
 
@@ -34,22 +35,22 @@ public class AddPolicies extends PolicyManagementCLI {
 
 		XACMLPolicyCLIUtils.initOpenSAML();
 
-		List<XACMLWizard> policyList = policyFileEncoder.parse(file);
+		List<XACMLWizard> xacmlWizardList = policyFileEncoder.parse(file);
 
-		for (XACMLWizard xacmlWizard : policyList) {
-		    
-		    if (!(xacmlWizard instanceof PolicySetWizard)) {
-		        System.out.println("Error: \"resource\" element not defined");
-		        result = false;
-		        continue;
-		    }
-		    
-		    PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
+		for (XACMLWizard xacmlWizard : xacmlWizardList) {
+
+			if (!(xacmlWizard instanceof PolicySetWizard)) {
+				System.out.println("Error: \"resource\" element not defined");
+				result = false;
+				continue;
+			}
+
+			PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
 
 			PolicySetType policySet = policySetWizard.getXACML();
-			
+
 			policySet.getPolicyIdReferences().clear();
-			
+
 			String policySetId = xacmlPolicyMgmtClient.addPolicySet(-1, policySet);
 
 			if (policySetId == null) {
@@ -65,20 +66,33 @@ public class AddPolicies extends PolicyManagementCLI {
 						.getTagAndValue(), policySetId));
 			}
 
-			for (PolicyWizard policyWizard : policySetWizard.getPolicyWizardList()) {
-				String policyId = xacmlPolicyMgmtClient.addPolicy(-1, policySetId,
-					policyWizard.getPolicyIdPrefix(), policyWizard.getXACML());
+			int size = policySetWizard.getPolicyWizardList().size();
+			PolicyType[] policyArray = new PolicyType[size];
+			String[] idPrefixArray = new String[size];
+			String[] tagAndValueArray = new String[size];
+
+			for (int i = 0; i < size; i++) {
+				PolicyWizard policyWizard = policySetWizard.getPolicyWizardList().get(i);
+				policyArray[i] = policyWizard.getXACML();
+				idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
+				tagAndValueArray[i] = policyWizard.getTagAndValue();
+			}
+
+			String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(0, policySetId, idPrefixArray,
+				policyArray);
+
+			for (int i = 0; i < size; i++) {
+				String policyId = policyIdArray[i];
+				String tagAndValue = tagAndValueArray[i];
 
 				if (policyId == null) {
-					System.out.println(String.format("Error policy not added: %s (id=%s)", policyWizard
-							.getTagAndValue(), policyWizard.getPolicyId()));
+					System.out.println(String.format("Error policy not added: %s", tagAndValue));
 					result = false;
 					continue;
 				}
 
 				if (verboseMode) {
-					System.out.println(String.format("Added policy: %s (id=%s)", policyWizard
-							.getTagAndValue(), policyWizard.getPolicyId()));
+					System.out.println(String.format("Added policy: %s (id=%s)", tagAndValue, policyId));
 				}
 			}
 

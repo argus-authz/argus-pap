@@ -158,7 +158,7 @@ public class ProvisioningServiceDAO {
             String policyId = policy.getPolicyId();
 
             if (policy instanceof PolicyTypeString) {
-                ((PolicyTypeString) policy).releasePolicyType();
+                ((PolicyTypeString) policy).releaseDOM();
             }
 
             if (!PolicyWizard.isPrivate(policyId)) {

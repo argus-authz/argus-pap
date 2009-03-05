@@ -2,6 +2,7 @@ package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
 
+import org.glite.authz.pap.authz.policymanagement.AddPoliciesOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPAPPolicyOperation;
@@ -30,6 +31,21 @@ import org.slf4j.LoggerFactory;
 public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
 	private static final Logger log = LoggerFactory.getLogger(XACMLPolicyManagementService.class);
+
+	public String[] addPolicies(int index, String policySetId, String[] policyIdPrefixArray,
+			PolicyType[] policyArray) throws RemoteException {
+		log.info(String.format("addPolicy(policySetId=\"%s\"\");", policySetId));
+
+		try {
+
+			return AddPoliciesOperation.instance(index, policySetId, policyIdPrefixArray, policyArray)
+					.execute();
+
+		} catch (RuntimeException e) {
+			ServiceClassExceptionManager.log(log, e);
+			throw e;
+		}
+	}
 
 	public String addPolicy(int index, String policySetId, String policyIdPrefix, PolicyType policy)
 			throws RemoteException {
