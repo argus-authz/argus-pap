@@ -229,13 +229,17 @@ public class PolicySetTypeString implements PolicySetType {
 
     public void releaseChildrenDOM(boolean arg0) {
         if (policySet != null) {
+        	initPolicySetStringIfNotSet();
             policySet.releaseChildrenDOM(arg0);
+            releaseDOM();
         }
     }
 
     public void releaseDOM() {
         if (policySet != null) {
             log.debug("Invalidating policySetType");
+            initPolicySetStringIfNotSet();
+            policySet.releaseChildrenDOM(true);
             policySet.releaseDOM();
             policySet = null;
         }

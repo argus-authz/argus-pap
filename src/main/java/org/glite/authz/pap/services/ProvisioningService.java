@@ -24,8 +24,8 @@ package org.glite.authz.pap.services;
 
 import java.util.List;
 
-import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
+import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
 import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
@@ -39,63 +39,71 @@ import org.slf4j.LoggerFactory;
 
 public class ProvisioningService implements Provisioning {
 
-    private final Logger log = LoggerFactory.getLogger(ProvisioningService.class);
-    
-    public Response XACMLPolicyQuery(XACMLPolicyQueryType query)
-	    throws java.rmi.RemoteException {
+	private final Logger log = LoggerFactory.getLogger(ProvisioningService.class);
+	private static final Object lock = new Object();
 
-	// log the received query
-	if (log.isDebugEnabled()) {
-	    log.debug("Received XACLMPolicyQuery "
-		    + ProvisioningServiceUtils.xmlObjectToString(query));
+	public Response XACMLPolicyQuery(XACMLPolicyQueryType query) throws java.rmi.RemoteException {
+
+		try {
+			synchronized (lock) {
+
+				// log the received query
+				if (log.isDebugEnabled()) {
+					log.debug("Received XACLMPolicyQuery "
+							+ ProvisioningServiceUtils.xmlObjectToString(query));
+				}
+
+				/* check a few things about the query */
+
+				try {
+					ProvisioningServiceUtils.checkQuery(query);
+				} catch (VersionMismatchException e) {
+					log.error(e.getMessage(), e);
+					return ProvisioningServiceUtils.createResponse(query, e);
+				} catch (MissingIssuerException e) {
+					log.error(e.getMessage(), e);
+					return ProvisioningServiceUtils.createResponse(query, e);
+				} catch (WrongFormatIssuerException e) {
+					log.error(e.getMessage(), e);
+					return ProvisioningServiceUtils.createResponse(query, e);
+				}
+
+				/* get local policies */
+
+				List<XACMLObject> resultList = null;
+
+				/*
+				 * TODO discrimination between a PAP and a PDP is done after the
+				 * presence of the Extensions element, too simplistic
+				 */
+
+				Extensions extensions = query.getExtensions();
+
+				if (extensions == null)
+
+					resultList = GetPoliciesForPDPOperation.instance().execute();
+
+				else
+
+					resultList = GetPoliciesForPAPOperation.instance().execute();
+
+				/* prepare the response */
+
+				Response response = ProvisioningServiceUtils.createResponse(query, resultList);
+
+				// log the outgoing response
+				if (log.isDebugEnabled()) {
+					log.debug("Sending Response : " + ProvisioningServiceUtils.xmlObjectToString(response));
+				}
+
+				return response;
+			}
+
+		} catch (RuntimeException e) {
+			ServiceClassExceptionManager.log(log, e);
+			throw e;
+		}
+
 	}
-
-	/* check a few things about the query */
-
-	try {
-	    ProvisioningServiceUtils.checkQuery(query);
-	} catch (VersionMismatchException e) {
-	    log.error(e.getMessage(), e);
-	    return ProvisioningServiceUtils.createResponse(query, e);
-	} catch (MissingIssuerException e) {
-	    log.error(e.getMessage(), e);
-	    return ProvisioningServiceUtils.createResponse(query, e);
-	} catch (WrongFormatIssuerException e) {
-	    log.error(e.getMessage(), e);
-	    return ProvisioningServiceUtils.createResponse(query, e);
-	}
-
-	/* get local policies */
-
-	List<XACMLObject> resultList = null;
-
-	/*
-	 * TODO discrimination between a PAP and a PDP is done after the
-	 * presence of the Extensions element, too simplistic
-	 */
-
-	Extensions extensions = query.getExtensions();
-
-	if (extensions == null)
-
-	    resultList = GetPoliciesForPDPOperation.instance().execute();
-
-	else
-
-	    resultList = GetPoliciesForPAPOperation.instance().execute();
-
-	/* prepare the response */
-
-	Response response = ProvisioningServiceUtils.createResponse(query,
-		resultList);
-
-	// log the outgoing response
-	if (log.isDebugEnabled()) {
-	    log.debug("Sending Response : "
-		    + ProvisioningServiceUtils.xmlObjectToString(response));
-	}
-
-	return response;
-    }
 
 }

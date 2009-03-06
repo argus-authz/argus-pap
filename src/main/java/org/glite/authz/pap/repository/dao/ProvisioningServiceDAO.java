@@ -110,9 +110,13 @@ public class ProvisioningServiceDAO {
         // replace policy set references with policy sets
         List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySet);
         for (String policySetIdReference : idReferenceList) {
+        	
+        	PolicySetType childPolicySet = getPolicySetNoReferences(papContainer, policySetIdReference);
 
-            PolicySetHelper.addPolicySet(policySet, getPolicySetNoReferences(papContainer, policySetIdReference));
+            PolicySetHelper.addPolicySet(policySet, childPolicySet);
 
+            childPolicySet.releaseDOM();
+            
             PolicySetHelper.deletePolicySetReference(policySet, policySetIdReference);
         }
 
@@ -123,6 +127,8 @@ public class ProvisioningServiceDAO {
             PolicyType policy = papContainer.getPolicy(policyIdReference);
 
             PolicySetHelper.addPolicy(policySet, policy);
+            
+            policy.releaseDOM();
 
             PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
         }

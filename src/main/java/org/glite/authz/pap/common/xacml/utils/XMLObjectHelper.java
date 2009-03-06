@@ -36,8 +36,8 @@ import org.w3c.dom.Element;
 
 public class XMLObjectHelper<T extends XMLObject> {
 
-    private static final Object lock = new Object();
     protected static final XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+    private static final Object lock = new Object();
 
     protected XMLObjectHelper() {}
 
@@ -105,6 +105,12 @@ public class XMLObjectHelper<T extends XMLObject> {
         toFile(file, xmlObject);
     }
 
+    public static String toString(Element element) {
+    	ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        write(bos, element);
+        return bos.toString();
+    }
+    
     public static String toString(XMLObject xmlObject) {
         return toString(xmlObject, 4);
     }
@@ -125,6 +131,19 @@ public class XMLObjectHelper<T extends XMLObject> {
         return xmlObject;
     }
 
+    public static void write(OutputStream outputStream, Element element) {
+        try {
+            Transformer tr = TransformerFactory.newInstance().newTransformer();
+//            tr.setOutputProperty(OutputKeys.INDENT, "yes");
+            tr.setOutputProperty(OutputKeys.METHOD, "xml");
+            tr.transform(new DOMSource(element), new StreamResult(outputStream));
+        } catch (TransformerConfigurationException e) {
+            throw new XMLObjectException(e);
+        } catch (TransformerException e) {
+            throw new XMLObjectException(e);
+        }
+    }
+    
     public static void write(OutputStream outputStream, XMLObject xmlObject, int indent) {
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();

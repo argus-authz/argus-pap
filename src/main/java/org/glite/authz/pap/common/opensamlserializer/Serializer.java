@@ -39,75 +39,77 @@ import org.xml.sax.Attributes;
  */
 public class Serializer implements org.apache.axis.encoding.Serializer {
 
-    private static final long serialVersionUID = -4207218164610553717L;
+	private static final long serialVersionUID = -4207218164610553717L;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName, org.xml.sax.Attributes,
-     * java.lang.Object, org.apache.axis.encoding.SerializationContext)
-     */
-    public void serialize(QName name, Attributes attributes, Object value, SerializationContext context) throws IOException {
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * org.apache.axis.encoding.Serializer#serialize(javax.xml.namespace.QName,
+	 * org.xml.sax.Attributes, java.lang.Object,
+	 * org.apache.axis.encoding.SerializationContext)
+	 */
+	public void serialize(QName name, Attributes attributes, Object value, SerializationContext context)
+			throws IOException {
 
-        try {
+		try {
 
-            if (value instanceof PolicyTypeString) {
-                
-                String policyString = ((PolicyTypeString) value).getPolicyString();
-                String ps = policyString.substring("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".length());
-                context.setWriteXMLType(null);
-                context.writeString(ps);
-                
-            } else if (value instanceof PolicySetTypeString) {
-                
-                String policySetString = ((PolicySetTypeString) value).getPolicySetString();
-                String pss = policySetString.substring("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".length());
-                context.setWriteXMLType(null);
-                context.writeString(pss);
-                
-            } else {
+			String elementAsString;
 
-                XMLObject xmlObject = (XMLObject) value;
+			if (value instanceof PolicyTypeString) {
 
-                Element element = XMLObjectHelper.marshall(xmlObject);
+				elementAsString = ((PolicyTypeString) value).getPolicyString();
+				
+			} else if (value instanceof PolicySetTypeString) {
 
-                if (attributes != null) {
-                    for (int i = 0; i < attributes.getLength(); i++) {
-                        element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes.getValue(i));
-                    }
-                }
+				elementAsString = ((PolicySetTypeString) value).getPolicySetString();
 
-                context.setWriteXMLType(null);
-                context.writeDOMElement(element);
-            }
+			} else {
 
-        } catch (Exception exception) {
+				Element element = XMLObjectHelper.marshall((XMLObject) value);
 
-            throw new IOException("Error serializing " + value.getClass().getName() + " : " + exception.getClass().getName());
+				if (attributes != null) {
+					for (int i = 0; i < attributes.getLength(); i++) {
+						element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes
+								.getValue(i));
+					}
+				}
 
-        }
-    }
+				elementAsString = XMLObjectHelper.toString(element);
+			}
+			String element = elementAsString.substring("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".length());
+			
+			context.setWriteXMLType(null);
+			context.writeString(element);
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
-     * org.apache.axis.wsdl.fromJava.Types)
-     */
-    @SuppressWarnings("unchecked")
-    public Element writeSchema(Class javaType, Types types) throws Exception {
-        Element complexType = types.createElement("complexType");
-        return complexType;
-    }
+		} catch (Exception exception) {
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
-     */
-    public String getMechanismType() {
-        // TODO Auto-generated method stub
-        return Constants.AXIS_SAX;
-    }
+			throw new IOException("Error serializing " + value.getClass().getName() + " : "
+					+ exception.getClass().getName());
+
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.apache.axis.encoding.Serializer#writeSchema(java.lang.Class,
+	 * org.apache.axis.wsdl.fromJava.Types)
+	 */
+	@SuppressWarnings("unchecked")
+	public Element writeSchema(Class javaType, Types types) throws Exception {
+		Element complexType = types.createElement("complexType");
+		return complexType;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see javax.xml.rpc.encoding.Serializer#getMechanismType()
+	 */
+	public String getMechanismType() {
+		// TODO Auto-generated method stub
+		return Constants.AXIS_SAX;
+	}
 
 }

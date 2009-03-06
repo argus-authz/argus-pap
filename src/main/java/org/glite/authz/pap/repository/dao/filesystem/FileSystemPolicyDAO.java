@@ -18,10 +18,9 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemPolicyDAO implements PolicyDAO {
 
-    private static final Map<String, Map<String, String>> cache = new ConcurrentHashMap<String, Map<String, String>>();
+    private static final Map<String, Map<String, PolicyTypeString>> cache = new ConcurrentHashMap<String, Map<String, PolicyTypeString>>();
     private static final String FILE_EXT = FileSystemRepositoryManager.getFileNameExt();
     private static FileSystemPolicyDAO instance = null;
-    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(FileSystemPolicyDAO.class);
     private static final String POLICY_FILE_NAME_PREFIX = FileSystemRepositoryManager.getPolicyFileNamePrefix();
     private static final PolicyHelper policyHelper = PolicyHelper.getInstance();
@@ -66,7 +65,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
     public synchronized void delete(String papId, String policyId) {
 
-        Map<String, String> papCache = cache.get(papId);
+        Map<String, PolicyTypeString> papCache = cache.get(papId);
 
         if (papCache != null) {
             papCache.remove(policyId);
@@ -93,7 +92,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
     public synchronized int deleteAll(String papId) {
 
-        Map<String, String> papCache = cache.get(papId);
+        Map<String, PolicyTypeString> papCache = cache.get(papId);
 
         if (papCache != null) {
             papCache.clear();
@@ -143,7 +142,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
         }
 
-        Map<String, String> papCache = getPAPCache(papId);
+        Map<String, PolicyTypeString> papCache = getPAPCache(papId);
 
         List<PolicyType> policyList = new LinkedList<PolicyType>();
 
@@ -158,17 +157,20 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             if (fileName.startsWith(POLICY_FILE_NAME_PREFIX)) {
 
                 String policyId = getPolicyIdFromFileName(fileName);
-                String policyString = papCache.get(policyId);
+                PolicyTypeString policy = papCache.get(policyId);
 
-                if (policyString == null) {
+                if (policy == null) {
                     try {
-                        policyString = policyHelper.readFromFileAsString(file);
+                        policy = new PolicyTypeString(policyId, policyHelper.readFromFileAsString(file));
                     } catch (Throwable e) {
                         throw new RepositoryException(e);
                     }
-                    papCache.put(policyId, policyString);
+                    papCache.put(policyId, policy);
                 }
-                policyList.add(new PolicyTypeString(policyId, policyString));
+                policyList.add(policy);
+                if (policy.isDOMLoaded()) {
+                	log.warn("DOM not released for id=" + policyId);
+                }
             }
         }
         return policyList;
@@ -176,11 +178,11 @@ public class FileSystemPolicyDAO implements PolicyDAO {
     
     public PolicyType getById(String papId, String policyId) {
 
-        Map<String, String> papCache = getPAPCache(papId);
+        Map<String, PolicyTypeString> papCache = getPAPCache(papId);
 
-        String policyString = papCache.get(policyId);
+        PolicyTypeString policy = papCache.get(policyId);
 
-        if (policyString == null) {
+        if (policy == null) {
 
             File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
 
@@ -192,15 +194,19 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             }
 
             try {
-                policyString = policyHelper.readFromFileAsString(policyFile);
+            	policy = new PolicyTypeString(policyId, policyHelper.readFromFileAsString(policyFile));
             } catch (Throwable e) {
                 throw new RepositoryException(e);
             }
 
-            papCache.put(policyId, policyString);
+            papCache.put(policyId, policy);
+        }
+        
+        if (policy.isDOMLoaded()) {
+        	log.warn("DOM not released for id=" + policyId);
         }
 
-        return new PolicyTypeString(policyId, policyString);
+        return policy;
     }
     
     public int getNumberOfPolicies(String papId) {
@@ -227,6 +233,10 @@ public class FileSystemPolicyDAO implements PolicyDAO {
     }
 
     public synchronized void store(String papId, PolicyType policy) {
+    	
+    	if (!(policy instanceof PolicyTypeString)) {
+    		throw new RepositoryException("BUG: not a PolicyTypeString class.");
+    	}
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
@@ -244,11 +254,17 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
         PolicyHelper.toFile(policyFileName, policy);
 
-        Map<String, String> papCache = getPAPCache(papId);
-        papCache.put(policyId, PolicyHelper.toString(policy));
+        policy.releaseDOM();
+        
+        Map<String, PolicyTypeString> papCache = getPAPCache(papId);
+        papCache.put(policyId, (PolicyTypeString) policy);
     }
 
     public synchronized void update(String papId, String policyVersion, PolicyType newPolicy) {
+    	
+    	if (!(newPolicy instanceof PolicyTypeString)) {
+    		throw new RepositoryException("BUG: not a PolicyTypeString class.");
+    	}
 
         String policyId = newPolicy.getPolicyId();
 
@@ -257,37 +273,39 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
         }
 
-        Map<String, String> papCache = getPAPCache(papId);
-        String oldPolicyString = papCache.get(policyId);
+        Map<String, PolicyTypeString> papCache = getPAPCache(papId);
+        PolicyTypeString oldPolicyString = papCache.get(policyId);
 
         if (oldPolicyString == null) {
             try {
-                oldPolicyString = policyHelper.readFromFileAsString(policyFile);
+                oldPolicyString = new PolicyTypeString(policyHelper.buildFromFile(policyFile));
             } catch (Throwable e) {
                 throw new RepositoryException(e);
             }
         }
         
-        PolicyType oldPolicy = new PolicyTypeString(policyId, oldPolicyString);
-
-        if (!(oldPolicy.getVersion().equals(policyVersion))) {
+        if (!(oldPolicyString.getVersion().equals(policyVersion))) {
             throw new RepositoryException(
                 String.format("Attempting to update the wrong version of PolicyId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
                               policyId,
                               policyVersion,
-                              oldPolicy.getVersion()));
+                              oldPolicyString.getVersion()));
         }
+        
+        oldPolicyString.releaseDOM();
 
         PolicyHelper.toFile(policyFile, newPolicy);
 
-        papCache.put(policyId, PolicyHelper.toString(newPolicy));
+        newPolicy.releaseDOM();
+        
+        papCache.put(policyId, (PolicyTypeString) newPolicy);
     }
 
-    private Map<String, String> getPAPCache(String papId) {
-        Map<String, String> papCache = cache.get(papId);
+    private Map<String, PolicyTypeString> getPAPCache(String papId) {
+        Map<String, PolicyTypeString> papCache = cache.get(papId);
 
         if (papCache == null) {
-            papCache = new ConcurrentHashMap<String, String>();
+            papCache = new ConcurrentHashMap<String, PolicyTypeString>();
             cache.put(papId, papCache);
         }
         return papCache;
