@@ -47,7 +47,7 @@ public class Deserializer extends DeserializerImpl {
 				MessageElement messageElement = context.getCurElement();
 				Element element = messageElement.getAsDOM();
 
-				XMLObject xmlObject = XMLObjectHelper.unmarshall(element);
+				XMLObject xmlObject = XMLObjectHelper.axisUnmarshall(element);
 
 				setValue(xmlObject);
 		}

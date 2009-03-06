@@ -129,7 +129,7 @@ public class ProvisioningServiceDAO {
             PolicySetHelper.addPolicy(policySet, policy);
             
             policy.releaseDOM();
-
+            
             PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
         }
 

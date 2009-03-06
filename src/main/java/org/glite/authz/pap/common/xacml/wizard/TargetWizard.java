@@ -173,6 +173,12 @@ public class TargetWizard {
         return true;
     }
 
+    public void releaseChildrenDOM() {
+        if (target != null) {
+            target.releaseChildrenDOM(true);
+        }
+    }
+    
     public void releaseDOM() {
         if (target != null) {
             target.releaseDOM();

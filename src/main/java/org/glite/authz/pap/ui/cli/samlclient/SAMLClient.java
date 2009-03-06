@@ -60,7 +60,8 @@ public class SAMLClient extends SAMLClientCLI {
     	
     	Response response = samlClient.XACMLPolicyQuery(query);
     	
-    	System.out.println(XMLObjectHelper.toString(response));
+    	System.out.println("Received response");
+//    	System.out.println(XMLObjectHelper.toString(response));
     	
         return ExitStatus.SUCCESS.ordinal();
         

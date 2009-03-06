@@ -10,6 +10,7 @@ import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicyWizardException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
 import org.opensaml.xacml.policy.EffectType;
@@ -29,7 +30,7 @@ public class PolicyWizard extends XACMLWizard {
     protected final String actionValue;
     protected String description = null;
     protected boolean isPrivate = false;
-    protected PolicyType policy = null;
+    protected PolicyTypeString policy = null;
 
     protected String policyId = null;
     protected String policyIdUniqueNumber;
@@ -52,6 +53,10 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     public PolicyWizard(PolicyType policy) throws UnsupportedPolicyException {
+
+        if (!(policy instanceof PolicyTypeString)) {
+            throw new PolicyWizardException("Argument is not PolicyTypeString");
+        }
 
         targetWizard = new TargetWizard(policy.getTarget());
 
@@ -78,7 +83,7 @@ public class PolicyWizard extends XACMLWizard {
             ruleWizardList.add(new RuleWizard(rule));
         }
 
-        this.policy = policy;
+        this.policy = (PolicyTypeString) policy;
     }
 
     public static String generateId(String prefix) {
@@ -200,7 +205,6 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     public PolicyType getXACML() {
-        log.debug("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
         initPolicyTypeIfNotSet();
         return policy;
     }
@@ -245,6 +249,19 @@ public class PolicyWizard extends XACMLWizard {
 
     public boolean isPublic() {
         return !isPrivate;
+    }
+
+    public boolean isDOMReleased() {
+        return (policy == null);
+    }
+
+    public void releaseChildrenDOM() {
+        targetWizard.releaseChildrenDOM();
+        targetWizard.releaseDOM();
+        for (RuleWizard ruleWizard : ruleWizardList) {
+            ruleWizard.releaseChildrenDOM();
+            ruleWizard.releaseDOM();
+        }
     }
 
     public void releaseDOM() {

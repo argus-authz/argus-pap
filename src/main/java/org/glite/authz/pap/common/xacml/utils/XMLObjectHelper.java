@@ -20,6 +20,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.glite.authz.pap.common.exceptions.XMLObjectException;
+import org.glite.authz.pap.common.xacml.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.PolicyTypeString;
+import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.XMLObjectBuilderFactory;
@@ -122,13 +126,38 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     public static XMLObject unmarshall(Element element) throws UnmarshallingException {
-        XMLObject xmlObject;
         synchronized (lock) {
             UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
             Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
-            xmlObject = unmarshaller.unmarshall(element);
+            XMLObject xmlObject = unmarshaller.unmarshall(element);
+            return xmlObject;
         }
-        return xmlObject;
+    }
+    
+    public static XMLObject axisUnmarshall(Element element) throws UnmarshallingException {
+        synchronized (lock) {
+            XMLObject xmlObject;
+            UnmarshallerFactory unmarshallerFactory = Configuration.getUnmarshallerFactory();
+            Unmarshaller unmarshaller = unmarshallerFactory.getUnmarshaller(element);
+
+            XMLObject xmlObjectDOM = unmarshaller.unmarshall(element);
+            
+            if (xmlObjectDOM instanceof PolicyType) {
+                
+                xmlObject = new PolicyTypeString((PolicyType) xmlObjectDOM);
+                xmlObject.releaseDOM();
+                
+            } else if(xmlObjectDOM instanceof PolicySetType) {
+                
+                xmlObject = new PolicySetTypeString((PolicySetType) xmlObjectDOM);
+                xmlObject.releaseDOM();
+                
+            } else {
+                
+                xmlObject = xmlObjectDOM;
+            }
+            return xmlObject;
+        }
     }
 
     public static void write(OutputStream outputStream, Element element) {

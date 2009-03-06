@@ -1,6 +1,8 @@
 package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
@@ -8,6 +10,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
+import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -31,13 +34,25 @@ public class ListPolicies extends PolicyManagementCLI {
         boolean somethingHasBeenSelected = false;
 
         PolicySetType[] policySetArray = policyIter.getAllPolicySets();
+        
 
         if (policySetArray.length == 0) {
             throw new CLIException("Error: the repository seems to be corrupted, no policy sets have been found");
         }
 
         PolicyType[] policyArray = policyIter.getAllPolicies();
-
+        
+        List<PolicyWizard> policyWizardList = new ArrayList<PolicyWizard>(policyArray.length);
+        
+        for (PolicyType policy : policyArray) {
+            PolicyWizard policyWizard = new PolicyWizard(policy); 
+            policyWizardList.add(policyWizard);
+            policyWizard.releaseChildrenDOM();
+            policyWizard.releaseDOM();
+        }
+        
+        policyArray = null;
+        
         PolicySetType localRootPolicySet = policySetArray[0];
 
         for (String policySetId : PolicySetHelper.getPolicySetIdReferencesValues(localRootPolicySet)) {
@@ -56,7 +71,7 @@ public class ListPolicies extends PolicyManagementCLI {
             }
 
             try {
-                PolicySetWizard policySetWizard = new PolicySetWizard(policySet, policyArray, null);
+                PolicySetWizard policySetWizard = new PolicySetWizard(policySet, policyWizardList, null);
                 System.out.println();
 
                 if (xacmlOutput) {
@@ -72,7 +87,7 @@ public class ListPolicies extends PolicyManagementCLI {
 
             somethingHasBeenSelected = true;
         }
-
+        
         return somethingHasBeenSelected;
     }
 

@@ -343,7 +343,7 @@ public class PolicyTypeString implements PolicyType {
 
 	private synchronized void initPolicyTypeIfNotSet() {
 		if (policy == null) {
-			log.debug("Initializing policyType");
+			log.debug("Initializing policyType: ", new Throwable());
 			policy = PolicyHelper.getInstance().buildFromString(policyString);
 			policyId = policy.getPolicyId();
 		} else {

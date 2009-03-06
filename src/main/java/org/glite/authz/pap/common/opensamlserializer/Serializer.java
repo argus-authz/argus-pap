@@ -30,6 +30,8 @@ import org.glite.authz.pap.common.xacml.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.opensaml.xml.XMLObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
 
@@ -40,6 +42,8 @@ import org.xml.sax.Attributes;
 public class Serializer implements org.apache.axis.encoding.Serializer {
 
 	private static final long serialVersionUID = -4207218164610553717L;
+	@SuppressWarnings("unused")
+    private static final Logger log = LoggerFactory.getLogger(Serializer.class);
 
 	/*
 	 * (non-Javadoc)
@@ -65,9 +69,11 @@ public class Serializer implements org.apache.axis.encoding.Serializer {
 				elementAsString = ((PolicySetTypeString) value).getPolicySetString();
 
 			} else {
+			    
+			    XMLObject xmlObject = (XMLObject) value;
 
-				Element element = XMLObjectHelper.marshall((XMLObject) value);
-
+				Element element = XMLObjectHelper.marshall(xmlObject);
+				
 				if (attributes != null) {
 					for (int i = 0; i < attributes.getLength(); i++) {
 						element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes
@@ -76,6 +82,10 @@ public class Serializer implements org.apache.axis.encoding.Serializer {
 				}
 
 				elementAsString = XMLObjectHelper.toString(element);
+				
+				xmlObject.releaseChildrenDOM(true);
+				xmlObject.releaseDOM();
+				xmlObject = null;
 			}
 			String element = elementAsString.substring("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".length());
 			

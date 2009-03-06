@@ -14,7 +14,6 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicySetWizardExcepti
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
 import org.opensaml.xacml.policy.PolicySetType;
-import org.opensaml.xacml.policy.PolicyType;
 
 public class PolicySetWizard extends XACMLWizard {
 
@@ -42,7 +41,7 @@ public class PolicySetWizard extends XACMLWizard {
         policySetWizardList = new LinkedList<PolicySetWizard>();
     }
 
-    public PolicySetWizard(PolicySetType policySet, PolicyType[] policyList, PolicySetType[] childPolicySetList) {
+    public PolicySetWizard(PolicySetType policySet, List<PolicyWizard> policyWizardList, PolicySetType[] childPolicySetList) {
 
         this.policySet = policySet;
         policySetId = policySet.getPolicySetId();
@@ -60,14 +59,14 @@ public class PolicySetWizard extends XACMLWizard {
                                                                policySet.getPolicySetId()), e);
         }
 
-        policyWizardList = new LinkedList<PolicyWizard>();
+        this.policyWizardList = new LinkedList<PolicyWizard>();
         policySetWizardList = new LinkedList<PolicySetWizard>();
 
         // add referenced policies
         List<String> idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
 
         if (idReferenceList.size() > 0) {
-            if (policyList == null) {
+            if (policyWizardList == null) {
                 throw new PolicySetWizardException("policyList is null");
             }
         }
@@ -75,12 +74,11 @@ public class PolicySetWizard extends XACMLWizard {
         for (String policyIdReference : idReferenceList) {
 
             boolean found = false;
+            for (PolicyWizard policyWizard : policyWizardList) {
 
-            for (PolicyType policy : policyList) {
-                if (policyIdReference.equals(policy.getPolicyId())) {
-                    PolicyWizard policyWizard = new PolicyWizard(policy);
-                    policyWizardList.add(policyWizard);
-                    policyWizard.releaseDOM();
+                if (policyIdReference.equals(policyWizard.getPolicyId())) {
+                    System.out.println("found policy: " + policyWizard.getPolicyId());
+                    this.policyWizardList.add(policyWizard);
                     found = true;
                 }
             }
@@ -103,7 +101,7 @@ public class PolicySetWizard extends XACMLWizard {
             boolean found = false;
             for (PolicySetType childPolicySet : childPolicySetList) {
                 if (policySetIdReference.equals(childPolicySet.getPolicySetId())) {
-                    PolicySetWizard psw = new PolicySetWizard(childPolicySet, policyList, childPolicySetList);
+                    PolicySetWizard psw = new PolicySetWizard(childPolicySet, policyWizardList, childPolicySetList);
                     policySetWizardList.add(psw);
                     psw.releaseDOM();
                     found = true;
@@ -150,8 +148,6 @@ public class PolicySetWizard extends XACMLWizard {
     }
 
     public void addPolicy(PolicyWizard policyWizard) {
-        // initPolicySetTypeIfNotSet();
-        // PolicySetHelper.addPolicyReference(policySet, policyWizard.getPolicyId());
         policyWizardList.add(policyWizard);
     }
 

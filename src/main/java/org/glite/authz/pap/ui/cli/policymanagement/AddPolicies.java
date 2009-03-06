@@ -48,8 +48,10 @@ public class AddPolicies extends PolicyManagementCLI {
 			PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
 
 			PolicySetType policySet = policySetWizard.getXACML();
-
+			
 			policySet.getPolicyIdReferences().clear();
+
+			policySetWizard.releaseDOM();
 
 			String policySetId = xacmlPolicyMgmtClient.addPolicySet(-1, policySet);
 
@@ -76,6 +78,9 @@ public class AddPolicies extends PolicyManagementCLI {
 				policyArray[i] = policyWizard.getXACML();
 				idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
 				tagAndValueArray[i] = policyWizard.getTagAndValue();
+				policyWizard.releaseChildrenDOM();
+				policyWizard.releaseDOM();
+				policyWizard = null;
 			}
 
 			String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(0, policySetId, idPrefixArray,

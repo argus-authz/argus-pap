@@ -101,6 +101,14 @@ public class RuleWizard {
         return true;
     }
     
+    public void releaseChildrenDOM() {
+        targetWizard.releaseChildrenDOM();
+        targetWizard.releaseDOM();
+        if (rule != null) {
+            rule.releaseChildrenDOM(true);
+        }
+    }
+    
     public void releaseDOM() {
         if (rule != null) {
             rule.releaseDOM();
