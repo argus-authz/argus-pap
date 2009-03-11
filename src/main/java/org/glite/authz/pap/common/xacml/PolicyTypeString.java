@@ -333,7 +333,7 @@ public class PolicyTypeString implements PolicyType {
 			policyString = PolicyHelper.toString(policy);
 			policyId = policy.getPolicyId();
 		} else {
-			log.debug("policyString already initialized, skipping initialization step");
+//			log.debug("policyString already initialized, skipping initialization step");
 		}
 	}
 
@@ -343,7 +343,7 @@ public class PolicyTypeString implements PolicyType {
 			policy = PolicyHelper.getInstance().buildFromString(policyString);
 			policyId = policy.getPolicyId();
 		} else {
-			log.debug("policyType already initialized, skipping initialization step");
+//			log.debug("policyType already initialized, skipping initialization step");
 		}
 	}
 

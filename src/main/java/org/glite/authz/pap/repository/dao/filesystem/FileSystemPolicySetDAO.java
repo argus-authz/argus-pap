@@ -19,272 +19,277 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemPolicySetDAO implements PolicySetDAO {
 
-	private static final Map<String, Map<String, PolicySetTypeString>> cache = new ConcurrentHashMap<String, Map<String, PolicySetTypeString>>();
-	private static final String FILE_EXT = FileSystemRepositoryManager.getFileNameExt();
-	private static final Logger log = LoggerFactory.getLogger(FileSystemPolicySetDAO.class);
-	private static final String POLICY_SET_FILE_NAME_PREFIX = FileSystemRepositoryManager
-			.getPolicySetFileNamePrefix();
-	private static final PolicySetHelper policySetHelper = PolicySetHelper.getInstance();
-	private static FileSystemPolicySetDAO instance = null;
+    private static final Map<String, Map<String, PolicySetTypeString>> cache = new ConcurrentHashMap<String, Map<String, PolicySetTypeString>>();
+    private static final String FILE_EXT = FileSystemRepositoryManager.getFileNameExt();
+    private static final Logger log = LoggerFactory.getLogger(FileSystemPolicySetDAO.class);
+    private static final String POLICY_SET_FILE_NAME_PREFIX = FileSystemRepositoryManager.getPolicySetFileNamePrefix();
+    private static final PolicySetHelper policySetHelper = PolicySetHelper.getInstance();
+    private static FileSystemPolicySetDAO instance = null;
 
-	private FileSystemPolicySetDAO() {}
+    private FileSystemPolicySetDAO() {}
 
-	public static FileSystemPolicySetDAO getInstance() {
-		if (instance == null) {
-			instance = new FileSystemPolicySetDAO();
-		}
-		return instance;
-	}
+    public static FileSystemPolicySetDAO getInstance() {
+        if (instance == null) {
+            instance = new FileSystemPolicySetDAO();
+        }
+        return instance;
+    }
 
-	private static String getPolicySetAbsolutePath(String papId, String policySetId) {
-		return FileSystemRepositoryManager.getPAPDirAbsolutePath(papId) + getPolicySetFileName(policySetId);
-	}
+    private static String getPolicySetAbsolutePath(String papId, String policySetId) {
+        return FileSystemRepositoryManager.getPAPDirAbsolutePath(papId) + getPolicySetFileName(policySetId);
+    }
 
-	private static String getPolicySetFileName(String policySetId) {
-		return POLICY_SET_FILE_NAME_PREFIX + policySetId + FILE_EXT;
-	}
+    private static String getPolicySetFileName(String policySetId) {
+        return POLICY_SET_FILE_NAME_PREFIX + policySetId + FILE_EXT;
+    }
 
-	private static String getPolicySetIdFromFileName(String fileName) {
-		int start = POLICY_SET_FILE_NAME_PREFIX.length();
-		int end = fileName.length() - FILE_EXT.length();
-		return fileName.substring(start, end);
-	}
+    private static String getPolicySetIdFromFileName(String fileName) {
+        int start = POLICY_SET_FILE_NAME_PREFIX.length();
+        int end = fileName.length() - FILE_EXT.length();
+        return fileName.substring(start, end);
+    }
 
-	private static String papDirNotFoundExceptionMsg(String papDirPAth) {
-		return "Not found PAP directory: " + papDirPAth;
-	}
+    private static String papDirNotFoundExceptionMsg(String papDirPAth) {
+        return "Not found PAP directory: " + papDirPAth;
+    }
 
-	// TODO: maybe it's better to create different exception classes instead of
-	// different exception messages
-	private static String policySetExceptionMsg(String policySetId) {
-		return String.format("policySetId=\"%s\"", policySetId);
-	}
+    // TODO: maybe it's better to create different exception classes instead of
+    // different exception messages
+    private static String policySetExceptionMsg(String policySetId) {
+        return String.format("policySetId=\"%s\"", policySetId);
+    }
 
-	private static String policySetNotFoundExceptionMsg(String policySetId) {
-		String msg = "Not found: " + policySetExceptionMsg(policySetId);
-		return msg;
-	}
+    private static String policySetNotFoundExceptionMsg(String policySetId) {
+        String msg = "Not found: " + policySetExceptionMsg(policySetId);
+        return msg;
+    }
 
-	public synchronized void delete(String papId, String policySetId) {
+    public synchronized void delete(String papId, String policySetId) {
 
-		Map<String, PolicySetTypeString> papCache = cache.get(papId);
+        Map<String, PolicySetTypeString> papCache = cache.get(papId);
 
-		if (papCache != null) {
-			papCache.remove(policySetId);
-		}
+        if (papCache != null) {
+            papCache.remove(policySetId);
+        }
 
-		File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
+        File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
 
-		if (policySetFile.exists()) {
+        if (policySetFile.exists()) {
 
-			if (papCache.size() == 0) {
-				cache.remove(papId);
-			}
+            if (papCache.size() == 0) {
+                cache.remove(papId);
+            }
 
-			if (!policySetFile.delete()) {
-				throw new RepositoryException("Cannot delete file: " + policySetFile.getAbsolutePath());
-			}
+            if (!policySetFile.delete()) {
+                throw new RepositoryException("Cannot delete file: " + policySetFile.getAbsolutePath());
+            }
 
-		} else {
-			throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
-		}
-	}
+        } else {
+            throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
+        }
+    }
 
-	public synchronized void deleteAll(String papId) {
+    public synchronized void deleteAll(String papId) {
 
-		Map<String, PolicySetTypeString> papCache = cache.get(papId);
+        Map<String, PolicySetTypeString> papCache = cache.get(papId);
 
-		if (papCache != null) {
-			papCache.clear();
-			cache.remove(papId);
-		}
+        if (papCache != null) {
+            papCache.clear();
+            cache.remove(papId);
+        }
 
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
-		if (!papDir.exists()) {
-			throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
-		}
+        if (!papDir.exists()) {
+            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+        }
 
-		for (File file : papDir.listFiles()) {
+        for (File file : papDir.listFiles()) {
 
-			if (file.isDirectory()) {
-				continue;
-			}
+            if (file.isDirectory()) {
+                continue;
+            }
 
-			String fileName = file.getName();
-			if (fileName.startsWith(POLICY_SET_FILE_NAME_PREFIX)) {
-				file.delete();
-			}
-		}
-	}
+            String fileName = file.getName();
+            if (fileName.startsWith(POLICY_SET_FILE_NAME_PREFIX)) {
+                file.delete();
+            }
+        }
+    }
 
-	public boolean exists(String papId, String policySetId) {
+    public boolean exists(String papId, String policySetId) {
 
-		File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
+        File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
 
-		boolean result = policySetFile.exists();
+        boolean result = policySetFile.exists();
 
-		log.debug(String.format("PolicySet \"%s\" exists=%s (file=\"%s\")", policySetId, String
-				.valueOf(result), policySetFile.getAbsoluteFile()));
-		return result;
-	}
+        log.debug(String.format("PolicySet \"%s\" exists=%s (file=\"%s\")",
+                                policySetId,
+                                String.valueOf(result),
+                                policySetFile.getAbsoluteFile()));
+        return result;
+    }
 
-	public List<PolicySetType> getAll(String papId) {
+    public List<PolicySetType> getAll(String papId) {
 
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
-		if (!papDir.exists()) {
-			throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
-		}
+        if (!papDir.exists()) {
+            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+        }
 
-		Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
 
-		List<PolicySetType> policySetList = new LinkedList<PolicySetType>();
+        List<PolicySetType> policySetList = new LinkedList<PolicySetType>();
 
-		for (File file : papDir.listFiles()) {
+        for (File file : papDir.listFiles()) {
 
-			if (file.isDirectory()) {
-				continue;
-			}
+            if (file.isDirectory()) {
+                continue;
+            }
 
-			String fileName = file.getName();
+            String fileName = file.getName();
 
-			if (fileName.startsWith(POLICY_SET_FILE_NAME_PREFIX)) {
+            if (fileName.startsWith(POLICY_SET_FILE_NAME_PREFIX)) {
 
-				String policySetId = getPolicySetIdFromFileName(fileName);
-				PolicySetTypeString policySet = papCache.get(policySetId);
+                String policySetId = getPolicySetIdFromFileName(fileName);
+                PolicySetTypeString policySet = papCache.get(policySetId);
 
-				if (policySet == null) {
-					try {
-						policySet = new PolicySetTypeString(policySetId, policySetHelper
-								.readFromFileAsString(file));
-					} catch (Throwable e) {
-						throw new RepositoryException(e);
-					}
-					papCache.put(policySetId, policySet);
-				}
-				policySetList.add(policySet);
-				if (policySet.isDOMLoaded()) {
-					log.warn("DOM not released for PolicySet id=" + policySetId);
-				}
-			}
-		}
-		return policySetList;
-	}
+                if (policySet == null) {
+                    try {
+                        policySet = new PolicySetTypeString(policySetId, policySetHelper.readFromFileAsString(file));
+                        log.debug("getAll(): PolicySet retrieved from file: id=" + policySetId);
+                    } catch (Throwable e) {
+                        throw new RepositoryException(e);
+                    }
+                    papCache.put(policySetId, policySet);
+                } else {
+                    log.debug("getAll(): PolicySet retrieved from cache: id=" + policySetId);
+                }
+                policySetList.add(policySet);
+                if (policySet.isDOMLoaded()) {
+                    log.warn("getAll(): DOM not released for PolicySet id=" + policySetId);
+                }
+            }
+        }
+        return policySetList;
+    }
 
-	public PolicySetType getById(String papId, String policySetId) {
+    public PolicySetType getById(String papId, String policySetId) {
 
-		Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
 
-		PolicySetTypeString policySet = papCache.get(policySetId);
+        PolicySetTypeString policySet = papCache.get(policySetId);
 
-		File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
-		if (policySet == null) {
+        File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
+        if (policySet == null) {
 
-			if (!policySetFile.exists()) {
-				if (papCache.size() == 0) {
-					cache.remove(papId);
-				}
-				throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
-			}
+            if (!policySetFile.exists()) {
+                if (papCache.size() == 0) {
+                    cache.remove(papId);
+                }
+                throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
+            }
 
-			try {
-				policySet = new PolicySetTypeString(policySetId, policySetHelper
-						.readFromFileAsString(policySetFile));
-			} catch (Throwable e) {
-				throw new RepositoryException(e);
-			}
+            try {
+                policySet = new PolicySetTypeString(policySetId, policySetHelper.readFromFileAsString(policySetFile));
+            } catch (Throwable e) {
+                throw new RepositoryException(e);
+            }
 
-			papCache.put(policySetId, policySet);
-			log.debug("getById(): PolicySet retrieved from file: id=" + policySetId);
+            papCache.put(policySetId, policySet);
+            log.debug("getById(): PolicySet retrieved from file: id=" + policySetId);
 
-		} else {
-			log.debug("getById(): PolicySet retrieved from cache: id=" + policySetId);
-		}
+        } else {
+            log.debug("getById(): PolicySet retrieved from cache: id=" + policySetId);
+        }
 
-		if (policySet.isDOMLoaded()) {
-			log.warn("DOM not released for id=" + policySetId);
-		}
+        if (policySet.isDOMLoaded()) {
+            log.warn("getById(): DOM not released for PolicySet id=" + policySetId);
+        }
 
-		return new PolicySetTypeString(policySet);
-	}
+        return policySet;
+    }
 
-	public synchronized void store(String papId, PolicySetType policySet) {
+    public synchronized void store(String papId, PolicySetType policySet) {
 
-		if (!(policySet instanceof PolicySetTypeString)) {
-			throw new RepositoryException("BUG: not a PolicySetTypeString class.");
-		}
+        if (!(policySet instanceof PolicySetTypeString)) {
+            throw new RepositoryException("BUG: not a PolicySetTypeString class");
+        }
 
-		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
+        File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
-		if (!papDir.exists())
-			throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+        if (!papDir.exists())
+            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
 
-		String policySetId = policySet.getPolicySetId();
+        String policySetId = policySet.getPolicySetId();
 
-		File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
-		if (policySetFile.exists()) {
-			throw new AlreadyExistsException("Already exists: policySetId=" + policySetId);
-		}
+        File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
+        if (policySetFile.exists()) {
+            throw new AlreadyExistsException("Already exists: policySetId=" + policySetId);
+        }
 
-		PolicySetHelper.toFile(policySetFile, policySet);
+        PolicySetHelper.toFile(policySetFile, policySet);
 
-		getPAPCache(papId).put(policySetId, TypeStringUtils.getAsPolicySetTypeString(policySet));
+        PolicySetTypeString policySetTypeString = TypeStringUtils.getAsPolicySetTypeString(policySet);
 
-		TypeStringUtils.releaseUnusedMemory(policySet);
-	}
+        getPAPCache(papId).put(policySetId, policySetTypeString);
 
-	public synchronized void update(String papId, String policySetVersion, PolicySetType newPolicySet) {
+        TypeStringUtils.releaseUnnecessaryMemory(policySetTypeString);
+    }
 
-		String policySetId = newPolicySet.getPolicySetId();
+    public synchronized void update(String papId, String policySetVersion, PolicySetType newPolicySet) {
 
-		File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
-		if (!policySetFile.exists()) {
-			throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
-		}
+        String policySetId = newPolicySet.getPolicySetId();
 
-		Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
-		PolicySetTypeString oldPolicySetString = papCache.get(policySetId);
+        File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
+        if (!policySetFile.exists()) {
+            throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
+        }
 
-		if (oldPolicySetString == null) {
-			try {
-				oldPolicySetString = new PolicySetTypeString(policySetHelper
-						.readFromFileAsString(policySetFile));
-				log.debug("update(): PolicySet retrieved from file: id=" + policySetId);
-			} catch (Throwable e) {
-				throw new RepositoryException(e);
-			}
-		} else {
-			log.debug("update(): PolicySet retrieved from cache: id=" + policySetId);
-		}
+        Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
+        PolicySetTypeString oldPolicySetString = papCache.get(policySetId);
 
-		PolicySetTypeString oldPolicySet = new PolicySetTypeString(oldPolicySetString);
+        if (oldPolicySetString == null) {
+            try {
+                oldPolicySetString = new PolicySetTypeString(policySetHelper.readFromFileAsString(policySetFile));
+                log.debug("update(): PolicySet retrieved from file: id=" + policySetId);
+            } catch (Throwable e) {
+                throw new RepositoryException(e);
+            }
+        } else {
+            log.debug("update(): PolicySet retrieved from cache: id=" + policySetId);
+        }
 
-		if (!(oldPolicySet.getVersion().equals(policySetVersion))) {
-			throw new RepositoryException(
-					String
-							.format(
-								"Attempting to update the wrong version of PolicySetId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
-								policySetId, policySetVersion, oldPolicySet.getVersion()));
-		}
-		
-		TypeStringUtils.releaseUnusedMemory(oldPolicySetString);
+        PolicySetTypeString oldPolicySet = new PolicySetTypeString(oldPolicySetString);
 
-		PolicySetHelper.toFile(policySetFile, newPolicySet);
+        if (!(oldPolicySet.getVersion().equals(policySetVersion))) {
+            throw new RepositoryException(
+                String.format("Attempting to update the wrong version of PolicySetId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
+                              policySetId,
+                              policySetVersion,
+                              oldPolicySet.getVersion()));
+        }
 
-		papCache.put(policySetId, TypeStringUtils.getAsPolicySetTypeString(newPolicySet));
-		
-		TypeStringUtils.releaseUnusedMemory(newPolicySet);
-	}
+        TypeStringUtils.releaseUnnecessaryMemory(oldPolicySetString);
 
-	private Map<String, PolicySetTypeString> getPAPCache(String papId) {
-		Map<String, PolicySetTypeString> papCache = cache.get(papId);
+        PolicySetHelper.toFile(policySetFile, newPolicySet);
 
-		if (papCache == null) {
-			log.debug("New HashMap for papId=" + papId);
-			papCache = new ConcurrentHashMap<String, PolicySetTypeString>();
-			cache.put(papId, papCache);
-		}
-		return papCache;
-	}
+        PolicySetTypeString newPolicySetTypeString = TypeStringUtils.getAsPolicySetTypeString(newPolicySet);
+
+        papCache.put(policySetId, newPolicySetTypeString);
+
+        TypeStringUtils.releaseUnnecessaryMemory(newPolicySetTypeString);
+    }
+
+    private Map<String, PolicySetTypeString> getPAPCache(String papId) {
+        Map<String, PolicySetTypeString> papCache = cache.get(papId);
+
+        if (papCache == null) {
+            log.debug("New HashMap for papId=" + papId);
+            papCache = new ConcurrentHashMap<String, PolicySetTypeString>();
+            cache.put(papId, papCache);
+        }
+        return papCache;
+    }
 }

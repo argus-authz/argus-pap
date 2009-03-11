@@ -11,13 +11,13 @@ import org.slf4j.LoggerFactory;
 public class AttributeWizard {
 
     public enum AttributeWizardType {
-        ACTION("action", "ACTION_ID", DataType.STRING, TargetElement.ACTION),
+        ACTION("action", "urn:oasis:names:tc:xacml:1.0:action:action-id", DataType.STRING, TargetElement.ACTION),
         CA("ca", "CA", DataType.X_500_NAME, TargetElement.SUBJECT),
         DEFAULT("default", "DEFAULT", DataType.STRING, TargetElement.SUBJECT),
-        DN("dn", "DN", DataType.X_500_NAME, TargetElement.SUBJECT),
+        DN("dn", "urn:oasis:names:tc:xacml:1.0:subject:subject-id", DataType.X_500_NAME, TargetElement.SUBJECT),
         FQAN("fqan", "FQAN", DataType.STRING, TargetElement.SUBJECT),
         GA("ga", "GA", DataType.STRING, TargetElement.SUBJECT),
-        RESOURCE_PS("resource", "RESOURCE_URI", DataType.STRING, TargetElement.RESOURCE),
+        RESOURCE_PS("resource", "urn:oasis:names:tc:xacml:1.0:resource:resource-id", DataType.STRING, TargetElement.RESOURCE),
         SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE);
 
         public enum TargetElement {

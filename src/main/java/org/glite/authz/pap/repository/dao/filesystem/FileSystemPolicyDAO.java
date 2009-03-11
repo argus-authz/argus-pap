@@ -256,7 +256,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
 		getPAPCache(papId).put(policyId, TypeStringUtils.getAsPolicyTypeString(policy));
 
-		TypeStringUtils.releaseUnusedMemory(policy);
+		TypeStringUtils.releaseUnnecessaryMemory(policy);
 	}
 
 	public synchronized void update(String papId, String policyVersion, PolicyType newPolicy) {
@@ -292,13 +292,13 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 								policyId, policyVersion, oldPolicy.getVersion()));
 		}
 
-		TypeStringUtils.releaseUnusedMemory(oldPolicy);
+		TypeStringUtils.releaseUnnecessaryMemory(oldPolicy);
 
 		PolicyHelper.toFile(policyFile, newPolicy);
 
 		papCache.put(policyId, TypeStringUtils.getAsPolicyTypeString(newPolicy));
 
-		TypeStringUtils.releaseUnusedMemory(newPolicy);
+		TypeStringUtils.releaseUnnecessaryMemory(newPolicy);
 	}
 
 	private Map<String, PolicyTypeString> getPAPCache(String papId) {

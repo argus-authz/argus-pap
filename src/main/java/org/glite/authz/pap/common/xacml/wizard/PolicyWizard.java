@@ -101,15 +101,25 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     public static boolean isPrivate(String policyId) {
-        String[] idComponents = policyId.split("_");
+        return !isPublic(policyId);
+    }
+    
+    public static boolean isPublic(String policyId) {
+        String[] idTokens = policyId.split("_");
 
-        if (idComponents.length != 3)
-            return false;
+        if (idTokens.length == 0) {
+            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
+        }
 
-        if (VISIBILITY_PRIVATE_PREFIX.equals(idComponents[0]))
+        if (idTokens.length == 1) {
             return true;
+        }
 
-        return false;
+        if (VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) {
+            return false;
+        }
+        
+        return true;
     }
 
     private static String generateUUID() {
@@ -385,37 +395,29 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     private void decomposePolicyId(String policyId) throws UnsupportedPolicyException {
-
+        isPrivate = isPrivate(policyId);
+        policyIdUniqueNumber = getIdUniqueNumber(policyId);
+        setPolicyIdVisibilityPrefix(isPrivate);
+    }
+    
+    private static String getIdUniqueNumber(String policyId) {
+        
         String[] idTokens = policyId.split("_");
 
         if (idTokens.length == 0) {
             throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
         }
-
-        isPrivate = false;
-        int idUniqueNumberTokenIndex = -1;
-
-        if (idTokens.length == 0) {
-            idUniqueNumberTokenIndex = 0;
+        
+        if (idTokens.length == 1) {
+            return idTokens[0];
         }
-
+        
         if (idTokens.length == 2) {
-
-            idUniqueNumberTokenIndex = 1;
-
-            if (VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) {
-                this.isPrivate = true;
-            } else if (!(VISIBILITY_PUBLIC_PREFIX.equals(idTokens[0]))) {
-                idUniqueNumberTokenIndex = -1;
+            if ((VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) || (VISIBILITY_PUBLIC_PREFIX.equals(idTokens[0]))) {
+                return idTokens[1];
             }
         }
-
-        if (idUniqueNumberTokenIndex == -1) {
-            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
-        }
-
-        policyIdUniqueNumber = idTokens[idUniqueNumberTokenIndex];
-        setPolicyIdVisibilityPrefix(isPrivate);
+        throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
     }
 
     private String generateId() {

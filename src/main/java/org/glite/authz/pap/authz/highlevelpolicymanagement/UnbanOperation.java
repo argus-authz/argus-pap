@@ -5,7 +5,7 @@ import java.util.List;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -37,31 +37,22 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
     protected UnbanResult doExecute() {
 
-        TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
-        TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
+        UnbanResult unbanResult = new UnbanResult();
+        unbanResult.setConflictingPolicies(new String[0]);
         
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
         
-        PolicySetType targetPolicySet = null;
-        List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(localPAP.getPAPRootPolicySet());
-        
-        for (String policySetId : policySetIdList) {
-            PolicySetType policySet = localPAP.getPolicySet(policySetId);
-            if (policySetTargetWizard.isEquivalent(policySet.getTarget())) {
-                targetPolicySet = policySet;
-                break;
-            }
-        }
-        
-        UnbanResult unbanResult = new UnbanResult();
-        unbanResult.setConflictingPolicies(new String[0]);
+        PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
         
         if (targetPolicySet == null) {
             unbanResult.setStatusCode(1);
             return unbanResult;
         }
         
+        TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
         List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
+        
+        TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
         
         for (String policyId : policyIdList) {
         	
@@ -69,8 +60,8 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
             
             if (policyTargetWizard.isEquivalent(repositoryPolicy.getTarget())) {
                 
-                PolicyWizard policyWizard = new PolicyWizard(PolicyHelper.getInstance().clone(repositoryPolicy));
-                repositoryPolicy.releaseDOM();
+                PolicyWizard policyWizard = new PolicyWizard(TypeStringUtils.cloneAsPolicyTypeString(repositoryPolicy));
+                TypeStringUtils.releaseUnnecessaryMemory(repositoryPolicy);
                 
                 if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
                     
@@ -87,11 +78,30 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
                 }
                 break;
             }
-            repositoryPolicy.releaseDOM();
+            TypeStringUtils.releaseUnnecessaryMemory(repositoryPolicy);
         }
         
         unbanResult.setStatusCode(1);
         return unbanResult;
+    }
+    
+    private PolicySetType getTargetPolicySet(PAPContainer papContainer) {
+        
+        TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
+        
+        PolicySetType rootPAPPolicySet = papContainer.getPAPRootPolicySet();
+        
+        List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(rootPAPPolicySet);
+        
+        TypeStringUtils.releaseUnnecessaryMemory(rootPAPPolicySet);
+        
+        for (String policySetId : policySetIdList) {
+            PolicySetType policySet = papContainer.getPolicySet(policySetId);
+            if (policySetTargetWizard.isEquivalent(policySet.getTarget())) {
+                return policySet;
+            }
+        }
+        return null;
     }
 
     @Override

@@ -20,118 +20,146 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class BanOperation extends BasePAPOperation<String> {
 
-	private AttributeWizard actionAttributeWizard;
-	private AttributeWizard banAttributeWizard;
-	private boolean isPublic;
-	private AttributeWizard resourceAttributeWizard;
+    private AttributeWizard actionAttributeWizard;
+    private AttributeWizard banAttributeWizard;
+    private boolean isPublic;
+    private AttributeWizard resourceAttributeWizard;
 
-	protected BanOperation(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
-			AttributeWizard actionAttributeWizard, boolean isPublic) {
+    protected BanOperation(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
+            AttributeWizard actionAttributeWizard, boolean isPublic) {
 
-		this.banAttributeWizard = banAttributeWizard;
-		this.resourceAttributeWizard = resourceAttributeWizard;
-		this.actionAttributeWizard = actionAttributeWizard;
-		this.isPublic = isPublic;
-	}
+        this.banAttributeWizard = banAttributeWizard;
+        this.resourceAttributeWizard = resourceAttributeWizard;
+        this.actionAttributeWizard = actionAttributeWizard;
+        this.isPublic = isPublic;
+    }
 
-	public static BanOperation instance(AttributeWizard banAttributeWizard,
-			AttributeWizard resourceAttributeWizard, AttributeWizard actionAttributeWizard, boolean isPublic) {
-		return new BanOperation(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic);
-	}
+    public static BanOperation instance(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
+            AttributeWizard actionAttributeWizard, boolean isPublic) {
+        return new BanOperation(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic);
+    }
 
-	protected String doExecute() {
+    protected String doExecute() {
 
-		PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        boolean policySetNeedToBeSaved = true;
+        boolean updateOperationForPolicySet = false;
+        boolean updateOperationForPolicy = false;
+        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-		// get the target policy set, it must be the very first policy set (if
-		// it exists)
-		PolicySetType targetPolicySet = null;
-		TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
+        PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
 
-		List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(localPAP
-				.getPAPRootPolicySet());
+        if (targetPolicySet == null) {
+            targetPolicySet = (new PolicySetWizard(resourceAttributeWizard)).getXACML();
+        } else {
+            updateOperationForPolicySet = true;
+        }
 
-		boolean updateOperationForPolicySet = false;
-		if (policySetIdList.size() > 0) {
-			PolicySetType candidatePolicySet = TypeStringUtils.cloneAsPolicySetTypeString(localPAP
-					.getPolicySet(policySetIdList.get(0)));
-			if (policySetTargetWizard.isEquivalent(candidatePolicySet.getTarget())) {
-				targetPolicySet = candidatePolicySet;
-				updateOperationForPolicySet = true;
-			}
-		}
+        String policyId = null;
 
-		if (targetPolicySet == null) {
-			targetPolicySet = (new PolicySetWizard(resourceAttributeWizard)).getXACML();
-		}
+        PolicyWizard targetPolicyWizard;
+        PolicyType candidatePolicy = getTargetPolicy(localPAP, targetPolicySet);
 
-		PolicyWizard targetPolicyWizard = null;
-		TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
-		boolean updateOperationForPolicy = false;
-		String policyId = null;
+        if (candidatePolicy == null) {
+            targetPolicyWizard = new PolicyWizard(actionAttributeWizard);
+            targetPolicyWizard.setPrivate(!isPublic);
+            policyId = targetPolicyWizard.getPolicyId();
+            PolicySetHelper.addPolicyReference(targetPolicySet, 0, policyId);
+        } else {
+            targetPolicyWizard = new PolicyWizard(candidatePolicy);
 
-		// get the target policy, it must be the very first policy
-		List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
+            if (targetPolicyWizard.denyRuleForAttributeExists(banAttributeWizard)) {
+                // ban policy already exists
+                return null;
+            }
+            policyId = candidatePolicy.getPolicyId();
+            updateOperationForPolicy = true;
+            policySetNeedToBeSaved = false;
+        }
 
-		if (policyIdList.size() > 0) {
-			PolicyType candidatePolicy = TypeStringUtils.cloneAsPolicyTypeString(localPAP
-					.getPolicy(policyIdList.get(0)));
-			if (policyTargetWizard.isEquivalent(candidatePolicy.getTarget())) {
-				
-				targetPolicyWizard = new PolicyWizard(candidatePolicy);
+        targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
 
-				if (targetPolicyWizard.isPublic() != isPublic) {
-					targetPolicyWizard = null;
-				} else {
-					if (targetPolicyWizard.denyRuleForAttributeExists(banAttributeWizard)) {
-						return null;
-					}
-					policyId = candidatePolicy.getPolicyId();
-					updateOperationForPolicy = true;
-					updateOperationForPolicySet = false;
-				}
-			}
-		}
+        // Store the ban policy and the policy set in which it is contained (only if needed)
+        if (policySetNeedToBeSaved) {
+            if (updateOperationForPolicySet) {
+                String oldVersion = targetPolicySet.getVersion();
+                PolicySetWizard.increaseVersion(targetPolicySet);
+                localPAP.updatePolicySet(oldVersion, targetPolicySet);
+            } else {
+                localPAP.addPolicySet(0, targetPolicySet);
+            }
+        } else {
+            TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
+        }
 
-		if (targetPolicyWizard == null) {
-			targetPolicyWizard = new PolicyWizard(actionAttributeWizard);
-			targetPolicyWizard.setPrivate(!isPublic);
-			policyId = targetPolicyWizard.getPolicyId();
-			PolicySetHelper.addPolicyReference(targetPolicySet, 0, policyId);
-		}
+        if (updateOperationForPolicy) {
+            String oldVersion = targetPolicyWizard.getVersionString();
+            targetPolicyWizard.increaseVersion();
+            log.debug(XMLObjectHelper.toString(targetPolicyWizard.getXACML()));
+            localPAP.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
+        } else {
+            localPAP.storePolicy(targetPolicyWizard.getXACML());
+        }
 
-		if (updateOperationForPolicySet) {
-			String oldVersion = targetPolicySet.getVersion();
-			PolicySetWizard.increaseVersion(targetPolicySet);
-			localPAP.updatePolicySet(oldVersion, targetPolicySet);
-		} else {
-			if (!updateOperationForPolicy) {
-				localPAP.addPolicySet(0, targetPolicySet);
-			}
-		}
+        targetPolicyWizard.releaseChildrenDOM();
+        targetPolicyWizard.releaseDOM();
 
-		targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
+        return policyId;
+    }
 
-		if (updateOperationForPolicy) {
-			String oldVersion = targetPolicyWizard.getVersionString();
-			targetPolicyWizard.increaseVersion();
-			log.debug(XMLObjectHelper.toString(targetPolicyWizard.getXACML()));
-			localPAP.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
-		} else {
-			localPAP.storePolicy(targetPolicyWizard.getXACML());
-		}
+    @Override
+    protected void setupPermissions() {
 
-		targetPolicyWizard.releaseChildrenDOM();
-		targetPolicyWizard.releaseDOM();
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
 
-		return policyId;
-	}
+    }
 
-	@Override
-	protected void setupPermissions() {
+    private PolicyType getTargetPolicy(PAPContainer papContainer, PolicySetType policySet) {
 
-		addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
+        List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
 
-	}
+        if (policyIdList.size() == 0) {
+            return null;
+        }
 
+        // get the target policy, it must be the very first policy
+        PolicyType candidatePolicy = TypeStringUtils.cloneAsPolicyTypeString(papContainer.getPolicy(policyIdList.get(0)));
+
+        PolicyType policy = null;;
+        TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
+
+        if (policyTargetWizard.isEquivalent(candidatePolicy.getTarget())) {
+
+            policy = candidatePolicy;
+
+            if (PolicyWizard.isPublic(policy.getPolicyId()) != isPublic) {
+                return null;
+            }
+        }
+        return policy;
+    }
+
+    private PolicySetType getTargetPolicySet(PAPContainer papContainer) {
+
+        // get the target policy set, it must be the very first policy set (if it exists)
+        PolicySetType targetPolicySet = null;
+        TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
+
+        PolicySetType papRootPolicySet = papContainer.getPAPRootPolicySet();
+
+        List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(papRootPolicySet);
+
+        TypeStringUtils.releaseUnnecessaryMemory(papRootPolicySet);
+
+        if (policySetIdList.size() == 0) {
+            return null;
+        }
+
+        PolicySetType candidatePolicySet = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPolicySet(policySetIdList.get(0)));
+
+        if (policySetTargetWizard.isEquivalent(candidatePolicySet.getTarget())) {
+            targetPolicySet = candidatePolicySet;
+        }
+
+        return targetPolicySet;
+    }
 }

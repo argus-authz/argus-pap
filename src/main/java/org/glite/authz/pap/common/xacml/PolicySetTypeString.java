@@ -163,6 +163,7 @@ public class PolicySetTypeString implements PolicySetType {
 
     public String getPolicySetId() {
         if (policySetId == null) {
+            log.debug("getPolicySetId(): PolicySetId is not set, need to build the DOM");
             initPolicySetTypeIfNotSet();
         }
         return policySetId;
@@ -237,8 +238,8 @@ public class PolicySetTypeString implements PolicySetType {
 
     public synchronized void releaseDOM() {
         if (policySet != null) {
-            log.debug("Invalidating policySetType");
             initPolicySetStringIfNotSet();
+            log.debug("Invalidating policySetType");
             policySet.releaseChildrenDOM(true);
             policySet.releaseDOM();
             policySet = null;
@@ -354,21 +355,21 @@ public class PolicySetTypeString implements PolicySetType {
 
     private void initPolicySetStringIfNotSet() {
         if (policySetString == null) {
-            log.debug("Initializing policySetString");
+            log.debug("Initializing policySetString id=" + policySet.getPolicySetId());
             policySetString = PolicyHelper.toString(policySet);
             policySetId = policySet.getPolicySetId();
         } else {
-            log.debug("policySetString already initialized, skipping initialization step");
+//            log.debug("policySetString already initialized, skipping initialization step");
         }
     }
 
     private synchronized void initPolicySetTypeIfNotSet() {
         if (policySet == null) {
-            log.debug("Initializing policySetType");
             policySet = PolicySetHelper.getInstance().buildFromString(policySetString);
             policySetId = policySet.getPolicySetId();
+            log.debug("Initializing policySetType id=" + policySetId);
         } else {
-            log.debug("policySetType already initialized, skipping initialization step");
+//            log.debug("policySetType already initialized, skipping initialization step");
         }
     }
 
