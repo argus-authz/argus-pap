@@ -5,6 +5,7 @@ import java.util.List;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -63,10 +64,13 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
         
         for (String policyId : policyIdList) {
-            PolicyType policy = localPAP.getPolicy(policyId);
-            if (policyTargetWizard.isEquivalent(policy.getTarget())) {
+        	
+            PolicyType repositoryPolicy = localPAP.getPolicy(policyId);
+            
+            if (policyTargetWizard.isEquivalent(repositoryPolicy.getTarget())) {
                 
-                PolicyWizard policyWizard = new PolicyWizard(policy);
+                PolicyWizard policyWizard = new PolicyWizard(PolicyHelper.getInstance().clone(repositoryPolicy));
+                repositoryPolicy.releaseDOM();
                 
                 if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
                     
@@ -83,6 +87,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
                 }
                 break;
             }
+            repositoryPolicy.releaseDOM();
         }
         
         unbanResult.setStatusCode(1);

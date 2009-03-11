@@ -195,6 +195,10 @@ public class PolicyTypeString implements PolicyType {
 		return policy.hasParent();
 	}
 
+	public boolean isDOMLoaded() {
+		return (policy != null);
+	}
+
 	@SuppressWarnings("unchecked")
 	public void registerValidator(Validator arg0) {
 		initPolicyTypeIfNotSet();
@@ -203,11 +207,7 @@ public class PolicyTypeString implements PolicyType {
 	}
 
 	public void releaseChildrenDOM(boolean arg0) {
-		if (policy != null) {
-			initPolicyStringIfNotSet();
-			policy.releaseChildrenDOM(arg0);
-			releaseDOM();
-		}
+		releaseDOM();
 	}
 
 	public synchronized void releaseDOM() {
@@ -321,14 +321,10 @@ public class PolicyTypeString implements PolicyType {
 		policy.setVersion(arg0);
 		invalidatePolicyString();
 	}
-
+	
 	public void validate(boolean arg0) throws ValidationException {
 		initPolicyTypeIfNotSet();
 		policy.validate(arg0);
-	}
-	
-	public boolean isDOMLoaded() {
-		return (policy != null);
 	}
 
 	private void initPolicyStringIfNotSet() {
@@ -343,7 +339,7 @@ public class PolicyTypeString implements PolicyType {
 
 	private synchronized void initPolicyTypeIfNotSet() {
 		if (policy == null) {
-			log.debug("Initializing policyType: ", new Throwable());
+			log.debug("Initializing policyType");
 			policy = PolicyHelper.getInstance().buildFromString(policyString);
 			policyId = policy.getPolicyId();
 		} else {

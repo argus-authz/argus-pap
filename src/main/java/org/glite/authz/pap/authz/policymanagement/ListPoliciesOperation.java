@@ -1,6 +1,5 @@
 package org.glite.authz.pap.authz.policymanagement;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.authz.BasePAPOperation;

@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.xacml.PolicyTypeString;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
@@ -50,12 +50,9 @@ public class AddPoliciesOperation extends BasePAPOperation<String[]> {
 			} else {
 				localPAP.addPolicy(index + i, policySetId, policy[i]);
 			}
+			TypeStringUtils.releaseUnusedMemory(policy[i]);
 
 			log.info(String.format("Added policy (policyId=\"%s\")", policyIdArray[i]));
-
-			if (policy[i] instanceof PolicyTypeString) {
-				((PolicyTypeString) policy[i]).releaseDOM();
-			}
 		}
 		return policyIdArray;
 	}

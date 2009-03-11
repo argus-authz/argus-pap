@@ -96,6 +96,8 @@ public class DistributionModule extends Thread {
                     log.error(String.format("Invalid object (not a Policy or PolicySet) received from PAP %s (%s)", pap
                             .getAlias(), pap.getEndpoint()));
                 }
+                xacmlObject.releaseChildrenDOM(true);
+                xacmlObject.releaseDOM();
             }
         } else {
             log.error(String.format("The root of the policy tree is not a PolicySet (papAlias=%s, endpoint=%s)", pap.getAlias(),

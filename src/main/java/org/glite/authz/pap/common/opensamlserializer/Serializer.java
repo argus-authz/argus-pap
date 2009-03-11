@@ -85,7 +85,6 @@ public class Serializer implements org.apache.axis.encoding.Serializer {
 				
 				xmlObject.releaseChildrenDOM(true);
 				xmlObject.releaseDOM();
-				xmlObject = null;
 			}
 			String element = elementAsString.substring("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".length());
 			

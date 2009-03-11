@@ -3,6 +3,7 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
@@ -31,6 +32,8 @@ public class AddPolicySetOperation extends BasePAPOperation<String> {
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
         localPAP.addPolicySet(index, policySet);
+        
+        TypeStringUtils.releaseUnusedMemory(policySet);
         
         log.info(String.format("Added policy (policyId=\"%s\")", policySetId));
 

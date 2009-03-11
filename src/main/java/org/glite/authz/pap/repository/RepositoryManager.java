@@ -97,6 +97,8 @@ public abstract class RepositoryManager {
             
             for (PolicyWizard policyWizard : policySetWizard.getPolicyWizardList()) {
                 localPapContainer.storePolicy(policyWizard.getXACML());
+                policyWizard.releaseChildrenDOM();
+                policyWizard.releaseDOM();
             }
         }
     }

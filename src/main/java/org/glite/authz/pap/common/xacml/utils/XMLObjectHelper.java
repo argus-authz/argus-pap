@@ -246,7 +246,22 @@ public class XMLObjectHelper<T extends XMLObject> {
         return build(doc.getDocumentElement());
     }
 
-    public T clone(T xmlObject) {
+	public T clone(T xmlObject) {
+//		try {
+//			
+//			Element element = marshall(xmlObject);
+//			T xmlObjectClone = (T) unmarshall(element);
+//			
+//			return xmlObjectClone;
+//			
+//		} catch (MarshallingException e) {
+//			throw new XMLObjectException(e);
+//		} catch (UnmarshallingException e) {
+//			throw new XMLObjectException(e);
+//		}
+		
+		// TODO: just marshalling and unmarshalling doesn't work, it gets a null
+		// pointer exception during unmarshalling... find out what's wrong
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         write(bos, xmlObject, 0);
         ByteArrayInputStream ios = new ByteArrayInputStream(bos.toByteArray());

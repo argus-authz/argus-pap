@@ -3,6 +3,7 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
@@ -37,6 +38,8 @@ public class StorePolicyOperation extends BasePAPOperation <String>{
         policy.setPolicyId(policyId);
         
         localPAP.storePolicy(policy);
+        
+        TypeStringUtils.releaseUnusedMemory(policy);
         
         return policyId;
             

@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.xacml.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.TargetWizard;
@@ -49,7 +51,8 @@ public class PAPContainer {
 
 		policyDAO.store(papId, policy);
 
-		PolicySetType policySet = policySetDAO.getById(papId, policySetId);
+		PolicySetTypeString policySet = TypeStringUtils.cloneAsPolicySetTypeString(policySetDAO.getById(
+			papId, policySetId));
 
 		if (PolicySetHelper.referenceIdExists(policySet, policyId)) {
 			throw new AlreadyExistsException("Reference id \"" + policyId + "\" alredy exists");
@@ -82,7 +85,8 @@ public class PAPContainer {
 
 		policySetDAO.store(papId, policySet);
 
-		PolicySetType rootPolicySet = PolicySetHelper.getInstance().clone(policySetDAO.getById(papId, rootPolicySetId));
+		PolicySetTypeString rootPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(policySetDAO.getById(
+			papId, rootPolicySetId));
 
 		if (PolicySetHelper.referenceIdExists(rootPolicySet, policySetId)) {
 			throw new AlreadyExistsException("Reference id \"" + policySetId + "\" alredy exists");
@@ -215,12 +219,14 @@ public class PAPContainer {
 		List<PolicySetType> policySetList = policySetDAO.getAll(papId);
 
 		for (PolicySetType policySet : policySetList) {
-			if (PolicySetHelper.deletePolicyReference(policySet, policyId)) {
+			PolicySetTypeString policySetString = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
 
-				String oldVersion = policySet.getVersion();
-				PolicySetWizard.increaseVersion(policySet);
+			if (PolicySetHelper.deletePolicyReference(policySetString, policyId)) {
 
-				policySetDAO.update(papId, oldVersion, policySet);
+				String oldVersion = policySetString.getVersion();
+				PolicySetWizard.increaseVersion(policySetString);
+
+				policySetDAO.update(papId, oldVersion, policySetString);
 			}
 		}
 
@@ -243,7 +249,8 @@ public class PAPContainer {
 			throw new NotFoundException("PolicySetId \"" + policySetId + "\" does not exists");
 		}
 
-		PolicySetType rootPolicySet = policySetDAO.getById(papId, rootPolicySetId);
+		PolicySetTypeString rootPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(policySetDAO.getById(
+			papId, rootPolicySetId));
 
 		if (PolicySetHelper.deletePolicySetReference(rootPolicySet, policySetId)) {
 

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.xacml.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
@@ -95,7 +96,7 @@ public class PAPManager {
         
         localPolicySet.setVersion("0");
 
-        localPAPContainer.storePolicySet(localPolicySet);
+        localPAPContainer.storePolicySet(new PolicySetTypeString(localPolicySet));
     }
 
     public PAP deleteTrustedPAP(String papAlias) throws NotFoundException {

@@ -21,11 +21,11 @@ import org.slf4j.LoggerFactory;
 
 public class PolicyWizard extends XACMLWizard {
 
-    private static final Logger log = LoggerFactory.getLogger(PolicyWizard.class);
-
     protected static final AttributeWizardType attributeWizardType = AttributeWizardType.ACTION;
+
     protected static final String VISIBILITY_PRIVATE_PREFIX = "private";
     protected static final String VISIBILITY_PUBLIC_PREFIX = "public";
+    private static final Logger log = LoggerFactory.getLogger(PolicyWizard.class);
 
     protected final String actionValue;
     protected String description = null;
@@ -136,10 +136,12 @@ public class PolicyWizard extends XACMLWizard {
 
     public void addObligation(ObligationWizard obligationWizard) {
     // TODO: implement me
+    	invalidatePolicyType();
     }
 
     public void addObligation(String obligationId, List<AttributeWizard> attributeWizardList) {
     // TODO: implement me
+    	invalidatePolicyType();
     }
 
     public void addRule(AttributeWizard attribute, EffectType effect) {
@@ -156,6 +158,7 @@ public class PolicyWizard extends XACMLWizard {
 
     public void addRule(int index, RuleWizard ruleWizard) {
         ruleWizardList.add(index, ruleWizard);
+        invalidatePolicyType();
     }
 
     public void addRule(List<AttributeWizard> targetAttributeList, EffectType effect) {
@@ -164,6 +167,7 @@ public class PolicyWizard extends XACMLWizard {
 
     public void addRule(RuleWizard ruleWizard) {
         ruleWizardList.add(ruleWizard);
+        invalidatePolicyType();
     }
 
     public boolean denyRuleForAttributeExists(AttributeWizard attributeWizard) {
@@ -213,6 +217,10 @@ public class PolicyWizard extends XACMLWizard {
         setVersion(getVersion() + 1);
     }
 
+    public boolean isDOMReleased() {
+        return (policy == null);
+    }
+
     public boolean isEquivalent(PolicyType policy) {
 
         if (!(targetWizard.isEquivalent(policy.getTarget()))) {
@@ -251,10 +259,6 @@ public class PolicyWizard extends XACMLWizard {
         return !isPrivate;
     }
 
-    public boolean isDOMReleased() {
-        return (policy == null);
-    }
-
     public void releaseChildrenDOM() {
         targetWizard.releaseChildrenDOM();
         targetWizard.releaseDOM();
@@ -284,6 +288,7 @@ public class PolicyWizard extends XACMLWizard {
                 if (policy != null) {
                     policy.getRules().remove(i);
                 }
+                invalidatePolicyType();
                 return true;
             }
         }
@@ -295,6 +300,7 @@ public class PolicyWizard extends XACMLWizard {
         if (policy != null) {
             policy.setDescription(DescriptionTypeHelper.build(value));
         }
+        invalidatePolicyType();
     }
 
     public void setPolicyId(String policyId) {
@@ -302,6 +308,7 @@ public class PolicyWizard extends XACMLWizard {
         if (policy != null) {
             policy.setPolicyId(policyId);
         }
+        invalidatePolicyType();
     }
 
     public void setPrivate(boolean isPrivate) {
@@ -314,6 +321,7 @@ public class PolicyWizard extends XACMLWizard {
         if (policy != null) {
             policy.setPolicyId(policyId);
         }
+        invalidatePolicyType();
     }
 
     public void setVersion(int version) {
@@ -322,6 +330,7 @@ public class PolicyWizard extends XACMLWizard {
         if (policy != null) {
             policy.setVersion(this.version);
         }
+        invalidatePolicyType();
     }
 
     public String toFormattedString() {
@@ -427,6 +436,11 @@ public class PolicyWizard extends XACMLWizard {
         }
     }
 
+    private void invalidatePolicyType() {
+    	releaseChildrenDOM();
+    	releaseDOM();
+    }
+
     private void setPolicyIdVisibilityPrefix(boolean isPrivate) {
         if (isPrivate) {
             policyIdVisibilityPrefix = VISIBILITY_PRIVATE_PREFIX;
@@ -434,7 +448,7 @@ public class PolicyWizard extends XACMLWizard {
             policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
         }
     }
-
+    
     private void setPolicyType() {
 
         releaseDOM();

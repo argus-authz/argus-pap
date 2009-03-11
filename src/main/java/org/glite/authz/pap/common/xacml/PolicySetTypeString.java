@@ -32,8 +32,13 @@ public class PolicySetTypeString implements PolicySetType {
 
     private static final Logger log = LoggerFactory.getLogger(PolicySetTypeString.class);
     private PolicySetType policySet = null;
-    private String policySetString = null;
     private String policySetId = null;
+    private String policySetString = null;
+
+    public PolicySetTypeString(PolicySetType policySet) {
+        this.policySet = policySet;
+        policySetId = policySet.getPolicySetId();
+    }
 
     public PolicySetTypeString(String policySetString) {
         this.policySetString = policySetString;
@@ -43,12 +48,7 @@ public class PolicySetTypeString implements PolicySetType {
         this(policySetString);
         this.policySetId = policySetId;
     }
-
-    public PolicySetTypeString(PolicySetType policySet) {
-        this.policySet = policySet;
-        policySetId = policySet.getPolicySetId();
-    }
-
+    
     public void addNamespace(Namespace arg0) {
         initPolicySetTypeIfNotSet();
         policySet.addNamespace(arg0);
@@ -221,6 +221,10 @@ public class PolicySetTypeString implements PolicySetType {
         return policySet.hasParent();
     }
 
+    public boolean isDOMLoaded() {
+		return (policySet != null);
+	}
+
     @SuppressWarnings("unchecked")
     public void registerValidator(Validator arg0) {
         initPolicySetTypeIfNotSet();
@@ -228,14 +232,10 @@ public class PolicySetTypeString implements PolicySetType {
     }
 
     public void releaseChildrenDOM(boolean arg0) {
-        if (policySet != null) {
-        	initPolicySetStringIfNotSet();
-            policySet.releaseChildrenDOM(arg0);
-            releaseDOM();
-        }
+        releaseDOM();
     }
 
-    public void releaseDOM() {
+    public synchronized void releaseDOM() {
         if (policySet != null) {
             log.debug("Invalidating policySetType");
             initPolicySetStringIfNotSet();
@@ -321,6 +321,13 @@ public class PolicySetTypeString implements PolicySetType {
         invalidatePolicySetId();
         releaseDOM();
     }
+    
+    public void setPolicySetString(String policySetId, String policySetString) {
+        this.policySetString = policySetString;
+        this.policySetId = policySetId;
+        invalidatePolicySetId();
+        releaseDOM();
+    }
 
     public void setSchemaLocation(String arg0) {
         initPolicySetTypeIfNotSet();
@@ -349,12 +356,13 @@ public class PolicySetTypeString implements PolicySetType {
         if (policySetString == null) {
             log.debug("Initializing policySetString");
             policySetString = PolicyHelper.toString(policySet);
+            policySetId = policySet.getPolicySetId();
         } else {
             log.debug("policySetString already initialized, skipping initialization step");
         }
     }
 
-    private void initPolicySetTypeIfNotSet() {
+    private synchronized void initPolicySetTypeIfNotSet() {
         if (policySet == null) {
             log.debug("Initializing policySetType");
             policySet = PolicySetHelper.getInstance().buildFromString(policySetString);

@@ -77,7 +77,6 @@ public class PolicySetWizard extends XACMLWizard {
             for (PolicyWizard policyWizard : policyWizardList) {
 
                 if (policyIdReference.equals(policyWizard.getPolicyId())) {
-                    System.out.println("found policy: " + policyWizard.getPolicyId());
                     this.policyWizardList.add(policyWizard);
                     found = true;
                 }

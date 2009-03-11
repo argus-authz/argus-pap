@@ -26,7 +26,7 @@ public class Ping extends PAPManagementCLI {
 	@Override
 	protected int executeCommand(CommandLine commandLine)
 			throws CLIException, ParseException, RemoteException {
-	    
+		
 		String[] args = commandLine.getArgs();
 		
 		if (args.length > 1)
