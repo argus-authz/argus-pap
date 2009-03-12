@@ -53,7 +53,7 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
         // policySet.getPolicySetIdReferences().add(index,
         // IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
         policySet.getPolicyChoiceGroup().add(index,
-                IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
+                                             IdReferenceHelper.build(IdReferenceHelper.Type.POLICYSET_ID_REFERENCE, idValue));
     }
 
     public static void addPolicySetReference(PolicySetType policySet, String idValue) {
@@ -64,7 +64,7 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
         return build(policySetId, policyCombinerAlgorithmId, target, null);
     }
-    
+
     public static PolicySetType build(String policySetId, String policyCombiningAlgorithmId, TargetType target,
             ObligationsType obligations) {
         PolicySetType policySet = build();
@@ -94,7 +94,8 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
             if (policyIdList.get(i).equals(oldValue)) {
                 policySet.getPolicyIdReferences().set(i,
-                        IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE, newValue));
+                                                      IdReferenceHelper.build(IdReferenceHelper.Type.POLICY_ID_REFERENCE,
+                                                                              newValue));
                 return true;
             }
         }
@@ -132,6 +133,11 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
         return getChildrenOrderedList(policySet).size();
     }
 
+    public static int getPolicyIdReferenceIndex(PolicySetType policySet, String id) {
+        List<String> idList = getPolicyIdReferencesValues(policySet);
+        return idList.indexOf(id);
+    }
+
     public static List<String> getPolicyIdReferencesValues(PolicySetType policySet) {
         List<IdReferenceType> refList = policySet.getPolicyIdReferences();
         List<String> list = new ArrayList<String>(refList.size());
@@ -139,6 +145,11 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
             list.add(ref.getValue());
         }
         return list;
+    }
+
+    public static int getPolicySetIdReferenceIndex(PolicySetType policySet, String id) {
+        List<String> idList = getPolicySetIdReferencesValues(policySet);
+        return idList.indexOf(id);
     }
 
     public static List<String> getPolicySetIdReferencesValues(PolicySetType policySet) {

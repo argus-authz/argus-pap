@@ -29,13 +29,16 @@
 				</xsd:sequence>
 			</xsd:complexType>
 		</xsd:schema>
-        <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://org.glite.authz/wsdl/pap/services/xacml_policy_management">
-        	<xsd:complexType name="StringArray">
-        		<xsd:sequence>
-        			<xsd:element name="stringElement" type="xsd:string" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-        		</xsd:sequence>
-        	</xsd:complexType></xsd:schema>
-    </wsdl:types>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://org.glite.authz/wsdl/pap/services/xacml_policy_management">
+			<xsd:complexType name="StringArray">
+				<xsd:sequence>
+					<xsd:element name="stringElement" type="xsd:string"
+						maxOccurs="unbounded" minOccurs="0"></xsd:element>
+				</xsd:sequence>
+			</xsd:complexType>
+		</xsd:schema>
+	</wsdl:types>
 
 	<wsdl:message name="getPolicyRequest">
 		<wsdl:part name="policyId" type="xsd:string" />
@@ -76,6 +79,13 @@
 	</wsdl:message>
 	<wsdl:message name="listPAPPolicySetsRequest">
 		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="moveRequest">
+		<wsdl:part name="id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="pivotId" type="xsd:string"></wsdl:part>
+		<wsdl:part name="moveAfter" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="moveResponse">
 	</wsdl:message>
 	<wsdl:message name="removePolicyRequest">
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
@@ -217,6 +227,10 @@
 			<wsdl:input message="tns:listPAPPolicySetsRequest"></wsdl:input>
 			<wsdl:output message="tns:listPolicySetsResponse"></wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="move">
+			<wsdl:input message="tns:moveRequest"></wsdl:input>
+			<wsdl:output message="tns:moveResponse"></wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="removePolicy">
 			<wsdl:input message="tns:removePolicyRequest"></wsdl:input>
 			<wsdl:output message="tns:removePolicyResponse"></wsdl:output>
@@ -351,6 +365,26 @@
 				<soap:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="move">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/move" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="removeObjectByIdAndReferences">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removeObjectByIdAndReferences" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="removePolicy">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removePolicy" />
@@ -434,16 +468,6 @@
 		<wsdl:operation name="addPolicySet">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/addPolicySet" />
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="removeObjectByIdAndReferences">
-			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/removeObjectByIdAndReferences" />
 			<wsdl:input>
 				<soap:body use="literal" />
 			</wsdl:input>

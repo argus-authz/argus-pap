@@ -15,6 +15,7 @@ import org.glite.authz.pap.authz.policymanagement.ListPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPoliciesOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPolicySetsForPAPOperation;
+import org.glite.authz.pap.authz.policymanagement.MoveOperation;
 import org.glite.authz.pap.authz.policymanagement.RemoveObjectByIdAndReferencesOperation;
 import org.glite.authz.pap.authz.policymanagement.RemovePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.RemovePolicySetOperation;
@@ -206,6 +207,19 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 		}
 	}
 
+	public void move(String id, String pivotId, boolean moveAfter) throws RemoteException {
+        log.info(String.format("move(id=\"%s\", pivotId=\"%s\", moveAfter=%b", id, pivotId, moveAfter));
+
+        try {
+
+            MoveOperation.instance(id, pivotId, moveAfter).execute();
+
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
+
 	public boolean removeObjectByIdAndReferences(String id) throws RemoteException {
 		log.info(String.format("removeObjectByIdAndReferences(\"%s\");", id));
 
@@ -243,7 +257,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 			throw e;
 		}
 	}
-
+	
 	public String storePolicy(String idPrefix, PolicyType policy) throws RemoteException {
 		log.info("storePolicy();");
 
