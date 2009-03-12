@@ -2,7 +2,6 @@ package org.glite.authz.pap.common.xacml.wizard;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.UUID;
 
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.PolicyTypeString;
@@ -21,11 +20,11 @@ import org.slf4j.LoggerFactory;
 
 public class PolicyWizard extends XACMLWizard {
 
-    protected static final AttributeWizardType attributeWizardType = AttributeWizardType.ACTION;
+    private static final Logger log = LoggerFactory.getLogger(PolicyWizard.class);
 
+    protected static final AttributeWizardType attributeWizardType = AttributeWizardType.ACTION;
     protected static final String VISIBILITY_PRIVATE_PREFIX = "private";
     protected static final String VISIBILITY_PUBLIC_PREFIX = "public";
-    private static final Logger log = LoggerFactory.getLogger(PolicyWizard.class);
 
     protected final String actionValue;
     protected String description = null;
@@ -86,24 +85,10 @@ public class PolicyWizard extends XACMLWizard {
         this.policy = (PolicyTypeString) policy;
     }
 
-    public static String generateId(String prefix) {
-        String id = generateUUID();
-
-        if (prefix == null) {
-            return id;
-        }
-
-        if (prefix.length() == 0) {
-            return id;
-        }
-
-        return prefix + "_" + generateUUID();
-    }
-
     public static boolean isPrivate(String policyId) {
         return !isPublic(policyId);
     }
-    
+
     public static boolean isPublic(String policyId) {
         String[] idTokens = policyId.split("_");
 
@@ -118,12 +103,28 @@ public class PolicyWizard extends XACMLWizard {
         if (VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) {
             return false;
         }
-        
+
         return true;
     }
 
-    private static String generateUUID() {
-        return UUID.randomUUID().toString();
+    private static String getIdUniqueNumber(String policyId) {
+
+        String[] idTokens = policyId.split("_");
+
+        if (idTokens.length == 0) {
+            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
+        }
+
+        if (idTokens.length == 1) {
+            return idTokens[0];
+        }
+
+        if (idTokens.length == 2) {
+            if ((VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) || (VISIBILITY_PUBLIC_PREFIX.equals(idTokens[0]))) {
+                return idTokens[1];
+            }
+        }
+        throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
     }
 
     private static void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
@@ -145,13 +146,13 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     public void addObligation(ObligationWizard obligationWizard) {
-    // TODO: implement me
-    	invalidatePolicyType();
+        // TODO: implement me
+        invalidatePolicyType();
     }
 
     public void addObligation(String obligationId, List<AttributeWizard> attributeWizardList) {
-    // TODO: implement me
-    	invalidatePolicyType();
+        // TODO: implement me
+        invalidatePolicyType();
     }
 
     public void addRule(AttributeWizard attribute, EffectType effect) {
@@ -309,16 +310,18 @@ public class PolicyWizard extends XACMLWizard {
         this.description = value;
         if (policy != null) {
             policy.setDescription(DescriptionTypeHelper.build(value));
+        } else {
+            invalidatePolicyType();
         }
-        invalidatePolicyType();
     }
 
     public void setPolicyId(String policyId) {
         this.policyId = policyId;
         if (policy != null) {
             policy.setPolicyId(policyId);
+        } else {
+            invalidatePolicyType();
         }
-        invalidatePolicyType();
     }
 
     public void setPrivate(boolean isPrivate) {
@@ -330,8 +333,9 @@ public class PolicyWizard extends XACMLWizard {
 
         if (policy != null) {
             policy.setPolicyId(policyId);
+        } else {
+            invalidatePolicyType();
         }
-        invalidatePolicyType();
     }
 
     public void setVersion(int version) {
@@ -339,8 +343,9 @@ public class PolicyWizard extends XACMLWizard {
 
         if (policy != null) {
             policy.setVersion(this.version);
+        } else {
+            invalidatePolicyType();
         }
-        invalidatePolicyType();
     }
 
     public String toFormattedString() {
@@ -399,32 +404,12 @@ public class PolicyWizard extends XACMLWizard {
         policyIdUniqueNumber = getIdUniqueNumber(policyId);
         setPolicyIdVisibilityPrefix(isPrivate);
     }
-    
-    private static String getIdUniqueNumber(String policyId) {
-        
-        String[] idTokens = policyId.split("_");
-
-        if (idTokens.length == 0) {
-            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
-        }
-        
-        if (idTokens.length == 1) {
-            return idTokens[0];
-        }
-        
-        if (idTokens.length == 2) {
-            if ((VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) || (VISIBILITY_PUBLIC_PREFIX.equals(idTokens[0]))) {
-                return idTokens[1];
-            }
-        }
-        throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
-    }
 
     private String generateId() {
 
         setPolicyIdVisibilityPrefix(isPrivate);
 
-        policyIdUniqueNumber = generateUUID();
+        policyIdUniqueNumber = WizardUtils.generateId(null);
 
         return composeId();
     }
@@ -439,8 +424,8 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     private void invalidatePolicyType() {
-    	releaseChildrenDOM();
-    	releaseDOM();
+        releaseChildrenDOM();
+        releaseDOM();
     }
 
     private void setPolicyIdVisibilityPrefix(boolean isPrivate) {
@@ -450,7 +435,7 @@ public class PolicyWizard extends XACMLWizard {
             policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
         }
     }
-    
+
     private void setPolicyType() {
 
         releaseDOM();

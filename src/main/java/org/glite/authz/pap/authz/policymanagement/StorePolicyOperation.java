@@ -4,7 +4,7 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
-import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
+import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicyType;
@@ -34,7 +34,7 @@ public class StorePolicyOperation extends BasePAPOperation <String>{
         
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
         
-        String policyId = PolicyWizard.generateId(idPrefix);
+        String policyId = WizardUtils.generateId(idPrefix);
         policy.setPolicyId(policyId);
         
         localPAP.storePolicy(policy);

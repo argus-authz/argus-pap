@@ -2,6 +2,8 @@ package org.glite.authz.pap.common.xacml;
 
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
+import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
@@ -75,6 +77,18 @@ public class TypeStringUtils {
     	    
     		((PolicySetType) object).releaseChildrenDOM(true);
     		((PolicySetType) object).releaseDOM();
-    	}
+    		
+    	} else if (object instanceof PolicyWizard) {
+    	    
+    	    ((PolicyWizard) object).releaseChildrenDOM();
+    	    ((PolicyWizard) object).releaseDOM();
+    	    
+    	} else if (object instanceof PolicySetWizard) {
+    	    
+    	    ((PolicySetWizard) object).releaseChildrenDOM();
+            ((PolicySetWizard) object).releaseDOM();
+        } else {
+            log.warn("releaseUnnecessaryMemory(): unknown object " + object.getClass().getName());
+        }
     }
 }

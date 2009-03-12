@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.common.xacml.PolicyTypeString;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.distribution.PAPManager;
@@ -87,15 +87,16 @@ public class ProvisioningServiceDAO {
             try {
                 PolicySetType papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
                                                                                   papContainer.getPAPRootPolicySetId());
-                
                 PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
-                
-                // TODO: consider to release PolicySetType if "papPolicySetNoReferences" is instance of PolicySetTypeString
-                
+
+                TypeStringUtils.releaseUnnecessaryMemory(papPolicySetNoReferences);
+
             } catch (NotFoundException e) {
                 continue;
             }
         }
+
+        TypeStringUtils.releaseUnnecessaryMemory(rootPolicySet);
 
         log.debug("PDP query executed: retrieved " + resultList.size() + " elemens (Policy/PolicySet) relate to "
                 + papManager.getOrderedRemotePAPsContainerArray().length + " PAPs");
@@ -105,35 +106,35 @@ public class ProvisioningServiceDAO {
 
     private PolicySetType getPolicySetNoReferences(PAPContainer papContainer, String policySetId) {
 
-        PolicySetType policySet = papContainer.getPolicySet(policySetId);
+        PolicySetType policySetNoRef = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPolicySet(policySetId));
 
         // replace policy set references with policy sets
-        List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySet);
-        for (String policySetIdReference : idReferenceList) {
-        	
-        	PolicySetType childPolicySet = getPolicySetNoReferences(papContainer, policySetIdReference);
+        List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySetNoRef);
+        for (String childPolicySetId : idReferenceList) {
 
-            PolicySetHelper.addPolicySet(policySet, childPolicySet);
+            PolicySetType childPolicySetNoRef = getPolicySetNoReferences(papContainer, childPolicySetId);
 
-            childPolicySet.releaseDOM();
-            
-            PolicySetHelper.deletePolicySetReference(policySet, policySetIdReference);
+            PolicySetHelper.addPolicySet(policySetNoRef, childPolicySetNoRef);
+
+            TypeStringUtils.releaseUnnecessaryMemory(childPolicySetNoRef);
+
+            PolicySetHelper.deletePolicySetReference(policySetNoRef, childPolicySetId);
         }
 
         // replace policy references with policies
-        idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
+        idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySetNoRef);
         for (String policyIdReference : idReferenceList) {
 
             PolicyType policy = papContainer.getPolicy(policyIdReference);
 
-            PolicySetHelper.addPolicy(policySet, policy);
-            
-            policy.releaseDOM();
-            
-            PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
+            PolicySetHelper.addPolicy(policySetNoRef, policy);
+
+            TypeStringUtils.releaseUnnecessaryMemory(policy);
+
+            PolicySetHelper.deletePolicyReference(policySetNoRef, policyIdReference);
         }
 
-        return policySet;
+        return policySetNoRef;
     }
 
     // pdpQuery() was modified in order to do not use references, therefore this
@@ -155,27 +156,39 @@ public class ProvisioningServiceDAO {
     }
 
     private List<XACMLObject> getPublic(PAPContainer papContainer) {
+
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
         List<PolicySetType> policySetList = papContainer.getAllPolicySets();
         List<PolicyType> policyList = papContainer.getAllPolicies();
 
+        boolean removedAtLeastOnePrivatePolicy = false;
+
+        // Remove all private policies from the list (together with its references in the policy sets)
         for (PolicyType policy : policyList) {
             String policyId = policy.getPolicyId();
 
-            if (policy instanceof PolicyTypeString) {
-                ((PolicyTypeString) policy).releaseDOM();
-            }
+            TypeStringUtils.releaseUnnecessaryMemory(policy);
 
-            if (!PolicyWizard.isPrivate(policyId)) {
+            if (PolicyWizard.isPublic(policyId)) {
                 continue;
             }
 
+            // Remove private policy from the list
             policyList.remove(policy);
 
+            // Remove references of the policy
             for (PolicySetType policySet : policySetList) {
-                if (PolicySetHelper.hasPolicyReferenceId(policySet, policyId))
+                if (PolicySetHelper.hasPolicyReferenceId(policySet, policyId)) {
                     PolicySetHelper.deletePolicyReference(policySet, policyId);
+                    removedAtLeastOnePrivatePolicy = true;
+                }
+            }
+        }
+
+        if (removedAtLeastOnePrivatePolicy) {
+            for (PolicySetType policySet : policySetList) {
+                TypeStringUtils.releaseUnnecessaryMemory(policySet);
             }
         }
 

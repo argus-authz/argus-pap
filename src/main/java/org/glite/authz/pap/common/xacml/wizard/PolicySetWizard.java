@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
@@ -14,9 +15,12 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicySetWizardExcepti
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PolicySetWizard extends XACMLWizard {
 
+    private static final Logger log = LoggerFactory.getLogger(PolicySetWizard.class);
     protected static final AttributeWizardType attributeWizardType = AttributeWizardType.RESOURCE_PS;
     protected String description = null;
     protected PolicySetType policySet = null;
@@ -65,35 +69,44 @@ public class PolicySetWizard extends XACMLWizard {
         // add referenced policies
         List<String> idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
 
-        if (idReferenceList.size() > 0) {
-            if (policyWizardList == null) {
-                throw new PolicySetWizardException("policyList is null");
+        if ((idReferenceList.size() > 0) && (policyWizardList == null)) {
+            throw new PolicySetWizardException("policyList is null");
+        }
+
+        int addedPolicies = 0;
+        for (PolicyWizard policyWizard : policyWizardList) {
+            String policyId = policyWizard.getPolicyId();
+            for (String policyIdReference : idReferenceList) {
+                if (policyIdReference.equals(policyId)) {
+                    this.policyWizardList.add(policyWizard);
+                    addedPolicies++;
+                }
             }
         }
 
-        for (String policyIdReference : idReferenceList) {
-
-            boolean found = false;
-            for (PolicyWizard policyWizard : policyWizardList) {
-
-                if (policyIdReference.equals(policyWizard.getPolicyId())) {
-                    this.policyWizardList.add(policyWizard);
-                    found = true;
+        if (idReferenceList.size() != addedPolicies) {
+            log.error("Some polcy has not been found: " + idReferenceList.size() + " references and " + addedPolicies
+                    + " policies added");
+            StringBuffer sb = new StringBuffer("Not found policy reference:");
+            for (String policyIdReference : idReferenceList) {
+                boolean found = false;
+                for (PolicyWizard policyWizard : this.policyWizardList) {
+                    if (policyIdReference.equals(policyWizard.getPolicyId())) {
+                        found = true;
+                    }
+                }
+                if (!found) {
+                    sb.append(" " + policyIdReference);
                 }
             }
-
-            if (!found) {
-                throw new PolicySetWizardException("Not found policy reference: " + policyIdReference);
-            }
+            throw new PolicySetWizardException(sb.toString());
         }
 
         // add referenced policy sets
         idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySet);
 
-        if (idReferenceList.size() > 0) {
-            if (childPolicySetList == null) {
-                throw new PolicySetWizardException("childPolicySetList is null");
-            }
+        if ((idReferenceList.size() > 0) && (childPolicySetList == null)) {
+            throw new PolicySetWizardException("childPolicySetList is null");
         }
 
         for (String policySetIdReference : idReferenceList) {
@@ -102,7 +115,8 @@ public class PolicySetWizard extends XACMLWizard {
                 if (policySetIdReference.equals(childPolicySet.getPolicySetId())) {
                     PolicySetWizard psw = new PolicySetWizard(childPolicySet, policyWizardList, childPolicySetList);
                     policySetWizardList.add(psw);
-                    psw.releaseDOM();
+                    TypeStringUtils.releaseUnnecessaryMemory(psw);
+                    TypeStringUtils.releaseUnnecessaryMemory(childPolicySet);
                     found = true;
                 }
             }
@@ -119,6 +133,7 @@ public class PolicySetWizard extends XACMLWizard {
             version = (new Integer(policySet.getVersion())).intValue();
             version++;
         } catch (NumberFormatException e) {
+            log.error("Unrecognized version format, setting version to 1. PolicySetId=" + policySet.getPolicySetId());
             version = 1;
         }
 
@@ -151,29 +166,11 @@ public class PolicySetWizard extends XACMLWizard {
     }
 
     public void addPolicySet(PolicySetWizard policySetWizard) {
-        // initPolicySetTypeIfNotSet();
-        // PolicySetHelper.addPolicySetReference(policySet, policySetWizard.getXACML().getPolicySetId());
         policySetWizardList.add(policySetWizard);
     }
 
     public String getDescription() {
         return description;
-    }
-
-    public String getPolicySetId() {
-        return policySetId;
-    }
-
-    public List<PolicyWizard> getPolicyWizardList() {
-        return policyWizardList;
-    }
-
-    public String getTagAndValue() {
-        return String.format("%s \"%s\"", attributeWizardType.getId(), resourceValue);
-    }
-
-    public TargetWizard getTargetWizard() {
-        return targetWizard;
     }
 
     public List<String> getPolicyIdReferences() {
@@ -187,6 +184,10 @@ public class PolicySetWizard extends XACMLWizard {
         return idRefList;
     }
 
+    public String getPolicySetId() {
+        return policySetId;
+    }
+
     public List<String> getPolicySetIdReferences() {
 
         List<String> idRefList = new ArrayList<String>(policySetWizardList.size());
@@ -196,6 +197,18 @@ public class PolicySetWizard extends XACMLWizard {
         }
 
         return idRefList;
+    }
+
+    public List<PolicyWizard> getPolicyWizardList() {
+        return policyWizardList;
+    }
+
+    public String getTagAndValue() {
+        return String.format("%s \"%s\"", attributeWizardType.getId(), resourceValue);
+    }
+
+    public TargetWizard getTargetWizard() {
+        return targetWizard;
     }
 
     public int getVersion() {
@@ -219,6 +232,19 @@ public class PolicySetWizard extends XACMLWizard {
         setVersion(getVersion() + 1);
     }
 
+    public void releaseChildrenDOM() {
+        targetWizard.releaseChildrenDOM();
+        targetWizard.releaseDOM();
+        for (PolicyWizard policyWizard : policyWizardList) {
+            policyWizard.releaseChildrenDOM();
+            policyWizard.releaseDOM();
+        }
+        for (PolicySetWizard policySetWizard : policySetWizardList) {
+            policySetWizard.releaseChildrenDOM();
+            policySetWizard.releaseDOM();
+        }
+    }
+
     public void releaseDOM() {
         if (policySet != null) {
             policySet.releaseDOM();
@@ -230,6 +256,8 @@ public class PolicySetWizard extends XACMLWizard {
         description = value;
         if (policySet != null) {
             policySet.setDescription(DescriptionTypeHelper.build(value));
+        } else {
+            invalidatePolicySetType();
         }
     }
 
@@ -237,6 +265,8 @@ public class PolicySetWizard extends XACMLWizard {
         policySetId = id;
         if (policySet != null) {
             policySet.setPolicySetId(id);
+        } else {
+            invalidatePolicySetType();
         }
     }
 
@@ -245,6 +275,8 @@ public class PolicySetWizard extends XACMLWizard {
 
         if (policySet != null) {
             policySet.setVersion(this.version);
+        } else {
+            invalidatePolicySetType();
         }
     }
 
@@ -296,16 +328,35 @@ public class PolicySetWizard extends XACMLWizard {
         return XMLObjectHelper.toString(policySet);
     }
 
+    private PolicySetTypeString buildXACMLNoReferences() {
+        PolicySetTypeString policySet = new PolicySetTypeString(PolicySetHelper.build(policySetId,
+                                                                                      PolicySetHelper.COMB_ALG_FIRST_APPLICABLE,
+                                                                                      targetWizard.getXACML(),
+                                                                                      null));
+        if (description != null) {
+            policySet.setDescription(DescriptionTypeHelper.build(description));
+        }
+
+        policySet.setVersion(version);
+
+        return policySet;
+    }
+
     private void initPolicySetTypeIfNotSet() {
         if (policySet == null) {
             setPolicySetType(true);
         }
     }
+    
+    private void invalidatePolicySetType() {
+        releaseChildrenDOM();
+        releaseDOM();
+    }
 
     private void setPolicySetType(boolean includeReferences) {
 
         releaseDOM();
-        
+
         policySet = buildXACMLNoReferences();
 
         if (includeReferences) {
@@ -317,19 +368,5 @@ public class PolicySetWizard extends XACMLWizard {
                 PolicySetHelper.addPolicyReference(policySet, policyWizard.getPolicyId());
             }
         }
-    }
-    
-    private PolicySetTypeString buildXACMLNoReferences() {
-        PolicySetTypeString policySet = new PolicySetTypeString(PolicySetHelper.build(policySetId,
-                                                                  PolicySetHelper.COMB_ALG_FIRST_APPLICABLE,
-                                                                  targetWizard.getXACML(),
-                                                                  null));
-        if (description != null) {
-            policySet.setDescription(DescriptionTypeHelper.build(description));
-        }
-
-        policySet.setVersion(version);
-        
-        return policySet;
     }
 }
