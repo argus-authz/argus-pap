@@ -163,7 +163,9 @@ MixIn ResourceContents() :
   MixIn mixin;
 }
 {
-    <DESCRIPTION> t1=<STRING> {return new MixIn(t1.toString()); }
+    <DESCRIPTION> t1=TextString() { 
+      return new MixIn(t1); 
+    }
 |   <OBLIGATION> t2=TextString() "{" (attr=ObligationContent() {obligationContent.add(attr); })+ "}" {
       return new MixIn(new ObligationWizard(t2, obligationContent)); 
     }

@@ -370,6 +370,7 @@ class BWParser implements BWParserConstants {
     case STRING:
       t = jj_consume_token(STRING);
     s = t.toString();
+    System.out.println("STRINGVALUE='" + s.substring(1, s.length()-1) +"'");
     {if (true) return s.substring(1, s.length()-1);}
       break;
     case ID:
