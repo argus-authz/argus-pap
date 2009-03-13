@@ -117,7 +117,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         }
     }
 
-    public boolean exists(String papId, String policySetId) {
+    public synchronized boolean exists(String papId, String policySetId) {
 
         File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
 
@@ -130,7 +130,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return result;
     }
 
-    public List<PolicySetType> getAll(String papId) {
+    public synchronized List<PolicySetType> getAll(String papId) {
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
@@ -175,7 +175,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return policySetList;
     }
 
-    public PolicySetType getById(String papId, String policySetId) {
+    public synchronized PolicySetType getById(String papId, String policySetId) {
 
         Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
 

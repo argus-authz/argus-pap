@@ -126,7 +126,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 		return numOfDeletedPolicies;
 	}
 
-	public boolean exists(String papId, String policyId) {
+	public synchronized boolean exists(String papId, String policyId) {
 
 		String policyFilePath = getPolicyFileAbsolutePath(papId, policyId);
 
@@ -135,7 +135,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 		return policyFile.exists();
 	}
 
-	public List<PolicyType> getAll(String papId) {
+	public synchronized List<PolicyType> getAll(String papId) {
 
 		File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
@@ -177,7 +177,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 		return policyList;
 	}
 
-	public PolicyType getById(String papId, String policyId) {
+	public synchronized PolicyType getById(String papId, String policyId) {
 
 		Map<String, PolicyTypeString> papCache = getPAPCache(papId);
 

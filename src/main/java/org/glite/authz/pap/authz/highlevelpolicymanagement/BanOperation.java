@@ -7,7 +7,6 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -24,6 +23,7 @@ public class BanOperation extends BasePAPOperation<String> {
     private AttributeWizard banAttributeWizard;
     private boolean isPublic;
     private AttributeWizard resourceAttributeWizard;
+    private static final Object lock = new Object();
 
     protected BanOperation(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
             AttributeWizard actionAttributeWizard, boolean isPublic) {
@@ -40,77 +40,76 @@ public class BanOperation extends BasePAPOperation<String> {
     }
 
     protected String doExecute() {
+        synchronized (lock) {
 
-        boolean policySetNeedToBeSaved = true;
-        boolean updateOperationForPolicySet = false;
-        boolean updateOperationForPolicy = false;
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+            boolean policySetNeedToBeSaved = true;
+            boolean updateOperationForPolicySet = false;
+            boolean updateOperationForPolicy = false;
+            PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-        PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
+            PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
 
-        if (targetPolicySet == null) {
-            targetPolicySet = (new PolicySetWizard(resourceAttributeWizard)).getXACML();
-        } else {
-            updateOperationForPolicySet = true;
-        }
-
-        String policyId = null;
-
-        PolicyWizard targetPolicyWizard;
-        PolicyType candidatePolicy = getTargetPolicy(localPAP, targetPolicySet);
-
-        if (candidatePolicy == null) {
-            targetPolicyWizard = new PolicyWizard(actionAttributeWizard);
-            targetPolicyWizard.setPrivate(!isPublic);
-            policyId = targetPolicyWizard.getPolicyId();
-            PolicySetHelper.addPolicyReference(targetPolicySet, 0, policyId);
-        } else {
-            targetPolicyWizard = new PolicyWizard(candidatePolicy);
-
-            if (targetPolicyWizard.denyRuleForAttributeExists(banAttributeWizard)) {
-                // ban policy already exists
-                return null;
-            }
-            policyId = candidatePolicy.getPolicyId();
-            updateOperationForPolicy = true;
-            policySetNeedToBeSaved = false;
-        }
-
-        targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
-
-        // Store the ban policy and the policy set in which it is contained (only if needed)
-        if (policySetNeedToBeSaved) {
-            if (updateOperationForPolicySet) {
-                String oldVersion = targetPolicySet.getVersion();
-                PolicySetWizard.increaseVersion(targetPolicySet);
-                localPAP.updatePolicySet(oldVersion, targetPolicySet);
+            if (targetPolicySet == null) {
+                targetPolicySet = (new PolicySetWizard(resourceAttributeWizard)).getXACML();
             } else {
-                localPAP.addPolicySet(0, targetPolicySet);
+                updateOperationForPolicySet = true;
             }
-        } else {
-            TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
+
+            String policyId = null;
+
+            PolicyWizard targetPolicyWizard;
+            PolicyType candidatePolicy = getTargetPolicy(localPAP, targetPolicySet);
+
+            if (candidatePolicy == null) {
+                targetPolicyWizard = new PolicyWizard(actionAttributeWizard);
+                targetPolicyWizard.setPrivate(!isPublic);
+                policyId = targetPolicyWizard.getPolicyId();
+                PolicySetHelper.addPolicyReference(targetPolicySet, 0, policyId);
+            } else {
+                targetPolicyWizard = new PolicyWizard(candidatePolicy);
+
+                if (targetPolicyWizard.denyRuleForAttributeExists(banAttributeWizard)) {
+                    // ban policy already exists
+                    return null;
+                }
+                policyId = candidatePolicy.getPolicyId();
+                updateOperationForPolicy = true;
+                policySetNeedToBeSaved = false;
+            }
+
+            targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
+
+            // Store the ban policy and the policy set in which it is contained (only if needed)
+            if (policySetNeedToBeSaved) {
+                if (updateOperationForPolicySet) {
+                    String oldVersion = targetPolicySet.getVersion();
+                    PolicySetWizard.increaseVersion(targetPolicySet);
+                    localPAP.updatePolicySet(oldVersion, targetPolicySet);
+                } else {
+                    localPAP.addPolicySet(0, targetPolicySet);
+                }
+            } else {
+                TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
+            }
+
+            if (updateOperationForPolicy) {
+                String oldVersion = targetPolicyWizard.getVersionString();
+                targetPolicyWizard.increaseVersion();
+                localPAP.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
+            } else {
+                localPAP.storePolicy(targetPolicyWizard.getXACML());
+            }
+
+            targetPolicyWizard.releaseChildrenDOM();
+            targetPolicyWizard.releaseDOM();
+
+            return policyId;
         }
-
-        if (updateOperationForPolicy) {
-            String oldVersion = targetPolicyWizard.getVersionString();
-            targetPolicyWizard.increaseVersion();
-            log.debug(XMLObjectHelper.toString(targetPolicyWizard.getXACML()));
-            localPAP.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
-        } else {
-            localPAP.storePolicy(targetPolicyWizard.getXACML());
-        }
-
-        targetPolicyWizard.releaseChildrenDOM();
-        targetPolicyWizard.releaseDOM();
-
-        return policyId;
     }
 
     @Override
     protected void setupPermissions() {
-
         addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
-
     }
 
     private PolicyType getTargetPolicy(PAPContainer papContainer, PolicySetType policySet) {
