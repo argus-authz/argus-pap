@@ -5,6 +5,7 @@ import org.glite.authz.pap.common.xacml.utils.DataType;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType.TargetElement;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
 import org.opensaml.xacml.ctx.AttributeType;
+import org.opensaml.xacml.policy.AttributeAssignmentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,6 +106,15 @@ public class AttributeWizard {
         if (attributeWizardType == null)
             throw new UnsupportedAttributeException("Attribute not supported: " + xacmlId);
         this.value = CtxAttributeTypeHelper.getFirstValue(attribute);
+    }
+    
+    public AttributeWizard(AttributeAssignmentType attributeAssignment) {
+        String xacmlId = attributeAssignment.getAttributeId();
+        attributeWizardType = AttributeWizardType.getByXACMLId(xacmlId);
+        if (attributeWizardType == null) {
+            throw new UnsupportedAttributeException("Attribute not supported: " + xacmlId);
+        }
+        this.value = attributeAssignment.getValue();
     }
 
     public AttributeWizard(AttributeWizardType attributeWizardType, String value) {

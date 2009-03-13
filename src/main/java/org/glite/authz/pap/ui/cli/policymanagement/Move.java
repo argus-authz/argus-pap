@@ -49,6 +49,11 @@ public class Move extends PolicyManagementCLI {
 
         String id = args[1];
         String pivotId = args[2];
+        
+        if (id.equals(pivotId)) {
+            return ExitStatus.SUCCESS.ordinal();
+        }
+        
         boolean moveAfter = false;
 
         if (commandLine.hasOption(OPT_MOVEAFTER)) {

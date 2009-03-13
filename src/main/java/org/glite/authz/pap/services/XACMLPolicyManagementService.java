@@ -208,7 +208,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 	}
 
 	public void move(String id, String pivotId, boolean moveAfter) throws RemoteException {
-        log.info(String.format("move(id=\"%s\", pivotId=\"%s\", moveAfter=%b", id, pivotId, moveAfter));
+        log.info(String.format("move(id=\"%s\", pivotId=\"%s\", moveAfter=%b);", id, pivotId, moveAfter));
 
         try {
 

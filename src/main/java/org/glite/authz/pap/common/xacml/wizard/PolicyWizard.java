@@ -6,6 +6,7 @@ import java.util.List;
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
+import org.glite.authz.pap.common.xacml.utils.ObligationsHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
@@ -13,6 +14,8 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicyWizardException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
 import org.opensaml.xacml.policy.EffectType;
+import org.opensaml.xacml.policy.ObligationType;
+import org.opensaml.xacml.policy.ObligationsType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.policy.RuleType;
 import org.slf4j.Logger;
@@ -35,6 +38,7 @@ public class PolicyWizard extends XACMLWizard {
     protected String policyIdUniqueNumber;
     protected String policyIdVisibilityPrefix;
     protected final List<RuleWizard> ruleWizardList = new LinkedList<RuleWizard>();
+    protected final List<ObligationWizard> obligationWizardList = new LinkedList<ObligationWizard>();
     protected final TargetWizard targetWizard;
     protected String version = null;
 
@@ -76,6 +80,13 @@ public class PolicyWizard extends XACMLWizard {
             new Integer(version);
         } catch (NumberFormatException e) {
             throw new UnsupportedPolicyException("Wrong version format", e);
+        }
+        
+        if (policy.getObligations() != null) {
+            List<ObligationType> obligationList = policy.getObligations().getObligations();
+            for (ObligationType obligation : obligationList) {
+                obligationWizardList.add(new ObligationWizard(obligation));
+            }
         }
 
         for (RuleType rule : policy.getRules()) {
@@ -146,12 +157,7 @@ public class PolicyWizard extends XACMLWizard {
     }
 
     public void addObligation(ObligationWizard obligationWizard) {
-        // TODO: implement me
-        invalidatePolicyType();
-    }
-
-    public void addObligation(String obligationId, List<AttributeWizard> attributeWizardList) {
-        // TODO: implement me
+        obligationWizardList.add(obligationWizard);
         invalidatePolicyType();
     }
 
@@ -273,6 +279,10 @@ public class PolicyWizard extends XACMLWizard {
     public void releaseChildrenDOM() {
         targetWizard.releaseChildrenDOM();
         targetWizard.releaseDOM();
+        for (ObligationWizard obligationWizard : obligationWizardList) {
+            obligationWizard.releaseChildrenDOM();
+            obligationWizard.releaseDOM();
+        }
         for (RuleWizard ruleWizard : ruleWizardList) {
             ruleWizard.releaseChildrenDOM();
             ruleWizard.releaseDOM();
@@ -299,7 +309,6 @@ public class PolicyWizard extends XACMLWizard {
                 if (policy != null) {
                     policy.getRules().remove(i);
                 }
-                invalidatePolicyType();
                 return true;
             }
         }
@@ -310,8 +319,6 @@ public class PolicyWizard extends XACMLWizard {
         this.description = value;
         if (policy != null) {
             policy.setDescription(DescriptionTypeHelper.build(value));
-        } else {
-            invalidatePolicyType();
         }
     }
 
@@ -319,8 +326,6 @@ public class PolicyWizard extends XACMLWizard {
         this.policyId = policyId;
         if (policy != null) {
             policy.setPolicyId(policyId);
-        } else {
-            invalidatePolicyType();
         }
     }
 
@@ -333,8 +338,6 @@ public class PolicyWizard extends XACMLWizard {
 
         if (policy != null) {
             policy.setPolicyId(policyId);
-        } else {
-            invalidatePolicyType();
         }
     }
 
@@ -343,8 +346,6 @@ public class PolicyWizard extends XACMLWizard {
 
         if (policy != null) {
             policy.setVersion(this.version);
-        } else {
-            invalidatePolicyType();
         }
     }
 
@@ -378,6 +379,11 @@ public class PolicyWizard extends XACMLWizard {
 
         if (description != null) {
             sb.append(String.format("%sdescription=\"%s\"\n", indentString, description));
+        }
+        
+        for (ObligationWizard obligationWizard : obligationWizardList) {
+            sb.append(obligationWizard.toFormattedString(baseIndentation + internalIndentation, internalIndentation));
+            sb.append('\n');
         }
 
         for (RuleWizard ruleWizard : ruleWizardList) {
@@ -449,6 +455,16 @@ public class PolicyWizard extends XACMLWizard {
         policy.setTarget(targetWizard.getXACML());
         policy.setVersion(version);
 
+        if (obligationWizardList.size() > 0) {
+            ObligationsType obligations = ObligationsHelper.build();
+            List<ObligationType> obligationList = obligations.getObligations();
+            for (ObligationWizard obligationWizard : obligationWizardList) {
+                obligationList.add(obligationWizard.getXACML());
+            }
+            
+            policy.setObligations(obligations);
+        }
+        
         for (RuleWizard ruleWizard : ruleWizardList) {
             policy.getRules().add(ruleWizard.getXACML());
         }

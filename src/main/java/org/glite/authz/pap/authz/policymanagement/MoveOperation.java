@@ -1,7 +1,5 @@
 package org.glite.authz.pap.authz.policymanagement;
 
-import java.util.List;
-
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
@@ -35,6 +33,14 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
     protected Object doExecute() {
         
+        if ((id == null) || (pivotId == null)) {
+            return null;
+        }
+        
+        if (id.equals(pivotId)) {
+            return null;
+        }
+        
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
         
         if (localPAP.hasPolicySet(id)) {
@@ -55,21 +61,21 @@ public class MoveOperation extends BasePAPOperation<Object> {
         // now we have only two levels so... all the policy sets (resource <id>) are referenced by the PAP root policy set
         PolicySetType rootPAPPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPAPRootPolicySet());
         
-        int pivotIndex = PolicySetHelper.getPolicySetIdReferenceIndex(rootPAPPolicySet, pivotId);
         
-        if (pivotIndex == -1) {
+        if (!(PolicySetHelper.hasPolicySetReferenceId(rootPAPPolicySet, pivotId))) {
             throw new RepositoryException("Id not found: " + pivotId);
         }
         
-        log.debug("PolicySet pivot index is " + pivotIndex);
-        
         if (!(PolicySetHelper.deletePolicySetReference(rootPAPPolicySet, id))) {
-            throw new RepositoryException("Id not found: " + id);
+            throw new RepositoryException(String.format("Id \"%s\" not found into resource \"%s\"", id, rootPAPPolicySet.getPolicySetId()));
         }
+        
+        int pivotIndex = PolicySetHelper.getPolicySetIdReferenceIndex(rootPAPPolicySet, pivotId);
         
         if (moveAfter) {
             pivotIndex++; 
         }
+        log.debug("New position for PolicySet is: " + pivotIndex);
         
         PolicySetHelper.addPolicySetReference(rootPAPPolicySet, pivotIndex, id);
         
@@ -81,34 +87,33 @@ public class MoveOperation extends BasePAPOperation<Object> {
     }
     
     private void movePolicyId(PAPContainer papContainer) {
-        // get the target policy set
         PolicySetType targetPolicySet = null;
-        List<PolicySetType> policySetList = papContainer.getAllPolicySets();
-        int pivotIndex = -1;
         
-        for (PolicySetType policySet : policySetList) {
+        // get the target policy set
+        for (PolicySetType policySet : papContainer.getAllPolicySets()) {
+            
             PolicySetType tempPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
-            for (String s:PolicySetHelper.getPolicyIdReferencesValues(tempPolicySet)) {
-                log.debug("PIPPO: " + s);
-            }
-            pivotIndex = PolicySetHelper.getPolicyIdReferenceIndex(tempPolicySet, pivotId);
-            if (pivotIndex != -1) {
-                log.debug("Policy pivot index is " + pivotIndex);
+            
+            if (PolicySetHelper.hasPolicyReferenceId(tempPolicySet, pivotId)) {
                 targetPolicySet = tempPolicySet;
+                break;
             }
         }
         
         if (targetPolicySet == null) {
             throw new RepositoryException("Id not found: " + pivotId);
         }
-
+        
         if (!(PolicySetHelper.deletePolicyReference(targetPolicySet, id))) {
-            throw new RepositoryException("Id not found: " + id);
+            throw new RepositoryException(String.format("Id \"%s\" not found into resource \"%s\"", id, targetPolicySet.getPolicySetId()));
         }
+
+        int pivotIndex = PolicySetHelper.getPolicyIdReferenceIndex(targetPolicySet, pivotId);
         
         if (moveAfter) {
             pivotIndex++;
         }
+        log.debug("New position for Policy is: " + pivotIndex);
         
         PolicySetHelper.addPolicyReference(targetPolicySet, pivotIndex, id);
         

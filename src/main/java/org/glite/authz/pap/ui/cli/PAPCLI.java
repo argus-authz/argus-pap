@@ -115,9 +115,7 @@ public class PAPCLI {
 
         } catch (RemoteException e) {
             log.error("Remote exception", e);
-            System.out.println("Error invoking the '" + serviceCLI.getClass().getSimpleName() + "' method on remote endpoint: "
-                    + serviceCLI.getServiceClient().getTargetEndpoint());
-            System.out.println("Reason: " + e.getMessage());
+            System.out.println("Error: " + e.getMessage());
             return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
 
         } catch (Exception e) {
