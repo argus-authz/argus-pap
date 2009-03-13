@@ -162,8 +162,8 @@ class BWParser implements BWParserConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case DESCRIPTION:
       jj_consume_token(DESCRIPTION);
-      t1 = jj_consume_token(STRING);
-                               {if (true) return new MixIn(t1.toString());}
+      t1 = TextString();
+      {if (true) return new MixIn(t1);}
       break;
     case OBLIGATION:
       jj_consume_token(OBLIGATION);
@@ -370,7 +370,6 @@ class BWParser implements BWParserConstants {
     case STRING:
       t = jj_consume_token(STRING);
     s = t.toString();
-    System.out.println("STRINGVALUE='" + s.substring(1, s.length()-1) +"'");
     {if (true) return s.substring(1, s.length()-1);}
       break;
     case ID:
