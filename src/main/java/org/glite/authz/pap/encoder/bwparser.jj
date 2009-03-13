@@ -153,7 +153,7 @@ XACMLWizard Resource() :
 
 MixIn ResourceContents() :
 {
-  Token t1 = null;
+  String t1 = null;
   String t2 = null;
   String t3 = null;
   String t4 = null;

@@ -151,7 +151,7 @@ class BWParser implements BWParserConstants {
   }
 
   static final public MixIn ResourceContents() throws ParseException {
-  Token t1 = null;
+  String t1 = null;
   String t2 = null;
   String t3 = null;
   String t4 = null;
