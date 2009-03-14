@@ -85,16 +85,16 @@ public abstract class RepositoryManager {
         localPapContainer.deleteAllPolicySets();
 
         for (XACMLWizard xacmlWizard : wizardList) {
-            
+
             if (!(xacmlWizard instanceof PolicySetWizard)) {
                 EncodingException e = new EncodingException("\"action\" element is allowed only inside a \"resource\" element");
                 throw new RepositoryException(e);
             }
-            
+
             PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
-            
+
             localPapContainer.addPolicySet(-1, policySetWizard.getXACML());
-            
+
             for (PolicyWizard policyWizard : policySetWizard.getPolicyWizardList()) {
                 localPapContainer.storePolicy(policyWizard.getXACML());
                 policyWizard.releaseChildrenDOM();
