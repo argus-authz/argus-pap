@@ -43,7 +43,7 @@ public class Serializer implements org.apache.axis.encoding.Serializer {
 
 	private static final long serialVersionUID = -4207218164610553717L;
 	@SuppressWarnings("unused")
-    private static final Logger log = LoggerFactory.getLogger(Serializer.class);
+	private static final Logger log = LoggerFactory.getLogger(Serializer.class);
 
 	/*
 	 * (non-Javadoc)
@@ -63,17 +63,17 @@ public class Serializer implements org.apache.axis.encoding.Serializer {
 			if (value instanceof PolicyTypeString) {
 
 				elementAsString = ((PolicyTypeString) value).getPolicyString();
-				
+
 			} else if (value instanceof PolicySetTypeString) {
 
 				elementAsString = ((PolicySetTypeString) value).getPolicySetString();
 
 			} else {
-			    
-			    XMLObject xmlObject = (XMLObject) value;
+
+				XMLObject xmlObject = (XMLObject) value;
 
 				Element element = XMLObjectHelper.marshall(xmlObject);
-				
+
 				if (attributes != null) {
 					for (int i = 0; i < attributes.getLength(); i++) {
 						element.setAttributeNS(attributes.getURI(i), attributes.getQName(i), attributes
@@ -82,12 +82,19 @@ public class Serializer implements org.apache.axis.encoding.Serializer {
 				}
 
 				elementAsString = XMLObjectHelper.toString(element);
-				
+
 				xmlObject.releaseChildrenDOM(true);
 				xmlObject.releaseDOM();
 			}
-			String element = elementAsString.substring("<?xml version=\"1.0\" encoding=\"UTF-8\"?>".length());
-			
+
+			String element;
+			int index = elementAsString.indexOf("?>");
+			if (index != -1) {
+				element = elementAsString.substring(index + 2);
+			} else {
+				element = elementAsString;
+			}
+
 			context.setWriteXMLType(null);
 			context.writeString(element);
 
