@@ -24,7 +24,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
     protected UnbanOperation(AttributeWizard bannedAttributeWizard, AttributeWizard resourceAttributeWizard,
             AttributeWizard actionAttributeWizard) {
-        
+
         this.bannedAttributeWizard = bannedAttributeWizard;
         this.resourceAttributeWizard = resourceAttributeWizard;
         this.actionAttributeWizard = actionAttributeWizard;
@@ -37,69 +37,76 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
     protected UnbanResult doExecute() {
 
-        UnbanResult unbanResult = new UnbanResult();
-        unbanResult.setConflictingPolicies(new String[0]);
-        
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
-        
-        PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
-        
-        if (targetPolicySet == null) {
+        synchronized (PAPContainer.addOperationLock) {
+
+            UnbanResult unbanResult = new UnbanResult();
+            unbanResult.setConflictingPolicies(new String[0]);
+
+            PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+
+            PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
+
+            if (targetPolicySet == null) {
+                unbanResult.setStatusCode(1);
+                return unbanResult;
+            }
+
+            TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
+            List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
+
+            TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
+
+            for (String policyId : policyIdList) {
+
+                PolicyType repositoryPolicy = localPAP.getPolicy(policyId);
+
+                if (policyTargetWizard.isEquivalent(repositoryPolicy.getTarget())) {
+
+                    PolicyWizard policyWizard = new PolicyWizard(TypeStringUtils.cloneAsPolicyTypeString(repositoryPolicy));
+                    TypeStringUtils.releaseUnnecessaryMemory(repositoryPolicy);
+
+                    if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
+
+                        if (policyWizard.getNumberOfRules() == 0) {
+                            localPAP.removePolicyAndReferences(policyId);
+                        } else {
+                            String oldVersion = policyWizard.getVersionString();
+                            policyWizard.increaseVersion();
+                            localPAP.updatePolicy(oldVersion, policyWizard.getXACML());
+                        }
+
+                        unbanResult.setStatusCode(0);
+                        return unbanResult;
+                    }
+                    break;
+                }
+                TypeStringUtils.releaseUnnecessaryMemory(repositoryPolicy);
+            }
+
             unbanResult.setStatusCode(1);
             return unbanResult;
         }
-        
-        TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
-        List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
-        
-        TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
-        
-        for (String policyId : policyIdList) {
-        	
-            PolicyType repositoryPolicy = localPAP.getPolicy(policyId);
-            
-            if (policyTargetWizard.isEquivalent(repositoryPolicy.getTarget())) {
-                
-                PolicyWizard policyWizard = new PolicyWizard(TypeStringUtils.cloneAsPolicyTypeString(repositoryPolicy));
-                TypeStringUtils.releaseUnnecessaryMemory(repositoryPolicy);
-                
-                if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
-                    
-                    if (policyWizard.getNumberOfRules() == 0) {
-                        localPAP.removePolicyAndReferences(policyId);
-                    } else {
-                    	String oldVersion = policyWizard.getVersionString();
-                    	policyWizard.increaseVersion();
-                        localPAP.updatePolicy(oldVersion, policyWizard.getXACML());
-                    }
-                    
-                    unbanResult.setStatusCode(0);
-                    return unbanResult;
-                }
-                break;
-            }
-            TypeStringUtils.releaseUnnecessaryMemory(repositoryPolicy);
-        }
-        
-        unbanResult.setStatusCode(1);
-        return unbanResult;
     }
-    
+
     private PolicySetType getTargetPolicySet(PAPContainer papContainer) {
-        
+
         TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
-        
+
         PolicySetType rootPAPPolicySet = papContainer.getPAPRootPolicySet();
-        
+
         List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(rootPAPPolicySet);
-        
+
         TypeStringUtils.releaseUnnecessaryMemory(rootPAPPolicySet);
-        
+
         for (String policySetId : policySetIdList) {
+            
             PolicySetType policySet = papContainer.getPolicySet(policySetId);
+            
             if (policySetTargetWizard.isEquivalent(policySet.getTarget())) {
                 return policySet;
             }
+            
+            TypeStringUtils.releaseUnnecessaryMemory(policySet);
         }
         return null;
     }

@@ -206,13 +206,13 @@ public class TargetWizard {
                                                                    AttributeWizardType.TargetElement.ACTION);
 
         SubjectsType subjects = SubjectsHelper.build(SubjectHelper.build(SubjectMatchHelper.buildListWithDesignator(sbjAttr,
-                                                                                                                    Functions.STRING_EQUAL)));
+                                                                                                                    Functions.STRING_REGEXP_MATCH)));
         ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(ResourceMatchHelper.buildWithDesignator(rsrcAttr,
-                                                                                                                     Functions.STRING_EQUAL)));
+                                                                                                                     Functions.STRING_REGEXP_MATCH)));
         ActionsType actions = ActionsHelper.build(ActionHelper.build(ActionMatchHelper.buildWithDesignator(actionAttr,
-                                                                                                           Functions.STRING_EQUAL)));
+                                                                                                           Functions.STRING_REGEXP_MATCH)));
         EnvironmentsType environments = EnvironmentsHelper.build(EnvironmentHelper.build(EnvironmentMatchHelper.buildWithDesignator(envAttr,
-                                                                                                                                    Functions.STRING_EQUAL)));
+                                                                                                                                    Functions.STRING_REGEXP_MATCH)));
 
         target = TargetHelper.build(subjects, actions, resources, environments);
 

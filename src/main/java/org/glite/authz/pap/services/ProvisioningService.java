@@ -37,65 +37,63 @@ import org.slf4j.LoggerFactory;
 public class ProvisioningService implements Provisioning {
 
     private final Logger log = LoggerFactory.getLogger(ProvisioningService.class);
+    private static final Object lock = new Object();
 
-    public synchronized Response XACMLPolicyQuery(XACMLPolicyQueryType query) throws java.rmi.RemoteException {
+    public Response XACMLPolicyQuery(XACMLPolicyQueryType query) throws java.rmi.RemoteException {
 
-        try {
-            // log the received query
-            if (log.isDebugEnabled()) {
-                log.debug("Received XACLMPolicyQuery " + ProvisioningServiceUtils.xmlObjectToString(query));
-            }
-
-            /* check a few things about the query */
+        // lock need to keep memory usage low, it's not possible to re-use opensaml objects so they have to
+        // be cloned for every request.
+        synchronized (lock) {
 
             try {
-                ProvisioningServiceUtils.checkQuery(query);
-            } catch (VersionMismatchException e) {
-                log.error(e.getMessage(), e);
-                return ProvisioningServiceUtils.createResponse(query, e);
-            } catch (MissingIssuerException e) {
-                log.error(e.getMessage(), e);
-                return ProvisioningServiceUtils.createResponse(query, e);
-            } catch (WrongFormatIssuerException e) {
-                log.error(e.getMessage(), e);
-                return ProvisioningServiceUtils.createResponse(query, e);
+                // log the received query
+                log.trace("Received XACLMPolicyQuery " + ProvisioningServiceUtils.xmlObjectToString(query));
+
+                /* check a few things about the query */
+                try {
+                    ProvisioningServiceUtils.checkQuery(query);
+                } catch (VersionMismatchException e) {
+                    log.error(e.getMessage(), e);
+                    return ProvisioningServiceUtils.createResponse(query, e);
+                } catch (MissingIssuerException e) {
+                    log.error(e.getMessage(), e);
+                    return ProvisioningServiceUtils.createResponse(query, e);
+                } catch (WrongFormatIssuerException e) {
+                    log.error(e.getMessage(), e);
+                    return ProvisioningServiceUtils.createResponse(query, e);
+                }
+
+                /* get local policies */
+
+                List<XACMLObject> resultList = null;
+
+                /*
+                 * TODO discrimination between a PAP and a PDP is done after the presence of the Extensions
+                 * element, too simplistic
+                 */
+
+                Extensions extensions = query.getExtensions();
+
+                if (extensions == null)
+
+                    resultList = GetPoliciesForPDPOperation.instance().execute();
+
+                else
+
+                    resultList = GetPoliciesForPAPOperation.instance().execute();
+
+                /* prepare the response */
+
+                Response response = ProvisioningServiceUtils.createResponse(query, resultList);
+
+                log.trace("Sending Response : " + ProvisioningServiceUtils.xmlObjectToString(response));
+
+                return response;
+
+            } catch (RuntimeException e) {
+                ServiceClassExceptionManager.log(log, e);
+                throw e;
             }
-
-            /* get local policies */
-
-            List<XACMLObject> resultList = null;
-
-            /*
-             * TODO discrimination between a PAP and a PDP is done after the presence of the Extensions
-             * element, too simplistic
-             */
-
-            Extensions extensions = query.getExtensions();
-
-            if (extensions == null)
-
-                resultList = GetPoliciesForPDPOperation.instance().execute();
-
-            else
-
-                resultList = GetPoliciesForPAPOperation.instance().execute();
-
-            /* prepare the response */
-
-            Response response = ProvisioningServiceUtils.createResponse(query, resultList);
-
-            // log the outgoing response
-            if (log.isDebugEnabled()) {
-                log.debug("Sending Response : " + ProvisioningServiceUtils.xmlObjectToString(response));
-            }
-
-            return response;
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
         }
-
     }
-
 }

@@ -11,51 +11,49 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class AddPolicyOperation extends BasePAPOperation<String> {
 
-	int index;
-	PolicyType policy;
-	String policyIdPrefix;
-	String policySetId;
+    int index;
+    PolicyType policy;
+    String policyIdPrefix;
+    String policySetId;
 
-	protected AddPolicyOperation(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
-		this.index = index;
-		this.policySetId = policySetId;
-		this.policyIdPrefix = policyIdPrefix;
-		this.policy = policy;
-	}
+    protected AddPolicyOperation(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
+        this.index = index;
+        this.policySetId = policySetId;
+        this.policyIdPrefix = policyIdPrefix;
+        this.policy = policy;
+    }
 
-	public static AddPolicyOperation instance(int index, String policySetId, String policyIdPrefix,
-			PolicyType policy) {
-		return new AddPolicyOperation(index, policySetId, policyIdPrefix, policy);
-	}
+    public static AddPolicyOperation instance(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
+        return new AddPolicyOperation(index, policySetId, policyIdPrefix, policy);
+    }
 
-	protected String doExecute() {
+    protected String doExecute() {
 
-		PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-		if (!localPAP.hasPolicySet(policySetId)) {
-			log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.",
-				policySetId));
-			return null;
-		}
+        if (!localPAP.hasPolicySet(policySetId)) {
+            log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));
+            return null;
+        }
 
-		String policyId = WizardUtils.generateId(policyIdPrefix);
+        String policyId = WizardUtils.generateId(policyIdPrefix);
 
-		policy.setPolicyId(policyId);
+        policy.setPolicyId(policyId);
 
-		localPAP.addPolicy(index, policySetId, policy);
+        localPAP.addPolicy(index, policySetId, policy);
 
-		TypeStringUtils.releaseUnnecessaryMemory(policy);
+        TypeStringUtils.releaseUnnecessaryMemory(policy);
 
-		log.info(String.format("Added policy (policyId=\"%s\")", policyId));
+        log.info(String.format("Added policy (policyId=\"%s\")", policyId));
 
-		return policyId;
-	}
+        return policyId;
+    }
 
-	@Override
-	protected void setupPermissions() {
+    @Override
+    protected void setupPermissions() {
 
-		addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
 
-	}
+    }
 
 }

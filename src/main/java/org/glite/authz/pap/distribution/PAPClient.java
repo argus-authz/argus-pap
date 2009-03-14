@@ -10,6 +10,8 @@ import javax.xml.rpc.ServiceException;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
+import org.glite.authz.pap.common.xacml.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.joda.time.DateTime;
 import org.opensaml.DefaultBootstrap;
@@ -24,6 +26,8 @@ import org.opensaml.saml2.core.Response;
 import org.opensaml.saml2.core.Statement;
 import org.opensaml.saml2.core.impl.IssuerBuilder;
 import org.opensaml.xacml.XACMLObject;
+import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyStatementType;
 import org.opensaml.xml.Configuration;
@@ -122,11 +126,16 @@ public class PAPClient {
             for (Statement statement : assertion.getStatements()) {
                 String statementLocalName = statement.getSchemaType().getLocalPart();
 
-                if ("XACMLPolicyStatementType".equals(statementLocalName)) {
+                if (XACMLPolicyStatementType.TYPE_LOCAL_NAME.equals(statementLocalName)) {
 
                     XACMLPolicyStatementType policyStatement = (XACMLPolicyStatementType) statement;
-                    responseList.addAll(policyStatement.getPolicySets());
-                    responseList.addAll(policyStatement.getPolicies());
+                    
+                    for (PolicySetType policySet : policyStatement.getPolicySets()) {
+                        responseList.add(new PolicySetTypeString(policySet));
+                    }
+                    for (PolicyType policy : policyStatement.getPolicies()) {
+                        responseList.add(new PolicyTypeString(policy));
+                    }
                 }
             }
         }

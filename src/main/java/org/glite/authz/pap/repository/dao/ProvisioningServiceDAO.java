@@ -7,6 +7,7 @@ import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
+import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
@@ -85,8 +86,12 @@ public class ProvisioningServiceDAO {
             log.info("Adding PAP: " + papContainer.getPAP().getAlias());
 
             try {
-                PolicySetType papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
-                                                                                  papContainer.getPAPRootPolicySetId());
+                PolicySetType papPolicySetNoReferences;
+
+                synchronized (DistributionModule.storePoliciesLock) {
+                    papPolicySetNoReferences = getPolicySetNoReferences(papContainer, papContainer.getPAPRootPolicySetId());
+                }
+
                 PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
 
                 TypeStringUtils.releaseUnnecessaryMemory(papPolicySetNoReferences);
@@ -98,8 +103,7 @@ public class ProvisioningServiceDAO {
 
         TypeStringUtils.releaseUnnecessaryMemory(rootPolicySet);
 
-        log.debug("PDP query executed: retrieved " + resultList.size() + " elemens (Policy/PolicySet) relate to "
-                + papManager.getOrderedRemotePAPsContainerArray().length + " PAPs");
+        log.debug("PDP query executed: retrieved " + resultList.size() + " elements (Policy/PolicySet)");
 
         return resultList;
     }
@@ -125,7 +129,7 @@ public class ProvisioningServiceDAO {
         idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySetNoRef);
         for (String policyIdReference : idReferenceList) {
 
-            PolicyType policy = papContainer.getPolicy(policyIdReference);
+            PolicyType policy = TypeStringUtils.cloneAsPolicyTypeString((papContainer.getPolicy(policyIdReference)));
 
             PolicySetHelper.addPolicy(policySetNoRef, policy);
 
@@ -159,8 +163,12 @@ public class ProvisioningServiceDAO {
 
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        List<PolicySetType> policySetList = papContainer.getAllPolicySets();
+        List<PolicySetType> resultPolicySetList = new LinkedList<PolicySetType>();
+        for (PolicySetType policySet : papContainer.getAllPolicySets()) {
+            resultPolicySetList.add(TypeStringUtils.cloneAsPolicySetTypeString(policySet));
+        }
         List<PolicyType> policyList = papContainer.getAllPolicies();
+        List<PolicyType> resultPolicyList = new LinkedList<PolicyType>();
 
         boolean removedAtLeastOnePrivatePolicy = false;
 
@@ -171,6 +179,7 @@ public class ProvisioningServiceDAO {
             TypeStringUtils.releaseUnnecessaryMemory(policy);
 
             if (PolicyWizard.isPublic(policyId)) {
+                resultPolicyList.add(TypeStringUtils.cloneAsPolicyTypeString(policy));
                 continue;
             }
 
@@ -178,25 +187,25 @@ public class ProvisioningServiceDAO {
             policyList.remove(policy);
 
             // Remove references of the policy
-            for (PolicySetType policySet : policySetList) {
-                if (PolicySetHelper.hasPolicyReferenceId(policySet, policyId)) {
-                    PolicySetHelper.deletePolicyReference(policySet, policyId);
+            for (PolicySetType policySet : resultPolicySetList) {
+                if (PolicySetHelper.deletePolicyReference(policySet, policyId)) {
                     removedAtLeastOnePrivatePolicy = true;
                 }
             }
         }
 
         if (removedAtLeastOnePrivatePolicy) {
-            for (PolicySetType policySet : policySetList) {
+            for (PolicySetType policySet : resultPolicySetList) {
                 TypeStringUtils.releaseUnnecessaryMemory(policySet);
             }
         }
 
-        log.debug("Adding " + policySetList.size() + " PolicySet elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
-        resultList.addAll(policySetList);
+        log.debug("Adding " + resultPolicySetList.size() + " PolicySet elements from PAP \"" + papContainer.getPAP().getPapId()
+                + "\"");
+        resultList.addAll(resultPolicySetList);
 
         log.debug("Adding " + policyList.size() + " Policy elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
-        resultList.addAll(policyList);
+        resultList.addAll(resultPolicyList);
 
         return resultList;
     }

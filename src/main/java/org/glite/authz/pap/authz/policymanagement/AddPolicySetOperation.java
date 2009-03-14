@@ -11,11 +11,11 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 public class AddPolicySetOperation extends BasePAPOperation<String> {
 
-	int index;
+    int index;
     PolicySetType policySet;
 
     protected AddPolicySetOperation(int index, PolicySetType policySet) {
-    	this.index = index;
+        this.index = index;
         this.policySet = policySet;
     }
 
@@ -26,15 +26,15 @@ public class AddPolicySetOperation extends BasePAPOperation<String> {
     protected String doExecute() {
 
         String policySetId = WizardUtils.generateId(null);
-        
+
         policySet.setPolicySetId(policySetId);
 
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
         localPAP.addPolicySet(index, policySet);
-        
+
         TypeStringUtils.releaseUnnecessaryMemory(policySet);
-        
+
         log.info(String.format("Added policy (policyId=\"%s\")", policySetId));
 
         return policySetId;

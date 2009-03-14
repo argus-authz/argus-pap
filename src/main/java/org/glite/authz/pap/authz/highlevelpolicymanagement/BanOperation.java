@@ -23,7 +23,6 @@ public class BanOperation extends BasePAPOperation<String> {
     private AttributeWizard banAttributeWizard;
     private boolean isPublic;
     private AttributeWizard resourceAttributeWizard;
-    private static final Object lock = new Object();
 
     protected BanOperation(AttributeWizard banAttributeWizard, AttributeWizard resourceAttributeWizard,
             AttributeWizard actionAttributeWizard, boolean isPublic) {
@@ -40,7 +39,7 @@ public class BanOperation extends BasePAPOperation<String> {
     }
 
     protected String doExecute() {
-        synchronized (lock) {
+        synchronized (PAPContainer.addOperationLock) {
 
             boolean policySetNeedToBeSaved = true;
             boolean updateOperationForPolicySet = false;

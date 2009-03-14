@@ -10,6 +10,7 @@ public class Functions {
     public static final String OR = "urn:oasis:names:tc:xacml:1.0:function:or";
     public static final String STRING_BAG = "urn:oasis:names:tc:xacml:1.0:function:string-bag";
     public static final String STRING_EQUAL = "urn:oasis:names:tc:xacml:1.0:function:string-equal";
+    public static final String STRING_REGEXP_MATCH = "urn:oasis:names:tc:xacml:1.0:function:string-regexp-match";
 
     private Functions() {}
 

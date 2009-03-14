@@ -24,6 +24,8 @@ import org.slf4j.LoggerFactory;
 
 public class PAPContainer {
 
+	public static final Object addOperationLock = new Object();
+	
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(PAPContainer.class);
 

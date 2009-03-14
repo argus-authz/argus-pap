@@ -14,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MoveOperation extends BasePAPOperation<Object> {
-    
+
     private static final Logger log = LoggerFactory.getLogger(MoveOperation.class);
-    
+
     String id;
     String pivotId;
     boolean moveAfter;
@@ -32,95 +32,99 @@ public class MoveOperation extends BasePAPOperation<Object> {
     }
 
     protected Object doExecute() {
-        
+
         if ((id == null) || (pivotId == null)) {
             return null;
         }
-        
+
         if (id.equals(pivotId)) {
             return null;
         }
-        
+
         PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
-        
+
         if (localPAP.hasPolicySet(id)) {
-            
+
             movePolicySetId(localPAP);
-            
+
         } else {
-            
+
             movePolicyId(localPAP);
-            
+
         }
-        
+
         return null;
     }
-    
+
     private void movePolicySetId(PAPContainer papContainer) {
-        
-        // now we have only two levels so... all the policy sets (resource <id>) are referenced by the PAP root policy set
+
+        // now we have only two levels so... all the policy sets (resource <id>) are referenced by the PAP
+        // root policy set
         PolicySetType rootPAPPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPAPRootPolicySet());
-        
-        
+
         if (!(PolicySetHelper.hasPolicySetReferenceId(rootPAPPolicySet, pivotId))) {
             throw new RepositoryException("Id not found: " + pivotId);
         }
-        
+
         if (!(PolicySetHelper.deletePolicySetReference(rootPAPPolicySet, id))) {
-            throw new RepositoryException(String.format("Id \"%s\" not found into resource \"%s\"", id, rootPAPPolicySet.getPolicySetId()));
+            throw new RepositoryException(String.format("Id \"%s\" not found into resource \"%s\"",
+                                                        id,
+                                                        rootPAPPolicySet.getPolicySetId()));
         }
-        
+
         int pivotIndex = PolicySetHelper.getPolicySetIdReferenceIndex(rootPAPPolicySet, pivotId);
-        
+
         if (moveAfter) {
-            pivotIndex++; 
+            pivotIndex++;
         }
         log.debug("New position for PolicySet is: " + pivotIndex);
-        
+
         PolicySetHelper.addPolicySetReference(rootPAPPolicySet, pivotIndex, id);
-        
+
         String version = rootPAPPolicySet.getVersion();
-        
+
         PolicySetWizard.increaseVersion(rootPAPPolicySet);
-        
+
         papContainer.updatePolicySet(version, rootPAPPolicySet);
     }
-    
+
     private void movePolicyId(PAPContainer papContainer) {
         PolicySetType targetPolicySet = null;
-        
+
         // get the target policy set
         for (PolicySetType policySet : papContainer.getAllPolicySets()) {
-            
+
             PolicySetType tempPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
-            
+
             if (PolicySetHelper.hasPolicyReferenceId(tempPolicySet, pivotId)) {
                 targetPolicySet = tempPolicySet;
                 break;
             }
         }
-        
+
         if (targetPolicySet == null) {
             throw new RepositoryException("Id not found: " + pivotId);
         }
-        
+
         if (!(PolicySetHelper.deletePolicyReference(targetPolicySet, id))) {
-            throw new RepositoryException(String.format("Id \"%s\" not found into resource \"%s\"", id, targetPolicySet.getPolicySetId()));
+            throw new RepositoryException(String.format("Id \"%s\" not found into resource \"%s\"",
+                                                        id,
+                                                        targetPolicySet.getPolicySetId()));
         }
 
         int pivotIndex = PolicySetHelper.getPolicyIdReferenceIndex(targetPolicySet, pivotId);
-        
+
         if (moveAfter) {
             pivotIndex++;
         }
         log.debug("New position for Policy is: " + pivotIndex);
-        
+
         PolicySetHelper.addPolicyReference(targetPolicySet, pivotIndex, id);
-        
+
         String version = targetPolicySet.getVersion();
-        
+
         PolicySetWizard.increaseVersion(targetPolicySet);
-        
+
         papContainer.updatePolicySet(version, targetPolicySet);
     }
 

@@ -11,54 +11,52 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class AddPoliciesOperation extends BasePAPOperation<String[]> {
 
-	int index;
-	PolicyType[] policy;
-	String[] policyIdPrefix;
-	String policySetId;
+    int index;
+    PolicyType[] policy;
+    String[] policyIdPrefix;
+    String policySetId;
 
-	protected AddPoliciesOperation(int index, String policySetId, String[] policyIdPrefix, PolicyType[] policy) {
-		this.index = index;
-		this.policySetId = policySetId;
-		this.policyIdPrefix = policyIdPrefix;
-		this.policy = policy;
-	}
+    protected AddPoliciesOperation(int index, String policySetId, String[] policyIdPrefix, PolicyType[] policy) {
+        this.index = index;
+        this.policySetId = policySetId;
+        this.policyIdPrefix = policyIdPrefix;
+        this.policy = policy;
+    }
 
-	public static AddPoliciesOperation instance(int index, String policySetId, String policyIdPrefix[],
-			PolicyType[] policy) {
-		return new AddPoliciesOperation(index, policySetId, policyIdPrefix, policy);
-	}
+    public static AddPoliciesOperation instance(int index, String policySetId, String policyIdPrefix[], PolicyType[] policy) {
+        return new AddPoliciesOperation(index, policySetId, policyIdPrefix, policy);
+    }
 
-	protected String[] doExecute() {
+    protected String[] doExecute() {
 
-		PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-		if (!localPAP.hasPolicySet(policySetId)) {
-			log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.",
-				policySetId));
-			return null;
-		}
+        if (!localPAP.hasPolicySet(policySetId)) {
+            log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));
+            return null;
+        }
 
-		String[] policyIdArray = new String[policy.length];
+        String[] policyIdArray = new String[policy.length];
 
-		for (int i = 0; i < policy.length; i++) {
+        for (int i = 0; i < policy.length; i++) {
 
-			policyIdArray[i] = WizardUtils.generateId(policyIdPrefix[i]);
-			policy[i].setPolicyId(policyIdArray[i]);
+            policyIdArray[i] = WizardUtils.generateId(policyIdPrefix[i]);
+            policy[i].setPolicyId(policyIdArray[i]);
 
-			if (index == -1) {
-				localPAP.addPolicy(index, policySetId, policy[i]);
-			} else {
-				localPAP.addPolicy(index + i, policySetId, policy[i]);
-			}
-			TypeStringUtils.releaseUnnecessaryMemory(policy[i]);
+            if (index == -1) {
+                localPAP.addPolicy(index, policySetId, policy[i]);
+            } else {
+                localPAP.addPolicy(index + i, policySetId, policy[i]);
+            }
+            TypeStringUtils.releaseUnnecessaryMemory(policy[i]);
 
-			log.info(String.format("Added policy (policyId=\"%s\")", policyIdArray[i]));
-		}
-		return policyIdArray;
-	}
+            log.info(String.format("Added policy (policyId=\"%s\")", policyIdArray[i]));
+        }
+        return policyIdArray;
+    }
 
-	@Override
-	protected void setupPermissions() {
-		addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
-	}
+    @Override
+    protected void setupPermissions() {
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
+    }
 }

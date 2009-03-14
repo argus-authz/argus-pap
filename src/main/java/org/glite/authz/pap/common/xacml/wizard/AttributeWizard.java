@@ -13,11 +13,11 @@ public class AttributeWizard {
 
     public enum AttributeWizardType {
         ACTION("action", "urn:oasis:names:tc:xacml:1.0:action:action-id", DataType.STRING, TargetElement.ACTION),
-        CA("ca", "CA", DataType.X_500_NAME, TargetElement.SUBJECT),
-        DEFAULT("default", "DEFAULT", DataType.STRING, TargetElement.SUBJECT),
-        DN("dn", "urn:oasis:names:tc:xacml:1.0:subject:subject-id", DataType.X_500_NAME, TargetElement.SUBJECT),
-        FQAN("fqan", "FQAN", DataType.STRING, TargetElement.SUBJECT),
-        GA("ga", "GA", DataType.STRING, TargetElement.SUBJECT),
+        CA("ca", "urn:oasis:names:tc:xacml:1.0:subject:subject-id-ca", DataType.X_500_NAME, TargetElement.SUBJECT),
+        DEFAULT("default", "urn:oasis:names:tc:xacml:1.0:subject:subject-id", DataType.STRING, TargetElement.SUBJECT),
+        DN("dn", "urn:oasis:names:tc:xacml:1.0:subject:subject-id-dn", DataType.X_500_NAME, TargetElement.SUBJECT),
+        FQAN("fqan", "urn:oasis:names:tc:xacml:1.0:subject:subject-id-fqan", DataType.STRING, TargetElement.SUBJECT),
+        GA("ga", "urn:oasis:names:tc:xacml:1.0:subject:subject-id-ga", DataType.STRING, TargetElement.SUBJECT),
         RESOURCE_PS("resource", "urn:oasis:names:tc:xacml:1.0:resource:resource-id", DataType.STRING, TargetElement.RESOURCE),
         SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE);
 
