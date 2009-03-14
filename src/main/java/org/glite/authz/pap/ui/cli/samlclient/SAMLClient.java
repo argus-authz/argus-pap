@@ -59,9 +59,12 @@ public class SAMLClient extends SAMLClientCLI {
         XACMLPolicyQueryType query = buildSamlXacmlQuery("IssuerString", isPAPQuery);
     	
     	Response response = samlClient.XACMLPolicyQuery(query);
-    	
-    	System.out.println("Received response");
-//    	System.out.println(XMLObjectHelper.toString(response));
+
+    	if (verboseMode) {
+    	    System.out.println(XMLObjectHelper.toString(response));
+    	} else {
+    	    System.out.println("Received response");
+    	}
     	
         return ExitStatus.SUCCESS.ordinal();
         
