@@ -153,6 +153,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             if (fileName.startsWith(POLICY_SET_FILE_NAME_PREFIX)) {
 
                 String policySetId = getPolicySetIdFromFileName(fileName);
+                
                 PolicySetTypeString policySet = papCache.get(policySetId);
 
                 if (policySet == null) {
@@ -162,11 +163,14 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
                     } catch (Throwable e) {
                         throw new RepositoryException(e);
                     }
+                    
                     papCache.put(policySetId, policySet);
                 } else {
                     log.debug("getAll(): PolicySet retrieved from cache: id=" + policySetId);
                 }
-                policySetList.add(policySet);
+                
+                policySetList.add(new PolicySetTypeString(policySetId, policySet.getPolicySetString()));
+                
                 if (policySet.isDOMLoaded()) {
                     log.warn("getAll(): DOM not released for PolicySet id=" + policySetId);
                 }
@@ -208,7 +212,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             log.warn("getById(): DOM not released for PolicySet id=" + policySetId);
         }
 
-        return policySet;
+        return new PolicySetTypeString(policySetId, policySet.getPolicySetString());
     }
 
     public synchronized void store(String papId, PolicySetType policySet) {
@@ -231,11 +235,9 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 
         PolicySetHelper.toFile(policySetFile, policySet);
 
-        PolicySetTypeString policySetTypeString = TypeStringUtils.getAsPolicySetTypeString(policySet);
+        PolicySetTypeString policySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
 
         getPAPCache(papId).put(policySetId, policySetTypeString);
-
-        TypeStringUtils.releaseUnnecessaryMemory(policySetTypeString);
     }
 
     public synchronized void update(String papId, String policySetVersion, PolicySetType newPolicySet) {
@@ -275,11 +277,9 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 
         PolicySetHelper.toFile(policySetFile, newPolicySet);
 
-        PolicySetTypeString newPolicySetTypeString = TypeStringUtils.getAsPolicySetTypeString(newPolicySet);
+        PolicySetTypeString newPolicySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(newPolicySet);
 
         papCache.put(policySetId, newPolicySetTypeString);
-
-        TypeStringUtils.releaseUnnecessaryMemory(newPolicySetTypeString);
     }
 
     private Map<String, PolicySetTypeString> getPAPCache(String papId) {

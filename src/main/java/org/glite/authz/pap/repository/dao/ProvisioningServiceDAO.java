@@ -107,7 +107,7 @@ public class ProvisioningServiceDAO {
 
     private PolicySetType getPolicySetNoReferences(PAPContainer papContainer, String policySetId) {
 
-        PolicySetType policySetNoRef = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPolicySet(policySetId));
+        PolicySetType policySetNoRef = papContainer.getPolicySet(policySetId);
 
         // replace policy set references with policy sets
         List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySetNoRef);
@@ -126,7 +126,7 @@ public class ProvisioningServiceDAO {
         idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySetNoRef);
         for (String policyIdReference : idReferenceList) {
 
-            PolicyType policy = TypeStringUtils.cloneAsPolicyTypeString((papContainer.getPolicy(policyIdReference)));
+            PolicyType policy = papContainer.getPolicy(policyIdReference);
 
             PolicySetHelper.addPolicy(policySetNoRef, policy);
 
@@ -138,31 +138,13 @@ public class ProvisioningServiceDAO {
         return policySetNoRef;
     }
 
-    // pdpQuery() was modified in order to do not use references, therefore this
-    // method is no more used... consider to delete it before or later...
-    @SuppressWarnings("unused")
-    private List<XACMLObject> getAll(PAPContainer papContainer) {
-        List<XACMLObject> resultList = new LinkedList<XACMLObject>();
-
-        List<PolicySetType> policySetList = papContainer.getAllPolicySets();
-        log.debug("Adding " + policySetList.size() + " PolicySet elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
-
-        List<PolicyType> policyList = papContainer.getAllPolicies();
-        log.debug("Adding " + policyList.size() + " Policy elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
-
-        resultList.addAll(policySetList);
-        resultList.addAll(policyList);
-
-        return resultList;
-    }
-
     private List<XACMLObject> getPublic(PAPContainer papContainer) {
 
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
         List<PolicySetType> resultPolicySetList = new LinkedList<PolicySetType>();
         for (PolicySetType policySet : papContainer.getAllPolicySets()) {
-            resultPolicySetList.add(TypeStringUtils.cloneAsPolicySetTypeString(policySet));
+            resultPolicySetList.add(policySet);
         }
         List<PolicyType> policyList = papContainer.getAllPolicies();
         List<PolicyType> resultPolicyList = new LinkedList<PolicyType>();
@@ -176,7 +158,7 @@ public class ProvisioningServiceDAO {
             TypeStringUtils.releaseUnnecessaryMemory(policy);
 
             if (PolicyWizard.isPublic(policyId)) {
-                resultPolicyList.add(TypeStringUtils.cloneAsPolicyTypeString(policy));
+                resultPolicyList.add(policy);
                 continue;
             }
 

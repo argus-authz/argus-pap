@@ -3,7 +3,6 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.distribution.PAPManager;
@@ -60,7 +59,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
         // now we have only two levels so... all the policy sets (resource <id>) are referenced by the PAP
         // root policy set
-        PolicySetType rootPAPPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPAPRootPolicySet());
+        PolicySetType rootPAPPolicySet = papContainer.getPAPRootPolicySet();
 
         if (!(PolicySetHelper.hasPolicySetReferenceId(rootPAPPolicySet, pivotId))) {
             throw new RepositoryException("Id not found: " + pivotId);
@@ -94,7 +93,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
         // get the target policy set
         for (PolicySetType policySet : papContainer.getAllPolicySets()) {
 
-            PolicySetType tempPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
+            PolicySetType tempPolicySet = policySet;
 
             if (PolicySetHelper.hasPolicyReferenceId(tempPolicySet, pivotId)) {
                 targetPolicySet = tempPolicySet;

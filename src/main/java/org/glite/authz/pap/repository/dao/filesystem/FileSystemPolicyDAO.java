@@ -157,6 +157,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             if (fileName.startsWith(POLICY_FILE_NAME_PREFIX)) {
 
                 String policyId = getPolicyIdFromFileName(fileName);
+                
                 PolicyTypeString policy = papCache.get(policyId);
 
                 if (policy == null) {
@@ -167,7 +168,8 @@ public class FileSystemPolicyDAO implements PolicyDAO {
                     }
                     papCache.put(policyId, policy);
                 }
-                policyList.add(policy);
+                policyList.add(new PolicyTypeString(policyId, policy.getPolicyString()));
+                
                 if (policy.isDOMLoaded()) {
                     log.warn("DOM not released for Policy id=" + policyId);
                 }
@@ -205,7 +207,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
         if (policy.isDOMLoaded()) {
             log.warn("DOM not released for id=" + policyId);
         }
-        return policy;
+        return new PolicyTypeString(policyId, policy.getPolicyString());
     }
 
     public int getNumberOfPolicies(String papId) {
@@ -253,7 +255,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
         PolicyHelper.toFile(policyFile, policy);
 
-        getPAPCache(papId).put(policyId, TypeStringUtils.getAsPolicyTypeString(policy));
+        getPAPCache(papId).put(policyId, TypeStringUtils.cloneAsPolicyTypeString(policy));
 
         TypeStringUtils.releaseUnnecessaryMemory(policy);
     }
@@ -295,7 +297,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
         PolicyHelper.toFile(policyFile, newPolicy);
 
-        papCache.put(policyId, TypeStringUtils.getAsPolicyTypeString(newPolicy));
+        papCache.put(policyId, TypeStringUtils.cloneAsPolicyTypeString(newPolicy));
 
         TypeStringUtils.releaseUnnecessaryMemory(newPolicy);
     }

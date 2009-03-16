@@ -119,7 +119,7 @@ public class BanOperation extends BasePAPOperation<String> {
         }
 
         // get the target policy, it must be the very first policy
-        PolicyType candidatePolicy = TypeStringUtils.cloneAsPolicyTypeString(papContainer.getPolicy(policyIdList.get(0)));
+        PolicyType candidatePolicy = papContainer.getPolicy(policyIdList.get(0));
 
         PolicyType policy = null;;
         TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
@@ -151,7 +151,7 @@ public class BanOperation extends BasePAPOperation<String> {
             return null;
         }
 
-        PolicySetType candidatePolicySet = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPolicySet(policySetIdList.get(0)));
+        PolicySetType candidatePolicySet = papContainer.getPolicySet(policySetIdList.get(0));
 
         if (policySetTargetWizard.isEquivalent(candidatePolicySet.getTarget())) {
             targetPolicySet = candidatePolicySet;

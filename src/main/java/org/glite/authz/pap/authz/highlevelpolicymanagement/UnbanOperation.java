@@ -101,7 +101,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 		
 		for (String policyId : policyIdList) {
 
-			PolicyType repositoryPolicy = TypeStringUtils.cloneAsPolicyTypeString(papContainer.getPolicy(policyId));
+			PolicyType repositoryPolicy = papContainer.getPolicy(policyId);
 
 			if (policyTargetWizard.isEquivalent(repositoryPolicy.getTarget())) {
 				return repositoryPolicy;
@@ -117,7 +117,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
         TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
 
-        PolicySetType rootPAPPolicySet = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPAPRootPolicySet());
+        PolicySetType rootPAPPolicySet = papContainer.getPAPRootPolicySet();
 
         List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(rootPAPPolicySet);
 
@@ -125,7 +125,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
         for (String policySetId : policySetIdList) {
             
-            PolicySetType policySet = TypeStringUtils.cloneAsPolicySetTypeString(papContainer.getPolicySet(policySetId));
+            PolicySetType policySet = papContainer.getPolicySet(policySetId);
             
             if (policySetTargetWizard.isEquivalent(policySet.getTarget())) {
                 targetPolicySetList.add(policySet);

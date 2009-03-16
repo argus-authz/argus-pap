@@ -18,7 +18,7 @@ public class TypeStringUtils {
 
 		if (policySet instanceof PolicySetTypeString) {
 		    
-			policySetTypeString = new PolicySetTypeString(((PolicySetTypeString) policySet).getPolicySetString());
+			policySetTypeString = new PolicySetTypeString(policySet.getPolicySetId(), ((PolicySetTypeString) policySet).getPolicySetString());
 			
 		} else {
 		    
@@ -34,10 +34,14 @@ public class TypeStringUtils {
 		PolicyTypeString policyTypeString;
 
 		if (policy instanceof PolicyTypeString) {
-			policyTypeString = new PolicyTypeString(((PolicyTypeString) policy).getPolicyString());
+		    
+			policyTypeString = new PolicyTypeString(policy.getPolicyId(), ((PolicyTypeString) policy).getPolicyString());
+			
 		} else {
+		    
 			policyTypeString = new PolicyTypeString(PolicyHelper.getInstance().clone(policy));
 			policyTypeString.releaseDOM();
+			
 		}
 		return policyTypeString;
 	}
