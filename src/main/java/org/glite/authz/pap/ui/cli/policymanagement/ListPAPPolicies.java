@@ -19,7 +19,6 @@ public class ListPAPPolicies extends PolicyManagementCLI {
     private static final Logger log = LoggerFactory.getLogger(ListPAPPolicies.class);
     private static final String USAGE = "[pap_alias] [options]";
 
-    private boolean getPoliciesOneByOne = false;
     private String[] papAliasArray;
     private String[] papInfoArray;
     private boolean showIds = false;
@@ -34,26 +33,9 @@ public class ListPAPPolicies extends PolicyManagementCLI {
 
         System.out.println(papInfo);
 
-        PAPPolicyIterator policyIter = new PAPPolicyIterator(xacmlPolicyMgmtClient, papAlias, getPoliciesOneByOne);
+        boolean policiesFound = false;
 
-        try {
-
-            policyIter.init();
-
-            if (policyIter.getNumberOfPolicies() == 0) {
-                System.out.println("No policies has been found.");
-                return ExitStatus.SUCCESS.ordinal();
-            }
-
-        } catch (RemoteException e) {
-            System.out.println(String.format("Error retrieving cache for PAP \"%s\": %s", papAlias, e.getMessage()));
-            log.error("Error retrieving cache of PAP " + papAlias, e);
-            return ExitStatus.FAILURE.ordinal();
-        }
-
-        boolean policiesFound;
-
-        policiesFound = ListPolicies.listPolicies(policyIter, showIds, showRulesId, xacmlOutput);
+//        policiesFound = ListPolicies.listPolicies(papAlias, showIds, showRulesId, xacmlOutput);
 
         if (!policiesFound) {
             printOutputMessage("No policies has benn found.");
@@ -110,15 +92,11 @@ public class ListPAPPolicies extends PolicyManagementCLI {
             xacmlOutput = true;
         }
 
-        if (commandLine.hasOption(OPT_LIST_ONE_BY_ONE)) {
-            getPoliciesOneByOne = true;
-        }
-        
         if (commandLine.hasOption(OPT_SHOW_IDS)) {
             showIds = true;
         }
         
-        if (commandLine.hasOption(OPT_SHOW_RULES_ID_LONG)) {
+        if (commandLine.hasOption(OPT_SHOW_ALL_IDS_LONG)) {
             showRulesId = true;
         }
 

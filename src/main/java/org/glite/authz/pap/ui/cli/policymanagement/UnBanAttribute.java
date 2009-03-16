@@ -12,10 +12,10 @@ import org.glite.authz.pap.ui.cli.CLIException;
 public class UnBanAttribute extends PolicyManagementCLI {
     
     private static String[] COMMAND_NAME_VALUES = { "un-ban", "ub" };
-    private static String DESCRIPTION = "Un-ban a previously banned attribute. The attribute id is any of the attribute ids that can be specified in the " +
-    		"simplified policy language. By default the attribute is un-bannen for resource and action \"*\". "
-            + "Specify a resource or an action (using options --" + OPT_RESOURCE_LONG + " and --" + OPT_ACTION_LONG
-            + ") if you want to reduce the scope of the un-ban.";
+    private static String DESCRIPTION = "Un-ban a previously banned attribute. <id> is any of the attribute ids that can be specified in the " +
+    		"simplified policy language. By default the attribute is un-bannen for resource and action both with value \"*\". "
+            + "Different values for resource and action can be set using options --" + OPT_RESOURCE_LONG + " and --" + OPT_ACTION_LONG
+            + ".";
     private static String USAGE = "<id> <value> [options]";
 
     public UnBanAttribute() {

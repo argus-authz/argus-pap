@@ -182,7 +182,7 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
         }
         return false;
     }
-
+    
     private static PolicySetType build() {
         return (PolicySetType) builderFactory.getBuilder(ELEMENT_NAME).buildObject(ELEMENT_NAME);
     }

@@ -3,12 +3,12 @@ package org.glite.authz.pap.ui.cli.policymanagement;
 import java.io.File;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -22,8 +22,10 @@ import org.opensaml.xacml.policy.PolicyType;
 public class UpdatePolicy extends PolicyManagementCLI {
 
 	private static final String[] commandNameValues = { "update-policy-from-file", "up" };
-	private static final String DESCRIPTION = "Update the policy identified by \"id\" with the new policy "
-			+ "defined in \"file\"";
+	private static final String DESCRIPTION = "Update the resource/action identified by <id> with the new resource/action "
+			+ "defined in <file>. In the case of update of a resource all the actions defined inside the new resource (the one inside <file>) " +
+			"are ignored. This means that for a resource only obligations and the description can be updated. To remove, add, and " +
+			"change the order of actions inside a resource use the appropriate commands.";
 	private static final String USAGE = "<id> <file> [options]";
 	private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
 
@@ -59,48 +61,32 @@ public class UpdatePolicy extends PolicyManagementCLI {
 			return ExitStatus.FAILURE.ordinal();
 		}
 
-		PolicySetType policySet = xacmlPolicyMgmtClient.getPolicySet(id);
+		PolicySetType repositoryPolicySet = xacmlPolicyMgmtClient.getPolicySet(id);
 
-		List<PolicyType> repoPolicyList = new LinkedList<PolicyType>();
-		for (String policyId : PolicySetHelper.getPolicyIdReferencesValues(policySet)) {
-			repoPolicyList.add(xacmlPolicyMgmtClient.getPolicy(policyId));
+		List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(repositoryPolicySet);
+		List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(repositoryPolicySet);
+		
+		String repositoryVersion = repositoryPolicySet.getVersion();
+		
+		TypeStringUtils.releaseUnneededMemory(repositoryPolicySet);
+
+		PolicySetType newPolicySet = policySetWizard.getXACML();
+		
+		newPolicySet.getPolicyIdReferences().clear();
+		newPolicySet.getPolicySetIdReferences().clear();
+		
+		for (String idRef : policyIdList) {
+		    PolicySetHelper.addPolicyReference(newPolicySet, idRef);
 		}
+		for (String idRef : policySetIdList) {
+            PolicySetHelper.addPolicySetReference(newPolicySet, idRef);
+        }
 
-		List<PolicyWizard> policyWizardList = policySetWizard.getPolicyWizardList();
-
-		if (policyWizardList.size() != repoPolicyList.size()) {
-			System.out
-					.println("Error: the set of actions is not the same, only order can be changed with the update operation");
-			return ExitStatus.FAILURE.ordinal();
-		}
-
-		for (PolicyWizard policyWizard : policyWizardList) {
-
-			boolean foundToBeEquivalent = false;
-
-			for (PolicyType policy : repoPolicyList) {
-				if (policyWizard.isEquivalent(policy)) {
-					if (!PolicySetHelper.changePolicyReferenceValue(policySetWizard.getXACML(), policyWizard
-							.getPolicyId(), policy.getPolicyId())) {
-						break;
-					}
-					policyWizard.setPolicyId(policy.getPolicyId());
-					foundToBeEquivalent = true;
-					break;
-				}
-			}
-
-			if (!foundToBeEquivalent) {
-				System.out
-						.println("Error: the set of actions is not the same, only order can be changed with the update operation");
-				return ExitStatus.FAILURE.ordinal();
-			}
-		}
-
-		policySetWizard.setPolicySetId(id);
-		String oldVersion = policySetWizard.getVersionString();
-		policySetWizard.increaseVersion();
-		xacmlPolicyMgmtClient.updatePolicySet(oldVersion, policySetWizard.getXACML());
+		newPolicySet.setPolicySetId(id);
+		newPolicySet.setVersion(repositoryVersion);
+		PolicySetWizard.increaseVersion(newPolicySet);
+		
+		xacmlPolicyMgmtClient.updatePolicySet(repositoryVersion, newPolicySet);
 
 		return ExitStatus.SUCCESS.ordinal();
 	}
@@ -134,7 +120,9 @@ public class UpdatePolicy extends PolicyManagementCLI {
 		List<XACMLWizard> wizardList = new ArrayList<XACMLWizard>(0);
 
 		try {
+		    
 			wizardList = policyFileEncoder.parse(file);
+			
 		} catch (EncodingException e) {
 			System.out.println("Syntax error in file: " + fileName);
 			System.out.println(e.getMessage());

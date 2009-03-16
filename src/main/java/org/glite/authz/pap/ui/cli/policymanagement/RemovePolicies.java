@@ -10,7 +10,7 @@ import org.glite.authz.pap.ui.cli.CLIException;
 public class RemovePolicies extends PolicyManagementCLI {
     
     private static final String[] commandNameValues = { "remove-policy", "rp" };
-    private static final String DESCRIPTION = "Remove policies.";
+    private static final String DESCRIPTION = "Remove policies (resources and/or actions) by id.";
     private static final String USAGE = "<policyId> [[policyId] ...] [options]";
 
     public RemovePolicies() {

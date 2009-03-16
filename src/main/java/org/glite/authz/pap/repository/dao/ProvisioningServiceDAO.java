@@ -54,11 +54,26 @@ public class ProvisioningServiceDAO {
 
         for (PAPContainer papContainer : papContainerList) {
 
-            String papId = papContainer.getPAP().getPapId();
-
-            PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
-
-            resultList.addAll(getPublic(papContainer));
+            List<XACMLObject> papXACMLObjectList = getPublic(papContainer);
+            
+            if (papXACMLObjectList.size() > 0) {
+                PolicySetType papRootPolicySet = (PolicySetType) papXACMLObjectList.get(0);
+                
+                List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(papRootPolicySet);
+                List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(papRootPolicySet);
+                
+                TypeStringUtils.releaseUnneededMemory(papRootPolicySet);
+                for (String id : policySetIdList) {
+                    PolicySetHelper.addPolicySetReference(rootPolicySet, id);
+                }
+                for (String id : policyIdList) {
+                    PolicySetHelper.addPolicySetReference(rootPolicySet, id);
+                }
+                
+                papXACMLObjectList.remove(papRootPolicySet);
+                
+                resultList.addAll(papXACMLObjectList);
+            }
         }
 
         log.debug("PAP query executed: retrieved " + resultList.size() + " elements (Policy/PolicySet)");
@@ -143,9 +158,11 @@ public class ProvisioningServiceDAO {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
         List<PolicySetType> resultPolicySetList = new LinkedList<PolicySetType>();
+        
         for (PolicySetType policySet : papContainer.getAllPolicySets()) {
             resultPolicySetList.add(policySet);
         }
+        
         List<PolicyType> policyList = papContainer.getAllPolicies();
         List<PolicyType> resultPolicyList = new LinkedList<PolicyType>();
 
@@ -161,9 +178,6 @@ public class ProvisioningServiceDAO {
                 resultPolicyList.add(policy);
                 continue;
             }
-
-            // Remove private policy from the list
-            policyList.remove(policy);
 
             // Remove references of the policy
             for (PolicySetType policySet : resultPolicySetList) {

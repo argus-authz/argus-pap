@@ -13,6 +13,12 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
+    protected static String OPT_PAPALIAS = "pap";
+    protected static String OPT_PAPALIAS_LONG = "pap";
+    protected static String OPT_PAPALIAS_DESCRIPTION = "Select <arg> as PAP";
+    protected static String OPT_ALLPAPS = "all";
+    protected static String OPT_ALLPAPS_LONG = "all-paps";
+    protected static String OPT_ALLPAPS_DESCRIPTION = "Select all PAPs";
 	protected static String OPT_MOVEAFTER = "a";
 	protected static String OPT_MOVEAFTER_LONG = "after";
 	protected static String OPT_MOVEAFTER_DESCRIPTION = "move <id> after <pivotId> (by default <id> is moved before <pivotId>)";
@@ -22,18 +28,15 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
     protected static String OPT_RESOURCE = "r";
     protected static String OPT_RESOURCE_DESCRIPTION = "Specify a resource value.";
     protected static String OPT_RESOURCE_LONG = "resource";
-	protected static final String OPT_LIST_ONE_BY_ONE = "obo";
-	protected static final String OPT_LIST_ONE_BY_ONE_DESCRIPTION = "Ask the server one policy at a time instead of all in once";
-	protected static final String OPT_LIST_ONE_BY_ONE_LONG = "one-by-one";
 	protected static final String OPT_POLICY_DESCRIPTION = "d";
 	protected static final String OPT_POLICY_DESCRIPTION_DESCRIPTION = "Description";
 	protected static final String OPT_POLICY_DESCRIPTION_LONG = "description";
 	protected static final String OPT_SHOW_IDS = "si";
 	protected static final String OPT_SHOW_IDS_DESCRIPTION = "Show policies id (needed for update or remove operations)";
 	protected static final String OPT_SHOW_IDS_LONG = "show-ids";
-	protected static final String OPT_SHOW_RULES_ID_DESCRIPTION = "Show rules id";
-	protected static final String OPT_SHOW_RULES_ID_LONG = "show-rules-id";
-	protected static final String OPT_SHOW_RULES_ID = "sri";
+	protected static final String OPT_SHOW_ALL_IDS_DESCRIPTION = "Show all ids (resource, action and rule ids)";
+	protected static final String OPT_SHOW_ALL_IDS_LONG = "show-all-ids";
+	protected static final String OPT_SHOW_ALL_IDS = "sai";
 	protected static final String OPT_SHOW_XACML_DESCRIPTION = "XACML output.";
 	protected static final String OPT_SHOW_XACML_LONG = "show-xacml";
 	protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"

@@ -30,12 +30,14 @@ public class AddPolicies extends PolicyManagementCLI {
 	private static String OPT_PIVOT_DESCRIPTION = "insert after <pivotId> (by default the insertion is before <pivotId>)";
 
 	private static final String[] commandNameValues = { "add-policies-from-file", "ap" };
-	private static final String DESCRIPTION = "Add policies defined in the given file.";
-	private static final String LONG_DESCRIPTION = "[targetId]   to be provided only to insert action elements.\n" +
-			"\n<file> can define a set of resource elements or a set of action elements. In the first case \"targetId\" must not " +
-			"be provided, in the latter \"targetId\" indentifies the resource element in which insert action elements. " +
-			"If option --" + OPT_PIVOT_LONG + " is not specified all the elements are inserted as last, otherwise are " +
-			"inserted before \"pivotId\" or after \"pivotId\" is option --" + OPT_MOVEAFTER_LONG + " is set.";
+	private static final String DESCRIPTION = "Add policies defined in the given file.\n" +
+			"[targetId]   resource id in which insert actions.\n" +
+			"<file>       define a set of resource elements or a set of action elements.\n";
+	private static final String LONG_DESCRIPTION = "If <file> defines a set of resource elements \"targetId\" must not " +
+			"be provided, otherwise if only action elements are defined \"targetId\" indentifies the resource element " +
+			"in which insert the given action elements. If option --" + OPT_PIVOT_LONG + " is not specified all the " +
+			"elements are inserted in the last available position, otherwise they are inserted before \"pivotId\" " +
+			"(or after \"pivotId\" if option --" + OPT_MOVEAFTER_LONG + " is set).";
 	private static final String USAGE = "<file> [targetId] [options]";
 	private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
 	List<XACMLWizard> xacmlWizardList;
