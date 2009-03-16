@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 public class FileSystemRepositoryManager extends RepositoryManager {
 
     private static String fileSystemDatabaseDir;
+    private static boolean initialized = false;
     private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
     private static final String POLICY_FILENAME_PREFIX = "Policy_";
     private static final String POLICYSET_FILENAME_PREFIX = "PolicySet_";
@@ -43,6 +44,13 @@ public class FileSystemRepositoryManager extends RepositoryManager {
         return POLICYSET_FILENAME_PREFIX;
     }
 
+    public static String getVersion() {
+    	if (!initialized) {
+    		throw new RepositoryException("FileSytemRepository not initialized");
+    	}
+		return FileSystemPAPDAO.getInstance().getVersion();
+	}
+
     public static String getXACMLFileNameExtension() {
         return XACML_FILENAME_EXTENSION;
     }
@@ -60,9 +68,10 @@ public class FileSystemRepositoryManager extends RepositoryManager {
             throw new RepositoryException("Cannot create the repository root directory: " + rootDir.getAbsolutePath(), e);
         }
 
+        initialized = true;
         log.info("Repository root directory is set to: " + rootDir.getAbsolutePath());
     }
-
+    
     private static void createDirectoryPath(File dir) {
 
         if (!dir.exists()) {
@@ -85,5 +94,4 @@ public class FileSystemRepositoryManager extends RepositoryManager {
             throw new RepositoryException("Execute permission not set: " + dir.getAbsolutePath(), e);
         }
     }
-
 }

@@ -11,9 +11,6 @@ import org.glite.authz.pap.ui.cli.CLIException;
 public class Move extends PolicyManagementCLI {
 
     private static final String[] commandNameValues = { "move", "mv" };
-    private static String OPT_MOVEAFTER = "a";
-    private static String OPT_MOVEAFTER_LONG = "after";
-    private static String OPT_MOVEAFTER_DESCRIPTION = "move <id> after <pivotId> (by default <id> is moved before <pivotId>)";
     private static final String DESCRIPTION = "Move a policy (i.e. action <id>) or a policy set (i.e. resource <id>) before/after "
             + "another, respectively, policy or policySet.";
     private static final String LONG_DESCRIPTION = "<id>        the index of the object (action/resouce) to be moved.\n"

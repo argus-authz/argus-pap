@@ -141,6 +141,12 @@
 	<wsdl:message name="getPAPPolicySetResponse">
 		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
+	<wsdl:message name="getPAPRootPolicySetRequest">
+        <wsdl:part name="papAlias" type="xsd:string"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="getPAPRootPolicySetResponse">
+		<wsdl:part name="getPAPRootPolicySetResponse" type="xsd1:PolicySetType"></wsdl:part>
+	</wsdl:message>
 	<wsdl:message name="addPolicyRequest">
 		<wsdl:part name="index" type="xsd:int"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
@@ -203,6 +209,10 @@
 			<wsdl:input message="tns:getPAPPolicySetRequest"></wsdl:input>
 			<wsdl:output message="tns:getPAPPolicySetResponse"></wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="getPAPRootPolicySet">
+			<wsdl:input message="tns:getPAPRootPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:getPAPRootPolicySetResponse"></wsdl:output>
+        </wsdl:operation>
 		<wsdl:operation name="hasPolicy">
 			<wsdl:input message="tns:hasPolicyRequest"></wsdl:input>
 			<wsdl:output message="tns:hasPolicyResponse"></wsdl:output>
@@ -298,6 +308,16 @@
 		<wsdl:operation name="getPAPPolicySet">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPAPPolicySet" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="getPAPRootPolicySet">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPAPRootPolicySet" />
 			<wsdl:input>
 				<soap:body use="literal" />
 			</wsdl:input>

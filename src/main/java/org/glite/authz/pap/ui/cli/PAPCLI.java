@@ -93,8 +93,9 @@ public class PAPCLI {
             return ServiceCLI.ExitStatus.SUCCESS.ordinal();
         }
 
-        if (serviceCLI == null)
+        if (serviceCLI == null) {
             return ServiceCLI.ExitStatus.INITIALIZATION_ERROR.ordinal();
+        }
 
         int exitStatus;
 
@@ -131,12 +132,22 @@ public class PAPCLI {
 
         CommandLine commandLine = parser.parse(options, args, true);
 
-        if (commandLine.hasOption('h'))
+        if (commandLine.hasOption('h')) {
             printGeneralHelpMessage = true;
-        else
+        } else {
             printGeneralHelpMessage = false;
+        }
 
-        String command = getCommand(args);
+        String command;
+        
+        try {
+        	command = getCommand(args);
+        } catch (ParseException e) {
+        	if (printGeneralHelpMessage) {
+        		return;
+        	}
+        	throw e;
+        }
 
         boolean commandFound = false;
 
@@ -167,10 +178,8 @@ public class PAPCLI {
     private void defineCommands() {
 
         // Policy Management
-        policyMgmtCommandList.add(BanAttribute.dn());
-        policyMgmtCommandList.add(BanAttribute.fqan());
-        policyMgmtCommandList.add(UnBanAttribute.dn());
-        policyMgmtCommandList.add(UnBanAttribute.fqan());
+        policyMgmtCommandList.add(new BanAttribute());
+        policyMgmtCommandList.add(new UnBanAttribute());
         policyMgmtCommandList.add(new AddPolicies());
         policyMgmtCommandList.add(new UpdatePolicy());
         policyMgmtCommandList.add(new RemovePolicies());
@@ -241,6 +250,7 @@ public class PAPCLI {
     private void printGeneralHelp() {
         PrintWriter pw = new PrintWriter(System.out);
 
+        pw.println();
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin <subcommand> [options]");
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP command-line client.");

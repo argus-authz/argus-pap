@@ -3,40 +3,38 @@ package org.glite.authz.pap.ui.cli.policymanagement;
 import java.rmi.RemoteException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.glite.authz.pap.ui.cli.CLIException;
 
 public class UnBanAttribute extends PolicyManagementCLI {
     
-    private static String[] COMMAND_NAME_VALUES_DN = { "un-ban-user", "ubu" };
-    private static String[] COMMAND_NAME_VALUES_FQAN = { "un-ban-fqan", "ubf" };
-    private static String DESCRIPTION_DN = "Un-ban a previously banned DN.";
-    private static String DESCRIPTION_FQAN = "Un-ban a previously banned FQAN";
-    private static String USAGE_DN = "<dn> [options]";
-    private static String USAGE_FQAN = "<fqan> [options]";
-    
-    private AttributeWizardType attributeToUnBan;
+    private static String[] COMMAND_NAME_VALUES = { "un-ban", "ub" };
+    private static String DESCRIPTION = "Un-ban a previously banned attribute. The attribute id is any of the attribute ids that can be specified in the " +
+    		"simplified policy language. By default the attribute is un-bannen for resource and action \"*\". "
+            + "Specify a resource or an action (using options --" + OPT_RESOURCE_LONG + " and --" + OPT_ACTION_LONG
+            + ") if you want to reduce the scope of the un-ban.";
+    private static String USAGE = "<id> <value> [options]";
 
-    private UnBanAttribute(String[] commandNameValues, String usage, String description,
-            String longDescription, AttributeWizardType awt) {
-        super(commandNameValues, usage, description, longDescription);
-        attributeToUnBan = awt;
+    public UnBanAttribute() {
+        super(COMMAND_NAME_VALUES, USAGE, DESCRIPTION, null);
     }
 
-    public static UnBanAttribute dn() {
-        return new UnBanAttribute(COMMAND_NAME_VALUES_DN, USAGE_DN, DESCRIPTION_DN, null, AttributeWizardType.DN);
-    }
-    
-    public static UnBanAttribute fqan() {
-        return new UnBanAttribute(COMMAND_NAME_VALUES_FQAN, USAGE_FQAN, DESCRIPTION_FQAN, null, AttributeWizardType.FQAN);
-    }
-    
-    @Override
+    @SuppressWarnings("static-access")
+	@Override
     protected Options defineCommandOptions() {
-        return null;
+    	Options options = new Options();
+        options.addOption(OptionBuilder.hasArg()
+                                       .withDescription(OPT_ACTION_DESCRIPTION)
+                                       .withLongOpt(OPT_ACTION_LONG)
+                                       .create(OPT_ACTION));
+        options.addOption(OptionBuilder.hasArg()
+                                       .withDescription(OPT_RESOURCE_DESCRIPTION)
+                                       .withLongOpt(OPT_RESOURCE_LONG)
+                                       .create(OPT_RESOURCE));
+        return options;
     }
     
     @Override
@@ -45,29 +43,46 @@ public class UnBanAttribute extends PolicyManagementCLI {
     
         String[] args = commandLine.getArgs();
 
-        if (args.length != 2)
+        if (args.length != 3) {
             throw new ParseException("Wrong number of arguments");
+        }
         
-        String attributeToUnBanValue = args[1];
+        String id = args[1];
+        String value = args[2];
+        
+        String resource = null;
+        String action = null;
+
+        if (commandLine.hasOption(OPT_RESOURCE)) {
+            resource = commandLine.getOptionValue(OPT_RESOURCE);
+        } else {
+            resource = "*";
+        }
+
+        if (commandLine.hasOption(OPT_ACTION)) {
+            action = commandLine.getOptionValue(OPT_ACTION);
+        } else {
+            action = "*";
+        }
+
+        if (verboseMode) {
+            System.out.print("Removing ban... ");
+        }
 
         UnbanResult unbanResult;
         
-        if (AttributeWizardType.DN.equals(attributeToUnBan))
-            unbanResult = highlevelPolicyMgmtClient.unbanDN(attributeToUnBanValue);
-        else
-            unbanResult = highlevelPolicyMgmtClient.unbanFQAN(attributeToUnBanValue);
+        unbanResult = highlevelPolicyMgmtClient.unban(id, value, resource, action);
         
         if (unbanResult.getStatusCode() != 0) {
             
-            System.out.println("Error: ban policy not found for " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+            System.out.println("ban policy not found.");
             return ExitStatus.FAILURE.ordinal();
             
         } else {
-            if (verboseMode)
-                System.out.println("Successfully un-banned " + attributeToUnBan.getId() + "=\"" + attributeToUnBanValue + "\"");
+            if (verboseMode) {
+                System.out.println("ok.");
+            }
         }
-        
         return ExitStatus.SUCCESS.ordinal();
     }
-    
 }

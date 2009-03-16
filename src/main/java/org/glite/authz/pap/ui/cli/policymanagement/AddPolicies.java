@@ -2,11 +2,15 @@ package org.glite.authz.pap.ui.cli.policymanagement;
 
 import java.io.File;
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.common.xacml.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.XACMLWizard;
@@ -15,35 +19,66 @@ import org.glite.authz.pap.encoder.PolicyFileEncoder;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AddPolicies extends PolicyManagementCLI {
 
+	private static final Logger log = LoggerFactory.getLogger(AddPolicies.class);
+	private static String OPT_PIVOT = "pivot";
+	private static String OPT_PIVOT_LONG = "pivot";
+	private static String OPT_PIVOT_DESCRIPTION = "insert after <pivotId> (by default the insertion is before <pivotId>)";
+
 	private static final String[] commandNameValues = { "add-policies-from-file", "ap" };
-	private static final String DESCRIPTION = "Add policies defined in the given files.";
-	private static final String USAGE = "<file> [[file] ...] [options]";
+	private static final String DESCRIPTION = "Add policies defined in the given file.";
+	private static final String LONG_DESCRIPTION = "[targetId]   to be provided only to insert action elements.\n" +
+			"\n<file> can define a set of resource elements or a set of action elements. In the first case \"targetId\" must not " +
+			"be provided, in the latter \"targetId\" indentifies the resource element in which insert action elements. " +
+			"If option --" + OPT_PIVOT_LONG + " is not specified all the elements are inserted as last, otherwise are " +
+			"inserted before \"pivotId\" or after \"pivotId\" is option --" + OPT_MOVEAFTER_LONG + " is set.";
+	private static final String USAGE = "<file> [targetId] [options]";
 	private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
+	List<XACMLWizard> xacmlWizardList;
+	String targetId = null;
+	String pivotId = null;
+	boolean moveAfter = false;
+	
 
 	public AddPolicies() {
-		super(commandNameValues, USAGE, DESCRIPTION, null);
+		super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
 	}
 
-	private boolean addPolicies(String fileName) throws EncodingException, RemoteException {
+	private boolean addResources() throws RemoteException {
+		
+		for (XACMLWizard xacmlWizard : xacmlWizardList) {
+			if (!(xacmlWizard instanceof PolicySetWizard)) {
+				System.out.println(String.format("Error: found action element (%s). Only highlevel \"resource\" elements are allowed.", ((PolicyWizard) xacmlWizard).getTagAndValue()));
+				return false;
+			}
+		}
+		
+		if (targetId != null) {
+			System.out.println("Error cannot use \"targetId\" to insert resource elements.");
+			return false;
+		}
+		
+		int position = -1;
+		
+		if (pivotId != null) {
+			PolicySetType rootPolicySet = xacmlPolicyMgmtClient.getPAPRootPolicySet(null);
+			position = PolicySetHelper.getPolicySetIdReferenceIndex(rootPolicySet, pivotId);
+			if (position == -1) {
+				System.out.println("Pivot id \"" + pivotId + "\" not found (or not a resource id).");
+				return false;
+			}
+			if (moveAfter) {
+				position++;
+			}
+		}
 
 		boolean result = true;
 
-		File file = new File(fileName);
-
-		XACMLPolicyCLIUtils.initOpenSAML();
-
-		List<XACMLWizard> xacmlWizardList = policyFileEncoder.parse(file);
-
 		for (XACMLWizard xacmlWizard : xacmlWizardList) {
-
-			if (!(xacmlWizard instanceof PolicySetWizard)) {
-				System.out.println("Error: \"resource\" element not defined");
-				result = false;
-				continue;
-			}
 
 			PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
 
@@ -53,7 +88,11 @@ public class AddPolicies extends PolicyManagementCLI {
 
 			policySetWizard.releaseDOM();
 
-			String policySetId = xacmlPolicyMgmtClient.addPolicySet(-1, policySet);
+			String policySetId = xacmlPolicyMgmtClient.addPolicySet(position, policySet);
+			
+			if (position != -1) {
+				position++;
+			}
 
 			if (policySetId == null) {
 				System.out.println(String.format(
@@ -107,10 +146,98 @@ public class AddPolicies extends PolicyManagementCLI {
 		}
 		return result;
 	}
+	
+private boolean addActions() throws RemoteException {
+		
+		List<PolicyWizard> policyWizardList = new ArrayList<PolicyWizard>(xacmlWizardList.size());
 
+		for (XACMLWizard xacmlWizard : xacmlWizardList) {
+			if (!(xacmlWizard instanceof PolicyWizard)) {
+				System.out.println(String.format(
+					"Error: found resource element (%s). Only \"action\" highlevel elements are allowed.",
+					((PolicySetWizard) xacmlWizard).getTagAndValue()));
+				return false;
+			}
+			policyWizardList.add((PolicyWizard) xacmlWizard);
+		}
+
+		if (targetId == null) {
+			System.out.println("Error \"targetId\" is needed to insert action elements");
+			return false;
+		}
+
+		PolicySetType targetolicySet = xacmlPolicyMgmtClient.getPolicySet(targetId);
+
+		int position = -1;
+
+		if (pivotId != null) {
+			position = PolicySetHelper.getPolicyIdReferenceIndex(targetolicySet, pivotId);
+			TypeStringUtils.releaseUnnecessaryMemory(targetolicySet);
+			if (position == -1) {
+				System.out.println("Pivot id \"" + pivotId + "\" not found inside resource id \"" + targetId
+						+ "\".");
+				return false;
+			}
+			if (moveAfter) {
+				position++;
+			}
+		}
+
+		boolean result = true;
+
+		int size = xacmlWizardList.size();
+		PolicyType[] policyArray = new PolicyType[size];
+		String[] idPrefixArray = new String[size];
+		String[] tagAndValueArray = new String[size];
+
+		for (int i = 0; i < size; i++) {
+			PolicyWizard policyWizard = policyWizardList.get(i);
+			policyArray[i] = policyWizard.getXACML();
+			idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
+			tagAndValueArray[i] = policyWizard.getTagAndValue();
+			TypeStringUtils.releaseUnnecessaryMemory(policyWizard);
+			policyWizard = null;
+		}
+		
+		log.debug("Inserting actions into position: " + position);
+
+		String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(position, targetId, idPrefixArray,
+			policyArray);
+
+		for (int i = 0; i < size; i++) {
+			String policyId = policyIdArray[i];
+			String tagAndValue = tagAndValueArray[i];
+
+			if (policyId == null) {
+				System.out.println(String.format("Error policy not added: %s", tagAndValue));
+				result = false;
+				continue;
+			}
+
+			if (verboseMode) {
+				System.out.println(String.format("Added policy: %s (id=%s)", tagAndValue, policyId));
+			}
+		}
+
+		if (verboseMode) {
+			System.out.println();
+		}
+		return result;
+	}
+
+	@SuppressWarnings("static-access")
 	@Override
 	protected Options defineCommandOptions() {
-		return null;
+		Options options = new Options();
+        options.addOption(OptionBuilder.hasArg(false)
+        	                           .withDescription(OPT_MOVEAFTER_DESCRIPTION)
+                                       .withLongOpt(OPT_MOVEAFTER_LONG)
+                                       .create(OPT_MOVEAFTER));
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_PIVOT_DESCRIPTION)
+                                       .withLongOpt(OPT_PIVOT_LONG)
+                                       .create(OPT_PIVOT));
+        return options;
 	}
 
 	@Override
@@ -118,52 +245,60 @@ public class AddPolicies extends PolicyManagementCLI {
 			RemoteException {
 		String[] args = commandLine.getArgs();
 
-		if (args.length < 2)
-			throw new ParseException("No input files defined.");
-
-		for (int i = 1; i < args.length; i++) {
-			File file = new File(args[i]);
-			if (!file.exists())
-				throw new ParseException("File not found: " + file.getAbsolutePath());
+		if ((args.length < 2) || (args.length > 3)) {
+			throw new ParseException("Wrong number of arguments.");
 		}
-
-		boolean partialSuccess = false;
-		boolean failure = false;
-
-		for (int i = 1; i < args.length; i++) {
-
-			String fileName = args[i];
-
-			try {
-
-				boolean result = addPolicies(fileName);
-
-				if (result == true) {
-					partialSuccess = true;
-
-					if (verboseMode) {
-						System.out.println("Success: policies has been added from file " + fileName);
-					}
-				} else {
-					System.out.println("Error addind policies from file " + fileName);
-					failure = true;
-				}
-
-			} catch (EncodingException e) {
-				failure = true;
-				System.out.println("Syntax error. Skipping file (no policies has been added):" + fileName);
-				System.out.println(e.getMessage());
-				continue;
-			}
+		
+		if (commandLine.hasOption(OPT_PIVOT)) {
+            pivotId = commandLine.getOptionValue(OPT_PIVOT);
 		}
+		
+		if ((args.length == 3)) {
+			targetId = args[2];
+		}
+		
+		if (commandLine.hasOption(OPT_MOVEAFTER)) {
+            moveAfter = true;
+        }
+		
+		log.debug("args.lengh=" + args.length);
+		log.debug("targetId=" + targetId);
+		log.debug("pivotId=" + pivotId);
+		log.debug("moveAfter=" + moveAfter);
 
-		if (failure && !partialSuccess)
+		File file = new File(args[1]);
+
+		XACMLPolicyCLIUtils.initOpenSAML();
+		
+		try {
+			xacmlWizardList = policyFileEncoder.parse(file);
+		} catch (EncodingException e) {
+			System.out.println("Syntax error no policies has been added from file:" + file.getAbsolutePath());
+			System.out.println("Reason:");
+			System.out.println(e.getMessage());
 			return ExitStatus.FAILURE.ordinal();
-
-		if (failure && partialSuccess)
-			return ExitStatus.PARTIAL_SUCCESS.ordinal();
-
+		}
+		
+		if (xacmlWizardList.isEmpty()) {
+			System.out.println("No policies defined in the give file");
+			return ExitStatus.FAILURE.ordinal();
+		}
+		
+		boolean result;
+		
+		if (xacmlWizardList.get(0) instanceof PolicySetWizard) {
+			result = addResources();
+		} else {
+			result = addActions();
+		}
+		
+		if (result == true) {
+			if (verboseMode) {
+				System.out.println("Success: policies has been added from file " + file.getAbsolutePath());
+			}
+		} else {
+			return ExitStatus.FAILURE.ordinal();
+		}
 		return ExitStatus.SUCCESS.ordinal();
-
 	}
 }

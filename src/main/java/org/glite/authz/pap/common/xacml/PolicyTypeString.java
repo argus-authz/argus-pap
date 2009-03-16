@@ -213,7 +213,7 @@ public class PolicyTypeString implements PolicyType {
 	public synchronized void releaseDOM() {
 		if (policy != null) {
 			initPolicyStringIfNotSet();
-			log.debug("Invalidating policyType");
+			log.trace("Invalidating policyType");
 			policy.releaseChildrenDOM(true);
 			policy.releaseDOM();
 			policy = null;
@@ -329,7 +329,7 @@ public class PolicyTypeString implements PolicyType {
 
 	private void initPolicyStringIfNotSet() {
 		if (policyString == null) {
-			log.debug("Initializing policyString");
+			log.trace("Initializing policyString");
 			policyString = PolicyHelper.toString(policy);
 			policyId = policy.getPolicyId();
 		} else {
@@ -339,7 +339,7 @@ public class PolicyTypeString implements PolicyType {
 
 	private synchronized void initPolicyTypeIfNotSet() {
 		if (policy == null) {
-			log.debug("Initializing policyType");
+			log.trace("Initializing policyType");
 			policy = PolicyHelper.getInstance().buildFromString(policyString);
 			policyId = policy.getPolicyId();
 		} else {
@@ -348,12 +348,12 @@ public class PolicyTypeString implements PolicyType {
 	}
 
 	private void invalidatePolicyId() {
-		log.debug("Invalidating policyId");
+		log.trace("Invalidating policyId");
 		policyId = null;
 	}
 
 	private void invalidatePolicyString() {
-		log.debug("Invalidating policyString");
+		log.trace("Invalidating policyString");
 		policyString = null;
 	}
 }

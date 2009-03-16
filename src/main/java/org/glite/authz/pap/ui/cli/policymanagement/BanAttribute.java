@@ -6,47 +6,24 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 
 public class BanAttribute extends PolicyManagementCLI {
 
-    private static String[] COMMAND_NAME_VALUES_DN = { "ban-user", "bu" };
-    private static String[] COMMAND_NAME_VALUES_FQAN = { "ban-fqan", "bf" };
-    private static String DESCRIPTION_DN = "Ban a DN. By default the DN is bannen for all resources and actions (i.e. \"*\"). "
-            + "Specify a resource or an action (using the options listed below) if you want to reduce the scope of the ban.";
-    private static String DESCRIPTION_FQAN = "Ban a FQAN. By default the FQAN is bannen for all resources and actions (i.e. \"*\"). "
-            + "Specify a resource or an action (using the options listed below) if you want to reduce the scope of the ban.";
-    private static String OPT_ACTION = "a";
-    private static String OPT_ACTION_DESCRIPTION = "Specify an action value.";
-    private static String OPT_ACTION_LONG = "action";
-    private static String OPT_RESOURCE = "r";
+    private static String[] COMMAND_NAME_VALUES = { "ban", "b" };
+    private static String DESCRIPTION = "Ban an attribute. The attribute id is any of the attribute ids that can be specified in the " +
+    		"simplified policy language. By default the attribute is bannen for resource and action \"*\". "
+            + "Specify a resource or an action (using options --" + OPT_RESOURCE_LONG + " and --" + OPT_ACTION_LONG
+            + ") if you want to reduce the scope of the ban.";
+    private static String USAGE = "<id> <value> [options]";
 
-    private static String OPT_RESOURCE_DESCRIPTION = "Specify a resource value.";
-    private static String OPT_RESOURCE_LONG = "resource";
-    private static String USAGE_DN = "<dn> [options]";
-    private static String USAGE_FQAN = "<fqan> [options]";
-
-    private AttributeWizardType attributeToDeny;
-
-    private BanAttribute(String[] commandNameValues, String usage, String description, String longDescription,
-            AttributeWizardType awt) {
-        super(commandNameValues, usage, description, longDescription);
-        attributeToDeny = awt;
-    }
-
-    public static BanAttribute dn() {
-        return new BanAttribute(COMMAND_NAME_VALUES_DN, USAGE_DN, DESCRIPTION_DN, null, AttributeWizardType.DN);
-    }
-
-    public static BanAttribute fqan() {
-        return new BanAttribute(COMMAND_NAME_VALUES_FQAN, USAGE_FQAN, DESCRIPTION_FQAN, null, AttributeWizardType.FQAN);
+    public BanAttribute() {
+        super(COMMAND_NAME_VALUES, USAGE, DESCRIPTION, null);
     }
 
     @SuppressWarnings("static-access")
     @Override
     protected Options defineCommandOptions() {
         Options options = new Options();
-
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription("Set the policy as public (default)")
                                        .withLongOpt(OPT_PUBLIC_LONG)
@@ -63,7 +40,6 @@ public class BanAttribute extends PolicyManagementCLI {
                                        .withDescription(OPT_RESOURCE_DESCRIPTION)
                                        .withLongOpt(OPT_RESOURCE_LONG)
                                        .create(OPT_RESOURCE));
-
         return options;
     }
 
@@ -72,14 +48,17 @@ public class BanAttribute extends PolicyManagementCLI {
 
         String[] args = commandLine.getArgs();
 
-        if (args.length != 2)
+        if (args.length != 3) {
             throw new ParseException("Wrong number of arguments");
+        }
 
-        String attributeValue = args[1];
+        String id = args[1];
+        String value = args[2];
 
         boolean isPublic = true;
-        if (commandLine.hasOption(OPT_PRIVATE_LONG))
+        if (commandLine.hasOption(OPT_PRIVATE_LONG)) {
             isPublic = false;
+        }
 
         String resource = null;
         String action = null;
@@ -97,26 +76,20 @@ public class BanAttribute extends PolicyManagementCLI {
         }
 
         if (verboseMode) {
-            System.out.print("Adding policy... ");
+            System.out.print("Adding deny rule... ");
         }
 
         String policyId = null;
 
-        if (AttributeWizardType.DN.equals(attributeToDeny)) {
-            policyId = highlevelPolicyMgmtClient.banDN(attributeValue, resource, action, isPublic);
-        } else {
-            policyId = highlevelPolicyMgmtClient.banFQAN(attributeValue, resource, action, isPublic);
-        }
+        policyId = highlevelPolicyMgmtClient.ban(id, value, resource, action, isPublic);
 
         if (policyId == null) {
-            printOutputMessage(String.format("ban rule already exists"));
+            printOutputMessage(String.format("error (ban rule already exists)."));
         } else {
             if (verboseMode) {
-                System.out.println("ok (id=" + policyId + ")");
+                System.out.println("ok");
             }
         }
-
         return ExitStatus.SUCCESS.ordinal();
     }
-
 }

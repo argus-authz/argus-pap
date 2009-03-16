@@ -7,6 +7,7 @@ import org.glite.authz.pap.authz.policymanagement.AddPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPAPPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPAPPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.GetPAPRootPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.HasPolicyOperation;
@@ -90,6 +91,19 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             return GetPAPPolicyOperation.instance(papAlias, policyId).execute();
+
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
+    
+    public PolicySetType getPAPRootPolicySet(String papAlias) throws RemoteException {
+        log.info(String.format("getPAPPolicySet(\"%s\");", papAlias));
+
+        try {
+
+            return GetPAPRootPolicySetOperation.instance(papAlias).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

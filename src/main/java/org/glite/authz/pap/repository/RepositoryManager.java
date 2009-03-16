@@ -13,14 +13,16 @@ import org.glite.authz.pap.encoder.EncodingException;
 import org.glite.authz.pap.encoder.PolicyFileEncoder;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager;
+import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class RepositoryManager {
 
-    private static final Logger log = LoggerFactory.getLogger(RepositoryManager.class);
+	public static final String REPOSITORY_VERSION = "1";
     private static boolean initialized = false;
+    private static final Logger log = LoggerFactory.getLogger(RepositoryManager.class);
 
     protected RepositoryManager() {}
 
@@ -31,13 +33,25 @@ public abstract class RepositoryManager {
     public static void bootstrap() {
 
         FileSystemRepositoryManager.initialize();
+        
+        String repositoryVersion = FileSystemRepositoryManager.getVersion();
+        
+        if (!(REPOSITORY_VERSION.equals(repositoryVersion))) {
+        	throw new InvalidVersionException("Invalid repository version (v" + repositoryVersion
+        		+ "). Requested version is v" + REPOSITORY_VERSION);
+		}
 
+		log.info("Repository version: v" + repositoryVersion);
+		
         initialized = true;
-
     }
-
+    
     public static DAOFactory getDAOFactory() {
         return DAOFactory.getDAOFactory();
+    }
+
+    public static String getVersion() {
+    	return REPOSITORY_VERSION;
     }
 
     /**

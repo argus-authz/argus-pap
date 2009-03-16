@@ -8,14 +8,16 @@ public interface PAPDAO {
 
     public void delete(String papAlias);
 
-    public List<PAP> getAll();
-
-    public String[] getAllAliases();
+    public boolean exists(String papAlias);
 
     public PAP get(String papAlias);
 
-    public boolean exists(String papAlias);
-
+    public List<PAP> getAll();
+    
+    public String[] getAllAliases();
+    
+    public String getVersion();
+    
     public void store(PAP pap);
 
     public void update(PAP pap);

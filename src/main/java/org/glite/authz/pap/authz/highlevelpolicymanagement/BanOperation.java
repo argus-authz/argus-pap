@@ -39,72 +39,71 @@ public class BanOperation extends BasePAPOperation<String> {
     }
 
     protected String doExecute() {
-        synchronized (PAPContainer.addOperationLock) {
 
-            boolean policySetNeedToBeSaved = true;
-            boolean updateOperationForPolicySet = false;
-            boolean updateOperationForPolicy = false;
-            PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+		boolean policySetNeedToBeSaved = true;
+		boolean updateOperationForPolicySet = false;
+		boolean updateOperationForPolicy = false;
+		PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
 
-            PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
+		PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
 
-            if (targetPolicySet == null) {
-                targetPolicySet = (new PolicySetWizard(resourceAttributeWizard)).getXACML();
-            } else {
-                updateOperationForPolicySet = true;
-            }
+		if (targetPolicySet == null) {
+			targetPolicySet = (new PolicySetWizard(resourceAttributeWizard)).getXACML();
+		} else {
+			updateOperationForPolicySet = true;
+		}
 
-            String policyId = null;
+		String policyId = null;
 
-            PolicyWizard targetPolicyWizard;
-            PolicyType candidatePolicy = getTargetPolicy(localPAP, targetPolicySet);
+		PolicyWizard targetPolicyWizard;
+		PolicyType candidatePolicy = getTargetPolicy(localPAP, targetPolicySet);
 
-            if (candidatePolicy == null) {
-                targetPolicyWizard = new PolicyWizard(actionAttributeWizard);
-                targetPolicyWizard.setPrivate(!isPublic);
-                policyId = targetPolicyWizard.getPolicyId();
-                PolicySetHelper.addPolicyReference(targetPolicySet, 0, policyId);
-            } else {
-                targetPolicyWizard = new PolicyWizard(candidatePolicy);
+		if (candidatePolicy == null) {
+			targetPolicyWizard = new PolicyWizard(actionAttributeWizard);
+			targetPolicyWizard.setPrivate(!isPublic);
+			policyId = targetPolicyWizard.getPolicyId();
+			PolicySetHelper.addPolicyReference(targetPolicySet, 0, policyId);
+		} else {
+			targetPolicyWizard = new PolicyWizard(candidatePolicy);
 
-                if (targetPolicyWizard.denyRuleForAttributeExists(banAttributeWizard)) {
-                    // ban policy already exists
-                    return null;
-                }
-                policyId = candidatePolicy.getPolicyId();
-                updateOperationForPolicy = true;
-                policySetNeedToBeSaved = false;
-            }
+			if (targetPolicyWizard.denyRuleForAttributeExists(banAttributeWizard)) {
+				// ban policy already exists
+				return null;
+			}
+			policyId = candidatePolicy.getPolicyId();
+			updateOperationForPolicy = true;
+			policySetNeedToBeSaved = false;
+		}
 
-            targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
+		targetPolicyWizard.addRule(0, banAttributeWizard, EffectType.Deny);
 
-            // Store the ban policy and the policy set in which it is contained (only if needed)
-            if (policySetNeedToBeSaved) {
-                if (updateOperationForPolicySet) {
-                    String oldVersion = targetPolicySet.getVersion();
-                    PolicySetWizard.increaseVersion(targetPolicySet);
-                    localPAP.updatePolicySet(oldVersion, targetPolicySet);
-                } else {
-                    localPAP.addPolicySet(0, targetPolicySet);
-                }
-            } else {
-                TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
-            }
+		// Store the ban policy and the policy set in which it is contained
+		// (only if needed)
+		if (policySetNeedToBeSaved) {
+			if (updateOperationForPolicySet) {
+				String oldVersion = targetPolicySet.getVersion();
+				PolicySetWizard.increaseVersion(targetPolicySet);
+				localPAP.updatePolicySet(oldVersion, targetPolicySet);
+			} else {
+				localPAP.addPolicySet(0, targetPolicySet);
+			}
+		} else {
+			TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
+		}
 
-            if (updateOperationForPolicy) {
-                String oldVersion = targetPolicyWizard.getVersionString();
-                targetPolicyWizard.increaseVersion();
-                localPAP.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
-            } else {
-                localPAP.storePolicy(targetPolicyWizard.getXACML());
-            }
+		if (updateOperationForPolicy) {
+			String oldVersion = targetPolicyWizard.getVersionString();
+			targetPolicyWizard.increaseVersion();
+			localPAP.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
+		} else {
+			localPAP.storePolicy(targetPolicyWizard.getXACML());
+		}
 
-            targetPolicyWizard.releaseChildrenDOM();
-            targetPolicyWizard.releaseDOM();
+		targetPolicyWizard.releaseChildrenDOM();
+		targetPolicyWizard.releaseDOM();
 
-            return policyId;
-        }
-    }
+		return policyId;
+	}
 
     @Override
     protected void setupPermissions() {

@@ -11,6 +11,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
@@ -20,14 +21,15 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemPAPDAO implements PAPDAO {
 
+    private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
+
+    private static FileSystemPAPDAO instance = null;
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(FileSystemPAPDAO.class);
 
-    private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
-    private static FileSystemPAPDAO instance = null;
-
     private static final String PAP_FILE_NAME = "pap_info.ini";
     private static final String REMOTE_PAP_STANZA = "remote-paps";
+    private static final String VERSION_KEY = "general-info.version";
 
     private INIConfiguration papsINIFile;
 
@@ -40,8 +42,11 @@ public class FileSystemPAPDAO implements PAPDAO {
 
         try {
 
-            if (!iniPAPConfigurationFile.exists())
+            if (!iniPAPConfigurationFile.exists()) {
+            	papsINIFile.setProperty(VERSION_KEY, RepositoryManager.REPOSITORY_VERSION);
                 papsINIFile.save();
+                papsINIFile.clearProperty(VERSION_KEY);
+            }
 
             papsINIFile.load();
         } catch (ConfigurationException e) {
@@ -175,6 +180,10 @@ public class FileSystemPAPDAO implements PAPDAO {
         return aliasArray;
     }
 
+    public String getVersion() {
+		return papsINIFile.getString(VERSION_KEY);
+	}
+
     public void store(PAP pap) {
 
         String papAlias = pap.getAlias();
@@ -287,7 +296,7 @@ public class FileSystemPAPDAO implements PAPDAO {
         }
     }
 
-    private void setPAPProperties(PAP pap) {
+	private void setPAPProperties(PAP pap) {
 
         String papAlias = pap.getAlias();
 

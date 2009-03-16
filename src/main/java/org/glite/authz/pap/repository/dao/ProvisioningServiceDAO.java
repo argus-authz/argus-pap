@@ -3,13 +3,13 @@ package org.glite.authz.pap.repository.dao;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -45,12 +45,10 @@ public class ProvisioningServiceDAO {
 
         List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
 
-        boolean useRootPolicySet = !(publicPAPContainerList.isEmpty());
-
         PolicySetType rootPolicySet = makeRootPolicySet();
+        resultList.add(rootPolicySet);
 
-        if (useRootPolicySet) {
-            resultList.add(rootPolicySet);
+        if (!(publicPAPContainerList.isEmpty())) {
             papContainerList.addAll(publicPAPContainerList);
         }
 
@@ -58,9 +56,8 @@ public class ProvisioningServiceDAO {
 
             String papId = papContainer.getPAP().getPapId();
 
-            if (useRootPolicySet) {
-                PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
-            }
+            PolicySetHelper.addPolicySetReference(rootPolicySet, papId);
+
             resultList.addAll(getPublic(papContainer));
         }
 
@@ -211,8 +208,10 @@ public class ProvisioningServiceDAO {
     }
 
     private PolicySetType makeRootPolicySet() {
-        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget("RootPolicySet_" + PAP.LOCAL_PAP_ALIAS,
+    	String rootPolicySetId = "root-" + PAPManager.getInstance().getLocalPAP().getPapId();
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(rootPolicySetId,
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        rootPolicySet.setVersion(RepositoryManager.getVersion());
         return rootPolicySet;
     }
 }

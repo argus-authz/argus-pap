@@ -101,7 +101,7 @@ public class ListPolicies extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_IDS_DESCRIPTION).withLongOpt(OPT_SHOW_IDS_LONG)
                 .create(OPT_SHOW_IDS));
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_SHOW_RULES_ID_DESCRIPTION).withLongOpt(OPT_SHOW_RULES_ID_LONG)
-                .create());
+                .create(OPT_SHOW_RULES_ID));
         options.addOption(OptionBuilder.hasArg(false).withDescription(OPT_LIST_ONE_BY_ONE_DESCRIPTION).withLongOpt(
                 OPT_LIST_ONE_BY_ONE_LONG).create(OPT_LIST_ONE_BY_ONE));
 

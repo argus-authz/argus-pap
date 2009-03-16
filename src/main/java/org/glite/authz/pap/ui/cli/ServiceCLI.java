@@ -40,7 +40,7 @@ public abstract class ServiceCLI {
     
     private static final String OPT_HOST = "host";
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). " +
-    		"This option defines the PAP endpoint to be contacted as follows: https://hostname:port/pap/services";
+    		"This option defines the PAP endpoint to be contacted as follows: https://arg:port/pap/services";
     private static final String OPT_HOST_LONG = "host";
     
     private static final String OPT_KEY = "key";
@@ -183,6 +183,7 @@ public abstract class ServiceCLI {
     public void printHelpMessage(PrintWriter pw) {
         String syntax = commandNameValues[0] + " " + usageText;
         
+        pw.println();
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), syntax);
         
         if (descriptionText != null) {

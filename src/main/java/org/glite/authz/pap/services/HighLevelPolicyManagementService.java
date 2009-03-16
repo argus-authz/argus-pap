@@ -7,6 +7,7 @@ import org.glite.authz.pap.authz.highlevelpolicymanagement.EraseRepositoryOperat
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
+import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.slf4j.Logger;
@@ -16,43 +17,30 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     private static final Logger log = LoggerFactory.getLogger(HighLevelPolicyManagementService.class);
 
-    public String banDN(String dn, String resource, String action, boolean isPublic) throws RemoteException {
-        log.info(String.format("Received banDN(dn=\"%s\", resource=\"%s\", action=\"%s\", isPublic=%s);",
-                               dn,
+    public String ban(String id, String value, String resource, String action, boolean isPublic) throws RemoteException {
+        log.info(String.format("Received ban(id=\"%s\" value=\"%s\", resource=\"%s\", action=\"%s\", isPublic=%s);",
+        					   id,
+                               value,
                                resource,
                                action,
                                String.valueOf(isPublic)));
         try {
 
-            AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.DN, dn);
+            AttributeWizard banAttributeWizard = new AttributeWizard(id, value);
             AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, resource);
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, action);
 
-            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic).execute();
+            synchronized (PAPContainer.addOperationLock) {
+				return BanOperation.instance(banAttributeWizard, resourceAttributeWizard,
+					actionAttributeWizard, isPublic).execute();
+			}
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
             throw e;
         }
     }
-
-    public String banFQAN(String fqan, String resource, String action, boolean isPublic) throws RemoteException {
-        log.info(String.format("Received banFQAN(fqan=\"%s\", isPublic=%s);", fqan, String.valueOf(isPublic)));
-
-        try {
-
-            AttributeWizard banAttributeWizard = new AttributeWizard(AttributeWizardType.FQAN, fqan);
-            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, resource);
-            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, action);
-
-            return BanOperation.instance(banAttributeWizard, resourceAttributeWizard, actionAttributeWizard, isPublic).execute();
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
-        }
-    }
-
+    
     public void eraseRepository() throws RemoteException {
         log.info("Received eraseRepository();");
 
@@ -66,33 +54,22 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         }
     }
 
-    public synchronized UnbanResult unbanDN(String dn) throws RemoteException {
-        log.info(String.format("Received unbanDN(\"%s\");", dn));
-
+    public UnbanResult unban(String id, String value, String resource, String action) throws RemoteException {
+        log.info(String.format("Received unban(id=\"%s\" value=\"%s\", resource=\"%s\", action=\"%s\");",
+        					   id,
+                               value,
+                               resource,
+                               action));
         try {
 
-            AttributeWizard bannedAttributeWizard = new AttributeWizard(AttributeWizardType.DN, dn);
-            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
-            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
+            AttributeWizard bannedAttributeWizard = new AttributeWizard(id, value);
+            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, resource);
+            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, action);
 
-            return UnbanOperation.instance(bannedAttributeWizard, resourceAttributeWizard, actionAttributeWizard).execute();
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
-        }
-    }
-
-    public synchronized UnbanResult unbanFQAN(String fqan) throws RemoteException {
-        log.info(String.format("Received unbanFQAN(\"%s\");", fqan));
-
-        try {
-
-            AttributeWizard bannedAttributeWizard = new AttributeWizard(AttributeWizardType.FQAN, fqan);
-            AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardType.RESOURCE_PS, "*");
-            AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, "*");
-
-            return UnbanOperation.instance(bannedAttributeWizard, resourceAttributeWizard, actionAttributeWizard).execute();
+            synchronized (PAPContainer.addOperationLock) {
+				return UnbanOperation.instance(bannedAttributeWizard, resourceAttributeWizard,
+					actionAttributeWizard).execute();
+			}
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
