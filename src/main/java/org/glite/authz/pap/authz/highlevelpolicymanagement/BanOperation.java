@@ -88,7 +88,7 @@ public class BanOperation extends BasePAPOperation<String> {
 				localPAP.addPolicySet(0, targetPolicySet);
 			}
 		} else {
-			TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
+			TypeStringUtils.releaseUnneededMemory(targetPolicySet);
 		}
 
 		if (updateOperationForPolicy) {
@@ -145,7 +145,7 @@ public class BanOperation extends BasePAPOperation<String> {
 
         List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(papRootPolicySet);
 
-        TypeStringUtils.releaseUnnecessaryMemory(papRootPolicySet);
+        TypeStringUtils.releaseUnneededMemory(papRootPolicySet);
 
         if (policySetIdList.size() == 0) {
             return null;

@@ -65,7 +65,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 		}
 		
 		PolicyWizard policyWizard = new PolicyWizard(targetPolicy);
-		TypeStringUtils.releaseUnnecessaryMemory(targetPolicy);
+		TypeStringUtils.releaseUnneededMemory(targetPolicy);
 
 		if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
 
@@ -95,7 +95,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
     private PolicyType getTargetPolicy(PAPContainer papContainer, PolicySetType targetPolicySet) {
     	
 		List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
-		TypeStringUtils.releaseUnnecessaryMemory(targetPolicySet);
+		TypeStringUtils.releaseUnneededMemory(targetPolicySet);
 
 		TargetWizard policyTargetWizard = new TargetWizard(actionAttributeWizard);
 		
@@ -106,7 +106,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 			if (policyTargetWizard.isEquivalent(repositoryPolicy.getTarget())) {
 				return repositoryPolicy;
 			}
-			TypeStringUtils.releaseUnnecessaryMemory(repositoryPolicy);
+			TypeStringUtils.releaseUnneededMemory(repositoryPolicy);
 		}
 		return null;
     }
@@ -121,7 +121,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
         List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(rootPAPPolicySet);
 
-        TypeStringUtils.releaseUnnecessaryMemory(rootPAPPolicySet);
+        TypeStringUtils.releaseUnneededMemory(rootPAPPolicySet);
 
         for (String policySetId : policySetIdList) {
             
@@ -131,7 +131,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
                 targetPolicySetList.add(policySet);
             }
             
-            TypeStringUtils.releaseUnnecessaryMemory(policySet);
+            TypeStringUtils.releaseUnneededMemory(policySet);
         }
         return targetPolicySetList;
     }

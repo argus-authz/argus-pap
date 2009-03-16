@@ -62,7 +62,7 @@ public class TypeStringUtils {
 		return new PolicyTypeString(policy);
 	}
 	
-	public static void releaseUnnecessaryMemory(Object object) {
+	public static void releaseUnneededMemory(Object object) {
 	    
     	if (object instanceof PolicyTypeString) {
     	    

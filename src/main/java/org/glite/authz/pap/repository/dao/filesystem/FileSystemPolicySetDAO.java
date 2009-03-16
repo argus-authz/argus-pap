@@ -273,7 +273,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
                               oldPolicySet.getVersion()));
         }
 
-        TypeStringUtils.releaseUnnecessaryMemory(oldPolicySetString);
+        TypeStringUtils.releaseUnneededMemory(oldPolicySetString);
 
         PolicySetHelper.toFile(policySetFile, newPolicySet);
 

@@ -114,7 +114,7 @@ public class DistributionModule extends Thread {
                                                 pap.getAlias(),
                                                 pap.getEndpoint()));
                     }
-                    TypeStringUtils.releaseUnnecessaryMemory(xacmlObject);
+                    TypeStringUtils.releaseUnneededMemory(xacmlObject);
                 }
             } else {
                 log.error(String.format("The root of the policy tree is not a PolicySet (papAlias=%s, endpoint=%s)",

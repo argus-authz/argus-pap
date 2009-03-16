@@ -91,14 +91,14 @@ public class ProvisioningServiceDAO {
 
                 PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
 
-                TypeStringUtils.releaseUnnecessaryMemory(papPolicySetNoReferences);
+                TypeStringUtils.releaseUnneededMemory(papPolicySetNoReferences);
 
             } catch (NotFoundException e) {
                 continue;
             }
         }
 
-        TypeStringUtils.releaseUnnecessaryMemory(rootPolicySet);
+        TypeStringUtils.releaseUnneededMemory(rootPolicySet);
 
         log.debug("PDP query executed: retrieved " + resultList.size() + " elements (Policy/PolicySet)");
 
@@ -117,7 +117,7 @@ public class ProvisioningServiceDAO {
 
             PolicySetHelper.addPolicySet(policySetNoRef, childPolicySetNoRef);
 
-            TypeStringUtils.releaseUnnecessaryMemory(childPolicySetNoRef);
+            TypeStringUtils.releaseUnneededMemory(childPolicySetNoRef);
 
             PolicySetHelper.deletePolicySetReference(policySetNoRef, childPolicySetId);
         }
@@ -130,7 +130,7 @@ public class ProvisioningServiceDAO {
 
             PolicySetHelper.addPolicy(policySetNoRef, policy);
 
-            TypeStringUtils.releaseUnnecessaryMemory(policy);
+            TypeStringUtils.releaseUnneededMemory(policy);
 
             PolicySetHelper.deletePolicyReference(policySetNoRef, policyIdReference);
         }
@@ -155,7 +155,7 @@ public class ProvisioningServiceDAO {
         for (PolicyType policy : policyList) {
             String policyId = policy.getPolicyId();
 
-            TypeStringUtils.releaseUnnecessaryMemory(policy);
+            TypeStringUtils.releaseUnneededMemory(policy);
 
             if (PolicyWizard.isPublic(policyId)) {
                 resultPolicyList.add(policy);
@@ -175,7 +175,7 @@ public class ProvisioningServiceDAO {
 
         if (removedAtLeastOnePrivatePolicy) {
             for (PolicySetType policySet : resultPolicySetList) {
-                TypeStringUtils.releaseUnnecessaryMemory(policySet);
+                TypeStringUtils.releaseUnneededMemory(policySet);
             }
         }
 

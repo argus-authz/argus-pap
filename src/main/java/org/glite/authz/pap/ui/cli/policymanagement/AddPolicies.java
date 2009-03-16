@@ -172,7 +172,7 @@ private boolean addActions() throws RemoteException {
 
 		if (pivotId != null) {
 			position = PolicySetHelper.getPolicyIdReferenceIndex(targetolicySet, pivotId);
-			TypeStringUtils.releaseUnnecessaryMemory(targetolicySet);
+			TypeStringUtils.releaseUnneededMemory(targetolicySet);
 			if (position == -1) {
 				System.out.println("Pivot id \"" + pivotId + "\" not found inside resource id \"" + targetId
 						+ "\".");
@@ -195,7 +195,7 @@ private boolean addActions() throws RemoteException {
 			policyArray[i] = policyWizard.getXACML();
 			idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
 			tagAndValueArray[i] = policyWizard.getTagAndValue();
-			TypeStringUtils.releaseUnnecessaryMemory(policyWizard);
+			TypeStringUtils.releaseUnneededMemory(policyWizard);
 			policyWizard = null;
 		}
 		

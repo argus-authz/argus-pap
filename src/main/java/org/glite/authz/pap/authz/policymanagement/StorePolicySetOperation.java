@@ -36,7 +36,7 @@ public class StorePolicySetOperation extends BasePAPOperation <String>{
         
         localPAP.storePolicySet(policySet);
         
-        TypeStringUtils.releaseUnnecessaryMemory(policySet);
+        TypeStringUtils.releaseUnneededMemory(policySet);
         
         return policySetId;
     }

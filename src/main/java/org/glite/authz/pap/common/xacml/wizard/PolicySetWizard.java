@@ -115,8 +115,8 @@ public class PolicySetWizard extends XACMLWizard {
                 if (policySetIdReference.equals(childPolicySet.getPolicySetId())) {
                     PolicySetWizard psw = new PolicySetWizard(childPolicySet, policyWizardList, childPolicySetList);
                     policySetWizardList.add(psw);
-                    TypeStringUtils.releaseUnnecessaryMemory(psw);
-                    TypeStringUtils.releaseUnnecessaryMemory(childPolicySet);
+                    TypeStringUtils.releaseUnneededMemory(psw);
+                    TypeStringUtils.releaseUnneededMemory(childPolicySet);
                     found = true;
                 }
             }

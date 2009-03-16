@@ -16,21 +16,21 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
     private int curPos = 0;
     private boolean getAllPoliciesInOnce;
     private boolean initialized = false;
-    private String papId = null;
+    private String papAlias = null;
     private PolicyType[] policyArray = null;
     private String[] policyIdsArray = null;
     private PolicySetType[] policySetArray = null;
 
     private XACMLPolicyManagement xacmlPolicyMgmtClient;
 
-    public PAPPolicyIterator(XACMLPolicyManagement xacmlPolicyMgmtClient, String papId, boolean getPoliciesOneByOne) {
+    public PAPPolicyIterator(XACMLPolicyManagement xacmlPolicyMgmtClient, String papAlias, boolean getPoliciesOneByOne) {
 
         this.xacmlPolicyMgmtClient = xacmlPolicyMgmtClient;
         getAllPoliciesInOnce = !getPoliciesOneByOne;
 
-        if (papId != null) {
-            if (papId.length() > 0) {
-                this.papId = papId;
+        if (papAlias != null) {
+            if (papAlias.length() > 0) {
+                this.papAlias = papAlias;
             }
         }
 
@@ -122,10 +122,10 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
             policy = policyArray[curPos];
         } else {
             try {
-                if (papId == null)
+                if (papAlias == null)
                     policy = xacmlPolicyMgmtClient.getPolicy(policyIdsArray[curPos]);
                 else {
-                    policy = xacmlPolicyMgmtClient.getPAPPolicy(papId, policyIdsArray[curPos]);
+                    policy = xacmlPolicyMgmtClient.getPAPPolicy(papAlias, policyIdsArray[curPos]);
                 }
             } catch (RemoteException e) {
                 log.error("Cannot retrive policy \"" + policyIdsArray[curPos] + "\"");
@@ -145,13 +145,13 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
 
     private void readAllPolicies() throws RemoteException {
 
-        if (papId == null) {
+        if (papAlias == null) {
             policyArray = xacmlPolicyMgmtClient.listPolicies();
             policySetArray = xacmlPolicyMgmtClient.listPolicySets();
         }
         else {
-            policyArray = xacmlPolicyMgmtClient.listPAPPolicies(papId);
-            policySetArray = xacmlPolicyMgmtClient.listPAPPolicySets(papId);
+            policyArray = xacmlPolicyMgmtClient.listPAPPolicies(papAlias);
+            policySetArray = xacmlPolicyMgmtClient.listPAPPolicySets(papAlias);
         }
 
     }
@@ -159,10 +159,10 @@ public class PAPPolicyIterator implements Iterator<PolicyType> {
     private void readPolicyIds() throws RemoteException {
         PolicySetType[] policySetArray;
 
-        if (papId == null)
+        if (papAlias == null)
             policySetArray = xacmlPolicyMgmtClient.listPolicySets();
         else
-            policySetArray = xacmlPolicyMgmtClient.listPAPPolicySets(papId);
+            policySetArray = xacmlPolicyMgmtClient.listPAPPolicySets(papAlias);
 
         int npolicy = 0;
         for (PolicySetType policySet : policySetArray) {

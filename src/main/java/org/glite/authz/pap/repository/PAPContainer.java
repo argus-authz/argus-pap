@@ -73,7 +73,7 @@ public class PAPContainer {
             throw e;
         }
 
-        TypeStringUtils.releaseUnnecessaryMemory(policySet);
+        TypeStringUtils.releaseUnneededMemory(policySet);
 
         updatePAPPolicyLastModificationTime();
 
@@ -108,7 +108,7 @@ public class PAPContainer {
             throw e;
         }
 
-        TypeStringUtils.releaseUnnecessaryMemory(rootPolicySet);
+        TypeStringUtils.releaseUnneededMemory(rootPolicySet);
 
         updatePAPPolicyLastModificationTime();
     }
@@ -207,7 +207,7 @@ public class PAPContainer {
 
                 policySetDAO.update(papId, oldVersion, policySet);
 
-                TypeStringUtils.releaseUnnecessaryMemory(policySet);
+                TypeStringUtils.releaseUnneededMemory(policySet);
             }
         }
 
@@ -238,7 +238,7 @@ public class PAPContainer {
 
             policySetDAO.update(papId, oldVersion, rootPolicySet);
             
-            TypeStringUtils.releaseUnnecessaryMemory(rootPolicySet);
+            TypeStringUtils.releaseUnneededMemory(rootPolicySet);
         }
 
         PolicySetType policySet = policySetDAO.getById(papId, policySetId);
@@ -246,7 +246,7 @@ public class PAPContainer {
 
         List<String> idList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
         
-        TypeStringUtils.releaseUnnecessaryMemory(policySet);
+        TypeStringUtils.releaseUnneededMemory(policySet);
         
         for (String policyId : idList) {
             policyDAO.delete(papId, policyId);

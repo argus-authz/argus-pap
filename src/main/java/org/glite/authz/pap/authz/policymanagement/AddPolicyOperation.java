@@ -42,7 +42,7 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
 
         localPAP.addPolicy(index, policySetId, policy);
 
-        TypeStringUtils.releaseUnnecessaryMemory(policy);
+        TypeStringUtils.releaseUnneededMemory(policy);
 
         log.info(String.format("Added policy (policyId=\"%s\")", policyId));
 
