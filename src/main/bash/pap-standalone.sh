@@ -70,6 +70,19 @@ status(){
 		fi
 	else
 		return 1
+		## No PID file found, check that there is no PAP running 
+		## without PID...
+		pid=`ps -efww | grep 'java.*PAPServer' | grep -v grep | awk '{print $2}'`
+		if [ -z $pid ]; then
+			return 1
+		else
+			echo "A PAP is running, but no pid file found! Will recreate the pid file"
+			echo $pid > $PAP_RUN_FILE
+			if [ $? -ne 0 ]; then
+				failure "Error creating pid file for running PAP!"
+			fi
+			return 0
+		fi
 	fi
 }
 
@@ -107,8 +120,7 @@ start(){
 
 stop(){
 	echo -n "Stopping $prog: "
-	kill_pap_proc && success "Ok." || failure "Error killing PAP process!"
-	rm -f $PAP_RUN_FILE
+	kill_pap_proc && (rm -f $PAP_RUN_FILE; success "Ok.") || failure "Error killing PAP process!"
 }
 
 case "$1" in
@@ -123,14 +135,8 @@ case "$1" in
 	status)
 		status && success "PAP running!" || failure "PAP not running!"
 		;;
-
-	restart)
-		stop
-		start
-		;;
-
 	*)
-		echo "Usage: $0 {start|stop|status|restart}"
+		echo "Usage: $0 {start|stop|status}"
 		RETVAL=1
 		;;
 esac

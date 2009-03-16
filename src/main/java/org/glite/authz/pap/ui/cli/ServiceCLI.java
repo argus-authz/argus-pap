@@ -15,6 +15,8 @@ import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.exceptions.PAPException;
+import org.mortbay.log.Log;
 
 public abstract class ServiceCLI {
 
@@ -30,7 +32,11 @@ public abstract class ServiceCLI {
     }
 
     private static final HelpFormatter helpFormatter = new HelpFormatter();
-
+    
+    private static final String OPT_USE_PROXY = "use_proxy";
+    private static final String OPT_USE_PROXY_DESCRIPTION = "Forces the pap-admin to use a proxy found in the standard location.";
+    private static final String OPT_USE_PROXY_LONG = "use_proxy";
+   
     private static final String OPT_PROXY = "proxy";
     private static final String OPT_PROXY_DESCRIPTION = "Specifies a user proxy to be used for authentication.";
     private static final String OPT_PROXY_LONG = "proxy";
@@ -151,11 +157,44 @@ public abstract class ServiceCLI {
             serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, host, port, PAP.DEFAULT_SERVICES_ROOT_PATH));
 
         }
-
-        if (commandLine.hasOption(OPT_PROXY))
-            serviceClient.setClientProxy(commandLine.getOptionValue(OPT_PROXY));
-
-        if (commandLine.hasOption(OPT_CERT))
+        
+        if (commandLine.hasOption( OPT_USE_PROXY )){
+            
+            // If the --proxy option is specified, we get the proxy from there
+            
+            if (!commandLine.hasOption( OPT_PROXY )){
+                
+                String euid = System.getenv( "EUID" );
+                
+                if (euid == null || "".equals( euid )){
+                    String euidProperty = System.getProperty( "effectiveUserId" );
+                    
+                    if ( (euidProperty == null || "".equals( euidProperty ))){
+                        
+                        String x509UserProxy = System.getenv( "X509_USER_PROXY" );
+                        
+                        if (x509UserProxy == null || "".equals( x509UserProxy ))
+                            throw new PAPException("Cannot enstabilish user's effective user id, please use the --proxy option " +
+                            		"to specify which proxy pap-admin should use for authentication." );
+                        else
+                            serviceClient.setClientProxy( x509UserProxy );
+                    }
+                        
+                    else
+                        serviceClient.setClientProxy( "/tmp/x509up_u"+euidProperty );
+                    
+                }else
+                    serviceClient.setClientProxy( "/tmp/x509up_u"+euid);
+                
+            }
+        }
+        
+        
+        if (commandLine.hasOption( OPT_PROXY ))
+            serviceClient.setClientProxy( commandLine.getOptionValue( OPT_PROXY ) );
+        
+        
+        if (commandLine.hasOption(OPT_CERT)) 
             serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
 
         if (commandLine.hasOption(OPT_KEY))
@@ -256,6 +295,10 @@ public abstract class ServiceCLI {
                                        .withLongOpt(OPT_VERBOSE_LONG)
                                        .withDescription(OPT_VERBOSE_DESCRIPTION)
                                        .create(OPT_VERBOSE));
+                                          
+        options.addOption(OptionBuilder.hasArg(false).withLongOpt(OPT_USE_PROXY_LONG)
+                .withDescription(OPT_USE_PROXY_DESCRIPTION).create(OPT_USE_PROXY));
+                                       
         return options;
     }
 

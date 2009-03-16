@@ -1,5 +1,8 @@
 package org.glite.authz.pap.authz;
 
+import org.glite.security.util.DN;
+import org.glite.security.util.DNHandler;
+
 public class PAPAdminFactory {
 
     public static final String ANY_AUTHENTICATED_USER_DN = "/O=PAP/OU=Internal/CN=Any authenticated user";
@@ -16,7 +19,9 @@ public class PAPAdminFactory {
 
     public static X509Principal getDn( String dn ) {
 
-        return new X509Principal( dn );
+        DN theDN = DNHandler.getDN( dn );
+        
+        return new X509Principal( theDN.getX500() );
 
     }
 

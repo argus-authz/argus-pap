@@ -35,7 +35,7 @@ public class PAPPermission {
             } else {
                 try {
 
-                    PermissionFlags newPerm = PermissionFlags.valueOf( s );
+                    PermissionFlags newPerm = PermissionFlags.valueOf( s.trim() );
                     perm.permissions.add( newPerm );
                 } catch ( IllegalArgumentException e ) {
 

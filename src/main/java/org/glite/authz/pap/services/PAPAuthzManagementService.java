@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import org.glite.authz.pap.authz.ACL;
 import org.glite.authz.pap.authz.AuthorizationEngine;
 import org.glite.authz.pap.authz.PAPAdmin;
+import org.glite.authz.pap.authz.PAPAdminFactory;
 import org.glite.authz.pap.authz.PAPContext;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.VOMSFQAN;
@@ -34,11 +35,12 @@ public class PAPAuthzManagementService implements PAPAuthorizationManagement{
 
 		if (principal.getType().equals("x509-dn")) {
 
-			return new X509Principal(principal.getName());
+		    return PAPAdminFactory.getDn( principal.getName() );
 
 		} else if (principal.getType().equals("voms-fqan")) {
-
-			return new VOMSFQAN(principal.getName());
+		    
+		    return PAPAdminFactory.getFQAN( principal.getName() );
+		    
 		} else
 			throw new PAPAuthzException("Unsupported principal type '"
 					+ principal.getType() + "'.");
@@ -67,10 +69,10 @@ public class PAPAuthzManagementService implements PAPAuthorizationManagement{
 	public void addACE(String context, PAPPrincipal principal,
 			String[] permissions) throws RemoteException, PAPException {
 
-		log.info("addACE("
-				+ StringUtils.join(new Object[] { context, principal,
-						permissions }, ',') + ");");
-
+	    
+	    log.info( "addACE('{}','{}','{}')", new Object[]{context,
+	            principal.getName(),permissions});
+	    
 		PAPContext papContext = null;
 
 		checkPAPPrincipal(principal);
@@ -101,6 +103,8 @@ public class PAPAuthzManagementService implements PAPAuthorizationManagement{
 	public void removeACE(String context, PAPPrincipal principal)
 			throws RemoteException, PAPException {
 
+	    log.info( "removeACE('{}','{}')",context,principal.getName());
+	    
 		PAPContext papContext = null;
 
 		checkPAPPrincipal(principal);
@@ -153,8 +157,7 @@ public class PAPAuthzManagementService implements PAPAuthorizationManagement{
     public org.glite.authz.pap.services.authz_management.axis_skeletons.PAPACE[] getACL(
             String context ) throws RemoteException , PAPException {
 
-        log.info( "getACL(" + StringUtils.join( new Object[] { context }, ',' )
-                + ");" );
+        log.info( "getACL('{}')", context);
         
         PAPContext papContext;
         
