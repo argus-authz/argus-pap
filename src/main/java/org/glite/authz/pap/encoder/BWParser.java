@@ -171,8 +171,6 @@ class BWParser implements BWParserConstants {
       jj_consume_token(22);
       label_5:
       while (true) {
-        attr = ObligationContent();
-                                                                obligationContent.add(attr);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STRING:
         case ID:
@@ -183,9 +181,14 @@ class BWParser implements BWParserConstants {
           jj_la1[5] = jj_gen;
           break label_5;
         }
+        attr = ObligationContent();
+                                                                obligationContent.add(attr);
       }
       jj_consume_token(23);
-      {if (true) return new MixIn(new ObligationWizard(t2, obligationContent));}
+      if (obligationContent.isEmpty())
+        {if (true) return new MixIn(new ObligationWizard(t2));}
+      else
+        {if (true) return new MixIn(new ObligationWizard(t2, obligationContent));}
       break;
     case ACTION:
       jj_consume_token(ACTION);
@@ -289,8 +292,6 @@ class BWParser implements BWParserConstants {
       jj_consume_token(22);
       label_8:
       while (true) {
-        attr = ObligationContent();
-                                obligationContent.add(attr);
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case STRING:
         case ID:
@@ -301,9 +302,14 @@ class BWParser implements BWParserConstants {
           jj_la1[9] = jj_gen;
           break label_8;
         }
+        attr = ObligationContent();
+                                                                obligationContent.add(attr);
       }
       jj_consume_token(23);
-    {if (true) return new MixIn(new ObligationWizard(t2, obligationContent));}
+      if (obligationContent.isEmpty())
+        {if (true) return new MixIn(new ObligationWizard(t2));}
+      else
+        {if (true) return new MixIn(new ObligationWizard(t2, obligationContent));}
       break;
     case RULE:
       jj_consume_token(RULE);

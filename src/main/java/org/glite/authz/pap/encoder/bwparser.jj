@@ -151,6 +151,7 @@ XACMLWizard Resource() :
 
 }
 
+
 MixIn ResourceContents() :
 {
   String t1 = null;
@@ -166,8 +167,11 @@ MixIn ResourceContents() :
     <DESCRIPTION> t1=TextString() { 
       return new MixIn(t1); 
     }
-|   <OBLIGATION> t2=TextString() "{" (attr=ObligationContent() {obligationContent.add(attr); })+ "}" {
-      return new MixIn(new ObligationWizard(t2, obligationContent)); 
+|   <OBLIGATION> t2=TextString() "{" (attr=ObligationContent() {obligationContent.add(attr); })* "}" {
+      if (obligationContent.isEmpty())
+        return new MixIn(new ObligationWizard(t2));
+      else 
+        return new MixIn(new ObligationWizard(t2, obligationContent)); 
     }
 |   <ACTION> t3=TextString() "{" (mixin=ActionContent() {mixinContent.add(mixin);} )+ "}" {
       PolicyWizard pw = new PolicyWizard(new AttributeWizard("action", t3));
@@ -222,13 +226,12 @@ MixIn ActionContent() :
   <DESCRIPTION> t1=TextString() { 
     return new MixIn(t1); 
   }
-
-| <OBLIGATION> t2=TextString() "{" 
-    ( attr=ObligationContent() {obligationContent.add(attr); }
-     )+ 
-  "}" {
-    return new MixIn(new ObligationWizard(t2, obligationContent));
-  }
+|   <OBLIGATION> t2=TextString() "{" (attr=ObligationContent() {obligationContent.add(attr); })* "}" {
+      if (obligationContent.isEmpty())
+        return new MixIn(new ObligationWizard(t2));
+      else 
+        return new MixIn(new ObligationWizard(t2, obligationContent)); 
+    }
 | <RULE> effect=RuleEffect() "{" 
      ( 
        attr=RuleContent() {ruleContent.add(attr);} 

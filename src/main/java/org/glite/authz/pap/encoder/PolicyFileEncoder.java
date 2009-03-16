@@ -62,40 +62,41 @@ public class PolicyFileEncoder {
         return doParse();
     }
 
-     private static void print(PolicySetWizard setw) {
-         System.out.println(setw.toFormattedString(false));
-     }
-
-//      public static void main(String[] args) {
-//          try{
-//              DefaultBootstrap.bootstrap();
-//              //            XMLConfigurator xmlConfigurator = new XMLConfigurator();
-//              //            xmlConfigurator.load( Configuration.class.getResourceAsStream( "/opensaml_bugfix.xml" ) ); 
-//          }
-//          catch (ConfigurationException e) {
-//              System.out.println(e.toString());
-//              return;
-//          }
-//          PolicyFileEncoder encoder = new PolicyFileEncoder();
-
-//          try {
-//              if (args.length > 0) {
-//                  int i = 0;
-//                  while (i < args.length) {
-//                      System.out.println("Try " + args[i]);
-//                      File f = new File(args[i++]);
-//                      List<XACMLWizard> list = encoder.parse(f);
-
-//                      //                     for (PolicySetWizard xacml: list) {
-//                      //                         System.out.println(xacml.getClass().getName());
-//                      //                         print(xacml);
-//                      }
-//              }
-//              else
-//                  System.out.println(encoder.parse(System.in));
-//          }
-//          catch (EncodingException e) {
-//              System.out.println(e.toString());
-//          }
+//      private static void print(XACMLWizard setw) {
+//          System.out.println(setw.toFormattedString(false));
 //      }
+
+//       public static void main(String[] args) {
+//           try{
+//               DefaultBootstrap.bootstrap();
+//               //            XMLConfigurator xmlConfigurator = new XMLConfigurator();
+//               //            xmlConfigurator.load( Configuration.class.getResourceAsStream( "/opensaml_bugfix.xml" ) ); 
+//           }
+//           catch (ConfigurationException e) {
+//               System.out.println(e.toString());
+//               return;
+//           }
+//           PolicyFileEncoder encoder = new PolicyFileEncoder();
+
+//           try {
+//               if (args.length > 0) {
+//                   int i = 0;
+//                   while (i < args.length) {
+//                       System.out.println("Try " + args[i]);
+//                       File f = new File(args[i++]);
+//                       List<XACMLWizard> list = encoder.parse(f);
+
+//                       for (XACMLWizard xacml: list) {
+//                           System.out.println(xacml.getClass().getName());
+//                           print(xacml);
+//                       }
+//                   }
+//               }
+//               else
+//                   System.out.println(encoder.parse(System.in));
+//           }
+//           catch (EncodingException e) {
+//               System.out.println(e.toString());
+//           }
+//       }
 }
