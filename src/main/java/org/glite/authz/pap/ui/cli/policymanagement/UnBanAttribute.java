@@ -26,11 +26,11 @@ public class UnBanAttribute extends PolicyManagementCLI {
 	@Override
     protected Options defineCommandOptions() {
     	Options options = new Options();
-        options.addOption(OptionBuilder.hasArg()
+        options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_ACTION_DESCRIPTION)
                                        .withLongOpt(OPT_ACTION_LONG)
                                        .create(OPT_ACTION));
-        options.addOption(OptionBuilder.hasArg()
+        options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_RESOURCE_DESCRIPTION)
                                        .withLongOpt(OPT_RESOURCE_LONG)
                                        .create(OPT_RESOURCE));

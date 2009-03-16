@@ -27,8 +27,7 @@ public class Move extends PolicyManagementCLI {
     @Override
     protected Options defineCommandOptions() {
         Options options = new Options();
-
-        options.addOption(OptionBuilder.hasArg()
+        options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_MOVEAFTER_DESCRIPTION)
                                        .withLongOpt(OPT_MOVEAFTER_LONG)
                                        .create(OPT_MOVEAFTER));

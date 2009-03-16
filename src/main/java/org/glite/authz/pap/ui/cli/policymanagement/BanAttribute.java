@@ -32,11 +32,11 @@ public class BanAttribute extends PolicyManagementCLI {
                                        .withDescription("Set the policy as private (it won't be distributed)")
                                        .withLongOpt(OPT_PRIVATE_LONG)
                                        .create());
-        options.addOption(OptionBuilder.hasArg()
+        options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_ACTION_DESCRIPTION)
                                        .withLongOpt(OPT_ACTION_LONG)
                                        .create(OPT_ACTION));
-        options.addOption(OptionBuilder.hasArg()
+        options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_RESOURCE_DESCRIPTION)
                                        .withLongOpt(OPT_RESOURCE_LONG)
                                        .create(OPT_RESOURCE));
