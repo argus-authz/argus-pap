@@ -128,11 +128,16 @@ public class ProvisioningServiceDAO {
         List<String> idReferenceList = PolicySetHelper.getPolicySetIdReferencesValues(policySetNoRef);
         for (String childPolicySetId : idReferenceList) {
 
+        	try {
             PolicySetType childPolicySetNoRef = getPolicySetNoReferences(papContainer, childPolicySetId);
 
             PolicySetHelper.addPolicySet(policySetNoRef, childPolicySetNoRef);
 
             TypeStringUtils.releaseUnneededMemory(childPolicySetNoRef);
+        	} catch (NotFoundException e) {
+        		// this exception might occur in case of concurrent remove/add policy operations
+        		// nothing to do, go on and remove the reference
+        	}
 
             PolicySetHelper.deletePolicySetReference(policySetNoRef, childPolicySetId);
         }
@@ -141,11 +146,16 @@ public class ProvisioningServiceDAO {
         idReferenceList = PolicySetHelper.getPolicyIdReferencesValues(policySetNoRef);
         for (String policyIdReference : idReferenceList) {
 
+        	try {
             PolicyType policy = papContainer.getPolicy(policyIdReference);
 
             PolicySetHelper.addPolicy(policySetNoRef, policy);
 
             TypeStringUtils.releaseUnneededMemory(policy);
+        	} catch (NotFoundException e) {
+        		// this exception might occur in case of concurrent remove/add policy operations
+        		// nothing to do, go on and remove the reference
+        	}
 
             PolicySetHelper.deletePolicyReference(policySetNoRef, policyIdReference);
         }
