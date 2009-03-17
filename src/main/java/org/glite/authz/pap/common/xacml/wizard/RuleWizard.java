@@ -132,10 +132,19 @@ public class RuleWizard {
             sb.append(String.format("%sid=%s\n", baseIndentString, ruleId));
         }
         
-        sb.append(String.format("%srule %s {\n", baseIndentString, effectString));
+        boolean multipleLines = (targetWizard.getAttributeWizardList().size() > 1);
+        
+        sb.append(String.format("%srule %s { ", baseIndentString, effectString));
+        
+        if (multipleLines) {
+        	sb.append('\n');
+        }
         
         for (AttributeWizard attributeWizard : targetWizard.getAttributeWizardList()) {
-            sb.append(String.format("%s%s\n", indentString, attributeWizard.toFormattedString()));
+            sb.append(String.format("%s%s ", indentString, attributeWizard.toFormattedString()));
+            if (multipleLines) {
+            	sb.append('\n');
+            }
         }
         
         sb.append(baseIndentString + "}");
