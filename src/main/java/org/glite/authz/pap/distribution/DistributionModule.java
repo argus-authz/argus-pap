@@ -54,7 +54,7 @@ public class DistributionModule extends Thread {
         }
 
         PAP pap = new PAP("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost",
-            "4554", "/glite-authz-pap/services", false);
+            "8150", "/glite-authz-pap/services", false);
         System.out.println(pap.toString());
         List<XACMLObject> list = getPoliciesFromPAP(pap);
         System.out.println("Retrieved " + list.size() + " policies");

@@ -30,7 +30,7 @@ public class PAP {
 
     public static String DEFAULT_HOST = "localhost";
     public static final String DEFAULT_PAP_ALIAS = "Local";
-    public static String DEFAULT_PORT = "4554";
+    public static String DEFAULT_PORT = "8150";
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
 
