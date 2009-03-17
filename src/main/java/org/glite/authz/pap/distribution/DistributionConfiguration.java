@@ -13,11 +13,11 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionConfiguration {
 
-	private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
-	private static final String CONFIGURATION_STANZA = "distribution-configuration";
-	private static final String REMOTE_PAPS_STANZA = "remote-paps";
-	
+    private static final String CONFIGURATION_STANZA = "distribution-configuration";
     private static DistributionConfiguration instance = null;
+    private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
+
+    private static final String REMOTE_PAPS_STANZA = "remote-paps";
     private PAPConfiguration papConfiguration;
 
     private DistributionConfiguration() {
@@ -43,12 +43,12 @@ public class DistributionConfiguration {
     }
 
     @SuppressWarnings("unused")
-	private static String minKeyLengthKey() {
+    private static String minKeyLengthKey() {
         return CONFIGURATION_STANZA + "." + "min-key-length";
     }
 
     @SuppressWarnings("unused")
-	private static String minKeyLengthKey(String papAlias) {
+    private static String minKeyLengthKey(String papAlias) {
         return aliasKey(papAlias) + "." + "min-key-length";
     }
 
@@ -72,6 +72,10 @@ public class DistributionConfiguration {
         return aliasKey(papAlias) + "." + "protocol";
     }
 
+    private static String typeKey(String papAlias) {
+        return aliasKey(papAlias) + "." + "type";
+    }
+
     private static String visibilityPublicKey(String papAlias) {
         return aliasKey(papAlias) + "." + "public";
     }
@@ -83,7 +87,7 @@ public class DistributionConfiguration {
         if (papOrderArray == null) {
             papOrderArray = new String[0];
         }
-        
+
         validatePAPOrder(papOrderArray);
 
         return papOrderArray;
@@ -92,7 +96,7 @@ public class DistributionConfiguration {
     public long getPollIntervallInMilliSecs() {
 
         long pollIntervalInSecs = papConfiguration.getLong(pollIntervallKey());
-        
+
         log.info("Polling interval for remote PAPs is set to: " + pollIntervalInSecs + " seconds");
 
         return pollIntervalInSecs * 1000;
@@ -106,15 +110,15 @@ public class DistributionConfiguration {
 
         int idx = 0;
         for (String papAlias : aliasSet) {
-            
+
             if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
                 continue;
             }
-            
+
             PAP pap = getPAPFromProperties(papAlias);
             papArray[idx] = pap;
             idx++;
-            
+
             log.info("Adding remote PAP \"" + pap + "\" from configuarion");
         }
 
@@ -161,7 +165,7 @@ public class DistributionConfiguration {
             papConfiguration.saveStartupConfiguration();
             return;
         }
-        
+
         validatePAPOrder(aliasArray);
 
         if (aliasArray.length == 0) {
@@ -188,7 +192,7 @@ public class DistributionConfiguration {
 
         if (isEmpty(alias))
             return false;
-        
+
         if (PAP.DEFAULT_PAP_ALIAS.equals(alias)) {
             return true;
         }
@@ -208,8 +212,8 @@ public class DistributionConfiguration {
         papConfiguration.clearDistributionProperty(pathKey(papAlias));
         papConfiguration.clearDistributionProperty(protocolKey(papAlias));
         papConfiguration.clearDistributionProperty(visibilityPublicKey(papAlias));
+        papConfiguration.clearDistributionProperty(typeKey(papAlias));
     }
-
 
     @SuppressWarnings("unchecked")
     private Set<String> getAliasSet() {
@@ -238,18 +242,20 @@ public class DistributionConfiguration {
         if (dn == null) {
             throw new DistributionConfigurationException("DN is not set for remote PAP \"" + papAlias + "\"");
         }
+        
+        String type = papConfiguration.getString(typeKey(papAlias));
+        if (type == null) {
+            throw new DistributionConfigurationException("\"type\" is not set for remote PAP \"" + papAlias + "\"");
+        }
 
         String hostname = papConfiguration.getString(hostnameKey(papAlias));
-        if (hostname == null)
-            throw new DistributionConfigurationException("Hostname is not set for remote PAP \"" + papAlias + "\"");
-
         String port = papConfiguration.getString(portKey(papAlias));
         String path = papConfiguration.getString(pathKey(papAlias));
         String protocol = papConfiguration.getString(protocolKey(papAlias));
         boolean visibilityPublic = papConfiguration.getBoolean(visibilityPublicKey(papAlias));
 
         // port, path and protocol can be null or empty
-        return new PAP(papAlias, dn, hostname, port, path, protocol, visibilityPublic);
+        return new PAP(papAlias, PAP.PSType.get(type), dn, hostname, port, path, protocol, visibilityPublic);
     }
 
     private boolean isEmpty(String s) {
@@ -264,6 +270,7 @@ public class DistributionConfiguration {
 
         String papAlias = pap.getAlias();
 
+        papConfiguration.setDistributionProperty(typeKey(papAlias), pap.getType().toString());
         papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
         papConfiguration.setDistributionProperty(hostnameKey(papAlias), pap.getHostname());
         papConfiguration.setDistributionProperty(portKey(papAlias), pap.getPort());
@@ -271,27 +278,28 @@ public class DistributionConfiguration {
         papConfiguration.setDistributionProperty(protocolKey(papAlias), pap.getProtocol());
         papConfiguration.setDistributionProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
     }
-    
+
     private void validatePAPOrder(String[] aliasArray) {
- 
-    	if (aliasArray == null) {
-    		throw new DistributionConfigurationException("aliasArray is null");
-    	}
-    	
-    	Set<String> aliasSet = new HashSet<String>(aliasArray.length);
-    	
-    	for (String alias : aliasArray) {
-    		
-    		if (aliasSet.contains(alias)) {
-    			throw new DistributionConfigurationException(String.format("Error in remote PAPs order: alias \"%s\" appears more than one time", alias));
-    		}
-    		
-    		aliasSet.add(alias);
-    		
-    		if (!aliasExists(alias)) {
-    			throw new AliasNotFoundException(String.format("Error in remote PAPs order: unknown alias \"%s\"", alias));
-    		}
-    	}
+
+        if (aliasArray == null) {
+            throw new DistributionConfigurationException("aliasArray is null");
+        }
+
+        Set<String> aliasSet = new HashSet<String>(aliasArray.length);
+
+        for (String alias : aliasArray) {
+
+            if (aliasSet.contains(alias)) {
+                throw new DistributionConfigurationException(
+                    String.format("Error in remote PAPs order: alias \"%s\" appears more than one time", alias));
+            }
+
+            aliasSet.add(alias);
+
+            if (!aliasExists(alias)) {
+                throw new AliasNotFoundException(String.format("Error in remote PAPs order: unknown alias \"%s\"", alias));
+            }
+        }
     }
 
 }

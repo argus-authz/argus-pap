@@ -88,7 +88,7 @@ public class FileSystemPAPDAO implements PAPDAO {
     private static String pathKey(String papAlias) {
         return aliasKey(papAlias) + "." + "path";
     }
-
+    
     private static String policyLastModificationTimeKey(String papAlias) {
         return aliasKey(papAlias) + "." + "policyLastModificationTime";
     }
@@ -99,6 +99,10 @@ public class FileSystemPAPDAO implements PAPDAO {
 
     private static String protocolKey(String papAlias) {
         return aliasKey(papAlias) + "." + "protocol";
+    }
+
+    private static String typeKey(String papAlias) {
+        return aliasKey(papAlias) + "." + "type";
     }
 
     private static String visibilityPublicKey(String papAlias) {
@@ -220,6 +224,7 @@ public class FileSystemPAPDAO implements PAPDAO {
         papsINIFile.clearProperty(idKey(papAlias));
         papsINIFile.clearProperty(visibilityPublicKey(papAlias));
         papsINIFile.clearProperty(policyLastModificationTimeKey(papAlias));
+        papsINIFile.clearProperty(typeKey(papAlias));
     }
 
     private boolean existsInINIFile(String papAlias) {
@@ -238,6 +243,7 @@ public class FileSystemPAPDAO implements PAPDAO {
         if (!exists(papAlias))
             return null;
 
+        String type = papsINIFile.getString(typeKey(papAlias));
         String dn = papsINIFile.getString(dnKey(papAlias));
         String host = papsINIFile.getString(hostnameKey(papAlias));
         String port = papsINIFile.getString(portKey(papAlias));
@@ -247,7 +253,7 @@ public class FileSystemPAPDAO implements PAPDAO {
         String policyLastModificationTimeString = papsINIFile.getString(policyLastModificationTimeKey(papAlias));
         boolean visibilityPublic = papsINIFile.getBoolean(visibilityPublicKey(papAlias));
 
-        PAP pap = new PAP(papAlias, dn, host, port, path, protocol, visibilityPublic);
+        PAP pap = new PAP(papAlias, PAP.PSType.get(type), dn, host, port, path, protocol, visibilityPublic);
         pap.setPapId(id);
         pap.setPolicyLastModificationTime(policyLastModificationTimeString);
 
@@ -300,6 +306,7 @@ public class FileSystemPAPDAO implements PAPDAO {
 
         String papAlias = pap.getAlias();
 
+        papsINIFile.setProperty(typeKey(papAlias), pap.getType().toString());
         papsINIFile.setProperty(dnKey(papAlias), pap.getDn());
         papsINIFile.setProperty(hostnameKey(papAlias), pap.getHostname());
         papsINIFile.setProperty(portKey(papAlias), pap.getPort());

@@ -5,22 +5,37 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class PAP {
 
+    public static enum PSType {
+        LOCAL, REMOTE;
+
+        public static PSType get(String type) {
+            if ("local".equals(type.toLowerCase())) {
+                return LOCAL;
+            }
+            if ("remote".equals(type.toLowerCase())) {
+                return REMOTE;
+            }
+            return LOCAL;
+        }
+    }
+
     public static String DEFAULT_DN = "invalid_dn";
 
     public static String DEFAULT_HOST = "localhost";
+    public static final String DEFAULT_PAP_ALIAS = "Local";
     public static String DEFAULT_PORT = "4554";
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
-    public static final String DEFAULT_PAP_ALIAS = "Local";
-    
-    private static DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+
     private static final String DEFAULT_PAP_ID = "Local";
+    private static DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     private static final Logger log = LoggerFactory.getLogger(PAP.class);
 
     private String alias;
@@ -31,35 +46,25 @@ public class PAP {
     private Date policyLastModificationTime = null;
     private String port;
     private String protocol;
+    private PSType pstype;
     private boolean visibilityPublic;
 
     public PAP(PAPData papData) {
-        this(papData.getAlias(), papData.getDn(), papData.getHostname(), papData.getPort(), papData.getPath(), papData
-                .getProtocol(), papData.isVisibilityPublic());
+        this(papData.getAlias(), PSType.get(papData.getType()), papData.getDn(), papData.getHostname(), papData.getPort(),
+             papData.getPath(), papData.getProtocol(), papData.isVisibilityPublic());
     }
 
     public PAP(String alias) {
-        this(alias, null, null, null, null, null, false);
+        this(alias, PSType.LOCAL, null, null, null, null, null, false);
     }
 
-    public PAP(String alias, String dn, String hostname) {
-        this(alias, dn, hostname, false);
-    }
-
-    public PAP(String alias, String dn, String hostname, boolean isPublic) {
-        this(alias, dn, hostname, null, null, null, isPublic);
-    }
-
-    public PAP(String alias, String dn, String hostname, String port, String servicesRootPath, boolean visibilityPublic) {
-        this(alias, dn, hostname, port, servicesRootPath, null, visibilityPublic);
-    }
-
-    public PAP(String alias, String dn, String hostname, String port, String servicesRootPath, String protocol,
+    public PAP(String alias, PSType pstype, String dn, String hostname, String port, String servicesRootPath, String protocol,
             boolean visibilityPublic) {
-        // TODO: assert alias != null and empty string
+
+        assert (alias != null) && (alias.length() > 0) : "alias cannot be null or empty";
 
         this.alias = alias;
-        
+
         if (DEFAULT_PAP_ALIAS.equals(alias)) {
             papId = DEFAULT_PAP_ID;
         } else {
@@ -73,16 +78,30 @@ public class PAP {
         this.path = DEFAULT_SERVICES_ROOT_PATH;
         this.protocol = DEFAULT_PROTOCOL;
 
-        if (isDefined(dn))
+        if (Utils.isDefined(dn))
             this.dn = dn;
-        if (isDefined(hostname))
+        if (Utils.isDefined(hostname))
             this.hostname = hostname;
-        if (isDefined(port))
+        if (Utils.isDefined(port))
             this.port = port;
-        if (isDefined(servicesRootPath))
+        if (Utils.isDefined(servicesRootPath))
             this.path = servicesRootPath;
-        if (isDefined(protocol))
+        if (Utils.isDefined(protocol))
             this.protocol = protocol;
+
+        this.pstype = pstype;
+    }
+
+    public PAP(String alias, String dn, String hostname) {
+        this(alias, dn, hostname, false);
+    }
+
+    public PAP(String alias, String dn, String hostname, boolean isPublic) {
+        this(alias, PSType.REMOTE, dn, hostname, null, null, null, isPublic);
+    }
+
+    public PAP(String alias, String dn, String hostname, String port, String servicesRootPath, boolean visibilityPublic) {
+        this(alias, PSType.REMOTE, dn, hostname, port, servicesRootPath, null, visibilityPublic);
     }
 
     public static PAP makeDefaultPAP() {
@@ -156,6 +175,24 @@ public class PAP {
         return protocol;
     }
 
+    public PSType getType() {
+        return pstype;
+    }
+
+    public boolean isLocal() {
+        if (pstype == PSType.LOCAL) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isRemote() {
+        if (pstype == PSType.REMOTE) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isVisibilityPublic() {
         return visibilityPublic;
     }
@@ -210,6 +247,10 @@ public class PAP {
         this.visibilityPublic = isPublic;
     }
 
+    public void setType(PSType pstype) {
+        this.pstype = pstype;
+    }
+
     public void setVisibilityPublic(boolean visibilityPublic) {
         this.visibilityPublic = visibilityPublic;
     }
@@ -224,52 +265,40 @@ public class PAP {
 
     public String toFormattedString(int indent, int padding) {
 
-        String indentString = fillWithSpaces(indent);
-        String paddingString = fillWithSpaces(indent + padding);
+        String indentString = Utils.fillWithSpaces(indent);
+        String paddingString = Utils.fillWithSpaces(indent + padding);
+        
+        String visibility;
+        if (visibilityPublic) {
+            visibility = "public";
+        } else {
+            visibility = "private";
+        }
 
-        String aliasString = indentString + "alias=\"" + alias + "\"\n";
-        String dnString = paddingString + "dn=\"" + dn + "\"\n";
-        String endpointString = paddingString + "endpoint=\"" + getEndpoint() + "\"\n";
-        String visibilityString = paddingString + "visibility=";
-        if (visibilityPublic)
-            visibilityString += "PUBLIC\n";
-        else
-            visibilityString += "PRIVATE\n";
+        String aliasString = String.format("%alias=%s\n", indentString, alias);
+        String typeString = String.format("%stype=%s\n", paddingString, pstype);
+        String dnString = String.format("%dn=%s\n", paddingString, dn);
+        String endpointString = String.format("%endpoint=%s\n", paddingString, getEndpoint());
+        String visibilityString = String.format("%visibility=%s\n", paddingString, visibility);
 
-        return aliasString + dnString + endpointString + visibilityString;
+        return aliasString + typeString + visibilityString + dnString + endpointString;
     }
 
     public String toString() {
         String visibility = "visibility=";
 
-        if (visibilityPublic)
-            visibility += "PUBLIC";
-        else
-            visibility += "PRIVATE";
-
-        return "alias=\"" + alias + "\" dn=\"" + dn + "\" endpoint=\"" + getEndpoint() + "\" id=\"" + papId + "\"";
-    }
-
-    private String fillWithSpaces(int n) {
-        String s = "";
-
-        for (int i = 0; i < n; i++) {
-            s += " ";
+        if (visibilityPublic) {
+            visibility += "public";
+        } else {
+            visibility += "private";
         }
 
-        return s;
+        return String.format("alias=\"%s\" type=\"%s\" visibility=\"%s\" dn=\"%s\" endpoint=\"%s\" id=\"%s\"",
+                             alias,
+                             pstype,
+                             visibility,
+                             dn,
+                             getEndpoint(),
+                             papId);
     }
-
-    private boolean isDefined(String s) {
-
-        if (s == null)
-            return false;
-
-        if (s.length() == 0)
-            return false;
-
-        return true;
-
-    }
-
 }

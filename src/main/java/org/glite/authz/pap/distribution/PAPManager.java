@@ -73,30 +73,30 @@ public class PAPManager {
 
     public void createDefaultPAPIfNotExists() {
 
-        PAP localPAP;
+        PAP defaultPAP;
         
         if (!papDAO.exists(PAP.DEFAULT_PAP_ALIAS)) {
             
-            localPAP = new PAP(PAP.DEFAULT_PAP_ALIAS, PAP.DEFAULT_PAP_ALIAS, "localhost", true);
+            defaultPAP = new PAP(PAP.DEFAULT_PAP_ALIAS);
 
-            papDAO.store(localPAP);
+            papDAO.store(defaultPAP);
         } else {
-            localPAP = papDAO.get(PAP.DEFAULT_PAP_ALIAS);
+            defaultPAP = papDAO.get(PAP.DEFAULT_PAP_ALIAS);
         }
 
         // check if the root policy set exists
-        PAPContainer localPAPContainer = getDefaultPAPContainer();
+        PAPContainer defaultPAPContainer = getDefaultPAPContainer();
         
-        if (localPAPContainer.hasPolicySet(localPAPContainer.getPAPRootPolicySetId())) {
+        if (defaultPAPContainer.hasPolicySet(defaultPAPContainer.getPAPRootPolicySetId())) {
             return;
         }
 
-        PolicySetType localPolicySet = PolicySetHelper.buildWithAnyTarget(localPAP.getPapId(),
+        PolicySetType defaultPolicySet = PolicySetHelper.buildWithAnyTarget(defaultPAP.getPapId(),
                 PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         
-        localPolicySet.setVersion("0");
+        defaultPolicySet.setVersion("0");
 
-        localPAPContainer.storePolicySet(new PolicySetTypeString(localPolicySet));
+        defaultPAPContainer.storePolicySet(new PolicySetTypeString(defaultPolicySet));
     }
 
     public PAP deleteTrustedPAP(String papAlias) throws NotFoundException {
