@@ -2,6 +2,16 @@
 set -e
 prog=pap-standalone
 
+if [ -z $GLITE_LOCATION ]; then
+	echo "Please define the GLITE_LOCATION environment variable before running this command!"
+	exit 1
+fi
+	
+if [ -z $GLITE_LOCATION_VAR ]; then
+	echo "Please define the GLITE_LOCATION_VAR environment variable before running this command!"
+	exit 1
+fi
+
 PAP_RUN_FILE=$GLITE_LOCATION_VAR/lock/subsys/pap-standalone.pid
 
 . $GLITE_LOCATION/etc/pap/sh/pap-utils.sh
@@ -43,9 +53,12 @@ kill_pap_proc(){
 	if [ $? -eq 0 ]; then
 		## pap process is running
 		pid=`head -1 $PAP_RUN_FILE`
-		kill -TERM $pid
+		
+		## Use shutdown service hook
+		wget -q --spider http://localhost:8151/shutdown
+		
 		if [ $? -ne 0 ]; then
-			failure "Error killing PAP process!"
+			failure "Error shutting down PAP service!"
 		else
 			## remove pid file
 			rm $PAP_RUN_FILE
@@ -69,7 +82,6 @@ status(){
 			return 0
 		fi
 	else
-		return 1
 		## No PID file found, check that there is no PAP running 
 		## without PID...
 		pid=`ps -efww | grep 'java.*PAPServer' | grep -v grep | awk '{print $2}'`

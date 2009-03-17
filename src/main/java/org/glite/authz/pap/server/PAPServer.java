@@ -1,5 +1,6 @@
 package org.glite.authz.pap.server;
 
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -9,6 +10,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.configuration.Configuration;
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.server.jetty.JettyShutdownCommand;
+import org.glite.authz.pap.server.jetty.JettyShutdownService;
 import org.glite.authz.pap.server.jetty.TrustManagerSocketConnector;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -25,6 +28,7 @@ public final class PAPServer {
     final class PAPDefaults {
 
         static final int PORT = 8150;
+        static final int SHUTDOWN_PORT = 8151;
 
         static final int MAX_REQUEST_QUEUE_SIZE = 0;
 
@@ -55,7 +59,7 @@ public final class PAPServer {
 
     protected String papRepositoryDir;
 
-    protected Server httpServer;
+    protected Server papServer;
 
     protected String getPAPWar() {
 
@@ -69,23 +73,23 @@ public final class PAPServer {
 
         PAPConfiguration.initialize( papConfigurationDir, papRepositoryDir );
 
-        configureHttpServer();
+        configurePAPServer();
 
         configureWar();
 
         try {
 
-            httpServer.start();
-            httpServer.join();
+            papServer.start();
+            papServer.join();
 
-        } catch ( Exception e ) {
+        } catch ( Throwable e ) {
             log
                     .info(
                             "PAP encountered an error that could not be dealt with, shutting down.",
                             e );
 
             try {
-                httpServer.stop();
+                papServer.stop();
 
             } catch ( Exception e1 ) {
                 // Just ignore this
@@ -107,17 +111,18 @@ public final class PAPServer {
 
     }
 
-    private void configureHttpServer() {
+    private void configurePAPServer() {
 
-        httpServer = new Server( getInt( "port", PAPDefaults.PORT ) );
+        papServer = new Server( getInt( "port", PAPDefaults.PORT ) );
 
         int maxRequestQueueSize = getInt( "max_request_queue_size",
                 PAPDefaults.MAX_REQUEST_QUEUE_SIZE );
+        
         int maxConnections = getInt( "max_connections",
                 PAPDefaults.MAX_CONNECTIONS );
 
-        httpServer.setSendServerVersion( false );
-        httpServer.setSendDateHeader( false );
+        papServer.setSendServerVersion( false );
+        papServer.setSendDateHeader( false );
 
         BlockingQueue <Runnable> requestQueue;
 
@@ -131,15 +136,21 @@ public final class PAPServer {
         ThreadPool threadPool = new ThreadPool( 5, maxConnections, 60,
                 TimeUnit.SECONDS, requestQueue );
 
-        httpServer.setThreadPool( threadPool );
+        papServer.setThreadPool( threadPool );
 
         TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
                 getTrustmanagerConfiguration() );
 
         connector.setPort( getInt( "port", PAPDefaults.PORT ) );
 
-        httpServer.setConnectors( new Connector[] { connector } );
-
+        papServer.setConnectors( new Connector[] { connector } );
+        
+        // Create shutdown service
+        JettyShutdownCommand papShutdownCommand =
+            new JettyShutdownCommand(papServer);
+        
+        // Create a Shutdown Service
+        JettyShutdownService.startJettyShutdownService( 8151,Collections.singletonList( (Runnable) papShutdownCommand));
     }
 
     private void configureWar() {
@@ -153,7 +164,7 @@ public final class PAPServer {
         handlers.setHandlers( new Handler[] { webappContext,
                 new DefaultHandler() } );
 
-        httpServer.setHandler( handlers );
+        papServer.setHandler( handlers );
 
     }
 

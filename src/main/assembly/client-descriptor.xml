@@ -29,13 +29,27 @@
 			<fileMode>0755</fileMode>
 		</file>
 	</files>
-	<dependencySets>
-		<dependencySet>
-			<outputDirectory>/share/pap/lib</outputDirectory>
-			<excludes>
-				<exclude>javax.servlet:servlet-api</exclude>
-				<exclude>*:war</exclude>
-			</excludes>
-		</dependencySet>
-	</dependencySets>
+    <dependencySets>
+    <dependencySet>
+      <outputDirectory>/share/pap/lib</outputDirectory>
+      <excludes>
+        <exclude>javax.servlet:servlet-api</exclude>
+        <exclude>org.apache.xerces:xml-apis</exclude>
+        <exclude>org.apache.xerces:xercesImpl</exclude>
+        <exclude>org.apache.xerces:serializer</exclude>
+        <exclude>org.apache.xerces:resolver</exclude>
+        <exclude>*:war</exclude>
+      </excludes>
+    </dependencySet>
+    
+    <dependencySet>
+      <outputDirectory>/share/pap/lib/endorsed</outputDirectory>
+      <includes>
+        <include>org.apache.xerces:xml-apis</include>
+        <include>org.apache.xerces:xercesImpl</include>
+        <include>org.apache.xerces:serializer</include>
+        <include>org.apache.xerces:resolver</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
 </assembly>
