@@ -30,7 +30,7 @@ public class PAPManager {
 
         papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
 
-        createLocalPAPIfNotExists();
+        createDefaultPAPIfNotExists();
 
         distributionConfiguration = DistributionConfiguration.getInstance();
 
@@ -58,7 +58,7 @@ public class PAPManager {
 
         String papAlias = pap.getAlias();
 
-        if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
+        if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
             throw new AlreadyExistsException("Forbidden alias: " + papAlias);
         }
 
@@ -71,21 +71,21 @@ public class PAPManager {
         return new PAPContainer(pap);
     }
 
-    public void createLocalPAPIfNotExists() {
+    public void createDefaultPAPIfNotExists() {
 
         PAP localPAP;
         
-        if (!papDAO.exists(PAP.LOCAL_PAP_ALIAS)) {
+        if (!papDAO.exists(PAP.DEFAULT_PAP_ALIAS)) {
             
-            localPAP = new PAP(PAP.LOCAL_PAP_ALIAS, PAP.LOCAL_PAP_ALIAS, "localhost", true);
+            localPAP = new PAP(PAP.DEFAULT_PAP_ALIAS, PAP.DEFAULT_PAP_ALIAS, "localhost", true);
 
             papDAO.store(localPAP);
         } else {
-            localPAP = papDAO.get(PAP.LOCAL_PAP_ALIAS);
+            localPAP = papDAO.get(PAP.DEFAULT_PAP_ALIAS);
         }
 
         // check if the root policy set exists
-        PAPContainer localPAPContainer = getLocalPAPContainer();
+        PAPContainer localPAPContainer = getDefaultPAPContainer();
         
         if (localPAPContainer.hasPolicySet(localPAPContainer.getPAPRootPolicySetId())) {
             return;
@@ -132,7 +132,7 @@ public class PAPManager {
 
         for (int i = 0, j = 0; i < aliasOrderedArray.length; i++) {
 
-            if (PAP.LOCAL_PAP_ALIAS.equals(aliasOrderedArray[i])) {
+            if (PAP.DEFAULT_PAP_ALIAS.equals(aliasOrderedArray[i])) {
                 continue;
             }
             papArray[j] = getPAP(aliasOrderedArray[i]);
@@ -157,17 +157,17 @@ public class PAPManager {
         return papContainerArray;
     }
 
-    public PAP getLocalPAP() {
-        return papDAO.get(PAP.LOCAL_PAP_ALIAS);
+    public PAP getDefaultPAP() {
+        return papDAO.get(PAP.DEFAULT_PAP_ALIAS);
     }
 
-    public PAPContainer getLocalPAPContainer() {
+    public PAPContainer getDefaultPAPContainer() {
 
         if (!localPAPExists()) {
             throw new NotFoundException("Critical error (probably a BUG): local PAP not found.");
         }
 
-        return new PAPContainer(getLocalPAP());
+        return new PAPContainer(getDefaultPAP());
     }
 
     public PAP getPAP(String papAlias) throws NotFoundException {
@@ -181,7 +181,7 @@ public class PAPManager {
 
         for (String alias : aliasOrderedArray) {
 
-            if (alias.equals(PAP.LOCAL_PAP_ALIAS)) {
+            if (alias.equals(PAP.DEFAULT_PAP_ALIAS)) {
                 continue;
             }
 
@@ -221,8 +221,8 @@ public class PAPManager {
 
     public void updatePAP(String papAlias, PAP newpap) {
 
-        if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
-            updateLocalPAP(newpap);
+        if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
+            updateDefaultPAP(newpap);
             return;
         }
 
@@ -269,7 +269,7 @@ public class PAPManager {
         for (String alias : papDAO.getAllAliases()) {
 
             // do not remove the local PAP
-            if (alias.equals(PAP.LOCAL_PAP_ALIAS)) {
+            if (alias.equals(PAP.DEFAULT_PAP_ALIAS)) {
                 continue;
             }
 
@@ -290,16 +290,16 @@ public class PAPManager {
     }
 
     private boolean localPAPExists() {
-        return papDAO.exists(PAP.LOCAL_PAP_ALIAS);
+        return papDAO.exists(PAP.DEFAULT_PAP_ALIAS);
     }
 
-    private void updateLocalPAP(PAP newLocalPAP) {
+    private void updateDefaultPAP(PAP newLocalPAP) {
 
-        if (!PAP.LOCAL_PAP_ALIAS.equals(newLocalPAP.getAlias())) {
-            throw new RepositoryException("Invalid alias for local PAP. Cannot perform updateLocalPAP request.");
+        if (!PAP.DEFAULT_PAP_ALIAS.equals(newLocalPAP.getAlias())) {
+            throw new RepositoryException("Invalid alias for local PAP. Cannot perform updateDefaultPAP request.");
         }
         
-        PAP oldLocalPAP = getLocalPAP();
+        PAP oldLocalPAP = getDefaultPAP();
         
         newLocalPAP.setPapId(oldLocalPAP.getPapId());
 
@@ -316,13 +316,13 @@ public class PAPManager {
             throw new PAPManagerException("BUG: configuration contains more PAPs then repository");
         }
 
-        int localPAPAliasIdx = getAliasIndex(PAP.LOCAL_PAP_ALIAS, repositoryAliasArray);
+        int localPAPAliasIdx = getAliasIndex(PAP.DEFAULT_PAP_ALIAS, repositoryAliasArray);
 
         if (localPAPAliasIdx == -1) {
             throw new PAPManagerException("BUG: local PAP does not exist in the repository");
         }
 
-        if (getAliasIndex(PAP.LOCAL_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
+        if (getAliasIndex(PAP.DEFAULT_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
             // local PAP goes for first
             swapElementsOfArray(localPAPAliasIdx, 0, repositoryAliasArray);
         }

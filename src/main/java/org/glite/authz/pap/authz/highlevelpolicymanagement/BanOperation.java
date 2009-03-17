@@ -43,7 +43,7 @@ public class BanOperation extends BasePAPOperation<String> {
 		boolean policySetNeedToBeSaved = true;
 		boolean updateOperationForPolicySet = false;
 		boolean updateOperationForPolicy = false;
-		PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+		PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
 		PolicySetType targetPolicySet = getTargetPolicySet(localPAP);
 

@@ -29,7 +29,7 @@ public class AddPolicySetOperation extends BasePAPOperation<String> {
 
         policySet.setPolicySetId(policySetId);
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
         localPAP.addPolicySet(index, policySet);
 

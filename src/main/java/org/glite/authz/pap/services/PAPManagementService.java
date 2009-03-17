@@ -128,9 +128,9 @@ public class PAPManagementService implements PAPManagement {
 		log.info("updateTrustedPAP(" + papData.getPapId() + "," + papData + ");");
 		try {
 
-			if (PAP.LOCAL_PAP_ALIAS.equals(papData.getAlias())) {
+			if (PAP.DEFAULT_PAP_ALIAS.equals(papData.getAlias())) {
 				throw new PAPManagerException(String.format("Invalid request. \"%s\" cannot be updated",
-					PAP.LOCAL_PAP_ALIAS));
+					PAP.DEFAULT_PAP_ALIAS));
 			}
 
 			return UpdateTrustedPAPOperation.instance(papData).execute();

@@ -40,7 +40,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
             return null;
         }
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
         if (localPAP.hasPolicySet(id)) {
 

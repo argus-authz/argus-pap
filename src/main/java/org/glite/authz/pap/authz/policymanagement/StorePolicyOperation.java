@@ -32,7 +32,7 @@ public class StorePolicyOperation extends BasePAPOperation <String>{
     protected String doExecute() {
         
         
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
         
         String policyId = WizardUtils.generateId(idPrefix);
         policy.setPolicyId(policyId);

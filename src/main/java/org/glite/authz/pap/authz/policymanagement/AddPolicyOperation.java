@@ -29,7 +29,7 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
 
     protected String doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
         if (!localPAP.hasPolicySet(policySetId)) {
             log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));

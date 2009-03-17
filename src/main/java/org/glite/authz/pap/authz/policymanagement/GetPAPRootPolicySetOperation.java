@@ -26,7 +26,7 @@ public class GetPAPRootPolicySetOperation extends BasePAPOperation<PolicySetType
 
         PAPContainer pap;
         if (papAlias == null) {
-        	pap = PAPManager.getInstance().getLocalPAPContainer();
+        	pap = PAPManager.getInstance().getDefaultPAPContainer();
         } else {
         	pap = PAPManager.getInstance().getRemotePAPContainer(papAlias);
         }

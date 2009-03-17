@@ -24,7 +24,7 @@ public class RemovePolicySetOperation extends BasePAPOperation<Boolean> {
     @Override
     protected Boolean doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
         try {
             localPAP.deletePolicySet(policySetId);

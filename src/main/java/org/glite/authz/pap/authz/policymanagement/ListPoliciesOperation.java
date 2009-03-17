@@ -26,7 +26,7 @@ public class ListPoliciesOperation extends BasePAPOperation <PolicyType[]> {
     @Override
     protected PolicyType[] doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
         
         List<PolicyType> policyList = localPAP.getAllPolicies();
         

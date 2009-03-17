@@ -22,7 +22,7 @@ public class ListPolicySetOperation extends BasePAPOperation<PolicySetType[]> {
     @Override
     protected PolicySetType[] doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
         List<PolicySetType> policySetList = localPAP.getAllPolicySets();
 

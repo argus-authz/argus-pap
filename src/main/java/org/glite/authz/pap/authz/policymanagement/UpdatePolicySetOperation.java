@@ -25,7 +25,7 @@ public class UpdatePolicySetOperation extends BasePAPOperation<Boolean> {
     @Override
     protected Boolean doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
         if (!localPAP.hasPolicySet(policySet.getPolicySetId())) {
             return false;

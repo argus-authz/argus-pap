@@ -30,7 +30,7 @@ public class StorePolicySetOperation extends BasePAPOperation <String>{
     
     protected String doExecute() {
         
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
         
         String policySetId = policySet.getPolicySetId();
         

@@ -29,7 +29,7 @@ public final class PAPService {
         PAPManager papManager = PAPManager.getInstance();
 
         // Property: number of local policies
-        int numberOfLocalPolicies = papManager.getLocalPAPContainer().getNumberOfPolicies();
+        int numberOfLocalPolicies = papManager.getDefaultPAPContainer().getNumberOfPolicies();
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME,
                 numberOfLocalPolicies);
 
@@ -46,7 +46,7 @@ public final class PAPService {
                 numberOfLocalPolicies + numOfRemotePolicies);
 
         // Property: policy last modification time
-        String policyLastModificationTimeString = papManager.getLocalPAP().getPolicyLastModificationTimeString();
+        String policyLastModificationTimeString = papManager.getDefaultPAP().getPolicyLastModificationTimeString();
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
                 policyLastModificationTimeString);
     }

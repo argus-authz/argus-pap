@@ -107,7 +107,7 @@ public class DistributionConfiguration {
         int idx = 0;
         for (String papAlias : aliasSet) {
             
-            if (PAP.LOCAL_PAP_ALIAS.equals(papAlias)) {
+            if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
                 continue;
             }
             
@@ -189,7 +189,7 @@ public class DistributionConfiguration {
         if (isEmpty(alias))
             return false;
         
-        if (PAP.LOCAL_PAP_ALIAS.equals(alias)) {
+        if (PAP.DEFAULT_PAP_ALIAS.equals(alias)) {
             return true;
         }
 

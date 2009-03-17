@@ -41,7 +41,7 @@ public class ProvisioningServiceDAO {
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
         List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
-        papContainerList.add(papManager.getLocalPAPContainer());
+        papContainerList.add(papManager.getDefaultPAPContainer());
 
         List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
 
@@ -204,7 +204,7 @@ public class ProvisioningServiceDAO {
     }
 
     private PolicySetType makeRootPolicySet() {
-    	String rootPolicySetId = "root-" + PAPManager.getInstance().getLocalPAP().getPapId();
+    	String rootPolicySetId = "root-" + PAPManager.getInstance().getDefaultPAP().getPapId();
         PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(rootPolicySetId,
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         rootPolicySet.setVersion(RepositoryManager.getVersion());

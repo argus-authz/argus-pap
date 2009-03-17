@@ -93,7 +93,7 @@ public abstract class RepositoryManager {
             throw new RepositoryException(e);
         }
 
-        PAPContainer localPapContainer = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPapContainer = PAPManager.getInstance().getDefaultPAPContainer();
 
         localPapContainer.deleteAllPolicies();
         localPapContainer.deleteAllPolicySets();

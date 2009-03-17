@@ -280,7 +280,7 @@ public class PAPContainer {
 
         String propName;
 
-        if (PAP.LOCAL_PAP_ALIAS.equals(pap.getAlias())) {
+        if (PAP.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
             propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
         } else {
             propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
@@ -310,7 +310,7 @@ public class PAPContainer {
 
         String propName;
 
-        if (PAP.LOCAL_PAP_ALIAS.equals(pap.getAlias())) {
+        if (PAP.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
             propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
         } else {
             propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
@@ -338,7 +338,7 @@ public class PAPContainer {
 
     private void notifyPolicyLastModificationTimeUpdate() {
 
-        if (!PAP.LOCAL_PAP_ALIAS.equals(pap.getAlias())) {
+        if (!PAP.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
             return;
         }
 

@@ -28,7 +28,7 @@ public class GetPolicySetOperation extends BasePAPOperation <PolicySetType>{
     @Override
     protected PolicySetType doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
         
         if (!localPAP.hasPolicySet(policySetId))
             throw new NotFoundException("PolicySet '" + policySetId + "' not found.");

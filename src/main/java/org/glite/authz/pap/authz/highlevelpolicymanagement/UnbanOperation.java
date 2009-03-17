@@ -41,7 +41,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 		UnbanResult unbanResult = new UnbanResult();
 		unbanResult.setConflictingPolicies(new String[0]);
 
-		PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+		PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
 		List<PolicySetType> targetPolicySetList = getTargetPolicySetList(localPAP);
 

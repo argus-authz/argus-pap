@@ -17,10 +17,10 @@ public class PAP {
     public static String DEFAULT_PORT = "4554";
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
-    public static final String LOCAL_PAP_ALIAS = "Local";
+    public static final String DEFAULT_PAP_ALIAS = "Local";
     
     private static DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
-    private static final String LOCAL_PAP_ID = "Local";
+    private static final String DEFAULT_PAP_ID = "Local";
     private static final Logger log = LoggerFactory.getLogger(PAP.class);
 
     private String alias;
@@ -60,8 +60,8 @@ public class PAP {
 
         this.alias = alias;
         
-        if (LOCAL_PAP_ALIAS.equals(alias)) {
-            papId = LOCAL_PAP_ID;
+        if (DEFAULT_PAP_ALIAS.equals(alias)) {
+            papId = DEFAULT_PAP_ID;
         } else {
             papId = alias;
         }
@@ -85,8 +85,8 @@ public class PAP {
             this.protocol = protocol;
     }
 
-    public static PAP makeLocalPAP() {
-        return new PAP(LOCAL_PAP_ALIAS, LOCAL_PAP_ALIAS, "localhost", true);
+    public static PAP makeDefaultPAP() {
+        return new PAP(DEFAULT_PAP_ALIAS, DEFAULT_PAP_ALIAS, "localhost", true);
     }
 
     public boolean equals(PAP pap) {

@@ -24,7 +24,7 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
     @Override
     protected Boolean doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
 
         if (localPAP.getPAPRootPolicySetId().equals(id)) {
             throw new RepositoryException("Invalid operation: cannot remove the local PAP root policy set");

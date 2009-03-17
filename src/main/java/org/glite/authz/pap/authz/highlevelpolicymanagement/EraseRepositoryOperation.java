@@ -19,12 +19,12 @@ public class EraseRepositoryOperation extends BasePAPOperation<Object> {
         
         PAPManager papManager = PAPManager.getInstance();
         
-        PAPContainer localPAPContainer = papManager.getLocalPAPContainer();
+        PAPContainer localPAPContainer = papManager.getDefaultPAPContainer();
         
         localPAPContainer.deleteAllPolicySets();
         localPAPContainer.deleteAllPolicies();
         
-        papManager.createLocalPAPIfNotExists();
+        papManager.createDefaultPAPIfNotExists();
         
         return null;
     }

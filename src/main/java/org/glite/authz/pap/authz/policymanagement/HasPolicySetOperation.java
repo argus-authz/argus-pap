@@ -23,7 +23,7 @@ public class HasPolicySetOperation extends BasePAPOperation <Boolean> {
     @Override
     protected Boolean doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getLocalPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
         return localPAP.hasPolicySet( policySetId );
     }
 
