@@ -98,7 +98,8 @@ public class PolicySetWizard extends XACMLWizard {
                 }
             }
             if (!found) {
-                throw new PolicySetWizardException("Not found policy reference: " + policyIdReference);
+            	PolicySetHelper.deletePolicyReference(policySet, policyIdReference);
+                log.debug("Not found policy reference: " + policyIdReference);
             }
         }
 
@@ -121,7 +122,8 @@ public class PolicySetWizard extends XACMLWizard {
                 }
             }
             if (!found) {
-                throw new PolicySetWizardException("Not found policy set reference: " + policySetIdReference);
+            	PolicySetHelper.deletePolicySetReference(policySet, policySetIdReference);
+            	log.error("Not found policy set reference: " + policySetIdReference);
             }
         }
     }
