@@ -153,7 +153,7 @@ public class ListPolicies extends PolicyManagementCLI {
         String[] papInfoArray = null;
 
         if (commandLine.hasOption(OPT_ALLPAPS)) {
-            PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
+            PAPData[] papDataArray = papMgmtClient.getAllPAPs();
             papAliasArray = new String[papDataArray.length + 1];
             papAliasArray[0] = null;
             for (int i = 0; i < papDataArray.length; i++) {
@@ -205,7 +205,7 @@ public class ListPolicies extends PolicyManagementCLI {
                     papData = papDataArray[j];
                     j++;
                 } else {
-                    papData = papMgmtClient.getTrustedPAP(alias);
+                    papData = papMgmtClient.getPAP(alias);
                 }
                 papInfoArray[i] = String.format("%s (%s:%s):", papData.getAlias(), papData.getHostname(), papData.getPort());
             }

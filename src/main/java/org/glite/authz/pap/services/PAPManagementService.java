@@ -20,125 +20,124 @@ import org.slf4j.LoggerFactory;
 
 public class PAPManagementService implements PAPManagement {
 
-	private static final Logger log = LoggerFactory.getLogger(PAPManagementService.class);
+    private static final Logger log = LoggerFactory.getLogger(PAPManagementService.class);
 
-	public boolean addTrustedPAP(PAPData papData) throws RemoteException {
-		log.info("addTrustedPAP();");
+    public boolean addPAP(PAPData papData) throws RemoteException {
+        log.info("addTrustedPAP();");
 
-		try {
+        try {
 
-			return AddTrustedPAPOperation.instance(papData).execute();
+            return AddTrustedPAPOperation.instance(papData).execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
-	public boolean exists(String papId) throws RemoteException {
-		log.info("exists(" + papId + ");");
+    public boolean exists(String papAlias) throws RemoteException {
+        log.info("exists(" + papAlias + ");");
 
-		try {
+        try {
 
-			return TrustedPAPExistsOperation.instance(papId).execute();
+            return TrustedPAPExistsOperation.instance(papAlias).execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
 
-	}
+    }
 
-	public String[] getOrder() throws RemoteException {
-		try {
+    public PAPData[] getAllPAPs() throws RemoteException {
+        log.info("listTrustedPAPs();");
+        try {
 
-			return GetOrderOperation.instance().execute();
+            return ListTrustedPAPsOperation.instance().execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
-	public PAPData getTrustedPAP(String papId) throws RemoteException {
-		log.info("getTrustedPAP(" + papId + ");");
-		try {
+    public String[] getOrder() throws RemoteException {
+        try {
 
-			return GetTrustedPAPOperation.instance(papId).execute();
+            return GetOrderOperation.instance().execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
-	public PAPData[] listTrustedPAPs() throws RemoteException {
-		log.info("listTrustedPAPs();");
-		try {
+    public PAPData getPAP(String papAlias) throws RemoteException {
+        log.info("getTrustedPAP(" + papAlias + ");");
+        try {
 
-			return ListTrustedPAPsOperation.instance().execute();
+            return GetTrustedPAPOperation.instance(papAlias).execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
-	public String ping() throws RemoteException {
-		log.info("Requested ping()");
-		return "PAP v0.1";
-	}
+    public String ping() throws RemoteException {
+        log.info("Requested ping()");
+        return "PAP v0.1";
+    }
 
-	public boolean refreshCache(String papId) throws RemoteException {
-		log.info("refreshCache(" + papId + ");");
-		try {
+    public boolean refreshCache(String papAlias) throws RemoteException {
+        log.info("refreshCache(" + papAlias + ");");
+        try {
 
-			return RefreshPolicyCacheOperation.instance(papId).execute();
+            return RefreshPolicyCacheOperation.instance(papAlias).execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
-	public boolean removeTrustedPAP(String papId) throws RemoteException {
-		log.info("removeTrustedPAP(" + papId + ");");
-		try {
+    public boolean removePAP(String papAlias) throws RemoteException {
+        log.info("removeTrustedPAP(" + papAlias + ");");
+        try {
 
-			return RemoveTrustedPAPOperation.instance(papId).execute();
+            return RemoveTrustedPAPOperation.instance(papAlias).execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
-	public boolean setOrder(String[] aliasArray) throws RemoteException {
-		try {
+    public boolean setOrder(String[] aliasArray) throws RemoteException {
+        try {
 
-			return SetOrderOperation.instance(aliasArray).execute();
+            return SetOrderOperation.instance(aliasArray).execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
-	public boolean updateTrustedPAP(PAPData papData) throws RemoteException {
-		log.info("updateTrustedPAP(" + papData.getId() + "," + papData + ");");
-		try {
+    public boolean updatePAP(PAPData papData) throws RemoteException {
+        log.info("updateTrustedPAP(" + papData.getId() + "," + papData + ");");
+        try {
 
-			if (PAP.DEFAULT_PAP_ALIAS.equals(papData.getAlias())) {
-				throw new PAPManagerException(String.format("Invalid request. \"%s\" cannot be updated",
-					PAP.DEFAULT_PAP_ALIAS));
-			}
+            if (PAP.DEFAULT_PAP_ALIAS.equals(papData.getAlias())) {
+                throw new PAPManagerException(String.format("Invalid request. \"%s\" cannot be updated", PAP.DEFAULT_PAP_ALIAS));
+            }
 
-			return UpdateTrustedPAPOperation.instance(papData).execute();
+            return UpdateTrustedPAPOperation.instance(papData).execute();
 
-		} catch (RuntimeException e) {
-			ServiceClassExceptionManager.log(log, e);
-			throw e;
-		}
-	}
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
 
 }

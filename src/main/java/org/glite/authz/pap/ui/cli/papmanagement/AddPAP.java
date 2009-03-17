@@ -84,7 +84,7 @@ public class AddPAP extends PAPManagementCLI {
         papData.setProtocol(pap.getProtocol());
         papData.setVisibilityPublic(pap.isVisibilityPublic());
         
-        papMgmtClient.addTrustedPAP(papData);
+        papMgmtClient.addPAP(papData);
         
         if (verboseMode)
             System.out.println("Success: new trusted PAP has been added.");

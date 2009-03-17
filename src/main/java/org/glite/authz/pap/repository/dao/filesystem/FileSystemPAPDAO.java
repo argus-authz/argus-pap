@@ -28,7 +28,7 @@ public class FileSystemPAPDAO implements PAPDAO {
     private static final Logger log = LoggerFactory.getLogger(FileSystemPAPDAO.class);
 
     private static final String PAP_FILE_NAME = "pap_info.ini";
-    private static final String REMOTE_PAP_STANZA = "remote-paps";
+    private static final String REMOTE_PAP_STANZA = "paps";
     private static final String VERSION_KEY = "general-info.version";
 
     private INIConfiguration papsINIFile;
@@ -228,7 +228,7 @@ public class FileSystemPAPDAO implements PAPDAO {
     }
 
     private boolean existsInINIFile(String papAlias) {
-        return keyExists(dnKey(papAlias));
+        return keyExists(idKey(papAlias));
     }
 
     private String getPAPDirAbsolutePath(String papId) {

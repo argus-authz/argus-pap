@@ -35,7 +35,7 @@ public class RemovePAP extends PAPManagementCLI {
         	return ExitStatus.FAILURE.ordinal();
         }
         
-        papMgmtClient.removeTrustedPAP(papId);
+        papMgmtClient.removePAP(papId);
         
         return ExitStatus.SUCCESS.ordinal();
         

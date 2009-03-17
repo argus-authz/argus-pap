@@ -25,7 +25,7 @@ public class RefreshCache extends PAPManagementCLI {
     private List<String> getAllPAPIds() throws RemoteException {
         List<String> papIdList = new LinkedList<String>();
         
-        PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
+        PAPData[] papDataArray = papMgmtClient.getAllPAPs();
         
         for (PAPData papData : papDataArray) {
             papIdList.add(papData.getId());

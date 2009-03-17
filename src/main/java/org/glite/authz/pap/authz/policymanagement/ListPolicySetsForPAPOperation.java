@@ -29,7 +29,7 @@ public class ListPolicySetsForPAPOperation extends
     @Override
     protected PolicySetType[] doExecute() {
         
-        PAPContainer pap = PAPManager.getInstance().getRemotePAPContainer( papId );
+        PAPContainer pap = PAPManager.getInstance().getPAPContainer( papId );
         
         List<PolicySetType> policySetList = pap.getAllPolicySets();
         

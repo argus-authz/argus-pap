@@ -43,7 +43,7 @@ public class ProvisioningServiceDAO {
         List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
         papContainerList.add(papManager.getDefaultPAPContainer());
 
-        List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
+        List<PAPContainer> publicPAPContainerList = PAPContainer.getContainers(papManager.getPublicPAPs());
 
         PolicySetType rootPolicySet = makeRootPolicySet();
         resultList.add(rootPolicySet);
@@ -91,7 +91,7 @@ public class ProvisioningServiceDAO {
 
         resultList.add(rootPolicySet);
 
-        PAPContainer[] papContainerList = papManager.getOrderedPAPContainerArray();
+        List<PAPContainer> papContainerList = PAPContainer.getContainers(papManager.getAllPAPs());
 
         // Add references to the remote PAPs
         for (PAPContainer papContainer : papContainerList) {

@@ -24,29 +24,31 @@ public class PAP {
             }
             return LOCAL;
         }
+        public String toString() {
+            return super.toString().toLowerCase();
+        }
     }
 
     public static String DEFAULT_DN = "invalid_dn";
 
     public static String DEFAULT_HOST = "localhost";
-    public static final String DEFAULT_PAP_ALIAS = "Local";
+    public static final String DEFAULT_PAP_ALIAS = "default";
     public static String DEFAULT_PORT = "4554";
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
 
-    private static final String DEFAULT_PAP_ID = "Local";
     private static DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
     private static final Logger log = LoggerFactory.getLogger(PAP.class);
 
-    private String alias;
-    private String dn;
-    private String hostname;
-    private String papId;
-    private String path;
+    private String alias = null;
+    private String dn = null;
+    private String hostname = null;
+    private String papId = null;
+    private String path = null;
     private Date policyLastModificationTime = null;
-    private String port;
-    private String protocol;
-    private PSType pstype;
+    private String port = null;
+    private String protocol = null;
+    private PSType pstype = null;
     private boolean visibilityPublic;
 
     public PAP(PAPData papData) {
@@ -64,19 +66,22 @@ public class PAP {
         assert (alias != null) && (alias.length() > 0) : "alias cannot be null or empty";
 
         this.alias = alias;
+        this.visibilityPublic = visibilityPublic;
+        this.pstype = pstype;
 
         if (DEFAULT_PAP_ALIAS.equals(alias)) {
-            papId = DEFAULT_PAP_ID;
+            papId = DEFAULT_PAP_ALIAS;
         } else {
             papId = alias;
         }
-        this.visibilityPublic = visibilityPublic;
 
-        this.dn = DEFAULT_DN;
-        this.hostname = DEFAULT_HOST;
-        this.port = DEFAULT_PORT;
-        this.path = DEFAULT_SERVICES_ROOT_PATH;
-        this.protocol = DEFAULT_PROTOCOL;
+        if (pstype == PSType.REMOTE) {
+            this.dn = DEFAULT_DN;
+            this.hostname = DEFAULT_HOST;
+            this.port = DEFAULT_PORT;
+            this.path = DEFAULT_SERVICES_ROOT_PATH;
+            this.protocol = DEFAULT_PROTOCOL;
+        }
 
         if (Utils.isDefined(dn))
             this.dn = dn;
@@ -88,8 +93,6 @@ public class PAP {
             this.path = servicesRootPath;
         if (Utils.isDefined(protocol))
             this.protocol = protocol;
-
-        this.pstype = pstype;
     }
 
     public PAP(String alias, String dn, String hostname) {
@@ -177,6 +180,10 @@ public class PAP {
 
     public PSType getType() {
         return pstype;
+    }
+    
+    public String getTypeAsString() {
+        return pstype.toString();
     }
 
     public boolean isLocal() {

@@ -25,7 +25,7 @@ public class GetPAPPolicyOperation extends BasePAPOperation<PolicyType> {
     @Override
     protected PolicyType doExecute() {
 
-        PAPContainer pap = PAPManager.getInstance().getRemotePAPContainer(papAlias);
+        PAPContainer pap = PAPManager.getInstance().getPAPContainer(papAlias);
 
         PolicyType policy = pap.getPolicy(policyId);
 

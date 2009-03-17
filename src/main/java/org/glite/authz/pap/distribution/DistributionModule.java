@@ -71,7 +71,7 @@ public class DistributionModule extends Thread {
         storePAPPolicies(pap, papPolicies);
     }
 
-    private static synchronized void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
+    private static void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
 
         if (papPolicies.isEmpty()) {
             return;
@@ -80,7 +80,7 @@ public class DistributionModule extends Thread {
         log.debug(String.format("Storing policies for PAP %s (id=%s)", pap.getAlias(), pap.getPapId()));
 
         PAPManager papManager = PAPManager.getInstance();
-        PAPContainer papContainer = papManager.getRemotePAPContainer(pap.getAlias());
+        PAPContainer papContainer = papManager.getPAPContainer(pap.getAlias());
 
         synchronized (storePoliciesLock) {
 
@@ -131,7 +131,7 @@ public class DistributionModule extends Thread {
 
                 log.info("Starting refreshing cache process...");
 
-                for (PAP pap : PAPManager.getInstance().getOrderedRemotePAPsArray()) {
+                for (PAP pap : PAPManager.getInstance().getOrderedRemotePAPs()) {
 
                     if (this.isInterrupted())
                         break;

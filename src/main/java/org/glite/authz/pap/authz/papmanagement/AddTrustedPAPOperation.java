@@ -33,7 +33,7 @@ public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
         
         try {
             
-            PAPManager.getInstance().addTrustedPAP( pap );
+            PAPManager.getInstance().addPAP( pap );
             
         } catch (AlreadyExistsException e) {
             return false;
