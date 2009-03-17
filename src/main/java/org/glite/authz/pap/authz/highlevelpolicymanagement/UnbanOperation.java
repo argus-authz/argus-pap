@@ -16,8 +16,12 @@ import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UnbanOperation extends BasePAPOperation<UnbanResult> {
+	
+	private static final Logger log = LoggerFactory.getLogger(UnbanOperation.class);
 
     private final AttributeWizard actionAttributeWizard;
     private final AttributeWizard bannedAttributeWizard;
@@ -46,6 +50,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 		List<PolicySetType> targetPolicySetList = getTargetPolicySetList(localPAP);
 
 		if (targetPolicySetList.isEmpty()) {
+			log.debug("targetPolicySet not found");
 			unbanResult.setStatusCode(1);
 			return unbanResult;
 		}
@@ -60,6 +65,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 		}
 		
 		if (targetPolicy == null) {
+			log.debug("targetPolicy not found");
 			unbanResult.setStatusCode(1);
 			return unbanResult;
 		}
@@ -68,12 +74,15 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 		TypeStringUtils.releaseUnneededMemory(targetPolicy);
 
 		if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
+			log.debug("ban rule found");
 
 			if (policyWizard.getNumberOfRules() == 0) {
 				
+				log.debug("no more rules in the policy, removing policy");
 				localPAP.removePolicyAndReferences(policyWizard.getPolicyId());
 				
 			} else {
+				log.debug("updating the policy");
 				String oldVersion = policyWizard.getVersionString();
 				policyWizard.increaseVersion();
 				localPAP.updatePolicy(oldVersion, policyWizard.getXACML());

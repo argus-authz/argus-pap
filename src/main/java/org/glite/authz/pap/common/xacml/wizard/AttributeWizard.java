@@ -13,7 +13,7 @@ public class AttributeWizard {
 
     public enum AttributeWizardType {
         ACTION("action", "urn:oasis:names:tc:xacml:1.0:action:action-id", DataType.STRING, TargetElement.ACTION),
-        DEFAULT("default", "urn:oasis:names:tc:xacml:1.0:subject:subject-id", DataType.STRING, TargetElement.SUBJECT),
+        DEFAULT("default", "http://cnaf.tmp/xacml/subject/default", DataType.STRING, TargetElement.SUBJECT),
         VO("vo", "http://authz-interop.org/xacml/subject/vo", DataType.STRING, TargetElement.SUBJECT),
         DN("dn", "urn:oasis:names:tc:xacml:1.0:subject:subject-id", DataType.X_500_NAME, TargetElement.SUBJECT),
         FQAN("fqan", "http://authz-interop.org/xacml/subject/voms-fqan", DataType.STRING, TargetElement.SUBJECT),
