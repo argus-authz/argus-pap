@@ -13,13 +13,14 @@ public class AttributeWizard {
 
     public enum AttributeWizardType {
         ACTION("action", "urn:oasis:names:tc:xacml:1.0:action:action-id", DataType.STRING, TargetElement.ACTION),
-        CA("ca", "urn:oasis:names:tc:xacml:1.0:subject:subject-id:ca", DataType.X_500_NAME, TargetElement.SUBJECT),
         DEFAULT("default", "urn:oasis:names:tc:xacml:1.0:subject:subject-id", DataType.STRING, TargetElement.SUBJECT),
-        DN("dn", "urn:oasis:names:tc:xacml:1.0:subject:subject-id:dn", DataType.X_500_NAME, TargetElement.SUBJECT),
-        FQAN("fqan", "urn:oasis:names:tc:xacml:1.0:subject:subject-id:fqan", DataType.STRING, TargetElement.SUBJECT),
-        GA("ga", "urn:oasis:names:tc:xacml:1.0:subject:subject-id:ga", DataType.STRING, TargetElement.SUBJECT),
-        RESOURCE_PS("resource", "urn:oasis:names:tc:xacml:1.0:resource:resource-id", DataType.STRING, TargetElement.RESOURCE),
-        SERVICE_CLASS("service_class", "SERVICE_CLASS", DataType.STRING, TargetElement.RESOURCE);
+        VO("vo", "http://authz-interop.org/xacml/subject/vo", DataType.STRING, TargetElement.SUBJECT),
+        DN("dn", "urn:oasis:names:tc:xacml:1.0:subject:subject-id", DataType.X_500_NAME, TargetElement.SUBJECT),
+        FQAN("fqan", "http://authz-interop.org/xacml/subject/voms-fqan", DataType.STRING, TargetElement.SUBJECT),
+        PFQAN("pfqan", "http://authz-interop.org/xacml/subject/primaryfqan", DataType.STRING, TargetElement.SUBJECT),
+        CA("ca", "http://cnaf.tmp/xacml/subject/ca", DataType.X_500_NAME, TargetElement.SUBJECT),
+        GA("ga", "http://authz-interop.org/xacml/subject/voms-generic-attribute", DataType.STRING, TargetElement.SUBJECT),
+        RESOURCE_PS("resource", "urn:oasis:names:tc:xacml:1.0:resource:resource-id", DataType.STRING, TargetElement.RESOURCE);
 
         public enum TargetElement {
             ACTION, ENVIRONMENT, RESOURCE, SUBJECT
