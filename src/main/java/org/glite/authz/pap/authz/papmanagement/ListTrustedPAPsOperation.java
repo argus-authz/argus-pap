@@ -39,7 +39,7 @@ public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
             papData.setAlias(pap.getAlias());
             papData.setDn(pap.getDn());
             papData.setHostname(pap.getHostname());
-            papData.setPapId(pap.getPapId());
+            papData.setId(pap.getPapId());
             papData.setPath(pap.getPath());
             papData.setPort(pap.getPort());
             papData.setProtocol(pap.getProtocol());

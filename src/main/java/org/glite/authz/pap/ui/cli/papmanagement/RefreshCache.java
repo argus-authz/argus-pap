@@ -28,7 +28,7 @@ public class RefreshCache extends PAPManagementCLI {
         PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
         
         for (PAPData papData : papDataArray) {
-            papIdList.add(papData.getPapId());
+            papIdList.add(papData.getId());
         }
         
         return papIdList;

@@ -125,7 +125,7 @@ public class PAPManagementService implements PAPManagement {
 	}
 
 	public boolean updateTrustedPAP(PAPData papData) throws RemoteException {
-		log.info("updateTrustedPAP(" + papData.getPapId() + "," + papData + ");");
+		log.info("updateTrustedPAP(" + papData.getId() + "," + papData + ");");
 		try {
 
 			if (PAP.DEFAULT_PAP_ALIAS.equals(papData.getAlias())) {
