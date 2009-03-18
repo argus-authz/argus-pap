@@ -48,6 +48,10 @@ public class BanOperation extends BasePAPOperation<String> {
         boolean updateOperationForPolicySet = false;
         boolean updateOperationForPolicy = false;
 
+        if (alias == null) {
+            alias = PAP.DEFAULT_PAP_ALIAS;
+        }
+        
         PAP pap = PAPManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {

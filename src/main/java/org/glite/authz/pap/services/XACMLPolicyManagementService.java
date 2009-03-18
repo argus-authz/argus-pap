@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import org.glite.authz.pap.authz.policymanagement.AddPoliciesOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.GetPAPRootPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.GetRootPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.HasPolicyOperation;
@@ -87,7 +87,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            return GetPAPRootPolicySetOperation.instance(papAlias).execute();
+            return GetRootPolicySetOperation.instance(papAlias).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

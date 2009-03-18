@@ -25,7 +25,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
     private static final Logger log = LoggerFactory.getLogger(UnbanOperation.class);
 
-    private final String alias;
+    private String alias;
     private final AttributeWizard actionAttributeWizard;
     private final AttributeWizard bannedAttributeWizard;
     private final AttributeWizard resourceAttributeWizard;
@@ -49,6 +49,10 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         UnbanResult unbanResult = new UnbanResult();
         unbanResult.setConflictingPolicies(new String[0]);
 
+        if (alias == null) {
+            alias = PAP.DEFAULT_PAP_ALIAS;
+        }
+        
         PAP pap = PAPManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {

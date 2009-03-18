@@ -44,6 +44,10 @@ public class MoveOperation extends BasePAPOperation<Object> {
             return null;
         }
 
+        if (alias == null) {
+            alias = PAP.DEFAULT_PAP_ALIAS;
+        }
+        
         PAP pap = PAPManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {

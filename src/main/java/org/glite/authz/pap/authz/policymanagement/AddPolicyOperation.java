@@ -33,6 +33,10 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
     }
 
     protected String doExecute() {
+        
+        if (alias == null) {
+            alias = PAP.DEFAULT_PAP_ALIAS;
+        }
 
         PAP pap = PAPManager.getInstance().getPAP(alias);
 
