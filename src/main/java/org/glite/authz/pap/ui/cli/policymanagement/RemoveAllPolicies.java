@@ -33,6 +33,10 @@ public class RemoveAllPolicies extends PolicyManagementCLI {
     @Override
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
 
+        if (commandLine.getArgs().length != 1) {
+            throw new ParseException("Wrong number of arguments");
+        }
+        
         if (commandLine.hasOption(OPT_PAPALIAS)) {
             alias = commandLine.getOptionValue(OPT_PAPALIAS);
         }
