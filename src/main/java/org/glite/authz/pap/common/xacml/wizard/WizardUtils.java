@@ -21,7 +21,7 @@ public class WizardUtils {
             return id;
         }
 
-        return prefix + "_" + generateUUID();
+        return prefix + "-" + generateUUID();
     }
 
     public static List<AttributeType> getAttributes(List<AttributeWizard> list, AttributeWizardType.TargetElement type) {

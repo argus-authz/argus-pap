@@ -37,6 +37,10 @@ public class RefreshPolicyCacheOperation extends BasePAPOperation<Boolean> {
             log.error("Unable to refresh cache, PAP not found: " + papAlias);
             return false;
         }
+        
+        if (!(pap.isRemote())) {
+            throw new PAPException("\"" + papAlias + "\" is local, nothing to refresh");
+        }
 
         try {
             DistributionModule.refreshCache(pap);

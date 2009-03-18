@@ -10,17 +10,17 @@
 			targetNamespace="http://org.glite.authz/wsdl/pap/services/pap_management">
 			<xsd:complexType name="PAPData">
 				<xsd:sequence>
-					<xsd:element name="alias" type="xsd:string"></xsd:element>
-					<xsd:element name="id" type="xsd:string"></xsd:element>
-					<xsd:element name="dn" type="xsd:string"></xsd:element>
-					<xsd:element name="hostname" type="xsd:string"></xsd:element>
-					<xsd:element name="port" type="xsd:string"></xsd:element>
-					<xsd:element name="path" type="xsd:string"></xsd:element>
-					<xsd:element name="protocol" type="xsd:string"></xsd:element>
+					<xsd:element name="alias" type="xsd:string" maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="id" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="dn" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="hostname" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="port" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="path" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="protocol" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
 					<xsd:element name="visibilityPublic"
-						type="xsd:boolean">
+						type="xsd:boolean" maxOccurs="1" minOccurs="1">
 					</xsd:element>
-					<xsd:element name="type" type="xsd:string"></xsd:element>
+					<xsd:element name="type" type="xsd:string" maxOccurs="1" minOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:complexType>
 			<xsd:complexType name="PAPDataList">
@@ -38,28 +38,28 @@
 		</xsd:schema>
 	</wsdl:types>
 
-	<wsdl:message name="addTrustedPAPRequest">
+	<wsdl:message name="addPAPRequest">
 		<wsdl:part name="pap" type="tns:PAPData" />
 	</wsdl:message>
-	<wsdl:message name="addTrustedPAPResponse">
-		<wsdl:part name="addTrustedPAPResponse" type="xsd:boolean" />
+	<wsdl:message name="addPAPResponse">
+		<wsdl:part name="addPAPResponse" type="xsd:boolean" />
 	</wsdl:message>
 	<wsdl:message name="existsRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+		<wsdl:part name="papAlias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="existsResponse">
 		<wsdl:part name="existsResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="getTrustedPAPRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+	<wsdl:message name="getAllPAPsRequest">
 	</wsdl:message>
-	<wsdl:message name="getTrustedPAPResponse">
-		<wsdl:part name="getTrustedPAPResponse" type="tns:PAPData"></wsdl:part>
+	<wsdl:message name="getAllPAPsResponse">
+		<wsdl:part name="getAllPAPsResponse" type="tns:PAPDataList"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="listTrustedPAPsRequest">
+	<wsdl:message name="getPAPRequest">
+		<wsdl:part name="papAlias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="listTrustedPAPsResponse">
-		<wsdl:part name="listTrustedPAPsResponse" type="tns:PAPDataList"></wsdl:part>
+	<wsdl:message name="getPAPResponse">
+		<wsdl:part name="getPAPResponse" type="tns:PAPData"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="pingRequest">
 	</wsdl:message>
@@ -67,22 +67,22 @@
 		<wsdl:part name="pingResponse" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="refreshCacheRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+		<wsdl:part name="papAlias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="refreshCacheResponse">
 		<wsdl:part name="refreshCacheResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="removeTrustedPAPRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
+	<wsdl:message name="removePAPRequest">
+		<wsdl:part name="papAlias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="removeTrustedPAPResponse">
-		<wsdl:part name="removeTrustedPAPResponse" type="xsd:boolean"></wsdl:part>
+	<wsdl:message name="removePAPResponse">
+		<wsdl:part name="removePAPResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="updateTrustedPAPRequest">
+	<wsdl:message name="updatePAPRequest">
 		<wsdl:part name="pap" type="tns:PAPData"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="updateTrustedPAPResponse">
-		<wsdl:part name="updateTrustedPAPResponse" type="xsd:boolean"></wsdl:part>
+	<wsdl:message name="updatePAPResponse">
+		<wsdl:part name="updatePAPResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="getOrderRequest">
 	</wsdl:message>
@@ -97,21 +97,21 @@
 	</wsdl:message>
 	
 	<wsdl:portType name="PAPManagement">
-		<wsdl:operation name="addTrustedPAP">
-			<wsdl:input message="tns:addTrustedPAPRequest" />
-			<wsdl:output message="tns:addTrustedPAPResponse" />
+		<wsdl:operation name="addPAP">
+			<wsdl:input message="tns:addPAPRequest" />
+			<wsdl:output message="tns:addPAPResponse" />
 		</wsdl:operation>
 		<wsdl:operation name="exists">
 			<wsdl:input message="tns:existsRequest"></wsdl:input>
 			<wsdl:output message="tns:existsResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="getTrustedPAP">
-			<wsdl:input message="tns:getTrustedPAPRequest"></wsdl:input>
-			<wsdl:output message="tns:getTrustedPAPResponse"></wsdl:output>
+		<wsdl:operation name="getAllPAPs">
+			<wsdl:input message="tns:getAllPAPsRequest"></wsdl:input>
+			<wsdl:output message="tns:getAllPAPsResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="listTrustedPAPs">
-			<wsdl:input message="tns:listTrustedPAPsRequest"></wsdl:input>
-			<wsdl:output message="tns:listTrustedPAPsResponse"></wsdl:output>
+		<wsdl:operation name="getPAP">
+			<wsdl:input message="tns:getPAPRequest"></wsdl:input>
+			<wsdl:output message="tns:getPAPResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="ping">
 			<wsdl:input message="tns:pingRequest"></wsdl:input>
@@ -121,13 +121,13 @@
 			<wsdl:input message="tns:refreshCacheRequest"></wsdl:input>
 			<wsdl:output message="tns:refreshCacheResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="removeTrustedPAP">
-			<wsdl:input message="tns:removeTrustedPAPRequest"></wsdl:input>
-			<wsdl:output message="tns:removeTrustedPAPResponse"></wsdl:output>
+		<wsdl:operation name="removePAP">
+			<wsdl:input message="tns:removePAPRequest"></wsdl:input>
+			<wsdl:output message="tns:removePAPResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="updateTrustedPAP">
-			<wsdl:input message="tns:updateTrustedPAPRequest"></wsdl:input>
-			<wsdl:output message="tns:updateTrustedPAPResponse"></wsdl:output>
+		<wsdl:operation name="updatePAP">
+			<wsdl:input message="tns:updatePAPRequest"></wsdl:input>
+			<wsdl:output message="tns:updatePAPResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="getOrder">
 			<wsdl:input message="tns:getOrderRequest"></wsdl:input>
@@ -142,9 +142,9 @@
 	<wsdl:binding name="PAPManagementSOAP" type="tns:PAPManagement">
 		<soap:binding style="rpc"
 			transport="http://schemas.xmlsoap.org/soap/http" />
-		<wsdl:operation name="addTrustedPAP">
+		<wsdl:operation name="addPAP">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/addTrustedPAP" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/addPAP" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />
@@ -166,9 +166,9 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="getTrustedPAP">
+		<wsdl:operation name="getAllPAPs">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/getTrustedPAP" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/getAllPAPs" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />
@@ -178,9 +178,9 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="listTrustedPAPs">
+		<wsdl:operation name="getPAP">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/listTrustedPAPs" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/getPAP" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />
@@ -214,9 +214,9 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="removeTrustedPAP">
+		<wsdl:operation name="removePAP">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/removeTrustedPAP" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/removePAP" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />
@@ -226,9 +226,9 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="updateTrustedPAP">
+		<wsdl:operation name="updatePAP">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/updateTrustedPAP" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/updatePAP" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />
@@ -252,7 +252,7 @@
 		</wsdl:operation>
 		<wsdl:operation name="setOrder">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/updateTrustedPAP" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/updatePAP" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />

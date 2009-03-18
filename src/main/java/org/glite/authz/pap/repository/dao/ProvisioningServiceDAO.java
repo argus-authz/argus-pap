@@ -1,5 +1,6 @@
 package org.glite.authz.pap.repository.dao;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -40,17 +41,20 @@ public class ProvisioningServiceDAO {
 
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
-        papContainerList.add(papManager.getDefaultPAPContainer());
-
-        List<PAPContainer> publicPAPContainerList = papManager.getPublicRemotePAPsContainers();
-
+        List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(PAPContainer.getContainers(papManager.getPublicPAPs()));
+        
         PolicySetType rootPolicySet = makeRootPolicySet();
         resultList.add(rootPolicySet);
-
-        if (!(publicPAPContainerList.isEmpty())) {
-            papContainerList.addAll(publicPAPContainerList);
-        }
+        
+//        List<PAPContainer> papContainerList = new LinkedList<PAPContainer>();
+//        papContainerList.add(papManager.getDefaultPAPContainer());
+//
+//        List<PAPContainer> publicPAPContainerList = PAPContainer.getContainers(papManager.getPublicPAPs());
+//
+//
+//        if (!(publicPAPContainerList.isEmpty())) {
+//            papContainerList.addAll(publicPAPContainerList);
+//        }
 
         for (PAPContainer papContainer : papContainerList) {
 
@@ -91,7 +95,7 @@ public class ProvisioningServiceDAO {
 
         resultList.add(rootPolicySet);
 
-        PAPContainer[] papContainerList = papManager.getOrderedPAPContainerArray();
+        List<PAPContainer> papContainerList = PAPContainer.getContainers(papManager.getAllPAPs());
 
         // Add references to the remote PAPs
         for (PAPContainer papContainer : papContainerList) {

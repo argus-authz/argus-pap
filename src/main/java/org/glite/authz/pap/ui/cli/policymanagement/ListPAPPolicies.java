@@ -64,7 +64,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
         String[] args = commandLine.getArgs();
 
         if (args.length == 1) {
-            PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
+            PAPData[] papDataArray = papMgmtClient.getAllPAPs();
             int size = papDataArray.length;
             papAliasArray = new String[size];
             papInfoArray = new String[size];

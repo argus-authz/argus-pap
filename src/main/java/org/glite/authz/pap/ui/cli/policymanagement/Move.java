@@ -19,6 +19,8 @@ public class Move extends PolicyManagementCLI {
             + "A resource cannot be moved inside an action.";
     private static final String USAGE = "<id> <pivotId> [-a]";
 
+    private String alias = null;
+
     public Move() {
         super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
     }
@@ -31,6 +33,10 @@ public class Move extends PolicyManagementCLI {
                                        .withDescription(OPT_MOVEAFTER_DESCRIPTION)
                                        .withLongOpt(OPT_MOVEAFTER_LONG)
                                        .create(OPT_MOVEAFTER));
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_PAPALIAS_DESCRIPTION)
+                                       .withLongOpt(OPT_PAPALIAS_LONG)
+                                       .create(OPT_PAPALIAS));
         return options;
     }
 
@@ -43,20 +49,24 @@ public class Move extends PolicyManagementCLI {
             throw new ParseException("Wrong number of arguments");
         }
 
+        if (commandLine.hasOption(OPT_PAPALIAS)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        }
+
         String id = args[1];
         String pivotId = args[2];
-        
+
         if (id.equals(pivotId)) {
             return ExitStatus.SUCCESS.ordinal();
         }
-        
+
         boolean moveAfter = false;
 
         if (commandLine.hasOption(OPT_MOVEAFTER)) {
             moveAfter = true;
         }
 
-        xacmlPolicyMgmtClient.move(id, pivotId, moveAfter);
+        xacmlPolicyMgmtClient.move(alias, id, pivotId, moveAfter);
 
         return ExitStatus.SUCCESS.ordinal();
     }

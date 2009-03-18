@@ -197,7 +197,7 @@ public class DistributionConfiguration {
             return true;
         }
 
-        String value = papConfiguration.getString(dnKey(alias));
+        String value = papConfiguration.getString(typeKey(alias));
 
         if (isEmpty(value))
             return false;
@@ -238,24 +238,30 @@ public class DistributionConfiguration {
 
     private PAP getPAPFromProperties(String papAlias) {
 
-        String dn = papConfiguration.getString(dnKey(papAlias));
-        if (dn == null) {
-            throw new DistributionConfigurationException("DN is not set for remote PAP \"" + papAlias + "\"");
-        }
-        
         String type = papConfiguration.getString(typeKey(papAlias));
         if (type == null) {
             throw new DistributionConfigurationException("\"type\" is not set for remote PAP \"" + papAlias + "\"");
         }
+        
+        PAP.PSType pstype = PAP.PSType.get(type);
+        
+        String dn = papConfiguration.getString(dnKey(papAlias));
+        if ((dn == null) && (pstype == PAP.PSType.REMOTE)) {
+            throw new DistributionConfigurationException("DN is not set for remote PAP \"" + papAlias + "\"");
+        }
 
         String hostname = papConfiguration.getString(hostnameKey(papAlias));
+        if ((hostname == null) && (pstype == PAP.PSType.REMOTE)) {
+            throw new DistributionConfigurationException("\"hostname\" is not set for remote PAP \"" + papAlias + "\"");
+        }
+        
         String port = papConfiguration.getString(portKey(papAlias));
         String path = papConfiguration.getString(pathKey(papAlias));
         String protocol = papConfiguration.getString(protocolKey(papAlias));
         boolean visibilityPublic = papConfiguration.getBoolean(visibilityPublicKey(papAlias));
 
         // port, path and protocol can be null or empty
-        return new PAP(papAlias, PAP.PSType.get(type), dn, hostname, port, path, protocol, visibilityPublic);
+        return new PAP(papAlias, pstype, dn, hostname, port, path, protocol, visibilityPublic);
     }
 
     private boolean isEmpty(String s) {

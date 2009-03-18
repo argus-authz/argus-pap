@@ -30,6 +30,7 @@ public class GetTrustedPAPOperation extends BasePAPOperation<PAPData> {
         PAPData papData = new PAPData();
         
         papData.setAlias(pap.getAlias());
+        papData.setType(pap.getTypeAsString());
         papData.setDn(pap.getDn());
         papData.setHostname(pap.getHostname());
         papData.setId(pap.getPapId());

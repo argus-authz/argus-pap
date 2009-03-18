@@ -7,18 +7,18 @@ import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicySetType;
 
-public class GetPAPRootPolicySetOperation extends BasePAPOperation<PolicySetType> {
+public class GetRootPolicySetOperation extends BasePAPOperation<PolicySetType> {
 
     String papAlias;
 
-    protected GetPAPRootPolicySetOperation(String papAlias) {
+    protected GetRootPolicySetOperation(String papAlias) {
 
         this.papAlias = papAlias;
 
     }
 
-    public static GetPAPRootPolicySetOperation instance(String papAlias) {
-        return new GetPAPRootPolicySetOperation(papAlias);
+    public static GetRootPolicySetOperation instance(String papAlias) {
+        return new GetRootPolicySetOperation(papAlias);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class GetPAPRootPolicySetOperation extends BasePAPOperation<PolicySetType
         if (papAlias == null) {
         	pap = PAPManager.getInstance().getDefaultPAPContainer();
         } else {
-        	pap = PAPManager.getInstance().getRemotePAPContainer(papAlias);
+        	pap = PAPManager.getInstance().getPAPContainer(papAlias);
         }
         
         PolicySetType policySet = pap.getPAPRootPolicySet();

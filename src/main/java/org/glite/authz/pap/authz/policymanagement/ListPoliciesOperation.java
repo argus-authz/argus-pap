@@ -5,6 +5,7 @@ import java.util.List;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicyType;
@@ -12,21 +13,25 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class ListPoliciesOperation extends BasePAPOperation <PolicyType[]> {
 
-    private ListPoliciesOperation() {
-
-        
+    String alias;
+    
+    private ListPoliciesOperation(String alias) {    
+        this.alias = alias;
     }
     
-    public static ListPoliciesOperation instance() {
-
-        return new ListPoliciesOperation();
+    public static ListPoliciesOperation instance(String alias) {
+        return new ListPoliciesOperation(alias);
     }
     
     
     @Override
     protected PolicyType[] doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        if (alias == null) {
+            alias = PAP.DEFAULT_PAP_ALIAS;
+        }
+        
+        PAPContainer localPAP = PAPManager.getInstance().getPAPContainer(alias);
         
         List<PolicyType> policyList = localPAP.getAllPolicies();
         

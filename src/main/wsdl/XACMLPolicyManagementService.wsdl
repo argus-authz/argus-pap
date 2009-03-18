@@ -41,46 +41,47 @@
 	</wsdl:types>
 
 	<wsdl:message name="getPolicyRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policyId" type="xsd:string" />
 	</wsdl:message>
 	<wsdl:message name="getPolicyResponse">
 		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="getPolicySetRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="getPolicySetResponse">
 		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="hasPolicyRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="hasPolicyResponse">
 		<wsdl:part name="hasPolicyResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="hasPolicySetRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="hasPolicySetResponse">
 		<wsdl:part name="hasPolicySetResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="listPoliciesRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="listPoliciesResponse">
 		<wsdl:part name="policyList" type="tns1:PolicyList"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="listPolicySetsRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="listPolicySetsResponse">
 		<wsdl:part name="policySetList" type="tns1:PolicySetList"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="listPAPPoliciesRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
-	</wsdl:message>
-	<wsdl:message name="listPAPPolicySetsRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
-	</wsdl:message>
 	<wsdl:message name="moveRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="pivotId" type="xsd:string"></wsdl:part>
 		<wsdl:part name="moveAfter" type="xsd:boolean"></wsdl:part>
@@ -88,18 +89,21 @@
 	<wsdl:message name="moveResponse">
 	</wsdl:message>
 	<wsdl:message name="removePolicyRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="removePolicyResponse">
 		<wsdl:part name="removePolicyResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="removePolicySetRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="removePolicySetResponse">
 		<wsdl:part name="removePolicySetResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="storePolicyRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="idPrefix" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
 	</wsdl:message>
@@ -107,6 +111,7 @@
 		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="storePolicySetRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="idPrefix" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
@@ -114,6 +119,7 @@
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePolicyRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="version" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
 	</wsdl:message>
@@ -121,33 +127,21 @@
 		<wsdl:part name="updatePolicyResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePolicySetRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="version" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePolicySetResponse">
 		<wsdl:part name="updatePolicySetResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="getPAPPolicyRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
-		<wsdl:part name="policyId" type="xsd:string"></wsdl:part>
+	<wsdl:message name="getRootPolicySetRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
-	<wsdl:message name="getPAPPolicyResponse">
-		<wsdl:part name="policy" type="xsd1:PolicyType"></wsdl:part>
-	</wsdl:message>
-	<wsdl:message name="getPAPPolicySetRequest">
-		<wsdl:part name="papId" type="xsd:string"></wsdl:part>
-		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
-	</wsdl:message>
-	<wsdl:message name="getPAPPolicySetResponse">
-		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
-	</wsdl:message>
-	<wsdl:message name="getPAPRootPolicySetRequest">
-        <wsdl:part name="papAlias" type="xsd:string"></wsdl:part>
-	</wsdl:message>
-	<wsdl:message name="getPAPRootPolicySetResponse">
-		<wsdl:part name="getPAPRootPolicySetResponse" type="xsd1:PolicySetType"></wsdl:part>
+	<wsdl:message name="getRootPolicySetResponse">
+		<wsdl:part name="getRootPolicySetResponse" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="addPolicyRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="index" type="xsd:int"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policyIdPrefix" type="xsd:string"></wsdl:part>
@@ -157,6 +151,7 @@
 		<wsdl:part name="addPolicyResponse" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="removeObjectByIdAndReferencesRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="id" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="removeObjectByIdAndReferencesResponse">
@@ -164,6 +159,7 @@
 			type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="addPolicySetRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="index" type="xsd:int"></wsdl:part>
 		<wsdl:part name="policySet" type="xsd1:PolicySetType"></wsdl:part>
 	</wsdl:message>
@@ -171,6 +167,7 @@
 		<wsdl:part name="addPolicySetResponse" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="addPoliciesRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="index" type="xsd:int"></wsdl:part>
 		<wsdl:part name="policySetId" type="xsd:string"></wsdl:part>
 		<wsdl:part name="policyIdPrefixArray" type="tns:StringArray"></wsdl:part>
@@ -201,18 +198,10 @@
 			<wsdl:input message="tns:getPolicySetRequest"></wsdl:input>
 			<wsdl:output message="tns:getPolicySetResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="getPAPPolicy">
-			<wsdl:input message="tns:getPAPPolicyRequest"></wsdl:input>
-			<wsdl:output message="tns:getPAPPolicyResponse"></wsdl:output>
+		<wsdl:operation name="getRootPolicySet">
+			<wsdl:input message="tns:getRootPolicySetRequest"></wsdl:input>
+			<wsdl:output message="tns:getRootPolicySetResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="getPAPPolicySet">
-			<wsdl:input message="tns:getPAPPolicySetRequest"></wsdl:input>
-			<wsdl:output message="tns:getPAPPolicySetResponse"></wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="getPAPRootPolicySet">
-			<wsdl:input message="tns:getPAPRootPolicySetRequest"></wsdl:input>
-			<wsdl:output message="tns:getPAPRootPolicySetResponse"></wsdl:output>
-        </wsdl:operation>
 		<wsdl:operation name="hasPolicy">
 			<wsdl:input message="tns:hasPolicyRequest"></wsdl:input>
 			<wsdl:output message="tns:hasPolicyResponse"></wsdl:output>
@@ -225,16 +214,8 @@
 			<wsdl:input message="tns:listPoliciesRequest"></wsdl:input>
 			<wsdl:output message="tns:listPoliciesResponse"></wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="listPAPPolicies">
-			<wsdl:input message="tns:listPAPPoliciesRequest"></wsdl:input>
-			<wsdl:output message="tns:listPoliciesResponse"></wsdl:output>
-		</wsdl:operation>
 		<wsdl:operation name="listPolicySets">
 			<wsdl:input message="tns:listPolicySetsRequest"></wsdl:input>
-			<wsdl:output message="tns:listPolicySetsResponse"></wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="listPAPPolicySets">
-			<wsdl:input message="tns:listPAPPolicySetsRequest"></wsdl:input>
 			<wsdl:output message="tns:listPolicySetsResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="move">
@@ -295,29 +276,9 @@
 				<soap:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="getPAPPolicy">
+		<wsdl:operation name="getRootPolicySet">
 			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPAPPolicy" />
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="getPAPPolicySet">
-			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPAPPolicySet" />
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="getPAPRootPolicySet">
-			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getPAPRootPolicySet" />
+				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/getRootPolicySet" />
 			<wsdl:input>
 				<soap:body use="literal" />
 			</wsdl:input>
@@ -355,27 +316,7 @@
 				<soap:body use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
-		<wsdl:operation name="listPAPPolicies">
-			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/listPAPPolicies" />
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
 		<wsdl:operation name="listPolicySets">
-			<soap:operation
-				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/listPolicySets" />
-			<wsdl:input>
-				<soap:body use="literal" />
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal" />
-			</wsdl:output>
-		</wsdl:operation>
-		<wsdl:operation name="listPAPPolicySets">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/xacml_policy_management/listPolicySets" />
 			<wsdl:input>

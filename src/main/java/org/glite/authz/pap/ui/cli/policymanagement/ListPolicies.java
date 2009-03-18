@@ -8,6 +8,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -37,11 +38,7 @@ public class ListPolicies extends PolicyManagementCLI {
 
         PolicySetType[] policySetArray;
 
-        if (papAlias == null) {
-            policySetArray = xacmlPolicyMgmtClient.listPolicySets();
-        } else {
-            policySetArray = xacmlPolicyMgmtClient.listPAPPolicySets(papAlias);
-        }
+        policySetArray = xacmlPolicyMgmtClient.listPolicySets(papAlias);
 
         if (policySetArray.length == 0) {
             throw new CLIException("Error: the repository seems to be corrupted, no policy sets have been found");
@@ -49,11 +46,7 @@ public class ListPolicies extends PolicyManagementCLI {
 
         PolicyType[] policyArray;
 
-        if (papAlias == null) {
-            policyArray = xacmlPolicyMgmtClient.listPolicies();
-        } else {
-            policyArray = xacmlPolicyMgmtClient.listPAPPolicies(papAlias);
-        }
+        policyArray = xacmlPolicyMgmtClient.listPolicies(papAlias);
 
         List<PolicyWizard> policyWizardList = new ArrayList<PolicyWizard>(policyArray.length);
 
@@ -153,31 +146,40 @@ public class ListPolicies extends PolicyManagementCLI {
         String[] papInfoArray = null;
 
         if (commandLine.hasOption(OPT_ALLPAPS)) {
-            PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
-            papAliasArray = new String[papDataArray.length + 1];
-            papAliasArray[0] = null;
+            PAPData[] papDataArray = papMgmtClient.getAllPAPs();
+            papAliasArray = new String[papDataArray.length];
             for (int i = 0; i < papDataArray.length; i++) {
-                papAliasArray[i + 1] = papDataArray[i].getAlias();
+                papAliasArray[i] = papDataArray[i].getAlias();
             }
             papInfoArray = getPAPInfoArray(papAliasArray, papDataArray);
         } else if (commandLine.hasOption(OPT_PAPALIAS)) {
             papAliasArray = commandLine.getOptionValues(OPT_PAPALIAS);
             papInfoArray = getPAPInfoArray(papAliasArray, null);
         } else {
+            PAPData papData = new PAPData();
+
+            papData.setAlias(PAP.DEFAULT_PAP_ALIAS);
+            papData.setType(PAP.PSType.LOCAL.toString());
+            papData.setVisibilityPublic(true);
+
+            PAPData[] papDataArray = new PAPData[1];
+            papDataArray[0] = papData;
+
             papAliasArray = new String[1];
-            papAliasArray[0] = null;
-            papInfoArray = getPAPInfoArray(papAliasArray, null);
+            papAliasArray[0] = papData.getAlias();
+
+            papInfoArray = getPAPInfoArray(papAliasArray, papDataArray);
         }
 
         XACMLPolicyCLIUtils.initOpenSAML();
-        
+
         for (int i = 0; i < papAliasArray.length; i++) {
 
             System.out.println();
             System.out.println(papInfoArray[i]);
 
             boolean policiesFound = listPolicies(papAliasArray[i], showIds, showRulesId, xacmlOutput);
-            
+
             if (!policiesFound) {
                 printOutputMessage("No policies has been found.");
             }
@@ -191,22 +193,21 @@ public class ListPolicies extends PolicyManagementCLI {
         int size = papAliasArray.length;
         String[] papInfoArray = new String[size];
 
-        for (int i = 0, j = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
 
             String alias = papAliasArray[i];
 
-            if (alias == null) {
+            PAPData papData;
 
-                papInfoArray[i] = "local (default pap):";
+            if (papDataArray != null) {
+                papData = papDataArray[i];
             } else {
+                papData = papMgmtClient.getPAP(alias);
+            }
 
-                PAPData papData;
-                if (papDataArray != null) {
-                    papData = papDataArray[j];
-                    j++;
-                } else {
-                    papData = papMgmtClient.getTrustedPAP(alias);
-                }
+            if (PAP.PSType.LOCAL.toString().equals(papData.getType())) {
+                papInfoArray[i] = String.format("%s (local):", papData.getAlias());
+            } else {
                 papInfoArray[i] = String.format("%s (%s:%s):", papData.getAlias(), papData.getHostname(), papData.getPort());
             }
         }

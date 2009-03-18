@@ -235,9 +235,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
     public synchronized void store(String papId, PolicyType policy) {
 
-        if (!(policy instanceof PolicyTypeString)) {
-            throw new RepositoryException("BUG: not a PolicyTypeString class.");
-        }
+        PolicyTypeString policyTypeString = TypeStringUtils.cloneAsPolicyTypeString(policy);
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
@@ -245,7 +243,8 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
         }
 
-        String policyId = policy.getPolicyId();
+        String policyId = policyTypeString.getPolicyId();
+        
 
         File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
 
@@ -253,18 +252,18 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             throw new AlreadyExistsException("Already exists: policyId=" + policyId);
         }
 
-        PolicyHelper.toFile(policyFile, policy);
+        PolicyHelper.toFile(policyFile, policyTypeString);
 
-        getPAPCache(papId).put(policyId, TypeStringUtils.cloneAsPolicyTypeString(policy));
+        getPAPCache(papId).put(policyId, policyTypeString);
 
-        TypeStringUtils.releaseUnneededMemory(policy);
+        TypeStringUtils.releaseUnneededMemory(policyTypeString);
+        
+        log.debug("Stored policy: " + policyId);
     }
 
     public synchronized void update(String papId, String policyVersion, PolicyType newPolicy) {
 
-        if (!(newPolicy instanceof PolicyTypeString)) {
-            throw new RepositoryException("BUG: not a PolicyTypeString class.");
-        }
+        PolicyTypeString newPolicyTypeString = TypeStringUtils.cloneAsPolicyTypeString(newPolicy);
 
         String policyId = newPolicy.getPolicyId();
 
@@ -295,11 +294,11 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
         TypeStringUtils.releaseUnneededMemory(oldPolicy);
 
-        PolicyHelper.toFile(policyFile, newPolicy);
+        PolicyHelper.toFile(policyFile, newPolicyTypeString);
 
-        papCache.put(policyId, TypeStringUtils.cloneAsPolicyTypeString(newPolicy));
+        papCache.put(policyId, newPolicyTypeString);
 
-        TypeStringUtils.releaseUnneededMemory(newPolicy);
+        TypeStringUtils.releaseUnneededMemory(newPolicyTypeString);
     }
 
     private Map<String, PolicyTypeString> getPAPCache(String papId) {

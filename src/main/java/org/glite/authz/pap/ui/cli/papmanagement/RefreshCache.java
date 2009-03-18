@@ -6,69 +6,85 @@ import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
-import org.glite.authz.pap.ui.cli.CLIException;
 
 public class RefreshCache extends PAPManagementCLI {
-    
+
     private static final String[] commandNameValues = { "refresh-cache", "rc" };
-    private static final String DESCRIPTION = "Invalidates the local policy cache and retrieves policies " +
-    		"from remote PAPs. The arguments identify the PAPs that will be contacted. If no arguments are " +
-    		"given, all the trusted PAPs are contacted.";
-    private static final String USAGE = "[papId] [[papId]...]";
-    
+    private static final String DESCRIPTION = "Invalidates the local policy cache and retrieves policies "
+            + "from remote PAPs. The arguments identify the PAPs that will be contacted. If no arguments are "
+            + "given, all the trusted PAPs are contacted.";
+    private static final String USAGE = "[alias] [[alias]...]";
+
     public RefreshCache() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
-    
-    private List<String> getAllPAPIds() throws RemoteException {
-        List<String> papIdList = new LinkedList<String>();
-        
-        PAPData[] papDataArray = papMgmtClient.listTrustedPAPs();
-        
+
+    private List<String> getAllAliases() throws RemoteException {
+        List<String> aliasList = new LinkedList<String>();
+
+        PAPData[] papDataArray = papMgmtClient.getAllPAPs();
+
         for (PAPData papData : papDataArray) {
-            papIdList.add(papData.getId());
+            if (PAP.PSType.REMOTE.toString().equals(papData.getType())) {
+                aliasList.add(papData.getAlias());
+            }
         }
-        
-        return papIdList;
+
+        return aliasList;
     }
-    
+
     @Override
     protected Options defineCommandOptions() {
         return null;
     }
-    
+
     @Override
-    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
-            RemoteException {
-        
+    protected int executeCommand(CommandLine commandLine) throws RemoteException {
+
         String[] args = commandLine.getArgs();
-        List<String> papIdList;
-        
+        List<String> aliasList;
+
         if (args.length == 1) {
-            papIdList = getAllPAPIds();
+            aliasList = getAllAliases();
         } else {
-            papIdList = new LinkedList<String>();
+            aliasList = new LinkedList<String>();
             for (int i = 1; i < args.length; i++) {
-                papIdList.add(args[i]);
+                aliasList.add(args[i]);
             }
         }
-        
-        if (papIdList.isEmpty()) {
+
+        if (aliasList.isEmpty()) {
             System.out.println("No remote PAPs found.");
             return ExitStatus.SUCCESS.ordinal();
         }
-        
-        for (String papId : papIdList) {
-            System.out.print("Refreshing cache for pap \"" + papId + "\"...");
-            // TODO: catch Remote exceptions in order to set exit status information for each PAP
-            papMgmtClient.refreshCache(papId);
+
+        boolean success = false;
+        boolean failure = false;
+
+        for (String alias : aliasList) {
+            System.out.print("Refreshing cache for pap \"" + alias + "\"...");
+
+            try {
+                papMgmtClient.refreshCache(alias);
+                success = true;
+            } catch (RemoteException e) {
+                System.out.println("error: " + e.getMessage());
+                failure = true;
+                continue;
+            }
             System.out.println(" ok.");
         }
-        
+
+        if (success && failure) {
+            return ExitStatus.PARTIAL_SUCCESS.ordinal();
+        }
+
+        if (!success && failure) {
+            return ExitStatus.FAILURE.ordinal();
+        }
+
         return ExitStatus.SUCCESS.ordinal();
-        
     }
-    
 }

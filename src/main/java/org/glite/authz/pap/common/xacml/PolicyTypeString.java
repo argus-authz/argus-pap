@@ -127,6 +127,7 @@ public class PolicyTypeString implements PolicyType {
 		if (policyId == null) {
 			initPolicyTypeIfNotSet();
 		}
+		log.trace("get policyId: " + policyId);
 		return policyId;
 	}
 
@@ -280,8 +281,9 @@ public class PolicyTypeString implements PolicyType {
 	}
 
 	public void setPolicyId(String arg0) {
-		policyId = arg0;
+	    log.trace("Setting policyId");
 		initPolicyTypeIfNotSet();
+		policyId = arg0;
 		policy.setPolicyId(arg0);
 		invalidatePolicyString();
 	}
@@ -346,7 +348,7 @@ public class PolicyTypeString implements PolicyType {
 //			log.debug("policyType already initialized, skipping initialization step");
 		}
 	}
-
+	
 	private void invalidatePolicyId() {
 		log.trace("Invalidating policyId");
 		policyId = null;

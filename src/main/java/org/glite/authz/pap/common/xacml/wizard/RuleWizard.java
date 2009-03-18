@@ -141,13 +141,23 @@ public class RuleWizard {
         }
         
         for (AttributeWizard attributeWizard : targetWizard.getAttributeWizardList()) {
-            sb.append(String.format("%s%s ", indentString, attributeWizard.toFormattedString()));
+            
+            if (multipleLines) {
+                sb.append(indentString);
+            }
+            
+            sb.append(String.format("%s ", attributeWizard.toFormattedString()));
+            
             if (multipleLines) {
             	sb.append('\n');
             }
         }
         
-        sb.append(baseIndentString + "}");
+        if (multipleLines) {
+            sb.append(baseIndentString);
+        }
+        
+        sb.append("}");
         
         return sb.toString();
     }

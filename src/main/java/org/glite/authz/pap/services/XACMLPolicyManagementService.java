@@ -5,17 +5,13 @@ import java.rmi.RemoteException;
 import org.glite.authz.pap.authz.policymanagement.AddPoliciesOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.GetPAPPolicyOperation;
-import org.glite.authz.pap.authz.policymanagement.GetPAPPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.GetPAPRootPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.GetRootPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.GetPolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.HasPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.HasPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.ListPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPoliciesOperation;
 import org.glite.authz.pap.authz.policymanagement.ListPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.ListPolicySetsForPAPOperation;
 import org.glite.authz.pap.authz.policymanagement.MoveOperation;
 import org.glite.authz.pap.authz.policymanagement.RemoveObjectByIdAndReferencesOperation;
 import org.glite.authz.pap.authz.policymanagement.RemovePolicyOperation;
@@ -35,15 +31,15 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
     private static final Logger log = LoggerFactory.getLogger(XACMLPolicyManagementService.class);
 
-    public String[] addPolicies(int index, String policySetId, String[] policyIdPrefixArray, PolicyType[] policyArray)
-            throws RemoteException {
+    public String[] addPolicies(String alias, int index, String policySetId, String[] policyIdPrefixArray,
+            PolicyType[] policyArray) throws RemoteException {
         log.info(String.format("addPolicy(policySetId=\"%s\"\");", policySetId));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
 
-                return AddPoliciesOperation.instance(index, policySetId, policyIdPrefixArray, policyArray).execute();
+                return AddPoliciesOperation.instance(alias, index, policySetId, policyIdPrefixArray, policyArray).execute();
 
             }
 
@@ -53,14 +49,15 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public String addPolicy(int index, String policySetId, String policyIdPrefix, PolicyType policy) throws RemoteException {
+    public String addPolicy(String alias, int index, String policySetId, String policyIdPrefix, PolicyType policy)
+            throws RemoteException {
 
         log.info(String.format("addPolicy(policySetId=\"%s\", policyIdPrefix=\"%s\");", policySetId, policyIdPrefix));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return AddPolicyOperation.instance(index, policySetId, policyIdPrefix, policy).execute();
+                return AddPolicyOperation.instance(alias, index, policySetId, policyIdPrefix, policy).execute();
             }
 
         } catch (RuntimeException e) {
@@ -69,14 +66,14 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public String addPolicySet(int index, PolicySetType policySet) throws RemoteException {
+    public String addPolicySet(String alias, int index, PolicySetType policySet) throws RemoteException {
 
         log.info(String.format("addPolicySet(policySetId=\"%s\");", policySet.getPolicySetId()));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return AddPolicySetOperation.instance(index, policySet).execute();
+                return AddPolicySetOperation.instance(alias, index, policySet).execute();
             }
 
         } catch (RuntimeException e) {
@@ -85,25 +82,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public PolicyType getPAPPolicy(String papAlias, String policyId) throws RemoteException {
-        log.info(String.format("getPAPPolicy(\"%s\", \"%s\");", papAlias, policyId));
-
-        try {
-
-            return GetPAPPolicyOperation.instance(papAlias, policyId).execute();
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
-        }
-    }
-    
-    public PolicySetType getPAPRootPolicySet(String papAlias) throws RemoteException {
+    public PolicySetType getRootPolicySet(String papAlias) throws RemoteException {
         log.info(String.format("getPAPPolicySet(\"%s\");", papAlias));
 
         try {
 
-            return GetPAPRootPolicySetOperation.instance(papAlias).execute();
+            return GetRootPolicySetOperation.instance(papAlias).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -111,25 +95,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public PolicySetType getPAPPolicySet(String papAlias, String policySetId) throws RemoteException {
-        log.info(String.format("getPAPPolicySet(\"%s\", \"%s\");", papAlias, policySetId));
-
-        try {
-
-            return GetPAPPolicySetOperation.instance(papAlias, policySetId).execute();
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
-        }
-    }
-
-    public PolicyType getPolicy(String policyId) throws RemoteException {
+    public PolicyType getPolicy(String alias, String policyId) throws RemoteException {
         log.info(String.format("getPolicy(\"%s\");", policyId));
 
         try {
 
-            PolicyType policy = GetPolicyOperation.instance(policyId).execute();
+            PolicyType policy = GetPolicyOperation.instance(alias, policyId).execute();
             return policy;
 
         } catch (RuntimeException e) {
@@ -138,12 +109,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public PolicySetType getPolicySet(String policySetId) throws RemoteException {
+    public PolicySetType getPolicySet(String alias, String policySetId) throws RemoteException {
         log.info(String.format("getPolicySet(\"%s\");", policySetId));
 
         try {
 
-            PolicySetType policySet = GetPolicySetOperation.instance(policySetId).execute();
+            PolicySetType policySet = GetPolicySetOperation.instance(alias, policySetId).execute();
             return policySet;
 
         } catch (RuntimeException e) {
@@ -152,11 +123,11 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean hasPolicy(String policyId) throws RemoteException {
+    public boolean hasPolicy(String alias, String policyId) throws RemoteException {
         log.info(String.format("hasPolicy(\"%s\");", policyId));
         try {
 
-            return HasPolicyOperation.instance(policyId).execute();
+            return HasPolicyOperation.instance(alias, policyId).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -164,11 +135,11 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean hasPolicySet(String policySetId) throws RemoteException {
+    public boolean hasPolicySet(String alias, String policySetId) throws RemoteException {
         log.info(String.format("hasPolicySet(\"%s\");", policySetId));
         try {
 
-            return HasPolicySetOperation.instance(policySetId).execute();
+            return HasPolicySetOperation.instance(alias, policySetId).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -176,38 +147,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public PolicyType[] listPAPPolicies(String papAlias) throws RemoteException {
-        log.info(String.format("lisPAPPolicies(\"%s\");", papAlias));
-        try {
-
-            return ListPoliciesForPAPOperation.instance(papAlias).execute();
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
-        }
-    }
-
-    public PolicySetType[] listPAPPolicySets(String papAlias) throws RemoteException {
-        log.info(String.format("listPolicySets(\"%s\");", papAlias));
-
-        try {
-
-            return ListPolicySetsForPAPOperation.instance(papAlias).execute();
-
-        } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
-            throw e;
-        }
-    }
-
-    public PolicyType[] listPolicies() throws RemoteException {
+    public PolicyType[] listPolicies(String alias) throws RemoteException {
         log.info("listPolicies();");
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return ListPoliciesOperation.instance().execute();
+                return ListPoliciesOperation.instance(alias).execute();
             }
 
         } catch (RuntimeException e) {
@@ -216,13 +162,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public PolicySetType[] listPolicySets() throws RemoteException {
+    public PolicySetType[] listPolicySets(String alias) throws RemoteException {
         log.info("listPolicySets();");
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return ListPolicySetOperation.instance().execute();
+                return ListPolicySetOperation.instance(alias).execute();
             }
 
         } catch (RuntimeException e) {
@@ -231,13 +177,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public void move(String id, String pivotId, boolean moveAfter) throws RemoteException {
+    public void move(String alias, String id, String pivotId, boolean moveAfter) throws RemoteException {
         log.info(String.format("move(id=\"%s\", pivotId=\"%s\", moveAfter=%b);", id, pivotId, moveAfter));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                MoveOperation.instance(id, pivotId, moveAfter).execute();
+                MoveOperation.instance(alias, id, pivotId, moveAfter).execute();
             }
 
         } catch (RuntimeException e) {
@@ -246,13 +192,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean removeObjectByIdAndReferences(String id) throws RemoteException {
+    public boolean removeObjectByIdAndReferences(String alias, String id) throws RemoteException {
         log.info(String.format("removeObjectByIdAndReferences(\"%s\");", id));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return RemoveObjectByIdAndReferencesOperation.instance(id).execute();
+                return RemoveObjectByIdAndReferencesOperation.instance(alias, id).execute();
             }
 
         } catch (RuntimeException e) {
@@ -261,12 +207,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean removePolicy(String policyId) throws RemoteException {
+    public boolean removePolicy(String alias, String policyId) throws RemoteException {
         log.info(String.format("removePolicy(\"%s\");", policyId));
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return RemovePolicyOperation.instance(policyId).execute();
+                return RemovePolicyOperation.instance(alias, policyId).execute();
             }
 
         } catch (RuntimeException e) {
@@ -275,13 +221,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean removePolicySet(String policySetId) throws RemoteException {
+    public boolean removePolicySet(String alias, String policySetId) throws RemoteException {
         log.info(String.format("removePolicySet(\"%s\");", policySetId));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return RemovePolicySetOperation.instance(policySetId).execute();
+                return RemovePolicySetOperation.instance(alias, policySetId).execute();
             }
 
         } catch (RuntimeException e) {
@@ -290,12 +236,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public String storePolicy(String idPrefix, PolicyType policy) throws RemoteException {
+    public String storePolicy(String alias, String idPrefix, PolicyType policy) throws RemoteException {
         log.info("storePolicy();");
 
         try {
 
-            return StorePolicyOperation.instance(idPrefix, policy).execute();
+            return StorePolicyOperation.instance(alias, idPrefix, policy).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -303,12 +249,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public String storePolicySet(String idPrefix, PolicySetType policySet) throws RemoteException {
+    public String storePolicySet(String alias, String idPrefix, PolicySetType policySet) throws RemoteException {
         log.info("storePolicySet();");
 
         try {
 
-            return StorePolicySetOperation.instance(idPrefix, policySet).execute();
+            return StorePolicySetOperation.instance(alias, idPrefix, policySet).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -316,13 +262,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean updatePolicy(String version, PolicyType policy) throws RemoteException {
+    public boolean updatePolicy(String alias, String version, PolicyType policy) throws RemoteException {
         log.info(String.format("updatePolicy(version=\"%s\", id=\"%s\");", version, policy.getPolicyId()));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return UpdatePolicyOperation.instance(version, policy).execute();
+                return UpdatePolicyOperation.instance(alias, version, policy).execute();
             }
 
         } catch (RuntimeException e) {
@@ -331,13 +277,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean updatePolicySet(String version, PolicySetType policySet) throws RemoteException {
+    public boolean updatePolicySet(String alias, String version, PolicySetType policySet) throws RemoteException {
         log.info(String.format("updatePolicySet(version=\"%s\", id=\"%s\");", version, policySet.getPolicySetId()));
 
         try {
 
             synchronized (PAPContainer.addOperationLock) {
-                return UpdatePolicySetOperation.instance(version, policySet).execute();
+                return UpdatePolicySetOperation.instance(alias, version, policySet).execute();
             }
 
         } catch (RuntimeException e) {

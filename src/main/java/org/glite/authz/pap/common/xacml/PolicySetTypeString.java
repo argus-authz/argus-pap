@@ -311,9 +311,9 @@ public class PolicySetTypeString implements PolicySetType {
     }
 
     public void setPolicySetId(String arg0) {
-        policySetId = arg0;
         initPolicySetTypeIfNotSet();
         policySet.setPolicySetId(arg0);
+        policySetId = arg0;
         invalidatePolicySetString();
     }
 

@@ -3,36 +3,50 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicyType;
 
 public class UpdatePolicyOperation extends BasePAPOperation<Boolean> {
 
+    String alias;
     String version;
     PolicyType policy;
 
-    private UpdatePolicyOperation(String version, PolicyType policy) {
+    private UpdatePolicyOperation(String alias, String version, PolicyType policy) {
 
+        this.alias = alias;
         this.version = version;
         this.policy = policy;
     }
 
-    public static UpdatePolicyOperation instance(String version, PolicyType policy) {
+    public static UpdatePolicyOperation instance(String alias, String version, PolicyType policy) {
 
-        return new UpdatePolicyOperation(version, policy);
+        return new UpdatePolicyOperation(alias, version, policy);
     }
 
     @Override
     protected Boolean doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        if (alias == null) {
+            alias = PAP.DEFAULT_PAP_ALIAS;
+        }
+        
+        PAP pap = PAPManager.getInstance().getPAP(alias);
 
-        if (!(localPAP.hasPolicy(policy.getPolicyId()))) {
+        if (pap.isRemote()) {
+            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
+        }
+
+        PAPContainer papContainer = new PAPContainer(pap);
+
+        if (!(papContainer.hasPolicy(policy.getPolicyId()))) {
             return false;
         }
 
-        localPAP.updatePolicy(version, policy);
+        papContainer.updatePolicy(version, policy);
 
         return true;
     }

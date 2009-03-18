@@ -1,5 +1,6 @@
 package org.glite.authz.pap.repository;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -39,6 +40,25 @@ public class PAPContainer {
         rootPolicySetId = papId;
         policySetDAO = DAOFactory.getDAOFactory().getPolicySetDAO();
         policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
+    }
+
+    public static List<PAPContainer> getContainers(List<PAP> papList) {
+
+        List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(papList.size());
+
+        for (PAP pap : papList) {
+            papContainerList.add(new PAPContainer(pap));
+        }
+        return papContainerList;
+    }
+
+    public void createRootPolicySet() {
+
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getPapId(),
+                                                                         PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        rootPolicySet.setVersion("0");
+
+        policySetDAO.store(papId, rootPolicySet);
     }
 
     public void addPolicy(int index, String policySetId, PolicyType policy) {
@@ -237,7 +257,7 @@ public class PAPContainer {
             PolicySetWizard.increaseVersion(rootPolicySet);
 
             policySetDAO.update(papId, oldVersion, rootPolicySet);
-            
+
             TypeStringUtils.releaseUnneededMemory(rootPolicySet);
         }
 
@@ -245,9 +265,9 @@ public class PAPContainer {
         policySetDAO.delete(papId, policySetId);
 
         List<String> idList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
-        
+
         TypeStringUtils.releaseUnneededMemory(policySet);
-        
+
         for (String policyId : idList) {
             policyDAO.delete(papId, policyId);
             notifyPoliciesDeleted(1);
