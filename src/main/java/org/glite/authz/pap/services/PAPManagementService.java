@@ -86,7 +86,7 @@ public class PAPManagementService implements PAPManagement {
 
     public String ping() throws RemoteException {
         log.info("Requested ping()");
-        return "PAP v0.1";
+        return "PAP v0.9.1";
     }
 
     public boolean refreshCache(String papAlias) throws RemoteException {
