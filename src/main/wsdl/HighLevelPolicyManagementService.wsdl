@@ -25,6 +25,7 @@
 	</wsdl:types>
 
 	<wsdl:message name="banRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="value" type="xsd:string" />
 		<wsdl:part name="resource" type="xsd:string"></wsdl:part>
@@ -35,10 +36,12 @@
 		<wsdl:part name="policyId" type="xsd:string" />
 	</wsdl:message>
 	<wsdl:message name="eraseRepositoryRequest">
+        <wsdl:part name="alias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="eraseRepositoryResponse">
 	</wsdl:message>
 	<wsdl:message name="unbanRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="id" type="xsd:string"></wsdl:part>
 		<wsdl:part name="value" type="xsd:string"></wsdl:part>
 		<wsdl:part name="resource" type="xsd:string"></wsdl:part>

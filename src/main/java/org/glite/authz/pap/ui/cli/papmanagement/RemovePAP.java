@@ -7,15 +7,15 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 public class RemovePAP extends PAPManagementCLI {
-    
+
     private static final String[] commandNameValues = { "remove-pap", "rpap" };
     private static final String DESCRIPTION = "Remove a trusted PAP and delete the cached policies.";
-    private static final String USAGE = "<papId>";
-    
+    private static final String USAGE = "<alias>";
+
     public RemovePAP() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
-    
+
     @Override
     protected Options defineCommandOptions() {
         return null;
@@ -25,20 +25,21 @@ public class RemovePAP extends PAPManagementCLI {
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
-        if (args.length != 2)
+        if (args.length != 2) {
             throw new ParseException("Wrong number of arguments");
-        
+        }
+
         String papId = args[1];
 
         if (!papMgmtClient.exists(papId)) {
-        	System.out.println("PAP not found: " + papId);
-        	return ExitStatus.FAILURE.ordinal();
+            System.out.println("PAP not found: " + papId);
+            return ExitStatus.FAILURE.ordinal();
         }
-        
+
         papMgmtClient.removePAP(papId);
-        
+
         return ExitStatus.SUCCESS.ordinal();
-        
+
     }
 
 }

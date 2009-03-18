@@ -5,7 +5,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.common.xacml.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
@@ -68,12 +67,12 @@ public class PAPManager {
 
         distributionConfiguration.savePAP(pap);
         papDAO.store(pap);
-        
-        // check if the root policy set exists
+
+        // create the root policy set
         PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getPapId(),
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         rootPolicySet.setVersion("0");
-        
+
         PAPContainer papContainer = new PAPContainer(pap);
         papContainer.storePolicySet(rootPolicySet);
     }
@@ -84,14 +83,14 @@ public class PAPManager {
 
         if (!papDAO.exists(PAP.DEFAULT_PAP_ALIAS)) {
 
-            defaultPAP = new PAP(PAP.DEFAULT_PAP_ALIAS);
+            defaultPAP = PAP.makeDefaultPAP();
             papDAO.store(defaultPAP);
 
         } else {
             defaultPAP = papDAO.get(PAP.DEFAULT_PAP_ALIAS);
         }
 
-//        PAPContainer defaultPAPContainer = new PAPContainer(defaultPAP);
+        // PAPContainer defaultPAPContainer = new PAPContainer(defaultPAP);
         PAPContainer defaultPAPContainer = getDefaultPAPContainer();
 
         // check if the root policy set exists
@@ -100,20 +99,15 @@ public class PAPManager {
         }
 
         // create the root policy set
-        PolicySetType defaultRootPolicySet = PolicySetHelper.buildWithAnyTarget(defaultPAP.getPapId(),
-                                                                                PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
-
-        defaultRootPolicySet.setVersion("0");
-
-        defaultPAPContainer.storePolicySet(new PolicySetTypeString(defaultRootPolicySet));
+        defaultPAPContainer.createRootPolicySet();
     }
 
     public void deletePAP(String papAlias) throws NotFoundException {
-        
+
         if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
             throw new PAPManagerException("Delete the default PAP is not allowed");
         }
-        
+
         distributionConfiguration.removePAP(papAlias);
         papDAO.delete(papAlias);
     }
@@ -152,7 +146,7 @@ public class PAPManager {
     public PAP getPAP(String papAlias) throws NotFoundException {
         return papDAO.get(papAlias);
     }
-    
+
     public String[] getPAPConfigurationOrder() {
         return configurationAliasOrderedArray;
     }
@@ -175,6 +169,7 @@ public class PAPManager {
 
     public void setPAPOrder(String[] aliasArray) {
         distributionConfiguration.savePAPOrder(aliasArray);
+
         // updated the internal list with the new order
         configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
     }
@@ -188,7 +183,7 @@ public class PAPManager {
 
         papDAO.update(newpap);
     }
-    
+
     private String[] buildOrderedAliasArray() {
 
         String[] repositoryAliasArray = papDAO.getAllAliases();
@@ -207,14 +202,20 @@ public class PAPManager {
 
         /* enforce the order specified in the configuration file */
 
-        // if the default PAP is not specified in the order then it goes for first
+        List<String> configurationAliasOrderedList = new LinkedList<String>();
+
+        // if the default PAP is not specified in the order in configuration then it goes for first
         if (getAliasIndex(PAP.DEFAULT_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
-            swapElementsOfArray(defaultPAPAliasIdx, 0, repositoryAliasArray);
+            configurationAliasOrderedList.add(PAP.DEFAULT_PAP_ALIAS);
+        }
+
+        for (int i = 0; i < configurationArraySize; i++) {
+            configurationAliasOrderedList.add(configurationAliasOrderedArray[i]);
         }
 
         // follow the order specified in the configuration file
-        for (int i = 0; i < configurationArraySize; i++) {
-            String alias = configurationAliasOrderedArray[i];
+        for (int i = 0; i < configurationAliasOrderedList.size(); i++) {
+            String alias = configurationAliasOrderedList.get(i);
 
             int aliasIndex = getAliasIndex(alias, repositoryAliasArray);
 
@@ -248,7 +249,7 @@ public class PAPManager {
     private List<PAP> getPAPList() {
         String[] aliasOrderedArray = buildOrderedAliasArray();
         List<PAP> papList = new ArrayList<PAP>(aliasOrderedArray.length);
-        
+
         for (String alias : aliasOrderedArray) {
             papList.add(papDAO.get(alias));
         }

@@ -11,6 +11,12 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 
 public abstract class PAPManagementCLI extends ServiceCLI {
 
+    protected static String OPT_LOCAL = "l";
+    protected static String OPT_LOCAL_LONG = "local";
+    protected static String OPT_LOCAL_DESCRIPTION = "Set the PAP as local";
+    protected static String OPT_REMOTE = "r";
+    protected static String OPT_REMOTEL_LONG = "remote";
+    protected static String OPT_REMOTE_DESCRIPTION = "Set the PAP as remote";
     protected PAPManagement papMgmtClient;
     
     public PAPManagementCLI(String[] commandNameValues, String usage, String description,

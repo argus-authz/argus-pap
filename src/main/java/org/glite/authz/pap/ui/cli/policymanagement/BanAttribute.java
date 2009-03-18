@@ -10,11 +10,12 @@ import org.apache.commons.cli.ParseException;
 public class BanAttribute extends PolicyManagementCLI {
 
     private static String[] COMMAND_NAME_VALUES = { "ban", "b" };
-    private static String DESCRIPTION = "Ban an attribute. <id> is any of the attribute ids that can be specified in the " +
-    		"simplified policy language. By default the attribute is bannen for resource and action both with value \"*\". "
-            + "Different values for resource and action can be set using options --" + OPT_RESOURCE_LONG + " and --" + OPT_ACTION_LONG
-            + ".";
+    private static String DESCRIPTION = "Ban an attribute. <id> is any of the attribute ids that can be specified in the "
+            + "simplified policy language. By default the attribute is bannen for resource and action both with value \"*\". "
+            + "Different values for resource and action can be set using options --" + OPT_RESOURCE_LONG + " and --"
+            + OPT_ACTION_LONG + ".";
     private static String USAGE = "<id> <value> [options]";
+    private String alias = null;
 
     public BanAttribute() {
         super(COMMAND_NAME_VALUES, USAGE, DESCRIPTION, null);
@@ -40,6 +41,10 @@ public class BanAttribute extends PolicyManagementCLI {
                                        .withDescription(OPT_RESOURCE_DESCRIPTION)
                                        .withLongOpt(OPT_RESOURCE_LONG)
                                        .create(OPT_RESOURCE));
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_PAPALIAS_DESCRIPTION)
+                                       .withLongOpt(OPT_PAPALIAS_LONG)
+                                       .create(OPT_PAPALIAS));
         return options;
     }
 
@@ -54,6 +59,10 @@ public class BanAttribute extends PolicyManagementCLI {
 
         String id = args[1];
         String value = args[2];
+        
+        if (commandLine.hasOption(OPT_PAPALIAS)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        }
 
         boolean isPublic = true;
         if (commandLine.hasOption(OPT_PRIVATE_LONG)) {
@@ -81,7 +90,7 @@ public class BanAttribute extends PolicyManagementCLI {
 
         String policyId = null;
 
-        policyId = highlevelPolicyMgmtClient.ban(id, value, resource, action, isPublic);
+        policyId = highlevelPolicyMgmtClient.ban(alias, id, value, resource, action, isPublic);
 
         if (policyId == null) {
             printOutputMessage(String.format("error (ban rule already exists)."));

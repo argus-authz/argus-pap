@@ -3,11 +3,13 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,18 +18,20 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
     private static final Logger log = LoggerFactory.getLogger(MoveOperation.class);
 
+    String alias;
     String id;
     String pivotId;
     boolean moveAfter;
 
-    protected MoveOperation(String id, String pivotId, boolean moveAfter) {
+    protected MoveOperation(String alias, String id, String pivotId, boolean moveAfter) {
+        this.alias = alias;
         this.id = id;
         this.pivotId = pivotId;
         this.moveAfter = moveAfter;
     }
 
-    public static MoveOperation instance(String id, String pivotId, boolean moveAfter) {
-        return new MoveOperation(id, pivotId, moveAfter);
+    public static MoveOperation instance(String alias, String id, String pivotId, boolean moveAfter) {
+        return new MoveOperation(alias, id, pivotId, moveAfter);
     }
 
     protected Object doExecute() {
@@ -40,15 +44,21 @@ public class MoveOperation extends BasePAPOperation<Object> {
             return null;
         }
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        PAP pap = PAPManager.getInstance().getPAP(alias);
 
-        if (localPAP.hasPolicySet(id)) {
+        if (pap.isRemote()) {
+            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
+        }
 
-            movePolicySetId(localPAP);
+        PAPContainer papContainer = new PAPContainer(pap);
+
+        if (papContainer.hasPolicySet(id)) {
+
+            movePolicySetId(papContainer);
 
         } else {
 
-            movePolicyId(localPAP);
+            movePolicyId(papContainer);
 
         }
 

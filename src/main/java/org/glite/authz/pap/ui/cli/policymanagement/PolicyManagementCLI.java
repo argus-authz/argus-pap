@@ -19,51 +19,51 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
     protected static String OPT_ALLPAPS = "all";
     protected static String OPT_ALLPAPS_LONG = "all-paps";
     protected static String OPT_ALLPAPS_DESCRIPTION = "Select all PAPs";
-	protected static String OPT_MOVEAFTER = "a";
-	protected static String OPT_MOVEAFTER_LONG = "after";
-	protected static String OPT_MOVEAFTER_DESCRIPTION = "move <id> after <pivotId> (by default <id> is moved before <pivotId>)";
-	protected static String OPT_ACTION = "a";
-	protected static String OPT_ACTION_DESCRIPTION = "Specify an action value.";
+    protected static String OPT_MOVEAFTER = "a";
+    protected static String OPT_MOVEAFTER_LONG = "after";
+    protected static String OPT_MOVEAFTER_DESCRIPTION = "move <id> after <pivotId> (by default <id> is moved before <pivotId>)";
+    protected static String OPT_ACTION = "a";
+    protected static String OPT_ACTION_DESCRIPTION = "Specify an action value.";
     protected static String OPT_ACTION_LONG = "action";
     protected static String OPT_RESOURCE = "r";
     protected static String OPT_RESOURCE_DESCRIPTION = "Specify a resource value.";
     protected static String OPT_RESOURCE_LONG = "resource";
-	protected static final String OPT_POLICY_DESCRIPTION = "d";
-	protected static final String OPT_POLICY_DESCRIPTION_DESCRIPTION = "Description";
-	protected static final String OPT_POLICY_DESCRIPTION_LONG = "description";
-	protected static final String OPT_SHOW_IDS = "si";
-	protected static final String OPT_SHOW_IDS_DESCRIPTION = "Show policies id (needed for update or remove operations)";
-	protected static final String OPT_SHOW_IDS_LONG = "show-ids";
-	protected static final String OPT_SHOW_ALL_IDS_DESCRIPTION = "Show all ids (resource, action and rule ids)";
-	protected static final String OPT_SHOW_ALL_IDS_LONG = "show-all-ids";
-	protected static final String OPT_SHOW_ALL_IDS = "sai";
-	protected static final String OPT_SHOW_XACML_DESCRIPTION = "XACML output.";
-	protected static final String OPT_SHOW_XACML_LONG = "show-xacml";
-	protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"
-	    + OPT_SHOW_XACML_LONG + ".";
+    protected static final String OPT_POLICY_DESCRIPTION = "d";
+    protected static final String OPT_POLICY_DESCRIPTION_DESCRIPTION = "Description";
+    protected static final String OPT_POLICY_DESCRIPTION_LONG = "description";
+    protected static final String OPT_SHOW_IDS = "si";
+    protected static final String OPT_SHOW_IDS_DESCRIPTION = "Show policies id (needed for update or remove operations)";
+    protected static final String OPT_SHOW_IDS_LONG = "show-ids";
+    protected static final String OPT_SHOW_ALL_IDS_DESCRIPTION = "Show all ids (resource, action and rule ids)";
+    protected static final String OPT_SHOW_ALL_IDS_LONG = "show-all-ids";
+    protected static final String OPT_SHOW_ALL_IDS = "sai";
+    protected static final String OPT_SHOW_XACML_DESCRIPTION = "XACML output.";
+    protected static final String OPT_SHOW_XACML_LONG = "show-xacml";
+    protected static final String GENERIC_XACML_ERROR_MESSAGE = "Generic XACML policy, to see this policy specify the option --"
+            + OPT_SHOW_XACML_LONG + ".";
 
-	protected HighLevelPolicyManagement highlevelPolicyMgmtClient;
-	protected PAPManagement papMgmtClient;
-	protected XACMLPolicyManagement xacmlPolicyMgmtClient;
+    protected HighLevelPolicyManagement highlevelPolicyMgmtClient;
+    protected PAPManagement papMgmtClient;
+    protected XACMLPolicyManagement xacmlPolicyMgmtClient;
 
-	public PolicyManagementCLI(String[] commandNameValues, String usage,
-			String description, String longDescription) {
-		super(commandNameValues, usage, description, longDescription);
-	}
+    public PolicyManagementCLI(String[] commandNameValues, String usage, String description, String longDescription) {
+        super(commandNameValues, usage, description, longDescription);
+    }
 
-	protected abstract int executeCommand(CommandLine commandLine)
-			throws CLIException, ParseException, RemoteException;
+    protected abstract int executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException;
 
-	@Override
-	protected int executeCommandService(CommandLine commandLine,
-			ServiceClient serviceClient) throws CLIException, ParseException,
-			RemoteException {
+    @Override
+    protected int executeCommandService(CommandLine commandLine, ServiceClient serviceClient) throws CLIException,
+            ParseException, RemoteException {
 
-		xacmlPolicyMgmtClient = serviceClient.getXACMLPolicyManagementService(serviceClient.getTargetEndpoint() + serviceClient.getXACMLPolicyManagementServiceName());
-		highlevelPolicyMgmtClient = serviceClient.getHighLevelPolicyManagementService(serviceClient.getTargetEndpoint() + serviceClient.getHighLevelPolicyManagementServiceName());
-		papMgmtClient = serviceClient.getPAPManagementService(serviceClient.getTargetEndpoint() + serviceClient.getPAPManagementServiceName());
+        xacmlPolicyMgmtClient = serviceClient.getXACMLPolicyManagementService(serviceClient.getTargetEndpoint()
+                + serviceClient.getXACMLPolicyManagementServiceName());
+        highlevelPolicyMgmtClient = serviceClient.getHighLevelPolicyManagementService(serviceClient.getTargetEndpoint()
+                + serviceClient.getHighLevelPolicyManagementServiceName());
+        papMgmtClient = serviceClient.getPAPManagementService(serviceClient.getTargetEndpoint()
+                + serviceClient.getPAPManagementServiceName());
 
-		return executeCommand(commandLine);
-	}
+        return executeCommand(commandLine);
+    }
 
 }

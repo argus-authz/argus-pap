@@ -3,35 +3,46 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicyType;
 
 public class AddPolicyOperation extends BasePAPOperation<String> {
 
+    String alias;
     int index;
     PolicyType policy;
     String policyIdPrefix;
     String policySetId;
 
-    protected AddPolicyOperation(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
+    protected AddPolicyOperation(String alias, int index, String policySetId, String policyIdPrefix, PolicyType policy) {
+        this.alias = alias;
         this.index = index;
         this.policySetId = policySetId;
         this.policyIdPrefix = policyIdPrefix;
         this.policy = policy;
     }
 
-    public static AddPolicyOperation instance(int index, String policySetId, String policyIdPrefix, PolicyType policy) {
-        return new AddPolicyOperation(index, policySetId, policyIdPrefix, policy);
+    public static AddPolicyOperation instance(String alias, int index, String policySetId, String policyIdPrefix,
+            PolicyType policy) {
+        return new AddPolicyOperation(alias, index, policySetId, policyIdPrefix, policy);
     }
 
     protected String doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        PAP pap = PAPManager.getInstance().getPAP(alias);
 
-        if (!localPAP.hasPolicySet(policySetId)) {
+        if (pap.isRemote()) {
+            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
+        }
+
+        PAPContainer papContainer = new PAPContainer(pap);
+
+        if (!papContainer.hasPolicySet(policySetId)) {
             log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));
             return null;
         }
@@ -40,7 +51,7 @@ public class AddPolicyOperation extends BasePAPOperation<String> {
 
         policy.setPolicyId(policyId);
 
-        localPAP.addPolicy(index, policySetId, policy);
+        papContainer.addPolicy(index, policySetId, policy);
 
         TypeStringUtils.releaseUnneededMemory(policy);
 

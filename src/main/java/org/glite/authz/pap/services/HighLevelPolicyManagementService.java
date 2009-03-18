@@ -17,7 +17,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     private static final Logger log = LoggerFactory.getLogger(HighLevelPolicyManagementService.class);
 
-    public String ban(String id, String value, String resource, String action, boolean isPublic) throws RemoteException {
+    public String ban(String alias, String id, String value, String resource, String action, boolean isPublic) throws RemoteException {
         log.info(String.format("Received ban(id=\"%s\" value=\"%s\", resource=\"%s\", action=\"%s\", isPublic=%s);",
         					   id,
                                value,
@@ -31,7 +31,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, action);
 
             synchronized (PAPContainer.addOperationLock) {
-				return BanOperation.instance(banAttributeWizard, resourceAttributeWizard,
+				return BanOperation.instance(alias, banAttributeWizard, resourceAttributeWizard,
 					actionAttributeWizard, isPublic).execute();
 			}
 
@@ -41,12 +41,12 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         }
     }
     
-    public void eraseRepository() throws RemoteException {
+    public void eraseRepository(String alias) throws RemoteException {
         log.info("Received eraseRepository();");
 
         try {
 
-            EraseRepositoryOperation.instance().execute();
+            EraseRepositoryOperation.instance(alias).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -54,7 +54,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         }
     }
 
-    public UnbanResult unban(String id, String value, String resource, String action) throws RemoteException {
+    public UnbanResult unban(String alias, String id, String value, String resource, String action) throws RemoteException {
         log.info(String.format("Received unban(id=\"%s\" value=\"%s\", resource=\"%s\", action=\"%s\");",
         					   id,
                                value,
@@ -67,7 +67,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardType.ACTION, action);
 
             synchronized (PAPContainer.addOperationLock) {
-				return UnbanOperation.instance(bannedAttributeWizard, resourceAttributeWizard,
+				return UnbanOperation.instance(alias, bannedAttributeWizard, resourceAttributeWizard,
 					actionAttributeWizard).execute();
 			}
 

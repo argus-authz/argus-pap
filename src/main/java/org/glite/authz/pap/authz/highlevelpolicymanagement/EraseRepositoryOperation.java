@@ -7,24 +7,25 @@ import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 
 public class EraseRepositoryOperation extends BasePAPOperation<Object> {
+    
+    private String alias;
 
-    protected EraseRepositoryOperation() {
+    protected EraseRepositoryOperation(String alias) {
+        this.alias = alias;
     }
 
-    public static EraseRepositoryOperation instance() {
-        return new EraseRepositoryOperation();
+    public static EraseRepositoryOperation instance(String alias) {
+        return new EraseRepositoryOperation(alias);
     }
 
     protected Object doExecute() {
         
-        PAPManager papManager = PAPManager.getInstance();
+        PAPContainer papContainer = PAPManager.getInstance().getPAPContainer(alias);
         
-        PAPContainer localPAPContainer = papManager.getDefaultPAPContainer();
+        papContainer.deleteAllPolicySets();
+        papContainer.deleteAllPolicies();
         
-        localPAPContainer.deleteAllPolicySets();
-        localPAPContainer.deleteAllPolicies();
-        
-        papManager.createDefaultPAPIfNotExists();
+        papContainer.createRootPolicySet();
         
         return null;
     }

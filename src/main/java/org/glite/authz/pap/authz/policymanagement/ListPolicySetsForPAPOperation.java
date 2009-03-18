@@ -13,23 +13,23 @@ import org.opensaml.xacml.policy.PolicySetType;
 public class ListPolicySetsForPAPOperation extends
         BasePAPOperation <PolicySetType[]>{
     
-    String papId;
+    String papAlias;
     
-    private ListPolicySetsForPAPOperation(String papId) {
+    private ListPolicySetsForPAPOperation(String papAlias) {
 
-        this.papId = papId;
+        this.papAlias = papAlias;
     }
     
-    public static ListPolicySetsForPAPOperation instance(String papId) {
+    public static ListPolicySetsForPAPOperation instance(String papAlias) {
 
-        return new ListPolicySetsForPAPOperation(papId);
+        return new ListPolicySetsForPAPOperation(papAlias);
     }
 
     
     @Override
     protected PolicySetType[] doExecute() {
         
-        PAPContainer pap = PAPManager.getInstance().getPAPContainer( papId );
+        PAPContainer pap = PAPManager.getInstance().getPAPContainer( papAlias );
         
         List<PolicySetType> policySetList = pap.getAllPolicySets();
         

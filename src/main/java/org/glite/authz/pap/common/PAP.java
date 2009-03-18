@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.glite.authz.pap.common.utils.Utils;
+import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +25,7 @@ public class PAP {
             }
             return LOCAL;
         }
+
         public String toString() {
             return super.toString().toLowerCase();
         }
@@ -59,6 +61,15 @@ public class PAP {
     public PAP(String alias) {
         this(alias, PSType.LOCAL, null, null, null, null, null, false);
     }
+    
+    public PAP(String alias, boolean visibilityPublic) {
+        this(alias, PSType.LOCAL, null, null, null, null, null, visibilityPublic);
+    }
+
+    public PAP(String alias, PSType pstype, String dn, String hostname, String port, String servicesRootPath,
+            boolean visibilityPublic) {
+        this(alias, pstype, dn, hostname, port, servicesRootPath, null, visibilityPublic);
+    }
 
     public PAP(String alias, PSType pstype, String dn, String hostname, String port, String servicesRootPath, String protocol,
             boolean visibilityPublic) {
@@ -69,11 +80,7 @@ public class PAP {
         this.visibilityPublic = visibilityPublic;
         this.pstype = pstype;
 
-        if (DEFAULT_PAP_ALIAS.equals(alias)) {
-            papId = DEFAULT_PAP_ALIAS;
-        } else {
-            papId = alias;
-        }
+        papId = WizardUtils.generateId(alias);
 
         if (pstype == PSType.REMOTE) {
             this.dn = DEFAULT_DN;
@@ -108,27 +115,66 @@ public class PAP {
     }
 
     public static PAP makeDefaultPAP() {
-        return new PAP(DEFAULT_PAP_ALIAS, DEFAULT_PAP_ALIAS, "localhost", true);
+        return new PAP(DEFAULT_PAP_ALIAS, true);
     }
 
     public boolean equals(PAP pap) {
 
-        if (pap == null)
+        if (pap == null) {
             return false;
-        if (!alias.equals(pap.getAlias()))
+        }
+        
+        if (!alias.equals(pap.getAlias())) {
             return false;
-        if (!dn.equals(pap.getDn()))
+        }
+        
+        if (!(pstype == pap.getType())) {
             return false;
-        if (!hostname.equals(pap.getHostname()))
+        }
+        
+        if (!(visibilityPublic == pap.isVisibilityPublic())) {
             return false;
-        if (!port.equals(pap.getPort()))
+        }
+        
+        if (dn != null) {
+            if (!dn.equals(pap.getDn())) {
+                return false;
+            }
+        } else if (pap.getDn() != null) {
             return false;
-        if (!path.equals(pap.getPath()))
+        }
+        
+        if (hostname != null) {
+            if (!hostname.equals(pap.getHostname())) {
+                return false;
+            }
+        } else if (pap.getHostname() != null) {
             return false;
-        if (!protocol.equals(pap.getProtocol()))
+        }
+        
+        if (port != null) {
+            if (!port.equals(pap.getPort())) {
+                return false;
+            }
+        } else if (pap.getPort() != null) {
             return false;
-        if (!(visibilityPublic == pap.isVisibilityPublic()))
+        }
+        
+        if (path != null) {
+            if (!path.equals(pap.getPath())) {
+                return false;
+            }
+        } else if (pap.getPath() != null) {
             return false;
+        }
+        
+        if (protocol != null) {
+            if (!protocol.equals(pap.getProtocol())) {
+                return false;
+            }
+        } else if (pap.getProtocol() != null) {
+            return false;
+        }
 
         return true;
     }
@@ -181,7 +227,7 @@ public class PAP {
     public PSType getType() {
         return pstype;
     }
-    
+
     public String getTypeAsString() {
         return pstype.toString();
     }
@@ -274,7 +320,7 @@ public class PAP {
 
         String indentString = Utils.fillWithSpaces(indent);
         String paddingString = Utils.fillWithSpaces(indent + padding);
-        
+
         String visibility;
         if (visibilityPublic) {
             visibility = "public";
@@ -282,11 +328,23 @@ public class PAP {
             visibility = "private";
         }
 
-        String aliasString = String.format("%alias=%s\n", indentString, alias);
+        String aliasString = String.format("%salias=%s\n", indentString, alias);
         String typeString = String.format("%stype=%s\n", paddingString, pstype);
-        String dnString = String.format("%dn=%s\n", paddingString, dn);
-        String endpointString = String.format("%endpoint=%s\n", paddingString, getEndpoint());
-        String visibilityString = String.format("%visibility=%s\n", paddingString, visibility);
+        String visibilityString = String.format("%svisibility=%s\n", paddingString, visibility);
+
+        String dnString = String.format("%sdn=%s\n", paddingString, dn);
+        String endpointString = String.format("%sendpoint=%s\n", paddingString, getEndpoint());
+
+        if (pstype == PSType.LOCAL) {
+            
+            if (dn == null) {
+                dnString = "";
+            }
+            
+            if ((hostname == null) && (port == null)) {
+                endpointString = "";
+            }
+        }
 
         return aliasString + typeString + visibilityString + dnString + endpointString;
     }
@@ -299,7 +357,6 @@ public class PAP {
         } else {
             visibility += "private";
         }
-
         return String.format("alias=\"%s\" type=\"%s\" visibility=\"%s\" dn=\"%s\" endpoint=\"%s\" id=\"%s\"",
                              alias,
                              pstype,

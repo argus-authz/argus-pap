@@ -3,6 +3,7 @@ package org.glite.authz.pap.ui.cli.policymanagement;
 import java.rmi.RemoteException;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
@@ -11,24 +12,36 @@ public class RemoveAllPolicies extends PolicyManagementCLI {
     private static final String[] commandNameValues = { "remove-all-policies", "rap" };
     private static final String DESCRIPTION = "Delete all policies.";
     private static final String USAGE = "[options]";
+    
+    private String alias = null;
 
     public RemoveAllPolicies() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 
+    @SuppressWarnings("static-access")
     @Override
     protected Options defineCommandOptions() {
-        return null;
+        Options options = new Options();
+        options.addOption(OptionBuilder.hasArg(true)
+                          .withDescription(OPT_PAPALIAS_DESCRIPTION)
+                          .withLongOpt(OPT_PAPALIAS_LONG)
+                          .create(OPT_PAPALIAS));
+        return options;
     }
 
     @Override
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
 
+        if (commandLine.hasOption(OPT_PAPALIAS)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        }
+        
         if (verboseMode) {
             System.out.print("Removing all policies... ");
         }
 
-        highlevelPolicyMgmtClient.eraseRepository();
+        highlevelPolicyMgmtClient.eraseRepository(alias);
 
         if (verboseMode)
             System.out.println("ok");

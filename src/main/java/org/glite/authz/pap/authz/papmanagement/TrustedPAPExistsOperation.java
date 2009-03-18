@@ -9,23 +9,23 @@ import org.glite.authz.pap.distribution.PAPManager;
 public class TrustedPAPExistsOperation extends BasePAPOperation<Boolean> {
 
     
-    String papId;
+    String papAlias;
     
-    protected TrustedPAPExistsOperation(String papId) {
+    protected TrustedPAPExistsOperation(String papAlias) {
 
-        this.papId = papId;
+        this.papAlias = papAlias;
     }
     
-    public static TrustedPAPExistsOperation instance(String papId) {
+    public static TrustedPAPExistsOperation instance(String papAlias) {
 
-        return new TrustedPAPExistsOperation(papId);
+        return new TrustedPAPExistsOperation(papAlias);
     }
     
     
     @Override
     protected Boolean doExecute() {
 
-        return PAPManager.getInstance().exists( papId );
+        return PAPManager.getInstance().exists( papAlias );
         
     }
 

@@ -3,52 +3,63 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicyType;
 
 public class AddPoliciesOperation extends BasePAPOperation<String[]> {
 
     int index;
-    PolicyType[] policy;
+    String alias;
+    PolicyType[] policyArray;
     String[] policyIdPrefix;
     String policySetId;
 
-    protected AddPoliciesOperation(int index, String policySetId, String[] policyIdPrefix, PolicyType[] policy) {
+    protected AddPoliciesOperation(String alias, int index, String policySetId, String[] policyIdPrefix, PolicyType[] policyArray) {
+        this.alias = alias;
         this.index = index;
         this.policySetId = policySetId;
         this.policyIdPrefix = policyIdPrefix;
-        this.policy = policy;
+        this.policyArray = policyArray;
     }
 
-    public static AddPoliciesOperation instance(int index, String policySetId, String policyIdPrefix[], PolicyType[] policy) {
-        return new AddPoliciesOperation(index, policySetId, policyIdPrefix, policy);
+    public static AddPoliciesOperation instance(String alias, int index, String policySetId, String policyIdPrefix[], PolicyType[] policyArray) {
+        return new AddPoliciesOperation(alias, index, policySetId, policyIdPrefix, policyArray);
     }
 
     protected String[] doExecute() {
+        
+        PAP pap = PAPManager.getInstance().getPAP(alias);
+        
+        if (pap.isRemote()) {
+            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
+        }
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        PAPContainer papContainer = new PAPContainer(pap);
 
-        if (!localPAP.hasPolicySet(policySetId)) {
+        if (!papContainer.hasPolicySet(policySetId)) {
             log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));
             return null;
         }
 
-        String[] policyIdArray = new String[policy.length];
+        String[] policyIdArray = new String[policyArray.length];
 
-        for (int i = 0; i < policy.length; i++) {
+        for (int i = 0; i < policyArray.length; i++) {
 
             policyIdArray[i] = WizardUtils.generateId(policyIdPrefix[i]);
-            policy[i].setPolicyId(policyIdArray[i]);
+            
+            policyArray[i].setPolicyId(policyIdArray[i]);
 
             if (index == -1) {
-                localPAP.addPolicy(index, policySetId, policy[i]);
+                papContainer.addPolicy(index, policySetId, policyArray[i]);
             } else {
-                localPAP.addPolicy(index + i, policySetId, policy[i]);
+                papContainer.addPolicy(index + i, policySetId, policyArray[i]);
             }
-            TypeStringUtils.releaseUnneededMemory(policy[i]);
+            TypeStringUtils.releaseUnneededMemory(policyArray[i]);
 
             log.info(String.format("Added policy (policyId=\"%s\")", policyIdArray[i]));
         }

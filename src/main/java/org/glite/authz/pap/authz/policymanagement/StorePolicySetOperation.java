@@ -3,48 +3,55 @@ package org.glite.authz.pap.authz.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
+import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicySetType;
 
+public class StorePolicySetOperation extends BasePAPOperation<String> {
 
-public class StorePolicySetOperation extends BasePAPOperation <String>{
-
-    
+    String alias;
     String idPrefix;
     PolicySetType policySet;
-    
-    
-    private StorePolicySetOperation(String idPrefix, PolicySetType policySet) {
 
+    private StorePolicySetOperation(String alias, String idPrefix, PolicySetType policySet) {
+
+        this.alias = alias;
         this.idPrefix = idPrefix;
         this.policySet = policySet;
-        
-    }
-    
-    public static StorePolicySetOperation instance(String idPrefix, PolicySetType policySet) {
 
-        return new StorePolicySetOperation(idPrefix,policySet);
     }
-    
+
+    public static StorePolicySetOperation instance(String alias, String idPrefix, PolicySetType policySet) {
+
+        return new StorePolicySetOperation(alias, idPrefix, policySet);
+    }
+
     protected String doExecute() {
-        
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
-        
+
+        PAP pap = PAPManager.getInstance().getPAP(alias);
+
+        if (pap.isRemote()) {
+            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
+        }
+
+        PAPContainer papContainer = new PAPContainer(pap);
+
         String policySetId = policySet.getPolicySetId();
-        
-        localPAP.storePolicySet(policySet);
-        
+
+        papContainer.storePolicySet(policySet);
+
         TypeStringUtils.releaseUnneededMemory(policySet);
-        
+
         return policySetId;
     }
 
     protected void setupPermissions() {
 
-        addRequiredPermission( PAPPermission.of( PermissionFlags.POLICY_WRITE ) );
-        
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
+
     }
 
 }

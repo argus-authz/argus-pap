@@ -9,24 +9,26 @@ import org.glite.authz.pap.repository.PAPContainer;
 
 public class HasPolicyOperation extends BasePAPOperation <Boolean> {
 
+    String alias;
     String policyId;
     
-    protected HasPolicyOperation( String policyId ) {
+    protected HasPolicyOperation( String alias, String policyId ) {
 
+        this.alias = alias;
         this.policyId = policyId;
 
     }
 
-    public static HasPolicyOperation instance(String policyId) {
+    public static HasPolicyOperation instance(String alias, String policyId) {
 
-        return new HasPolicyOperation(policyId);
+        return new HasPolicyOperation(alias, policyId);
     }
     
     
     @Override
     protected Boolean doExecute() {
         
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getPAPContainer(alias);
         return localPAP.hasPolicy( policyId );
         
     }

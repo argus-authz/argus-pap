@@ -216,26 +216,24 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
     }
 
     public synchronized void store(String papId, PolicySetType policySet) {
-
-        if (!(policySet instanceof PolicySetTypeString)) {
-            throw new RepositoryException("BUG: not a PolicySetTypeString class");
-        }
+        
+        PolicySetTypeString policySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
         if (!papDir.exists())
             throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
 
-        String policySetId = policySet.getPolicySetId();
+        String policySetId = policySetTypeString.getPolicySetId();
 
         File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
         if (policySetFile.exists()) {
             throw new AlreadyExistsException("Already exists: policySetId=" + policySetId);
         }
 
-        PolicySetHelper.toFile(policySetFile, policySet);
+        PolicySetHelper.toFile(policySetFile, policySetTypeString);
 
-        PolicySetTypeString policySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
+        TypeStringUtils.releaseUnneededMemory(policySetTypeString);
 
         getPAPCache(papId).put(policySetId, policySetTypeString);
     }

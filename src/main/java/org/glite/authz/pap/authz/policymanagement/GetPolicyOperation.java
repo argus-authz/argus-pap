@@ -11,29 +11,30 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class GetPolicyOperation extends BasePAPOperation <PolicyType>{
 
+    String alias;
     String policyId;
     
-    protected GetPolicyOperation(String policyId) {
+    protected GetPolicyOperation(String alias, String policyId) {
+        this.alias = alias;
         this.policyId = policyId;
-            
     }
     
 
-    public static GetPolicyOperation instance(String policyId) {
-
-        return new GetPolicyOperation(policyId);
+    public static GetPolicyOperation instance(String alias, String policyId) {
+        return new GetPolicyOperation(alias, policyId);
     }
     
     
     @Override
     protected PolicyType doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        PAPContainer papContainer = PAPManager.getInstance().getPAPContainer(alias);
         
-        if (!localPAP.hasPolicy(policyId))
+        if (!papContainer.hasPolicy(policyId)) {
             throw new NotFoundException("Policy '" + policyId + "' not found.");
+        }
         
-        PolicyType policy = localPAP.getPolicy(policyId);
+        PolicyType policy = papContainer.getPolicy(policyId);
         
         return policy;
     }

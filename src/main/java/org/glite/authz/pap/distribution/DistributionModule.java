@@ -91,7 +91,7 @@ public class DistributionModule extends Thread {
 
             if (papRoot instanceof PolicySetType) {
 
-                ((PolicySetType) papRoot).setPolicySetId(papContainer.getPAP().getAlias());
+                ((PolicySetType) papRoot).setPolicySetId(papContainer.getPAP().getPapId());
 
                 for (XACMLObject xacmlObject : papPolicies) {
 

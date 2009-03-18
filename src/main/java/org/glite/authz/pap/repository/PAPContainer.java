@@ -52,6 +52,15 @@ public class PAPContainer {
         return papContainerList;
     }
 
+    public void createRootPolicySet() {
+
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getPapId(),
+                                                                         PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        rootPolicySet.setVersion("0");
+
+        policySetDAO.store(papId, rootPolicySet);
+    }
+
     public void addPolicy(int index, String policySetId, PolicyType policy) {
 
         if (!policySetDAO.exists(papId, policySetId)) {

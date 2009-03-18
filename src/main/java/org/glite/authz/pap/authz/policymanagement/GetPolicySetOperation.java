@@ -11,29 +11,31 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 public class GetPolicySetOperation extends BasePAPOperation <PolicySetType>{
 
+    String alias;
     String policySetId;
     
      
-    protected GetPolicySetOperation( String policySetId ) {
+    protected GetPolicySetOperation( String alias, String policySetId ) {
 
+        this.alias = alias;
         this.policySetId = policySetId;
     
     }
 
-    public static GetPolicySetOperation instance(String policySetId) {
+    public static GetPolicySetOperation instance(String alias, String policySetId) {
 
-        return new GetPolicySetOperation(policySetId);
+        return new GetPolicySetOperation(alias, policySetId);
     }
     
     @Override
     protected PolicySetType doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        PAPContainer papContainer = PAPManager.getInstance().getPAPContainer(alias);
         
-        if (!localPAP.hasPolicySet(policySetId))
+        if (!papContainer.hasPolicySet(policySetId))
             throw new NotFoundException("PolicySet '" + policySetId + "' not found.");
         
-        PolicySetType policySet = localPAP.getPolicySet(policySetId);
+        PolicySetType policySet = papContainer.getPolicySet(policySetId);
         
         return policySet;
         

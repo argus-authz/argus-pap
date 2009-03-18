@@ -12,21 +12,21 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class ListPoliciesOperation extends BasePAPOperation <PolicyType[]> {
 
-    private ListPoliciesOperation() {
-
-        
+    String alias;
+    
+    private ListPoliciesOperation(String alias) {    
+        this.alias = alias;
     }
     
-    public static ListPoliciesOperation instance() {
-
-        return new ListPoliciesOperation();
+    public static ListPoliciesOperation instance(String alias) {
+        return new ListPoliciesOperation(alias);
     }
     
     
     @Override
     protected PolicyType[] doExecute() {
 
-        PAPContainer localPAP = PAPManager.getInstance().getDefaultPAPContainer();
+        PAPContainer localPAP = PAPManager.getInstance().getPAPContainer(alias);
         
         List<PolicyType> policyList = localPAP.getAllPolicies();
         
