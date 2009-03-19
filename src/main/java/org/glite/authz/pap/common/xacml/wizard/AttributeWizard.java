@@ -123,10 +123,6 @@ public class AttributeWizard {
         this.value = value;
     }
 
-    public AttributeWizard(String idEqualValue) {
-        this(getIdFromIdEqualValue(idEqualValue), getValueFromIdEqualValue(idEqualValue));
-    }
-
     public AttributeWizard(String identifier, String value) {
 
         attributeWizardType = AttributeWizardType.getById(identifier);
@@ -156,32 +152,6 @@ public class AttributeWizard {
     public static boolean isSubjectAttribute(AttributeType attribute) {
         String xacmlId = attribute.getAttributeID();
         return AttributeWizardType.xacmlIdMatchesTargetElement(xacmlId, TargetElement.SUBJECT);
-    }
-
-    private static String getIdFromIdEqualValue(String idEqualValue) {
-        int separatorPosition = getSeparatorPositionForIdEqualValue(idEqualValue);
-        return idEqualValue.substring(0, separatorPosition);
-    }
-
-    private static int getSeparatorPositionForIdEqualValue(String idEqualValue) {
-        int separatorPosition = idEqualValue.indexOf('=');
-        if (separatorPosition == -1)
-            throw new UnsupportedAttributeException("'" + idEqualValue + "' is not in the format 'id=value'");
-        return separatorPosition;
-    }
-
-    private static String getValueFromIdEqualValue(String idEqualValue) {
-        int separatorPosition = getSeparatorPositionForIdEqualValue(idEqualValue);
-
-        String value = idEqualValue.substring(separatorPosition + 1);
-
-        if (value.startsWith("\""))
-            value = value.substring(1);
-
-        if (value.endsWith("\""))
-            value = value.substring(0, value.length());
-
-        return value;
     }
 
     public boolean equals(Object attributeWizardObject) {
