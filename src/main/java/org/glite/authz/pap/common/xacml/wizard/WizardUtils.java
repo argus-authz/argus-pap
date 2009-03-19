@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
-import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.opensaml.xacml.ctx.AttributeType;
 
 public class WizardUtils {

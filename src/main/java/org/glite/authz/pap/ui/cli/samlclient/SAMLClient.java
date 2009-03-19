@@ -54,7 +54,7 @@ public class SAMLClient extends SAMLClientCLI {
             isPAPQuery = false;
         }
         
-        XACMLPolicyCLIUtils.initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
         
         XACMLPolicyQueryType query = buildSamlXacmlQuery("IssuerString", isPAPQuery);
     	

@@ -171,7 +171,7 @@ public class ListPolicies extends PolicyManagementCLI {
             papInfoArray = getPAPInfoArray(papAliasArray, papDataArray);
         }
 
-        XACMLPolicyCLIUtils.initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
 
         for (int i = 0; i < papAliasArray.length; i++) {
 

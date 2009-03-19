@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 
 import org.glite.authz.pap.authz.AuthorizationEngine;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
+import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
 import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
@@ -74,6 +75,9 @@ public final class PAPService {
             logger.error("Error configuring OpenSAML:" + e.getMessage());
             throw new PAPConfigurationException("Error configuring OpenSAML:" + e.getMessage(), e);
         }
+        
+        // Boostrap wizard attributes
+        AttributeWizardTypeConfiguration.bootstrap();
 
         // Start repository manager
         logger.info("Starting repository manager...");

@@ -127,7 +127,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
             return ExitStatus.FAILURE.ordinal();
         }
 
-        XACMLPolicyCLIUtils.initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
 
         List<XACMLWizard> wizardList = new ArrayList<XACMLWizard>(0);
 

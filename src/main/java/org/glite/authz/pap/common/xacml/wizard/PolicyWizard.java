@@ -9,7 +9,6 @@ import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.ObligationsHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
-import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.PolicyWizardException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
@@ -25,20 +24,21 @@ public class PolicyWizard extends XACMLWizard {
 
     private static final Logger log = LoggerFactory.getLogger(PolicyWizard.class);
 
-    protected static final AttributeWizardType attributeWizardType = AttributeWizardType.ACTION;
     protected static final String VISIBILITY_PRIVATE_PREFIX = "private";
     protected static final String VISIBILITY_PUBLIC_PREFIX = "public";
-
     protected final String actionValue;
+
+    protected final AttributeWizardType attributeWizardType = AttributeWizardTypeConfiguration.getInstance()
+                                                                                              .getActionAttributeWizard();
     protected String description = null;
     protected boolean isPrivate = false;
-    protected PolicyTypeString policy = null;
+    protected final List<ObligationWizard> obligationWizardList = new LinkedList<ObligationWizard>();
 
+    protected PolicyTypeString policy = null;
     protected String policyId = null;
     protected String policyIdUniqueNumber;
     protected String policyIdVisibilityPrefix;
     protected final List<RuleWizard> ruleWizardList = new LinkedList<RuleWizard>();
-    protected final List<ObligationWizard> obligationWizardList = new LinkedList<ObligationWizard>();
     protected final TargetWizard targetWizard;
     protected String version = null;
 
@@ -81,7 +81,7 @@ public class PolicyWizard extends XACMLWizard {
         } catch (NumberFormatException e) {
             throw new UnsupportedPolicyException("Wrong version format", e);
         }
-        
+
         if (policy.getObligations() != null) {
             List<ObligationType> obligationList = policy.getObligations().getObligations();
             for (ObligationType obligation : obligationList) {
@@ -136,24 +136,6 @@ public class PolicyWizard extends XACMLWizard {
             }
         }
         throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
-    }
-
-    private static void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
-
-        if (targetAttributeWizardList == null) {
-            throw new UnsupportedPolicySetWizardException("targetAttributeWizardList is null");
-        }
-
-        if (targetAttributeWizardList.size() != 1) {
-            throw new UnsupportedPolicySetWizardException("Only one resource attribute is supported (found "
-                    + targetAttributeWizardList.size() + " attributes)");
-        }
-
-        AttributeWizard aw = targetAttributeWizardList.get(0);
-
-        if (aw.getAttributeWizardType() != attributeWizardType) {
-            throw new UnsupportedPolicySetWizardException("Only one action attribute is supported");
-        }
     }
 
     public void addObligation(ObligationWizard obligationWizard) {
@@ -380,7 +362,7 @@ public class PolicyWizard extends XACMLWizard {
         if (description != null) {
             sb.append(String.format("%sdescription=\"%s\"\n", indentString, description));
         }
-        
+
         for (ObligationWizard obligationWizard : obligationWizardList) {
             sb.append(obligationWizard.toFormattedString(baseIndentation + internalIndentation, internalIndentation));
             sb.append('\n');
@@ -461,12 +443,30 @@ public class PolicyWizard extends XACMLWizard {
             for (ObligationWizard obligationWizard : obligationWizardList) {
                 obligationList.add(obligationWizard.getXACML());
             }
-            
+
             policy.setObligations(obligations);
         }
-        
+
         for (RuleWizard ruleWizard : ruleWizardList) {
             policy.getRules().add(ruleWizard.getXACML());
+        }
+    }
+
+    private void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
+
+        if (targetAttributeWizardList == null) {
+            throw new UnsupportedPolicySetWizardException("targetAttributeWizardList is null");
+        }
+
+        if (targetAttributeWizardList.size() != 1) {
+            throw new UnsupportedPolicySetWizardException("Only one resource attribute is supported (found "
+                    + targetAttributeWizardList.size() + " attributes)");
+        }
+
+        AttributeWizard aw = targetAttributeWizardList.get(0);
+
+        if (aw.getAttributeWizardType() != attributeWizardType) {
+            throw new UnsupportedPolicySetWizardException("Only one action attribute is supported");
         }
     }
 }

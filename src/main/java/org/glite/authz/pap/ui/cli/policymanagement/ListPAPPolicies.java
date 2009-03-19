@@ -100,7 +100,7 @@ public class ListPAPPolicies extends PolicyManagementCLI {
             showRulesId = true;
         }
 
-        XACMLPolicyCLIUtils.initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
 
         boolean failure = false;
         boolean partialSuccess = false;

@@ -273,7 +273,7 @@ public class AddPolicies extends PolicyManagementCLI {
 
         File file = new File(args[1]);
 
-        XACMLPolicyCLIUtils.initOpenSAML();
+        XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
 
         try {
             xacmlWizardList = policyFileEncoder.parse(file);

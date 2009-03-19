@@ -10,7 +10,6 @@ import org.glite.authz.pap.common.xacml.utils.ActionsHelper;
 import org.glite.authz.pap.common.xacml.utils.EnvironmentHelper;
 import org.glite.authz.pap.common.xacml.utils.EnvironmentMatchHelper;
 import org.glite.authz.pap.common.xacml.utils.EnvironmentsHelper;
-import org.glite.authz.pap.common.xacml.utils.Functions;
 import org.glite.authz.pap.common.xacml.utils.ResourceHelper;
 import org.glite.authz.pap.common.xacml.utils.ResourceMatchHelper;
 import org.glite.authz.pap.common.xacml.utils.ResourcesHelper;
@@ -18,16 +17,18 @@ import org.glite.authz.pap.common.xacml.utils.SubjectHelper;
 import org.glite.authz.pap.common.xacml.utils.SubjectMatchHelper;
 import org.glite.authz.pap.common.xacml.utils.SubjectsHelper;
 import org.glite.authz.pap.common.xacml.utils.TargetHelper;
-import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
-import org.glite.authz.pap.common.xacml.wizard.AttributeWizard.AttributeWizardType;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.TargetWizardException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
 import org.opensaml.xacml.ctx.AttributeType;
+import org.opensaml.xacml.policy.ActionMatchType;
 import org.opensaml.xacml.policy.ActionType;
 import org.opensaml.xacml.policy.ActionsType;
+import org.opensaml.xacml.policy.EnvironmentMatchType;
 import org.opensaml.xacml.policy.EnvironmentsType;
+import org.opensaml.xacml.policy.ResourceMatchType;
 import org.opensaml.xacml.policy.ResourceType;
 import org.opensaml.xacml.policy.ResourcesType;
+import org.opensaml.xacml.policy.SubjectMatchType;
 import org.opensaml.xacml.policy.SubjectType;
 import org.opensaml.xacml.policy.SubjectsType;
 import org.opensaml.xacml.policy.TargetType;
@@ -149,8 +150,6 @@ public class TargetWizard {
 
         List<AttributeWizard> attributeWizardList = targetWizard.getAttributeWizardList();
         if (targetAttributeWizardList.size() != attributeWizardList.size()) {
-            log.debug(String.format("DIFFERENT SIZE: %d!=%d", targetAttributeWizardList.size(), attributeWizardList.size()));
-            log.debug(XMLObjectHelper.toString(target));
             return false;
         }
 
@@ -178,14 +177,14 @@ public class TargetWizard {
             target.releaseChildrenDOM(true);
         }
     }
-    
+
     public void releaseDOM() {
         if (target != null) {
             target.releaseDOM();
             target = null;
         }
     }
-    
+
     private void initTargetTypeIfNotSet() {
         if (target == null) {
             setTargetType();
@@ -196,25 +195,43 @@ public class TargetWizard {
 
         releaseDOM();
 
-        List<AttributeType> sbjAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                                                                AttributeWizardType.TargetElement.SUBJECT);
-        List<AttributeType> rsrcAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                                                                 AttributeWizardType.TargetElement.RESOURCE);
-        List<AttributeType> envAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                                                                AttributeWizardType.TargetElement.ENVIRONMENT);
-        List<AttributeType> actionAttr = WizardUtils.getAttributes(targetAttributeWizardList,
-                                                                   AttributeWizardType.TargetElement.ACTION);
+        List<SubjectMatchType> subjectMatchTypeList = new LinkedList<SubjectMatchType>();
+        for (AttributeWizard attributeWizard : targetAttributeWizardList) {
+            if (attributeWizard.isSubjectAttribute()) {
+                subjectMatchTypeList.add(SubjectMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
+                                                                                attributeWizard.getMatchfunction()));
+            }
+        }
 
-        SubjectsType subjects = SubjectsHelper.build(SubjectHelper.build(SubjectMatchHelper.buildListWithDesignator(sbjAttr,
-                                                                                                                    Functions.STRING_REGEXP_MATCH)));
-        ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(ResourceMatchHelper.buildWithDesignator(rsrcAttr,
-                                                                                                                     Functions.STRING_REGEXP_MATCH)));
-        ActionsType actions = ActionsHelper.build(ActionHelper.build(ActionMatchHelper.buildWithDesignator(actionAttr,
-                                                                                                           Functions.STRING_REGEXP_MATCH)));
-        EnvironmentsType environments = EnvironmentsHelper.build(EnvironmentHelper.build(EnvironmentMatchHelper.buildWithDesignator(envAttr,
-                                                                                                                                    Functions.STRING_REGEXP_MATCH)));
+        List<ResourceMatchType> resourceMatchTypeList = new LinkedList<ResourceMatchType>();
+        for (AttributeWizard attributeWizard : targetAttributeWizardList) {
+            if (attributeWizard.isResourceAttribute()) {
+                resourceMatchTypeList.add(ResourceMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
+                                                                                  attributeWizard.getMatchfunction()));
+            }
+        }
+
+        List<ActionMatchType> actionMatchTypeList = new LinkedList<ActionMatchType>();
+        for (AttributeWizard attributeWizard : targetAttributeWizardList) {
+            if (attributeWizard.isActionAttribute()) {
+                actionMatchTypeList.add(ActionMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
+                                                                              attributeWizard.getMatchfunction()));
+            }
+        }
+
+        List<EnvironmentMatchType> environmentMatchTypeList = new LinkedList<EnvironmentMatchType>();
+        for (AttributeWizard attributeWizard : targetAttributeWizardList) {
+            if (attributeWizard.isEnvironmentAttribute()) {
+                environmentMatchTypeList.add(EnvironmentMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
+                                                                                        attributeWizard.getMatchfunction()));
+            }
+        }
+
+        SubjectsType subjects = SubjectsHelper.build(SubjectHelper.build(subjectMatchTypeList));
+        ResourcesType resources = ResourcesHelper.build(ResourceHelper.build(resourceMatchTypeList));
+        ActionsType actions = ActionsHelper.build(ActionHelper.build(actionMatchTypeList));
+        EnvironmentsType environments = EnvironmentsHelper.build(EnvironmentHelper.build(environmentMatchTypeList));
 
         target = TargetHelper.build(subjects, actions, resources, environments);
-
     }
 }

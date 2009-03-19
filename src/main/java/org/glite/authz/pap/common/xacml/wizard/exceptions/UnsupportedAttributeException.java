@@ -1,7 +1,7 @@
 package org.glite.authz.pap.common.xacml.wizard.exceptions;
 
 
-public class UnsupportedAttributeException extends WizardException {
+public class UnsupportedAttributeException extends AttributeWizardTypeConfigurationException {
 
     private static final long serialVersionUID = 1L;
 
