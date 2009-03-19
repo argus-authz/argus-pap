@@ -28,6 +28,7 @@ public final class PAPServer {
     final class PAPDefaults {
 
         static final int PORT = 8150;
+
         static final int SHUTDOWN_PORT = 8151;
 
         static final int MAX_REQUEST_QUEUE_SIZE = 0;
@@ -61,6 +62,8 @@ public final class PAPServer {
 
     protected Server papServer;
 
+    private WebAppContext webappContext;
+
     protected String getPAPWar() {
 
         return (String) System.getProperty( "GLITE_LOCATION" )
@@ -69,24 +72,32 @@ public final class PAPServer {
 
     public PAPServer( String[] args ) {
 
-        parseOptions( args );
-
-        PAPConfiguration.initialize( papConfigurationDir, papRepositoryDir );
-
-        configurePAPServer();
-
-        configureWar();
-
         try {
 
+            parseOptions( args );
+
+            PAPConfiguration.initialize( papConfigurationDir, papRepositoryDir );
+
+            configurePAPServer();
+
             papServer.start();
+
+            if ( webappContext.getUnavailableException() != null )
+                throw webappContext.getUnavailableException();
+
             papServer.join();
 
         } catch ( Throwable e ) {
+
             log
-                    .info(
-                            "PAP encountered an error that could not be dealt with, shutting down.",
-                            e );
+                    .error( "PAP encountered an error that could not be dealt with, shutting down!" );
+            
+            log.error( e.getMessage() );
+            
+            // Print stack trace if log is debug enabled!
+            if (log.isDebugEnabled()) 
+                log.error( e.getMessage(), e);
+            
 
             try {
                 papServer.stop();
@@ -100,24 +111,13 @@ public final class PAPServer {
 
     }
 
-    private void checkCertificates() {
-
-        Properties tmProps = getTrustmanagerConfiguration();
-
-        CertificateChecker cc = CertificateChecker.instance();
-
-        cc.checkCertificate( tmProps.getProperty( "sslCertFile" ) );
-        cc.checkCertificate( tmProps.getProperty( "sslKey" ) );
-
-    }
-
     private void configurePAPServer() {
 
         papServer = new Server( getInt( "port", PAPDefaults.PORT ) );
 
         int maxRequestQueueSize = getInt( "max_request_queue_size",
                 PAPDefaults.MAX_REQUEST_QUEUE_SIZE );
-        
+
         int maxConnections = getInt( "max_connections",
                 PAPDefaults.MAX_CONNECTIONS );
 
@@ -144,18 +144,18 @@ public final class PAPServer {
         connector.setPort( getInt( "port", PAPDefaults.PORT ) );
 
         papServer.setConnectors( new Connector[] { connector } );
-        
+
         // Create shutdown service
-        JettyShutdownCommand papShutdownCommand =
-            new JettyShutdownCommand(papServer);
-        
+        JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
+                papServer );
+
         // Create a Shutdown Service
-        JettyShutdownService.startJettyShutdownService( 8151,Collections.singletonList( (Runnable) papShutdownCommand));
-    }
-
-    private void configureWar() {
-
-        WebAppContext webappContext = new WebAppContext();
+        JettyShutdownService.startJettyShutdownService( 8151, Collections
+                .singletonList( (Runnable) papShutdownCommand ) );
+        
+        
+        // Create a webapp context for the PAP web application
+        webappContext = new WebAppContext();
 
         webappContext.setContextPath( PAP_DEFAULT_CONTEXT );
         webappContext.setWar( getPAPWar() );
@@ -165,20 +165,14 @@ public final class PAPServer {
                 new DefaultHandler() } );
 
         papServer.setHandler( handlers );
-
+        
     }
 
+    
     private int getInt( String key, int defaultValue ) {
 
         PAPConfiguration conf = PAPConfiguration.instance();
         return conf.getInt( STANDALONE_STANZA + "." + key, defaultValue );
-    }
-
-    private String getString( String key, String defaultValue ) {
-
-        PAPConfiguration conf = PAPConfiguration.instance();
-        return conf.getString( STANDALONE_STANZA + "." + key, defaultValue );
-
     }
 
     private Properties getTrustmanagerConfiguration() {
@@ -237,4 +231,5 @@ public final class PAPServer {
         System.out.println( usage );
         System.exit( 0 );
     }
+
 }
