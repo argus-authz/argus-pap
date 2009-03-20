@@ -19,6 +19,11 @@ public class AttributeWizardTypeConfiguration {
     private static List<AttributeWizardType> list = null;
     private static final Logger log = LoggerFactory.getLogger(AttributeWizardTypeConfiguration.class);
     private static AttributeWizardType resourcePolicySetAttributeWizard = null;
+    private static AttributeWizardType unrecognizedAttributeWizard = null;
+
+    private static String baseKey(String id) {
+        return id;
+    }
 
     public static void bootstrap() {
 
@@ -28,21 +33,7 @@ public class AttributeWizardTypeConfiguration {
 
         initResourcePolicySetAttributeWizard();
         initActionPolicyAttributeWizard();
-    }
-
-    public static AttributeWizardTypeConfiguration getInstance() {
-        if (list == null) {
-            throw new AttributeWizardTypeConfigurationException(
-                "Initialization is required (call bootstrap()) before calling the getInstance method");
-        }
-        if (instance == null) {
-            instance = new AttributeWizardTypeConfiguration();
-        }
-        return instance;
-    }
-
-    private static String baseKey(String id) {
-        return id;
+        initUnrecognizedAttributeWizard();
     }
 
     private static boolean checkIdExist(String id) {
@@ -63,6 +54,17 @@ public class AttributeWizardTypeConfiguration {
         return false;
     }
 
+    public static AttributeWizardTypeConfiguration getInstance() {
+        if (list == null) {
+            throw new AttributeWizardTypeConfigurationException(
+                "Initialization is required (call bootstrap()) before calling the getInstance method");
+        }
+        if (instance == null) {
+            instance = new AttributeWizardTypeConfiguration();
+        }
+        return instance;
+    }
+
     private static String idKey() {
         return "id";
     }
@@ -77,7 +79,7 @@ public class AttributeWizardTypeConfiguration {
         }
         throw new AttributeWizardTypeConfigurationException("Cannot find id \"action\"");
     }
-
+    
     private static void initListFromFile() {
 
         String attributeMappingsFile = "/configuration/attribute-mappings.ini";
@@ -166,6 +168,17 @@ public class AttributeWizardTypeConfiguration {
         throw new AttributeWizardTypeConfigurationException("Cannot find id \"resource\"");
     }
 
+    private static void initUnrecognizedAttributeWizard() {
+
+        for (AttributeWizardType attributeWizardType : list) {
+            if ("unrecognized-id".equals(attributeWizardType.getId())) {
+                unrecognizedAttributeWizard = attributeWizardType;
+                return;
+            }
+        }
+        throw new AttributeWizardTypeConfigurationException("Cannot find id \"action\"");
+    }
+
     private static String xacmlDataTypeKey(String id) {
         return baseKey(id) + ".xacml-datatype";
     }
@@ -210,6 +223,10 @@ public class AttributeWizardTypeConfiguration {
 
     public AttributeWizardType getResourceAttributeWizard() {
         return resourcePolicySetAttributeWizard;
+    }
+    
+    public AttributeWizardType getUnrecognizedAttributeWizard() {
+        return unrecognizedAttributeWizard;
     }
 
     public boolean idExist(String id) {

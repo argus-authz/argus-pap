@@ -18,19 +18,21 @@ public class AttributeWizard {
 
     public AttributeWizard(AttributeAssignmentType attributeAssignment) {
         String xacmlId = attributeAssignment.getAttributeId();
-        attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
-        if (attributeWizardType == null) {
-            throw new UnsupportedAttributeException("Attribute not supported: " + xacmlId);
-        }
+        try {
+			attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
+		} catch (UnsupportedAttributeException e) {
+			attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard();
+		}
         this.value = attributeAssignment.getValue();
     }
 
     public AttributeWizard(AttributeType attribute) {
         String xacmlId = attribute.getAttributeID();
-        attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
-        if (attributeWizardType == null) {
-            throw new UnsupportedAttributeException("Attribute not supported: " + xacmlId);
-        }
+        try {
+			attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
+		} catch (UnsupportedAttributeException e) {
+			attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard();
+		}
         this.value = CtxAttributeTypeHelper.getFirstValue(attribute);
     }
 
