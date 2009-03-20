@@ -102,7 +102,8 @@ public final class PAPService {
         DistributionModule.getInstance().stopDistributionModule();
 
         logger.info("Shutting down authorization module...");
-        AuthorizationEngine.instance().shutdown();
+        if (AuthorizationEngine.instance() != null)
+            AuthorizationEngine.instance().shutdown();
 
     }
 

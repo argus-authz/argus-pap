@@ -58,7 +58,17 @@ kill_pap_proc(){
 		wget -q --spider http://localhost:8151/shutdown
 		
 		if [ $? -ne 0 ]; then
-			failure "Error shutting down PAP service!"
+			echo "Error shutting down PAP service! Will kill the process..."
+			
+			kill -9 $pid
+			
+			if [ $? -ne 0 ]; then
+				failure "Error killing the PAP service... maybe you don't have the permissions to kill it!"
+			else
+				## remove pid file
+				rm $PAP_RUN_FILE
+			fi
+			
 		else
 			## remove pid file
 			rm $PAP_RUN_FILE

@@ -15,7 +15,7 @@ public class CurrentAdmin {
 
     static Logger log = LoggerFactory.getLogger( CurrentAdmin.class );
     
-    static VOMSValidator validator = new VOMSValidator((X509Certificate)null);
+    static VOMSValidator validator = null;
 
     private PAPAdmin papAdmin;
 
