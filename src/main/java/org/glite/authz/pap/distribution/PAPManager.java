@@ -174,12 +174,19 @@ public class PAPManager {
         configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
     }
 
-    public void updatePAP(String papAlias, PAP newpap) {
+    public void updatePAP(PAP newpap) {
+    	
+    	String alias = newpap.getAlias();
 
-        if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
+        if (PAP.DEFAULT_PAP_ALIAS.equals(alias)) {
             updateDefaultPAP(newpap);
             return;
         }
+        
+        PAP oldPAP = papDAO.get(alias);
+        
+        // id (and alias) cannot change
+        newpap.setPapId(oldPAP.getPapId());
 
         papDAO.update(newpap);
     }
