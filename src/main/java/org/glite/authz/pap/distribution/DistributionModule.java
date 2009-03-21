@@ -139,9 +139,9 @@ public class DistributionModule extends Thread {
                     try {
                         refreshCache(pap);
                     } catch (RemoteException e) {
-                        log.error(String.format("Cannot connect to: %s (%s)", pap.getAlias(), pap.getEndpoint()));
+                        log.error(String.format("Error connecting to %s (%s): %s", pap.getAlias(), pap.getEndpoint(), e.getMessage()));
                     } catch (ServiceException e) {
-                        log.error(String.format("Cannot connect to: %s (%s)", pap.getAlias(), pap.getEndpoint()));
+                        log.error(String.format("Cannot connect to: %s (%s)", pap.getAlias(), pap.getEndpoint(), e.getMessage()));
                     }
 
                 }
