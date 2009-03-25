@@ -236,6 +236,8 @@ public class FileSystemPolicyDAO implements PolicyDAO {
     public synchronized void store(String papId, PolicyType policy) {
 
         PolicyTypeString policyTypeString = TypeStringUtils.cloneAsPolicyTypeString(policy);
+        
+        TypeStringUtils.releaseUnneededMemory(policy);
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
@@ -265,7 +267,9 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
         PolicyTypeString newPolicyTypeString = TypeStringUtils.cloneAsPolicyTypeString(newPolicy);
 
-        String policyId = newPolicy.getPolicyId();
+        TypeStringUtils.releaseUnneededMemory(newPolicy);
+        
+        String policyId = newPolicyTypeString.getPolicyId();
 
         File policyFile = new File(getPolicyFileAbsolutePath(papId, policyId));
         if (!policyFile.exists()) {
