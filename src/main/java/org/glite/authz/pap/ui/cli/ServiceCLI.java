@@ -44,7 +44,6 @@ public abstract class ServiceCLI {
     private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
     private static final String OPT_CERT_LONG = "cert";
 
-    private static final String OPT_HOST = "host";
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). "
             + "This option defines the PAP endpoint to be contacted as follows: https://arg:port/pap/services";
     private static final String OPT_HOST_LONG = "host";
@@ -153,8 +152,8 @@ public abstract class ServiceCLI {
             String host = PAP.DEFAULT_HOST;
             String port = PAP.DEFAULT_PORT;
 
-            if (commandLine.hasOption(OPT_HOST))
-                host = commandLine.getOptionValue(OPT_HOST);
+            if (commandLine.hasOption(OPT_HOST_LONG))
+                host = commandLine.getOptionValue(OPT_HOST_LONG);
 
             if (commandLine.hasOption(OPT_PORT))
                 port = commandLine.getOptionValue(OPT_PORT);
@@ -275,7 +274,7 @@ public abstract class ServiceCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_HOST_LONG)
                                        .withDescription(OPT_HOST_DESCRIPTION)
-                                       .create(OPT_HOST));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_PORT_LONG)
                                        .withDescription(OPT_PORT_DESCRIPTION)
