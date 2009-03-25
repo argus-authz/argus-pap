@@ -218,6 +218,8 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
     public synchronized void store(String papId, PolicySetType policySet) {
         
         PolicySetTypeString policySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
+        
+        TypeStringUtils.releaseUnneededMemory(policySet);
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
