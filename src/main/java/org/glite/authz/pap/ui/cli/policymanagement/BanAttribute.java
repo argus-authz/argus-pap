@@ -11,7 +11,7 @@ public class BanAttribute extends PolicyManagementCLI {
 
     private static String[] COMMAND_NAME_VALUES = { "ban", "b" };
     private static String DESCRIPTION = "Ban an attribute. <id> is any of the attribute ids that can be specified in the "
-            + "simplified policy language. By default the attribute is bannen for resource and action both with value \"*\". "
+            + "simplified policy language. By default the attribute is bannen for resource and action both with value \".*\". "
             + "Different values for resource and action can be set using options --" + OPT_RESOURCE_LONG + " and --"
             + OPT_ACTION_LONG + ".";
     private static String USAGE = "<id> <value> [options]";
@@ -75,13 +75,13 @@ public class BanAttribute extends PolicyManagementCLI {
         if (commandLine.hasOption(OPT_RESOURCE)) {
             resource = commandLine.getOptionValue(OPT_RESOURCE);
         } else {
-            resource = "*";
+            resource = ".*";
         }
 
         if (commandLine.hasOption(OPT_ACTION)) {
             action = commandLine.getOptionValue(OPT_ACTION);
         } else {
-            action = "*";
+            action = ".*";
         }
 
         if (verboseMode) {
