@@ -66,13 +66,13 @@ public class UnBanAttribute extends PolicyManagementCLI {
         if (commandLine.hasOption(OPT_RESOURCE)) {
             resource = commandLine.getOptionValue(OPT_RESOURCE);
         } else {
-            resource = "*";
+            resource = ".*";
         }
 
         if (commandLine.hasOption(OPT_ACTION)) {
             action = commandLine.getOptionValue(OPT_ACTION);
         } else {
-            action = "*";
+            action = ".*";
         }
 
         if (verboseMode) {
