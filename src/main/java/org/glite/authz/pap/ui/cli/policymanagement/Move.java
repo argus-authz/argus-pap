@@ -17,7 +17,7 @@ public class Move extends PolicyManagementCLI {
             + "<pivotId>   the index of the target object. <id> is moved before <pivotId> by default.\n"
             + "\nAn action can be moved before/after another action of the same resource. "
             + "A resource cannot be moved inside an action.";
-    private static final String USAGE = "<id> <pivotId> [-a]";
+    private static final String USAGE = "[options] <id> <pivotId> [-a]";
 
     private String alias = null;
 

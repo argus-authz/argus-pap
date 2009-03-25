@@ -27,7 +27,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
             + "defined in <file>. In the case of update of a resource all the actions defined inside the new resource (the one inside <file>) "
             + "are ignored. This means that for a resource only obligations and the description can be updated. To remove, add, and "
             + "change the order of actions inside a resource use the appropriate commands.";
-    private static final String USAGE = "<id> <file> [options]";
+    private static final String USAGE = "[options] <id> <file>";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
 
     private String alias = null;

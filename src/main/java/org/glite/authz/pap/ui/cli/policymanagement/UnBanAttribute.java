@@ -18,7 +18,7 @@ public class UnBanAttribute extends PolicyManagementCLI {
             + OPT_RESOURCE_LONG
             + " and --"
             + OPT_ACTION_LONG + ".";
-    private static String USAGE = "<id> <value> [options]";
+    private static String USAGE = "[options] <id> <value>";
     private String alias = null;
 
     public UnBanAttribute() {

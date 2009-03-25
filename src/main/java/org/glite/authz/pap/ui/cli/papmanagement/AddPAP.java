@@ -20,7 +20,7 @@ public class AddPAP extends PAPManagementCLI {
             + "cnaf_pap \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\" " + "test.cnaf.infn.it " + PAP.DEFAULT_PORT;
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";
-    private static final String USAGE = "<alias> [<dn> <host> <port> [path]] [options]";
+    private static final String USAGE = "[options] <alias> [<dn> <host> <port> [path]]";
 
     public AddPAP() {
         super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);

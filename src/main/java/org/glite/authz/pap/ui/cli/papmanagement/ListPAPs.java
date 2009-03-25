@@ -15,7 +15,7 @@ public class ListPAPs extends PAPManagementCLI {
     private static final String DESCRIPTION = "List trusted PAPs.";
     private static final String OPT_LONGLIST_FORMAT = "l";
     private static final String OPT_LONGLIST_FORMAT_DESCRIPTION = "Use a long list format (displays all the information of a PAP).";
-    private static final String USAGE = "";
+    private static final String USAGE = "[options]";
 
     public ListPAPs() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

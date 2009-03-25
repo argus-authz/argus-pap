@@ -38,7 +38,7 @@ public class AddPolicies extends PolicyManagementCLI {
             + "in which insert the given action elements. If option --" + OPT_PIVOT_LONG + " is not specified all the "
             + "elements are inserted in the last available position, otherwise they are inserted before \"pivotId\" "
             + "(or after \"pivotId\" if option --" + OPT_MOVEAFTER_LONG + " is set).";
-    private static final String USAGE = "<file> [targetId] [options]";
+    private static final String USAGE = "[options] <file> [targetId]";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
     private List<XACMLWizard> xacmlWizardList;
     private String targetId = null;

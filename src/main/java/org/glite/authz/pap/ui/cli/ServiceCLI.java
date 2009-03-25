@@ -16,7 +16,6 @@ import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.exceptions.PAPException;
-import org.mortbay.log.Log;
 
 public abstract class ServiceCLI {
 
@@ -83,13 +82,17 @@ public abstract class ServiceCLI {
     private String[] commandNameValues;
     private Options commandOptions;
     private String descriptionText;
-    private Options globalOptions;
+    private static Options globalOptions;
     private String longDescriptionText;
     private Options options;
     private final ServiceClient serviceClient;
     private String usageText;
     protected boolean verboseMode = false;
 
+    static {
+    	globalOptions = defineGlobalOptions();
+    }
+    
     @SuppressWarnings("unchecked")
     public ServiceCLI(String[] commandNameValues, String usage, String description, String longDescription) {
 
@@ -110,8 +113,6 @@ public abstract class ServiceCLI {
 
         commandOptions.addOption(OPT_HELP, OPT_HELP_LONG, false, OPT_HELP_DESCRIPTION);
 
-        globalOptions = defineGlobalOptions();
-
         options = new Options();
         Collection<Option> optionsList = commandOptions.getOptions();
         for (Option opt : optionsList) {
@@ -122,6 +123,10 @@ public abstract class ServiceCLI {
         for (Option opt : optionsList) {
             options.addOption(opt);
         }
+    }
+    
+    public static Options getGlobalOptions() {
+    	return globalOptions;
     }
 
     public boolean commandMatch(String command) {
@@ -219,7 +224,7 @@ public abstract class ServiceCLI {
     }
 
     public void printHelpMessage(PrintWriter pw) {
-        String syntax = commandNameValues[0] + " " + usageText;
+        String syntax = String.format(" [global-options] %s %s", commandNameValues[0], usageText);
 
         pw.println();
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), syntax);
@@ -254,7 +259,7 @@ public abstract class ServiceCLI {
     }
 
     @SuppressWarnings("static-access")
-    private Options defineGlobalOptions() {
+    private static Options defineGlobalOptions() {
 
         Options options = new Options();
 

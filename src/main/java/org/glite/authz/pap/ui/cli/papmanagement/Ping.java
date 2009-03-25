@@ -12,7 +12,7 @@ public class Ping extends PAPManagementCLI {
 	private static final String[] commandNameValues = { "ping" };
     private static final String DESCRIPTION = "Ping a PAP (default endpoint is: " + 
     DEFAULT_SERVICE_URL + ").";
-    private static final String USAGE = "[options]";
+    private static final String USAGE = "";
 
 	public Ping() {
 		super(commandNameValues, USAGE, DESCRIPTION, null);

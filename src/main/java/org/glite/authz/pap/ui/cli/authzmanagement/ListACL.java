@@ -12,7 +12,7 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class ListACL extends AuthZManagementCLI {
     
-    private static final String USAGE = "<context> [options]";
+    private static final String USAGE = "[options] <context>";
     private static final String[] commandNameValues = { "list-acl", "lacl" };
     private static final String DESCRIPTION = "Lists the ACL for a given context..";
     private static final String LONG_DESCRIPTION = "Lists the ACL for a given PAP authz context. Currently only " +

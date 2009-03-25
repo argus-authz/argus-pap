@@ -11,7 +11,7 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class RemoveACE extends AuthZManagementCLI {
     
-    private static final String USAGE = "<principal> [options]";
+    private static final String USAGE = "[options] <principal>";
     private static final String[] commandNameValues = { "remove-ace", "race" };
     private static final String DESCRIPTION = "Removes an entry from the PAP global context ACL.";
     private static final String LONG_DESCRIPTION =  "<principal> can be either an X509 DN or a VOMS FQAN.";

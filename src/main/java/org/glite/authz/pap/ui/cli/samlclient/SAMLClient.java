@@ -28,8 +28,8 @@ public class SAMLClient extends SAMLClientCLI {
     private static final String[] commandNameValues = { "test-client", "tc" };
     private static final String OPT_PDP = "pdp";
     private static final String OPT_PDP_DESCRIPTION = "Send a PDP query (otherwise a PAP query is sent).";
-    private static final String DESCRIPTION = "Get the defined order of the remote PAPs";
-    private static final String USAGE = "Test client perfoming a PAP (default) or PDP query.";
+    private static final String DESCRIPTION = "Test client perfoming a PAP (default) or PDP query.";
+    private static final String USAGE = "[options]";
     
     public SAMLClient() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

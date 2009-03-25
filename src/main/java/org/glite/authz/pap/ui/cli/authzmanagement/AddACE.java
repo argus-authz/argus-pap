@@ -13,9 +13,10 @@ import org.slf4j.LoggerFactory;
 
 public class AddACE extends AuthZManagementCLI {
     
-    private static final Logger log = LoggerFactory.getLogger( AddACE.class );
+    @SuppressWarnings("unused")
+	private static final Logger log = LoggerFactory.getLogger( AddACE.class );
     
-    private static final String USAGE = "<principal> <permissions> [options]";
+    private static final String USAGE = "[options] <principal> <permissions>";
     private static final String[] commandNameValues = { "add-ace", "aace" };
     private static final String DESCRIPTION = "Adds an entry to the ACL for the PAP global context.";
     private static final String LONG_DESCRIPTION =  "<principal> can be either an X509 DN or a VOMS FQAN. ANYONE can be used to assign permissions to any authenticated user." +

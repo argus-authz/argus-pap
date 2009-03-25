@@ -16,7 +16,7 @@ public class UpdatePAP extends PAPManagementCLI {
     		"the effect is to update old iformation with the new one.\n";
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";
-    private static final String USAGE = "<alias> [<dn> <host> <port> [path]] [options]";
+    private static final String USAGE = "[options] <alias> [<dn> <host> <port> [path]]";
 
     public UpdatePAP() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

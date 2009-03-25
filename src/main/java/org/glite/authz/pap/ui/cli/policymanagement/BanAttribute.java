@@ -14,7 +14,7 @@ public class BanAttribute extends PolicyManagementCLI {
             + "simplified policy language. By default the attribute is bannen for resource and action both with value \".*\". "
             + "Different values for resource and action can be set using options --" + OPT_RESOURCE_LONG + " and --"
             + OPT_ACTION_LONG + ".";
-    private static String USAGE = "<id> <value> [options]";
+    private static String USAGE = "[options] <id> <value>";
     private String alias = null;
 
     public BanAttribute() {

@@ -68,7 +68,7 @@ public class PAPCLI {
     private final List<ServiceCLI> testCommandList = new LinkedList<ServiceCLI>();
 
     protected int hfWidth = 80;
-    protected final Options options = new Options();
+    protected Options options = null;
     protected final CommandLineParser parser = new GnuParser();
     protected final HelpFormatter helpFormatter = new HelpFormatter();
     protected ServiceCLI serviceCLI = null;
@@ -141,7 +141,7 @@ public class PAPCLI {
         String command;
         
         try {
-        	command = getCommand(args);
+        	command = getCommand(commandLine);
         } catch (ParseException e) {
         	if (printGeneralHelpMessage) {
         		return;
@@ -213,6 +213,7 @@ public class PAPCLI {
     }
 
     private void defineOptions() {
+    	options = ServiceCLI.getGlobalOptions();
         options.addOption("h", "help", false, "Print this message");
     }
 
@@ -251,7 +252,7 @@ public class PAPCLI {
         PrintWriter pw = new PrintWriter(System.out);
 
         pw.println();
-        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin <subcommand> [options]");
+        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin [global-options] <subcommand> [options] [args]");
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP command-line client.");
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(),
@@ -310,12 +311,15 @@ public class PAPCLI {
         return s;
     }
 
-    protected String getCommand(String[] args) throws ParseException {
-        for (String arg : args) {
-            if (!arg.startsWith("-"))
-                return arg;
-        }
-        throw new ParseException("Missing command");
+    protected String getCommand(CommandLine commandLine) throws ParseException {
+    	
+    	String[] args = commandLine.getArgs();
+    	
+    	if (args.length == 0) {
+    		throw new ParseException("Missing command");
+    	}
+    	
+        return args[0];
     }
 
     protected int profileCommandExecution(ServiceCLI serviceCLI, String[] args) throws HelpMessageException, RemoteException,
