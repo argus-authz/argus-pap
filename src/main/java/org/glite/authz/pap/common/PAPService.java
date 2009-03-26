@@ -1,6 +1,6 @@
 package org.glite.authz.pap.common;
 
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
 
 import javax.servlet.ServletContext;
@@ -28,7 +28,9 @@ public final class PAPService {
         // TODO: find a more reliable naming scheme
 
         // Property: service startup time
-        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.SERVICE_STARTUP_TIME_PROP_NAME, new Date());
+        PAPConfiguration.instance()
+                        .setMonitoringProperty(MonitoredProperties.SERVICE_STARTUP_TIME_PROP_NAME,
+                                               ((new GregorianCalendar()).getTimeInMillis() / 1000));
 
         PAPManager papManager = PAPManager.getInstance();
 
@@ -50,7 +52,7 @@ public final class PAPService {
                 numberOfLocalPolicies + numOfRemotePolicies);
 
         // Property: policy last modification time
-        String policyLastModificationTimeString = papManager.getDefaultPAP().getPolicyLastModificationTimeString();
+        String policyLastModificationTimeString = papManager.getDefaultPAP().getPolicyLastModificationTimeInSecondsString();
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
                 policyLastModificationTimeString);
     }

@@ -1,7 +1,7 @@
 package org.glite.authz.pap.repository;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
@@ -363,11 +363,11 @@ public class PAPContainer {
         }
 
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                                                          pap.getPolicyLastModificationTimeString());
+                                                          pap.getPolicyLastModificationTimeInSecondsString());
     }
 
     private void updatePAPPolicyLastModificationTime() {
-        pap.setPolicyLastModificationTime(new Date());
+        pap.setPolicyLastModificationTime((new GregorianCalendar()).getTimeInMillis());
         RepositoryManager.getDAOFactory().getPAPDAO().update(pap);
         notifyPolicyLastModificationTimeUpdate();
     }

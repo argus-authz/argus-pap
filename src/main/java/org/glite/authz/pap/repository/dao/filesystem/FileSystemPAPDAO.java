@@ -250,12 +250,18 @@ public class FileSystemPAPDAO implements PAPDAO {
         String protocol = papsINIFile.getString(protocolKey(papAlias));
         String path = papsINIFile.getString(pathKey(papAlias));
         String id = papsINIFile.getString(idKey(papAlias));
-        String policyLastModificationTimeString = papsINIFile.getString(policyLastModificationTimeKey(papAlias));
         boolean visibilityPublic = papsINIFile.getBoolean(visibilityPublicKey(papAlias));
 
         PAP pap = new PAP(papAlias, PAP.PSType.get(type), dn, host, port, path, protocol, visibilityPublic);
         pap.setPapId(id);
-        pap.setPolicyLastModificationTime(policyLastModificationTimeString);
+        
+        long policyLastModificationTime;
+        try {
+            policyLastModificationTime = Long.parseLong(papsINIFile.getString(policyLastModificationTimeKey(papAlias)));
+        } catch (NumberFormatException e) {
+            policyLastModificationTime = 0;
+        }
+        pap.setPolicyLastModificationTime(policyLastModificationTime);
 
         return pap;
     }
@@ -314,8 +320,6 @@ public class FileSystemPAPDAO implements PAPDAO {
         papsINIFile.setProperty(protocolKey(papAlias), pap.getProtocol());
         papsINIFile.setProperty(idKey(papAlias), pap.getPapId());
         papsINIFile.setProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
-        if (pap.getPolicyLastModificationTime() != null) {
-            papsINIFile.setProperty(policyLastModificationTimeKey(papAlias), pap.getPolicyLastModificationTimeString());
-        }
+        papsINIFile.setProperty(policyLastModificationTimeKey(papAlias), pap.getPolicyLastModificationTimeInSecondsString());
     }
 }

@@ -1,6 +1,5 @@
 package org.glite.authz.pap.monitoring;
 
-import java.util.Hashtable;
 import java.util.Map;
 import java.util.TreeMap;
 

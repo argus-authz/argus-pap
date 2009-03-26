@@ -1,10 +1,5 @@
 package org.glite.authz.pap.common;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
@@ -39,7 +34,7 @@ public class PAP {
     public static String DEFAULT_PROTOCOL = "https";
     public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
 
-    private static DateFormat df = new SimpleDateFormat("EEE MMM dd HH:mm:ss zzz yyyy");
+    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PAP.class);
 
     private String alias = null;
@@ -47,7 +42,7 @@ public class PAP {
     private String hostname = null;
     private String papId = null;
     private String path = null;
-    private Date policyLastModificationTime = null;
+    private long policyLastModificationTimeInMillis = 0;
     private String port = null;
     private String protocol = null;
     private PSType pstype = null;
@@ -203,17 +198,8 @@ public class PAP {
         return path;
     }
 
-    public Date getPolicyLastModificationTime() {
-        return policyLastModificationTime;
-    }
-
-    public String getPolicyLastModificationTimeString() {
-
-        if (policyLastModificationTime == null) {
-            return "Undefined";
-        }
-
-        return df.format(policyLastModificationTime);
+    public String getPolicyLastModificationTimeInSecondsString() {
+        return String.valueOf( policyLastModificationTimeInMillis / 1000 );
     }
 
     public String getPort() {
@@ -270,22 +256,8 @@ public class PAP {
         this.path = path;
     }
 
-    public void setPolicyLastModificationTime(Date policyLastModificationTime) {
-        this.policyLastModificationTime = policyLastModificationTime;
-    }
-
-    public void setPolicyLastModificationTime(String policyLastModificationTimeString) {
-        Date policyLastModificationTime = null;
-
-        if (policyLastModificationTimeString != null) {
-            try {
-                policyLastModificationTime = df.parse(policyLastModificationTimeString);
-            } catch (ParseException e) {
-                log.error(String.format("Invalid date format for PAP: papAlias=\"%s\" papId=\"%s\"", alias, papId), e);
-            }
-        }
-
-        this.policyLastModificationTime = policyLastModificationTime;
+    public void setPolicyLastModificationTime(long milliseconds) {
+        this.policyLastModificationTimeInMillis = milliseconds;
     }
 
     public void setPort(String port) {
