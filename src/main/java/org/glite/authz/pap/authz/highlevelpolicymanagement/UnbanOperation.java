@@ -30,8 +30,8 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
     private final AttributeWizard bannedAttributeWizard;
     private final AttributeWizard resourceAttributeWizard;
 
-    protected UnbanOperation(String alias, AttributeWizard bannedAttributeWizard, AttributeWizard resourceAttributeWizard,
-            AttributeWizard actionAttributeWizard) {
+    protected UnbanOperation(String alias, AttributeWizard bannedAttributeWizard,
+            AttributeWizard resourceAttributeWizard, AttributeWizard actionAttributeWizard) {
 
         this.alias = alias;
         this.bannedAttributeWizard = bannedAttributeWizard;
@@ -41,7 +41,10 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
     public static UnbanOperation instance(String alias, AttributeWizard bannedAttributeWizard,
             AttributeWizard resourceAttributeWizard, AttributeWizard actionAttributeWizard) {
-        return new UnbanOperation(alias, bannedAttributeWizard, resourceAttributeWizard, actionAttributeWizard);
+        return new UnbanOperation(alias,
+                                  bannedAttributeWizard,
+                                  resourceAttributeWizard,
+                                  actionAttributeWizard);
     }
 
     protected UnbanResult doExecute() {
@@ -52,7 +55,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         if (alias == null) {
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
-        
+
         PAP pap = PAPManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {
@@ -88,19 +91,11 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         TypeStringUtils.releaseUnneededMemory(targetPolicy);
 
         if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
-            log.debug("ban rule found");
+            log.debug("ban rule found, updating policy");
 
-            if (policyWizard.getNumberOfRules() == 0) {
-
-                log.debug("no more rules in the policy, removing policy");
-                papContainer.removePolicyAndReferences(policyWizard.getPolicyId());
-
-            } else {
-                log.debug("updating the policy");
-                String oldVersion = policyWizard.getVersionString();
-                policyWizard.increaseVersion();
-                papContainer.updatePolicy(oldVersion, policyWizard.getXACML());
-            }
+            String oldVersion = policyWizard.getVersionString();
+            policyWizard.increaseVersion();
+            papContainer.updatePolicy(oldVersion, policyWizard.getXACML());
 
             unbanResult.setStatusCode(0);
             return unbanResult;
@@ -112,7 +107,8 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
     @Override
     protected void setupPermissions() {
-        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE, PermissionFlags.POLICY_READ_LOCAL));
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE,
+                                               PermissionFlags.POLICY_READ_LOCAL));
     }
 
     private PolicyType getTargetPolicy(PAPContainer papContainer, PolicySetType targetPolicySet) {
