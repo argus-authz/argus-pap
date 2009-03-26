@@ -31,7 +31,8 @@ public class RemovePolicies extends PolicyManagementCLI {
     }
 
     @Override
-    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+            RemoteException {
 
         String[] args = commandLine.getArgs();
 
@@ -51,19 +52,28 @@ public class RemovePolicies extends PolicyManagementCLI {
             for (int i = 1; i < args.length; i++) {
 
                 String policyId = args[i];
-                System.out.print("Removing \"" + policyId + "\"... ");
+
+                if (verboseMode) {
+                    System.out.print("Removing \"" + policyId + "\"... ");
+                }
 
                 boolean policyRemoved = xacmlPolicyMgmtClient.removeObjectByIdAndReferences(alias, policyId);
 
                 if (!policyRemoved) {
-                    System.out.println("NOT FOUND.");
+                    if (verboseMode) {
+                        System.out.println("error: not found.");
+                    } else {
+                        System.out.println("Error id not found: " + policyId);
+                    }
                     failure = true;
                     continue;
                 }
 
                 partialSuccess = true;
 
-                System.out.println("ok.");
+                if (verboseMode) {
+                    System.out.println("ok.");
+                }
             }
         } catch (RemoteException e) {
             System.out.println("ERROR.");

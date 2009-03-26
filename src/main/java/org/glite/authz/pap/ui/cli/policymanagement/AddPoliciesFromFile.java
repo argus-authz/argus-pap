@@ -22,14 +22,14 @@ import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AddPolicies extends PolicyManagementCLI {
+public class AddPoliciesFromFile extends PolicyManagementCLI {
 
-    private static final Logger log = LoggerFactory.getLogger(AddPolicies.class);
+    private static final Logger log = LoggerFactory.getLogger(AddPoliciesFromFile.class);
     private static String OPT_PIVOT = "pivot";
     private static String OPT_PIVOT_LONG = "pivot";
     private static String OPT_PIVOT_DESCRIPTION = "insert after <pivotId> (by default the insertion is before <pivotId>)";
 
-    private static final String[] commandNameValues = { "add-policies-from-file", "ap" };
+    private static final String[] commandNameValues = { "add-policies-from-file", "apf" };
     private static final String DESCRIPTION = "Add policies defined in the given file.\n"
             + "[targetId]   resource id in which insert actions.\n"
             + "<file>       define a set of resource elements or a set of action elements.\n";
@@ -46,7 +46,7 @@ public class AddPolicies extends PolicyManagementCLI {
     private String alias = null;
     private boolean moveAfter = false;
 
-    public AddPolicies() {
+    public AddPoliciesFromFile() {
         super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
     }
 

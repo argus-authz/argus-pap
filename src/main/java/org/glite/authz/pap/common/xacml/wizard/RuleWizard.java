@@ -32,7 +32,7 @@ public class RuleWizard {
         
         targetWizard = new TargetWizard(targetAttributeWizardList);
         this.effect = effect;
-        ruleId = WizardUtils.generateId("Rule");
+        ruleId = WizardUtils.generateId(null);
     }
     
     public RuleWizard(RuleType rule) {

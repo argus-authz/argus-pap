@@ -24,6 +24,18 @@
 		</xsd:schema>
 	</wsdl:types>
 
+	<wsdl:message name="addRuleRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
+		<wsdl:part name="isPermit" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="id" type="xsd:string"></wsdl:part>
+		<wsdl:part name="value" type="xsd:string"></wsdl:part>
+		<wsdl:part name="actionIdentifier" type="xsd:string"></wsdl:part>
+		<wsdl:part name="ruleIdentifier" type="xsd:string"></wsdl:part>
+		<wsdl:part name="moveAfter" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="addRuleResponse">
+		<wsdl:part name="ruleId" type="xsd:string"></wsdl:part>
+	</wsdl:message>
 	<wsdl:message name="banRequest">
 		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="id" type="xsd:string"></wsdl:part>
@@ -36,7 +48,7 @@
 		<wsdl:part name="policyId" type="xsd:string" />
 	</wsdl:message>
 	<wsdl:message name="eraseRepositoryRequest">
-        <wsdl:part name="alias" type="xsd:string"></wsdl:part>
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="eraseRepositoryResponse">
 	</wsdl:message>
@@ -52,6 +64,10 @@
 	</wsdl:message>
 
 	<wsdl:portType name="HighLevelPolicyManagement">
+		<wsdl:operation name="addRule">
+			<wsdl:input message="tns:addRuleRequest"></wsdl:input>
+			<wsdl:output message="tns:addRuleResponse"></wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="ban">
 			<wsdl:input message="tns:banRequest" />
 			<wsdl:output message="tns:banResponse" />
@@ -70,6 +86,20 @@
 		<soap:binding style="rpc"
 			transport="http://schemas.xmlsoap.org/soap/http" />
 
+		<wsdl:operation name="addRule">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/addRule" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="ban">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/banDN" />

@@ -23,7 +23,8 @@ import org.glite.authz.pap.ui.cli.papmanagement.RefreshCache;
 import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
 import org.glite.authz.pap.ui.cli.papmanagement.SetOrder;
 import org.glite.authz.pap.ui.cli.papmanagement.UpdatePAP;
-import org.glite.authz.pap.ui.cli.policymanagement.AddPolicies;
+import org.glite.authz.pap.ui.cli.policymanagement.AddPoliciesFromFile;
+import org.glite.authz.pap.ui.cli.policymanagement.AddPolicy;
 import org.glite.authz.pap.ui.cli.policymanagement.BanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.Move;
@@ -180,7 +181,8 @@ public class PAPCLI {
         // Policy Management
         policyMgmtCommandList.add(new BanAttribute());
         policyMgmtCommandList.add(new UnBanAttribute());
-        policyMgmtCommandList.add(new AddPolicies());
+        policyMgmtCommandList.add(new AddPolicy());
+        policyMgmtCommandList.add(new AddPoliciesFromFile());
         policyMgmtCommandList.add(new UpdatePolicy());
         policyMgmtCommandList.add(new RemovePolicies());
         policyMgmtCommandList.add(new RemoveAllPolicies());

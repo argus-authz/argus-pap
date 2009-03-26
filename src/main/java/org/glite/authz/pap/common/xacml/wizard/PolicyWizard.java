@@ -26,6 +26,59 @@ public class PolicyWizard extends XACMLWizard {
 
     protected static final String VISIBILITY_PRIVATE_PREFIX = "private";
     protected static final String VISIBILITY_PUBLIC_PREFIX = "public";
+    private static String getIdUniqueNumber(String policyId) {
+
+        String[] idTokens = policyId.split("_");
+
+        if (idTokens.length == 0) {
+            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
+        }
+
+        if (idTokens.length == 1) {
+            return idTokens[0];
+        }
+
+        if (idTokens.length == 2) {
+            if ((VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) || (VISIBILITY_PUBLIC_PREFIX.equals(idTokens[0]))) {
+                return idTokens[1];
+            }
+        }
+        throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
+    }
+
+    public static void increaseVersion(PolicyType policy) {
+        int version;
+
+        try {
+            version = (new Integer(policy.getVersion())).intValue();
+            version++;
+        } catch (NumberFormatException e) {
+            log.error("Unrecognized version format, setting version to 1. PolicySetId=" + policy.getPolicyId());
+            version = 1;
+        }
+
+        policy.setVersion(Integer.toString(version));
+    }
+    public static boolean isPrivate(String policyId) {
+        return !isPublic(policyId);
+    }
+    public static boolean isPublic(String policyId) {
+        String[] idTokens = policyId.split("_");
+
+        if (idTokens.length == 0) {
+            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
+        }
+
+        if (idTokens.length == 1) {
+            return true;
+        }
+
+        if (VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) {
+            return false;
+        }
+
+        return true;
+    }
     protected final String actionValue;
 
     protected final AttributeWizardType attributeWizardType = AttributeWizardTypeConfiguration.getInstance()
@@ -33,13 +86,16 @@ public class PolicyWizard extends XACMLWizard {
     protected String description = null;
     protected boolean isPrivate = false;
     protected final List<ObligationWizard> obligationWizardList = new LinkedList<ObligationWizard>();
-
     protected PolicyTypeString policy = null;
     protected String policyId = null;
     protected String policyIdUniqueNumber;
+
     protected String policyIdVisibilityPrefix;
+
     protected final List<RuleWizard> ruleWizardList = new LinkedList<RuleWizard>();
+    
     protected final TargetWizard targetWizard;
+
     protected String version = null;
 
     public PolicyWizard(AttributeWizard attributeWizard) {
@@ -96,48 +152,6 @@ public class PolicyWizard extends XACMLWizard {
         this.policy = (PolicyTypeString) policy;
     }
 
-    public static boolean isPrivate(String policyId) {
-        return !isPublic(policyId);
-    }
-
-    public static boolean isPublic(String policyId) {
-        String[] idTokens = policyId.split("_");
-
-        if (idTokens.length == 0) {
-            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
-        }
-
-        if (idTokens.length == 1) {
-            return true;
-        }
-
-        if (VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) {
-            return false;
-        }
-
-        return true;
-    }
-
-    private static String getIdUniqueNumber(String policyId) {
-
-        String[] idTokens = policyId.split("_");
-
-        if (idTokens.length == 0) {
-            throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
-        }
-
-        if (idTokens.length == 1) {
-            return idTokens[0];
-        }
-
-        if (idTokens.length == 2) {
-            if ((VISIBILITY_PRIVATE_PREFIX.equals(idTokens[0])) || (VISIBILITY_PUBLIC_PREFIX.equals(idTokens[0]))) {
-                return idTokens[1];
-            }
-        }
-        throw new UnsupportedPolicyException("Unrecognized policyId: " + policyId);
-    }
-
     public void addObligation(ObligationWizard obligationWizard) {
         obligationWizardList.add(obligationWizard);
         invalidatePolicyType();
@@ -169,6 +183,16 @@ public class PolicyWizard extends XACMLWizard {
         invalidatePolicyType();
     }
 
+    private String composeId() {
+        return policyIdVisibilityPrefix + "_" + policyIdUniqueNumber;
+    }
+
+    private void decomposePolicyId(String policyId) throws UnsupportedPolicyException {
+        isPrivate = isPrivate(policyId);
+        policyIdUniqueNumber = getIdUniqueNumber(policyId);
+        setPolicyIdVisibilityPrefix(isPrivate);
+    }
+
     public boolean denyRuleForAttributeExists(AttributeWizard attributeWizard) {
 
         for (RuleWizard ruleWizard : ruleWizardList) {
@@ -177,6 +201,15 @@ public class PolicyWizard extends XACMLWizard {
             }
         }
         return false;
+    }
+
+    private String generateId() {
+
+        setPolicyIdVisibilityPrefix(isPrivate);
+
+        policyIdUniqueNumber = WizardUtils.generateId(null);
+
+        return composeId();
     }
 
     public String getDescription() {
@@ -214,6 +247,20 @@ public class PolicyWizard extends XACMLWizard {
 
     public void increaseVersion() {
         setVersion(getVersion() + 1);
+    }
+
+    private void initPolicyTypeIfNotSet() {
+        if (policy == null) {
+            log.debug("Initializing policyType");
+            setPolicyType();
+        } else {
+            log.debug("policyType already initialized");
+        }
+    }
+
+    private void invalidatePolicyType() {
+        releaseChildrenDOM();
+        releaseDOM();
     }
 
     public boolean isDOMReleased() {
@@ -311,6 +358,42 @@ public class PolicyWizard extends XACMLWizard {
         }
     }
 
+    private void setPolicyIdVisibilityPrefix(boolean isPrivate) {
+        if (isPrivate) {
+            policyIdVisibilityPrefix = VISIBILITY_PRIVATE_PREFIX;
+        } else {
+            policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
+        }
+    }
+
+    private void setPolicyType() {
+
+        releaseDOM();
+
+        policy = new PolicyTypeString(PolicyHelper.build(policyId, PolicyHelper.RULE_COMBALG_FIRST_APPLICABLE));
+
+        if (description != null) {
+            policy.setDescription(DescriptionTypeHelper.build(description));
+        }
+
+        policy.setTarget(targetWizard.getXACML());
+        policy.setVersion(version);
+
+        if (obligationWizardList.size() > 0) {
+            ObligationsType obligations = ObligationsHelper.build();
+            List<ObligationType> obligationList = obligations.getObligations();
+            for (ObligationWizard obligationWizard : obligationWizardList) {
+                obligationList.add(obligationWizard.getXACML());
+            }
+
+            policy.setObligations(obligations);
+        }
+
+        for (RuleWizard ruleWizard : ruleWizardList) {
+            policy.getRules().add(ruleWizard.getXACML());
+        }
+    }
+
     public void setPrivate(boolean isPrivate) {
         this.isPrivate = isPrivate;
 
@@ -381,75 +464,6 @@ public class PolicyWizard extends XACMLWizard {
     public String toXACMLString() {
         initPolicyTypeIfNotSet();
         return XMLObjectHelper.toString(policy);
-    }
-
-    private String composeId() {
-        return policyIdVisibilityPrefix + "_" + policyIdUniqueNumber;
-    }
-
-    private void decomposePolicyId(String policyId) throws UnsupportedPolicyException {
-        isPrivate = isPrivate(policyId);
-        policyIdUniqueNumber = getIdUniqueNumber(policyId);
-        setPolicyIdVisibilityPrefix(isPrivate);
-    }
-
-    private String generateId() {
-
-        setPolicyIdVisibilityPrefix(isPrivate);
-
-        policyIdUniqueNumber = WizardUtils.generateId(null);
-
-        return composeId();
-    }
-
-    private void initPolicyTypeIfNotSet() {
-        if (policy == null) {
-            log.debug("Initializing policyType");
-            setPolicyType();
-        } else {
-            log.debug("policyType already initialized");
-        }
-    }
-
-    private void invalidatePolicyType() {
-        releaseChildrenDOM();
-        releaseDOM();
-    }
-
-    private void setPolicyIdVisibilityPrefix(boolean isPrivate) {
-        if (isPrivate) {
-            policyIdVisibilityPrefix = VISIBILITY_PRIVATE_PREFIX;
-        } else {
-            policyIdVisibilityPrefix = VISIBILITY_PUBLIC_PREFIX;
-        }
-    }
-
-    private void setPolicyType() {
-
-        releaseDOM();
-
-        policy = new PolicyTypeString(PolicyHelper.build(policyId, PolicyHelper.RULE_COMBALG_FIRST_APPLICABLE));
-
-        if (description != null) {
-            policy.setDescription(DescriptionTypeHelper.build(description));
-        }
-
-        policy.setTarget(targetWizard.getXACML());
-        policy.setVersion(version);
-
-        if (obligationWizardList.size() > 0) {
-            ObligationsType obligations = ObligationsHelper.build();
-            List<ObligationType> obligationList = obligations.getObligations();
-            for (ObligationWizard obligationWizard : obligationWizardList) {
-                obligationList.add(obligationWizard.getXACML());
-            }
-
-            policy.setObligations(obligations);
-        }
-
-        for (RuleWizard ruleWizard : ruleWizardList) {
-            policy.getRules().add(ruleWizard.getXACML());
-        }
     }
 
     private void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
