@@ -1,6 +1,7 @@
 package org.glite.authz.pap.common;
 
 import java.util.Date;
+import java.util.NoSuchElementException;
 
 import javax.servlet.ServletContext;
 
@@ -12,6 +13,8 @@ import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
+import org.glite.authz.pap.repository.RepositoryUtils;
+import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
 import org.slf4j.Logger;
@@ -85,7 +88,31 @@ public final class PAPService {
         
         PAPManager.initialize();
         
-        RepositoryManager.setLocalPoliciesFromConfigurationFileIfSetIntoConfiguration();
+        boolean performRepositoryValidationCheck;
+
+        try {
+            performRepositoryValidationCheck = PAPConfiguration.instance().getBoolean("repository-configuration.repository-check");
+        } catch (NoSuchElementException e) {
+            performRepositoryValidationCheck = false;
+            logger.info("Skipping repository validation check");
+        }
+
+        if (performRepositoryValidationCheck) {
+            
+            boolean repair;
+            
+            try {
+                repair = PAPConfiguration.instance().getBoolean("repository-configuration.repository-check.automatic-repair");
+            } catch (NoSuchElementException e) {
+                repair = false;
+            }
+            
+            logger.info("Starting repository validation. automatic-repair=" + repair);
+            
+            if (RepositoryUtils.performAllChecks(repair) == false) {
+                throw new RepositoryException("Repository validation check failed");
+            }
+        }
         
         setStartupMonitoringProperties();
 

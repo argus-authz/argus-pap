@@ -20,6 +20,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.glite.authz.pap.common.exceptions.XMLObjectException;
+import org.glite.authz.pap.common.exceptions.XMLObjectParserException;
 import org.glite.authz.pap.common.xacml.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -205,7 +206,7 @@ public class XMLObjectHelper<T extends XMLObject> {
             ppMgr.setNamespaceAware(true);
             doc = ppMgr.parse(inputStream);
         } catch (XMLParserException e) {
-            throw new XMLObjectException(e);
+            throw new XMLObjectParserException(e);
         }
 
         return doc;

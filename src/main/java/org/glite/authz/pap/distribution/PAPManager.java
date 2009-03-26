@@ -131,6 +131,18 @@ public class PAPManager {
         return new PAPContainer(getDefaultPAP());
     }
 
+    public List<PAP> getLocalPAPs() {
+
+        List<PAP> resultList = new LinkedList<PAP>();
+
+        for (PAP pap : getPAPList()) {
+            if (pap.isLocal()) {
+                resultList.add(pap);
+            }
+        }
+        return resultList;
+    }
+
     public List<PAP> getOrderedRemotePAPs() {
 
         List<PAP> remotePapList = new LinkedList<PAP>();
@@ -154,7 +166,7 @@ public class PAPManager {
     public PAPContainer getPAPContainer(String papAlias) {
         return new PAPContainer(getPAP(papAlias));
     }
-
+    
     public List<PAP> getPublicPAPs() {
 
         List<PAP> resultList = new LinkedList<PAP>();

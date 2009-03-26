@@ -105,22 +105,32 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
 
     public static boolean deletePolicyReference(PolicySetType policySet, String policyId) {
         List<IdReferenceType> policyRefList = policySet.getPolicyIdReferences();
+        IdReferenceType idReference = null;
         for (IdReferenceType policyRef : policyRefList) {
             if (policyRef.getValue().equals(policyId)) {
-                policyRefList.remove(policyRef);
-                return true;
+                idReference = policyRef;
+                break;
             }
+        }
+        if (idReference != null) {
+            policyRefList.remove(idReference);
+            return true;
         }
         return false;
     }
 
     public static boolean deletePolicySetReference(PolicySetType policySet, String policySetId) {
         List<IdReferenceType> psRefList = policySet.getPolicySetIdReferences();
+        IdReferenceType idReference = null;
         for (IdReferenceType psRef : psRefList) {
             if (psRef.getValue().equals(policySetId)) {
-                psRefList.remove(psRef);
-                return true;
+                idReference = psRef;
+                break;
             }
+        }
+        if (idReference != null) {
+            psRefList.remove(idReference);
+            return true;
         }
         return false;
     }
