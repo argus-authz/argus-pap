@@ -34,14 +34,7 @@ public abstract class RepositoryManager {
 
         FileSystemRepositoryManager.initialize();
         
-        String repositoryVersion = FileSystemRepositoryManager.getVersion();
-        
-        if (!(REPOSITORY_VERSION.equals(repositoryVersion))) {
-        	throw new InvalidVersionException("Invalid repository version (v" + repositoryVersion
-        		+ "). Requested version is v" + REPOSITORY_VERSION);
-		}
-
-		log.info("Repository version: v" + repositoryVersion);
+        checkVersion();
 		
         initialized = true;
     }
@@ -51,9 +44,9 @@ public abstract class RepositoryManager {
     }
 
     public static String getVersion() {
-    	return REPOSITORY_VERSION;
+        return REPOSITORY_VERSION;
     }
-
+    
     /**
      * Initialize the repository reading policies from the configuration file.
      */
@@ -115,5 +108,16 @@ public abstract class RepositoryManager {
                 policyWizard.releaseDOM();
             }
         }
+    }
+
+    private static void checkVersion() {
+        String repositoryVersion = FileSystemRepositoryManager.getVersion();
+
+        if (!(REPOSITORY_VERSION.equals(repositoryVersion))) {
+            throw new InvalidVersionException("Invalid repository version (v" + repositoryVersion
+                    + "). Requested version is v" + REPOSITORY_VERSION);
+        }
+
+        log.info("Repository version: v" + repositoryVersion);
     }
 }
