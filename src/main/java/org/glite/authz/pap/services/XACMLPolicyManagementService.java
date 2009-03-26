@@ -37,7 +37,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
 
                 return AddPoliciesOperation.instance(alias, index, policySetId, policyIdPrefixArray, policyArray).execute();
 
@@ -56,7 +56,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return AddPolicyOperation.instance(alias, index, policySetId, policyIdPrefix, policy).execute();
             }
 
@@ -72,7 +72,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return AddPolicySetOperation.instance(alias, index, policySet).execute();
             }
 
@@ -152,7 +152,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return ListPoliciesOperation.instance(alias).execute();
             }
 
@@ -167,7 +167,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return ListPolicySetOperation.instance(alias).execute();
             }
 
@@ -182,7 +182,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 MoveOperation.instance(alias, id, pivotId, moveAfter).execute();
             }
 
@@ -197,7 +197,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return RemoveObjectByIdAndReferencesOperation.instance(alias, id).execute();
             }
 
@@ -211,7 +211,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         log.info(String.format("removePolicy(\"%s\");", policyId));
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return RemovePolicyOperation.instance(alias, policyId).execute();
             }
 
@@ -226,7 +226,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return RemovePolicySetOperation.instance(alias, policySetId).execute();
             }
 
@@ -267,7 +267,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return UpdatePolicyOperation.instance(alias, version, policy).execute();
             }
 
@@ -282,7 +282,7 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return UpdatePolicySetOperation.instance(alias, version, policySet).execute();
             }
 

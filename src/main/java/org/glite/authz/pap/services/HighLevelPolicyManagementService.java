@@ -29,7 +29,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                moveAfter));
         try {
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return AddRuleOperation.instance(alias,
                                                  isPermit,
                                                  new AttributeWizard(id, value),
@@ -62,7 +62,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return BanOperation.instance(alias,
                                              banAttributeWizard,
                                              resourceAttributeWizard,
@@ -106,7 +106,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
 
-            synchronized (PAPContainer.addOperationLock) {
+            synchronized (PAPContainer.highLevelOperationLock) {
                 return UnbanOperation.instance(alias,
                                                bannedAttributeWizard,
                                                resourceAttributeWizard,
