@@ -140,6 +140,7 @@ public class ListPolicies extends PolicyManagementCLI {
 
         if (commandLine.hasOption(OPT_SHOW_ALL_IDS_LONG)) {
             showRulesId = true;
+            showIds = true;
         }
 
         String[] papAliasArray = null;
