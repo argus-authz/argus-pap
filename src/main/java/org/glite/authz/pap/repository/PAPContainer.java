@@ -70,6 +70,10 @@ public class PAPContainer {
         String policyId = policy.getPolicyId();
 
         policyDAO.store(papId, policy);
+        
+        int numberOfRules = policy.getRules().size();
+        
+        TypeStringUtils.releaseUnneededMemory(policy);
 
         PolicySetType policySet = policySetDAO.getById(papId, policySetId);
 
@@ -97,7 +101,7 @@ public class PAPContainer {
 
         updatePAPPolicyLastModificationTime();
 
-        notifyPoliciesAdded(1);
+        notifyPoliciesAdded(numberOfRules);
     }
 
     public void addPolicySet(int index, PolicySetType policySet) {
@@ -134,9 +138,17 @@ public class PAPContainer {
     }
 
     public void deleteAllPolicies() {
-        int numOfDeletedPolicies = policyDAO.deleteAll(papId);
+        // get the number of rules
+        List<PolicyType> policyList = policyDAO.getAll(papId);
+        int numberOfRules = 0;
+        for (PolicyType policy : policyList) {
+            numberOfRules += policy.getRules().size();
+            TypeStringUtils.releaseUnneededMemory(policy);
+        }
+        policyDAO.deleteAll(papId);
+        
         updatePAPPolicyLastModificationTime();
-        notifyPoliciesDeleted(numOfDeletedPolicies);
+        notifyPoliciesDeleted(numberOfRules);
     }
 
     public void deleteAllPolicySets() {
@@ -144,9 +156,14 @@ public class PAPContainer {
     }
 
     public void deletePolicy(String id) throws NotFoundException, RepositoryException {
+        PolicyType policy = policyDAO.getById(id, id);
+        
+        int numberOfRules = policy.getRules().size();
+        
         policyDAO.delete(papId, id);
+        
         updatePAPPolicyLastModificationTime();
-        notifyPoliciesDeleted(1);
+        notifyPoliciesDeleted(numberOfRules);
     }
 
     public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
@@ -179,7 +196,17 @@ public class PAPContainer {
     }
 
     public int getNumberOfPolicies() {
-        return policyDAO.getNumberOfPolicies(papId);
+        
+        List<PolicyType> policyList = policyDAO.getAll(papId);
+        
+        int numberOfRules = 0;
+        
+        for (PolicyType policy : policyList) {
+            numberOfRules += policy.getRules().size();
+            TypeStringUtils.releaseUnneededMemory(policy);
+        }
+        
+        return numberOfRules;
     }
 
     public PAP getPAP() {
@@ -231,11 +258,14 @@ public class PAPContainer {
             }
         }
 
+        PolicyType policy = policyDAO.getById(papId, policyId);
+        
+        int numberOfRules = policy.getRules().size();
+        
         policyDAO.delete(papId, policyId);
 
         updatePAPPolicyLastModificationTime();
-
-        notifyPoliciesDeleted(1);
+        notifyPoliciesDeleted(numberOfRules);
     }
 
     /**
@@ -269,8 +299,13 @@ public class PAPContainer {
         TypeStringUtils.releaseUnneededMemory(policySet);
 
         for (String policyId : idList) {
+            
+            PolicyType policy = policyDAO.getById(papId, policyId);
+            int numberOfRules = policy.getRules().size();
+            TypeStringUtils.releaseUnneededMemory(policy);
+            
             policyDAO.delete(papId, policyId);
-            notifyPoliciesDeleted(1);
+            notifyPoliciesDeleted(numberOfRules);
         }
 
         updatePAPPolicyLastModificationTime();
@@ -278,8 +313,13 @@ public class PAPContainer {
 
     public void storePolicy(PolicyType policy) {
         policyDAO.store(papId, policy);
+        
+        int numberOfRules = policy.getRules().size();
+        
+        TypeStringUtils.releaseUnneededMemory(policy);
+        
         updatePAPPolicyLastModificationTime();
-        notifyPoliciesAdded(1);
+        notifyPoliciesAdded(numberOfRules);
     }
 
     public void storePolicySet(PolicySetType policySet) {
@@ -287,8 +327,17 @@ public class PAPContainer {
     }
 
     public void updatePolicy(String version, PolicyType policy) {
+        PolicyType oldPolicy = policyDAO.getById(papId, policy.getPolicyId());
+        int numberOfRemovedRules = oldPolicy.getRules().size();
+        TypeStringUtils.releaseUnneededMemory(oldPolicy);
+        
+        int numberOfAddedRules = policy.getRules().size();
+        
         policyDAO.update(papId, version, policy);
+        
         updatePAPPolicyLastModificationTime();
+        notifyPoliciesDeleted(numberOfRemovedRules);
+        notifyPoliciesAdded(numberOfAddedRules);
     }
 
     public void updatePolicySet(String version, PolicySetType newPolicySet) {
