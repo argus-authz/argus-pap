@@ -23,8 +23,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
-import org.glite.authz.pap.common.xacml.PolicySetTypeString;
-import org.glite.authz.pap.common.xacml.PolicyTypeString;
 import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
 import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
@@ -67,6 +65,7 @@ import org.w3c.dom.Element;
  */
 public class ProvisioningServiceUtils {
 
+    @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.getLogger(ProvisioningServiceUtils.class);
 
     public static String xmlObjectToString(XMLObject xmlObject) {
@@ -118,7 +117,9 @@ public class ProvisioningServiceUtils {
         Issuer issuer = issuerBuilder.buildObject();
 
         // TODO here goes the name of the PAP
-        issuer.setValue("test");
+        String endpoint = "localhost";
+        
+        issuer.setValue(endpoint);
 
         assertion.setIssuer(issuer);
 

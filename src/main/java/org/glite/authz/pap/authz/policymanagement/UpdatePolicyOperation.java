@@ -54,7 +54,7 @@ public class UpdatePolicyOperation extends BasePAPOperation<Boolean> {
     @Override
     protected void setupPermissions() {
 
-        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE, PermissionFlags.POLICY_READ_LOCAL));
 
     }
 

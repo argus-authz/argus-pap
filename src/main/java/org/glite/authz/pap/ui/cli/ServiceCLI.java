@@ -31,16 +31,13 @@ public abstract class ServiceCLI {
     }
 
     private static final HelpFormatter helpFormatter = new HelpFormatter();
-    
-    private static final String OPT_USE_PROXY = "use_proxy";
+
     private static final String OPT_USE_PROXY_DESCRIPTION = "Forces the pap-admin to use a proxy found in the standard location.";
     private static final String OPT_USE_PROXY_LONG = "use_proxy";
-   
-    private static final String OPT_PROXY = "proxy";
+
     private static final String OPT_PROXY_DESCRIPTION = "Specifies a user proxy to be used for authentication.";
     private static final String OPT_PROXY_LONG = "proxy";
 
-    private static final String OPT_CERT = "cert";
     private static final String OPT_CERT_DESCRIPTION = "Specifies non-standard user certificate.";
     private static final String OPT_CERT_LONG = "cert";
 
@@ -48,11 +45,9 @@ public abstract class ServiceCLI {
             + "This option defines the PAP endpoint to be contacted as follows: https://arg:port/pap/services";
     private static final String OPT_HOST_LONG = "host";
 
-    private static final String OPT_KEY = "key";
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
     private static final String OPT_KEY_LONG = "key";
 
-    private static final String OPT_PASSWORD = "password";
     private static final String OPT_PASSWORD_DESCRIPTION = "Specifies the password used to decrypt the user's private key.";
     private static final String OPT_PASSWORD_LONG = "password";
 
@@ -61,7 +56,6 @@ public abstract class ServiceCLI {
             + "(default is " + PAP.DEFAULT_PORT + ")";
     private static final String OPT_PORT_LONG = "port";
 
-    private static final String OPT_URL = "url";
     private static final String OPT_URL_LONG = "url";
 
     private static final String OPT_VERBOSE = "v";
@@ -89,9 +83,9 @@ public abstract class ServiceCLI {
     protected boolean verboseMode = false;
 
     static {
-    	globalOptions = defineGlobalOptions();
+        globalOptions = defineGlobalOptions();
     }
-    
+
     @SuppressWarnings("unchecked")
     public ServiceCLI(String[] commandNameValues, String usage, String description, String longDescription) {
 
@@ -123,9 +117,9 @@ public abstract class ServiceCLI {
             options.addOption(opt);
         }
     }
-    
+
     public static Options getGlobalOptions() {
-    	return globalOptions;
+        return globalOptions;
     }
 
     public boolean commandMatch(String command) {
@@ -143,9 +137,9 @@ public abstract class ServiceCLI {
         if (commandLine.hasOption(OPT_HELP))
             throw new HelpMessageException();
 
-        if (commandLine.hasOption(OPT_URL)) {
+        if (commandLine.hasOption(OPT_URL_LONG)) {
 
-            serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL));
+            serviceClient.setTargetEndpoint(commandLine.getOptionValue(OPT_URL_LONG));
 
         } else {
 
@@ -158,54 +152,55 @@ public abstract class ServiceCLI {
             if (commandLine.hasOption(OPT_PORT))
                 port = commandLine.getOptionValue(OPT_PORT);
 
-            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL, host, port, PAP.DEFAULT_SERVICES_ROOT_PATH));
+            serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL,
+                                                          host,
+                                                          port,
+                                                          PAP.DEFAULT_SERVICES_ROOT_PATH));
 
         }
-        
-        if (commandLine.hasOption( OPT_USE_PROXY )){
-            
+
+        if (commandLine.hasOption(OPT_USE_PROXY_LONG)) {
+
             // If the --proxy option is specified, we get the proxy from there
-            
-            if (!commandLine.hasOption( OPT_PROXY )){
-                
-                String euid = System.getenv( "EUID" );
-                
-                if (euid == null || "".equals( euid )){
-                    String euidProperty = System.getProperty( "effectiveUserId" );
-                    
-                    if ( (euidProperty == null || "".equals( euidProperty ))){
-                        
-                        String x509UserProxy = System.getenv( "X509_USER_PROXY" );
-                        
-                        if (x509UserProxy == null || "".equals( x509UserProxy ))
-                            throw new PAPException("Cannot enstabilish user's effective user id, please use the --proxy option " +
-                            		"to specify which proxy pap-admin should use for authentication." );
+
+            if (!commandLine.hasOption(OPT_PROXY_LONG)) {
+
+                String euid = System.getenv("EUID");
+
+                if (euid == null || "".equals(euid)) {
+                    String euidProperty = System.getProperty("effectiveUserId");
+
+                    if ((euidProperty == null || "".equals(euidProperty))) {
+
+                        String x509UserProxy = System.getenv("X509_USER_PROXY");
+
+                        if (x509UserProxy == null || "".equals(x509UserProxy))
+                            throw new PAPException("Cannot enstabilish user's effective user id, please use the --proxy option "
+                                    + "to specify which proxy pap-admin should use for authentication.");
                         else
-                            serviceClient.setClientProxy( x509UserProxy );
+                            serviceClient.setClientProxy(x509UserProxy);
                     }
-                        
+
                     else
-                        serviceClient.setClientProxy( "/tmp/x509up_u"+euidProperty );
-                    
-                }else
-                    serviceClient.setClientProxy( "/tmp/x509up_u"+euid);
-                
+                        serviceClient.setClientProxy("/tmp/x509up_u" + euidProperty);
+
+                } else
+                    serviceClient.setClientProxy("/tmp/x509up_u" + euid);
+
             }
         }
-        
-        
-        if (commandLine.hasOption( OPT_PROXY ))
-            serviceClient.setClientProxy( commandLine.getOptionValue( OPT_PROXY ) );
-        
-        
-        if (commandLine.hasOption(OPT_CERT)) 
-            serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT));
 
-        if (commandLine.hasOption(OPT_KEY))
-            serviceClient.setClientPrivateKey(commandLine.getOptionValue(OPT_KEY));
+        if (commandLine.hasOption(OPT_PROXY_LONG))
+            serviceClient.setClientProxy(commandLine.getOptionValue(OPT_PROXY_LONG));
 
-        if (commandLine.hasOption(OPT_PASSWORD))
-            serviceClient.setClientPrivateKeyPassword(commandLine.getOptionValue(OPT_PASSWORD));
+        if (commandLine.hasOption(OPT_CERT_LONG))
+            serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT_LONG));
+
+        if (commandLine.hasOption(OPT_KEY_LONG))
+            serviceClient.setClientPrivateKey(commandLine.getOptionValue(OPT_KEY_LONG));
+
+        if (commandLine.hasOption(OPT_PASSWORD_LONG))
+            serviceClient.setClientPrivateKeyPassword(commandLine.getOptionValue(OPT_PASSWORD_LONG));
 
         if (commandLine.hasOption(OPT_VERBOSE))
             verboseMode = true;
@@ -262,7 +257,8 @@ public abstract class ServiceCLI {
 
         Options options = new Options();
 
-        // TODO: OPT_URL and (OPT_HOST, OPT_PORT) are mutually exclusive options. Use OptionGroup.
+        // TODO: OPT_URL and (OPT_HOST, OPT_PORT) are mutually exclusive
+        // options. Use OptionGroup.
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_URL_LONG)
                                        .withDescription("Specifies the target PAP endpoint (default: "
@@ -270,7 +266,7 @@ public abstract class ServiceCLI {
                                                                PAP.DEFAULT_HOST,
                                                                PAP.DEFAULT_PORT,
                                                                PAP.DEFAULT_SERVICES_ROOT_PATH) + ").")
-                                       .create(OPT_URL));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_HOST_LONG)
                                        .withDescription(OPT_HOST_DESCRIPTION)
@@ -282,34 +278,34 @@ public abstract class ServiceCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_PROXY_LONG)
                                        .withDescription(OPT_PROXY_DESCRIPTION)
-                                       .create(OPT_PROXY));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_CERT_LONG)
                                        .withDescription(OPT_CERT_DESCRIPTION)
-                                       .create(OPT_CERT));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_KEY_LONG)
                                        .withDescription(OPT_KEY_DESCRIPTION)
-                                       .create(OPT_KEY));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_PASSWORD_LONG)
                                        .withDescription(OPT_PASSWORD_DESCRIPTION)
-                                       .create(OPT_PASSWORD));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(false)
                                        .withLongOpt(OPT_VERBOSE_LONG)
                                        .withDescription(OPT_VERBOSE_DESCRIPTION)
                                        .create(OPT_VERBOSE));
-                                          
-        options.addOption(OptionBuilder.hasArg(false).withLongOpt(OPT_USE_PROXY_LONG)
-                .withDescription(OPT_USE_PROXY_DESCRIPTION).create(OPT_USE_PROXY));
-                                       
+        options.addOption(OptionBuilder.hasArg(false)
+                                       .withLongOpt(OPT_USE_PROXY_LONG)
+                                       .withDescription(OPT_USE_PROXY_DESCRIPTION)
+                                       .create());
         return options;
     }
 
     protected abstract Options defineCommandOptions();
 
-    protected abstract int executeCommandService(CommandLine commandLine, ServiceClient serviceClient) throws CLIException,
-            ParseException, RemoteException;
+    protected abstract int executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
+            throws CLIException, ParseException, RemoteException;
 
     protected void printErrorMessage(String msg) {
         System.out.println(msg);

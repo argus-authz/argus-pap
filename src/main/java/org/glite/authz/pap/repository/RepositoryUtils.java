@@ -1,9 +1,7 @@
 package org.glite.authz.pap.repository;
 
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
@@ -11,7 +9,6 @@ import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicySetType;
-import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,29 +28,6 @@ public class RepositoryUtils {
         return result;
     }
     
-    public static boolean performAllChecks(boolean repair) {
-        
-        boolean success = true;
-        
-        if (checkXMLValidation() == false) {
-            log.info("Starting detailed check for XML validation");
-            success = checkXMLValidationInDetail(repair);
-        }
-        
-        if (success == true) {
-            log.info("Starting check for loops");
-            success = checkForLoops(repair);
-        }
-        
-        if (success == true) {
-            log.info("Starting purge of unreferenced objects");
-            purgeUnreferencesPolicySets();
-            purgeUnreferencesPolicies();
-        }
-        
-        return success;
-    }
-
     public static boolean checkXMLValidation() {
 
         List<PAPContainer> containerList = PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs());
@@ -70,7 +44,7 @@ public class RepositoryUtils {
         }
         return true;
     }
-    
+
     public static boolean checkXMLValidationInDetail(boolean repair) {
         
         boolean result = true;
@@ -149,59 +123,38 @@ public class RepositoryUtils {
         return result;
     }
     
-    public static void purgeUnreferencesPolicySets() {
+    public static boolean performAllChecks(boolean repair) {
         
-        for (PAPContainer papContainer : PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs())) {
-            
-            Set<String> idSet = new HashSet<String>();
-            
-            PolicySetType rootPS = papContainer.getPAPRootPolicySet();
-            
-            idSet.add(rootPS.getPolicySetId());
-            
-            for (String id : PolicySetHelper.getPolicySetIdReferencesValues(rootPS)) {
-                idSet.add(id);
-            }
-            
-            TypeStringUtils.releaseUnneededMemory(rootPS);
-            
-            for (PolicySetType policySet : papContainer.getAllPolicySets()) {
-                
-                String policySetId = policySet.getPolicySetId();
-                
-                if (!idSet.contains(policySetId)) {
-                    log.info("Purging policy set " + policySetId);
-                    papContainer.deletePolicySet(policySetId);
-                }
-            }
+        boolean success = true;
+        
+        if (checkXMLValidation() == false) {
+            log.info("Starting detailed check for XML validation");
+            success = checkXMLValidationInDetail(repair);
         }
+        
+        if (success == true) {
+            log.info("Starting check for loops");
+            success = checkForLoops(repair);
+        }
+        
+        if (success == true) {
+            log.info("Starting purge of unreferenced objects");
+            purgeUnreferencesPolicySets();
+            purgeUnreferencesPolicies();
+        }
+        
+        return success;
     }
     
     public static void purgeUnreferencesPolicies() {
-        
         for (PAPContainer papContainer : PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs())) {
-            
-            Set<String> idSet = new HashSet<String>();
-            
-            for (PolicySetType policySet : papContainer.getAllPolicySets()) {
-                
-                List<String> idList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
-                
-                TypeStringUtils.releaseUnneededMemory(policySet);
-                
-                for (String id : idList) {
-                    idSet.add(id);
-                }
-            }
-            
-            for (PolicyType policy : papContainer.getAllPolicies()) {
-                String policyId = policy.getPolicyId();
-                
-                if (!idSet.contains(policyId)) {
-                    log.info("Purging policy " + policyId);
-                    papContainer.deletePolicy(policyId);
-                }
-            }
+            papContainer.purgeUnreferencesPolicies();
+        }
+    }
+
+    public static void purgeUnreferencesPolicySets() {
+        for (PAPContainer papContainer : PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs())) {
+            papContainer.purgeUnreferencedPolicySets();
         }
     }
     

@@ -10,7 +10,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
-import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.XACMLWizard;
@@ -64,33 +63,44 @@ public class UpdatePolicy extends PolicyManagementCLI {
             return ExitStatus.FAILURE.ordinal();
         }
 
+        List<PolicyWizard> policyWizardList = policySetWizard.getPolicyWizardList();
+        
         PolicySetType repositoryPolicySet = xacmlPolicyMgmtClient.getPolicySet(alias, id);
-
-        List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(repositoryPolicySet);
-        List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(repositoryPolicySet);
 
         String repositoryVersion = repositoryPolicySet.getVersion();
 
         TypeStringUtils.releaseUnneededMemory(repositoryPolicySet);
 
-        PolicySetType newPolicySet = policySetWizard.getXACML();
+        PolicySetType policySet = policySetWizard.getXACML();
 
-        newPolicySet.getPolicyIdReferences().clear();
-        newPolicySet.getPolicySetIdReferences().clear();
+        policySet.getPolicyIdReferences().clear();
+        policySet.getPolicySetIdReferences().clear();
 
-        for (String idRef : policyIdList) {
-            PolicySetHelper.addPolicyReference(newPolicySet, idRef);
+        policySet.setPolicySetId(id);
+        policySet.setVersion(repositoryVersion);
+        PolicySetWizard.increaseVersion(policySet);
+
+        xacmlPolicyMgmtClient.updatePolicySet(alias, repositoryVersion, policySet);
+        
+        TypeStringUtils.releaseUnneededMemory(policySetWizard);
+        TypeStringUtils.releaseUnneededMemory(policySet);
+        
+        // add actions
+        int size = policyWizardList.size();
+        PolicyType[] policyArray = new PolicyType[size];
+        String[] idPrefixArray = new String[size];
+
+        for (int i = 0; i < size; i++) {
+            PolicyWizard policyWizard = policySetWizard.getPolicyWizardList().get(i);
+            policyArray[i] = policyWizard.getXACML();
+            idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
+            TypeStringUtils.releaseUnneededMemory(policyWizard);
         }
-        for (String idRef : policySetIdList) {
-            PolicySetHelper.addPolicySetReference(newPolicySet, idRef);
-        }
 
-        newPolicySet.setPolicySetId(id);
-        newPolicySet.setVersion(repositoryVersion);
-        PolicySetWizard.increaseVersion(newPolicySet);
-
-        xacmlPolicyMgmtClient.updatePolicySet(alias, repositoryVersion, newPolicySet);
-
+        xacmlPolicyMgmtClient.addPolicies(alias, 0, id, idPrefixArray, policyArray);
+        
+        highlevelPolicyMgmtClient.purge(alias, true, false, false, false);
+        
         return ExitStatus.SUCCESS.ordinal();
     }
 

@@ -46,7 +46,7 @@ public class AddPoliciesOperation extends BasePAPOperation<String[]> {
         PAPContainer papContainer = new PAPContainer(pap);
 
         if (!papContainer.hasPolicySet(policySetId)) {
-            log.warn(String.format("Policy not added because PolicySetId \"%s\" does not exists.", policySetId));
+            log.warn(String.format("Policies not added because PolicySetId \"%s\" does not exists.", policySetId));
             return null;
         }
 

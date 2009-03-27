@@ -2,7 +2,9 @@ package org.glite.authz.pap.repository;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
@@ -25,7 +27,6 @@ public class PAPContainer {
 
     public static final Object highLevelOperationLock = new Object();
 
-    @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PAPContainer.class);
 
     private final PAP pap;
@@ -50,15 +51,6 @@ public class PAPContainer {
             papContainerList.add(new PAPContainer(pap));
         }
         return papContainerList;
-    }
-
-    public void createRootPolicySet() {
-
-        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getPapId(),
-                                                                         PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
-        rootPolicySet.setVersion("0");
-
-        policySetDAO.store(papId, rootPolicySet);
     }
 
     public void addPolicy(int index, String policySetId, PolicyType policy) {
@@ -137,6 +129,15 @@ public class PAPContainer {
         updatePAPPolicyLastModificationTime();
     }
 
+    public void createRootPolicySet() {
+
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getPapId(),
+                                                                         PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        rootPolicySet.setVersion("0");
+
+        policySetDAO.store(papId, rootPolicySet);
+    }
+
     public void deleteAllPolicies() {
         // get the number of rules
         List<PolicyType> policyList = policyDAO.getAll(papId);
@@ -156,7 +157,7 @@ public class PAPContainer {
     }
 
     public void deletePolicy(String id) throws NotFoundException, RepositoryException {
-        PolicyType policy = policyDAO.getById(id, id);
+        PolicyType policy = policyDAO.getById(papId, id);
         
         int numberOfRules = policy.getRules().size();
         
@@ -235,6 +236,81 @@ public class PAPContainer {
 
     public boolean hasPolicySet(String id) {
         return policySetDAO.exists(papId, id);
+    }
+    
+    public void purgePoliciesWithNoRules() {
+        List<PolicyType> policyList = policyDAO.getAll(papId);
+        for (PolicyType policy : policyList) {
+            if (policy.getRules().size() == 0) {
+                removePolicyAndReferences(policy.getPolicyId());
+            }
+        }
+    }
+    
+    public void purgePolicySetWithNoPolicies() {
+        List<PolicySetType> policySetList = policySetDAO.getAll(papId);
+        for (PolicySetType policySet : policySetList) {
+            
+            String policySetId = policySet.getPolicySetId();
+            
+            if (rootPolicySetId.equals(policySetId)) {
+                continue;
+            }
+            
+            if (policySet.getPolicyIdReferences().size() == 0) {
+                removePolicySetAndReferences(policySetId);
+            }
+        }
+    }
+
+    public void purgeUnreferencedPolicySets() {
+        
+        Set<String> idSet = new HashSet<String>();
+
+        PolicySetType rootPS = policySetDAO.getById(papId, rootPolicySetId);
+
+        idSet.add(rootPS.getPolicySetId());
+
+        for (String id : PolicySetHelper.getPolicySetIdReferencesValues(rootPS)) {
+            idSet.add(id);
+        }
+
+        TypeStringUtils.releaseUnneededMemory(rootPS);
+
+        for (PolicySetType policySet : policySetDAO.getAll(papId)) {
+
+            String policySetId = policySet.getPolicySetId();
+
+            if (!idSet.contains(policySetId)) {
+                log.info("Purging policy set " + policySetId);
+                policySetDAO.delete(papId, policySetId);
+            }
+        }
+    }
+    
+    public void purgeUnreferencesPolicies() {
+
+        Set<String> idSet = new HashSet<String>();
+
+        for (PolicySetType policySet : policySetDAO.getAll(papId)) {
+
+            List<String> idList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
+
+            TypeStringUtils.releaseUnneededMemory(policySet);
+
+            for (String id : idList) {
+                idSet.add(id);
+            }
+        }
+
+        for (PolicyType policy : policyDAO.getAll(papId)) {
+            String policyId = policy.getPolicyId();
+
+            if (!idSet.contains(policyId)) {
+                log.info("Purging policy " + policyId);
+                policyDAO.delete(papId, policyId);
+            }
+        }
     }
 
     public void removePolicyAndReferences(String policyId) throws NotFoundException, RepositoryException {

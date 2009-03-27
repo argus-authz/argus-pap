@@ -5,6 +5,7 @@ import java.rmi.RemoteException;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.AddRuleOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.BanOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.EraseRepositoryOperation;
+import org.glite.authz.pap.authz.highlevelpolicymanagement.PurgeOperation;
 import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
@@ -28,7 +29,6 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                ruleId,
                                moveAfter));
         try {
-
             synchronized (PAPContainer.highLevelOperationLock) {
                 return AddRuleOperation.instance(alias,
                                                  isPermit,
@@ -53,7 +53,6 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                action,
                                isPublic));
         try {
-
             AttributeWizard banAttributeWizard = new AttributeWizard(id, value);
             AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()
                                                                                                           .getResourceAttributeWizard(),
@@ -61,7 +60,6 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
-
             synchronized (PAPContainer.highLevelOperationLock) {
                 return BanOperation.instance(alias,
                                              banAttributeWizard,
@@ -69,7 +67,6 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                              actionAttributeWizard,
                                              isPublic).execute();
             }
-
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
             throw e;
@@ -81,8 +78,32 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
         try {
 
-            EraseRepositoryOperation.instance(alias).execute();
+            synchronized (PAPContainer.highLevelOperationLock) {
+                EraseRepositoryOperation.instance(alias).execute();
+            }
 
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
+
+    public void purge(String alias, boolean purgeUnreferencedPolicies, boolean purgeEmptyPolicies,
+            boolean purgeUnreferencedPolicySets, boolean purgeEmptyPolicySets) throws RemoteException {
+        log.info(String.format("Received unban(alias=%s purgeUnreferencedPolicies=%b purgeEmptyPolicies=%b, purgeUnreferencedPolicySets=%b, purgeEmptyPolicySets=%b);",
+                               alias,
+                               purgeUnreferencedPolicies,
+                               purgeEmptyPolicies,
+                               purgeUnreferencedPolicySets,
+                               purgeEmptyPolicySets));
+        try {
+            synchronized (PAPContainer.highLevelOperationLock) {
+                PurgeOperation.instance(alias,
+                                        purgeUnreferencedPolicies,
+                                        purgeEmptyPolicies,
+                                        purgeUnreferencedPolicySets,
+                                        purgeEmptyPolicySets).execute();
+            }
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
             throw e;
@@ -91,7 +112,8 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     public UnbanResult unban(String alias, String id, String value, String resource, String action)
             throws RemoteException {
-        log.info(String.format("Received unban(id=\"%s\" value=\"%s\", resource=\"%s\", action=\"%s\");",
+        log.info(String.format("Received unban(alias=%s id=%s value=%s, resource=%s, action=%s);",
+                               alias,
                                id,
                                value,
                                resource,
@@ -105,14 +127,12 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
-
             synchronized (PAPContainer.highLevelOperationLock) {
                 return UnbanOperation.instance(alias,
                                                bannedAttributeWizard,
                                                resourceAttributeWizard,
                                                actionAttributeWizard).execute();
             }
-
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
             throw e;

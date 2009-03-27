@@ -10,9 +10,16 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class RemovePolicies extends PolicyManagementCLI {
 
+    private static String OPT_PURGE_ALL_LONG = "purge-all";
+    private static String OPT_PURGE_ALL_DESCRIPTION = "Remove all resources with no actions and all actions with no rules.";
+    private static String OPT_PURGE_RESOURCES_LONG = "purge-resources";
+    private static String OPT_PURGE_RESOURCES_DESCRIPTION = "Remove all resources with no actions.";
+    private static String OPT_PURGE_ACTIONS_LONG = "purge-actions";
+    private static String OPT_PURGE_ACTIONS_DESCRIPTION = "Remove all actions with no rules";
+
     private static final String[] commandNameValues = { "remove-policy", "rp" };
     private static final String DESCRIPTION = "Remove policies (resources and/or actions) by id.";
-    private static final String USAGE = "[options] <policyId> [[policyId] ...]";
+    private static final String USAGE = "[options] < --purge-* | <<policyId> [[policyId] ...]>>";
     private String alias = null;
 
     public RemovePolicies() {
@@ -27,6 +34,18 @@ public class RemovePolicies extends PolicyManagementCLI {
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
                                        .create(OPT_PAPALIAS));
+        options.addOption(OptionBuilder.hasArg(false)
+                                       .withDescription(OPT_PURGE_ALL_DESCRIPTION)
+                                       .withLongOpt(OPT_PURGE_ALL_LONG)
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(false)
+                                       .withDescription(OPT_PURGE_RESOURCES_DESCRIPTION)
+                                       .withLongOpt(OPT_PURGE_RESOURCES_LONG)
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(false)
+                                       .withDescription(OPT_PURGE_ACTIONS_DESCRIPTION)
+                                       .withLongOpt(OPT_PURGE_ACTIONS_LONG)
+                                       .create());
         return options;
     }
 
@@ -35,9 +54,25 @@ public class RemovePolicies extends PolicyManagementCLI {
             RemoteException {
 
         String[] args = commandLine.getArgs();
+        
+        boolean purgeResources = false;
+        boolean purgeActions = false;
 
-        if (args.length < 2) {
-            throw new ParseException("Missing argument <policyId>");
+        if (commandLine.hasOption(OPT_PURGE_RESOURCES_LONG)) {
+            purgeResources = true;
+        }
+        
+        if (commandLine.hasOption(OPT_PURGE_ACTIONS_LONG)) {
+            purgeActions = true;
+        }
+        
+        if (commandLine.hasOption(OPT_PURGE_ALL_LONG)) {
+            purgeResources = true;
+            purgeActions = true;
+        }
+        
+        if ((args.length < 2) && !(purgeResources || purgeActions)) {
+            throw new ParseException("Wrong number of arguments: an id to remove and/or a purge option must be specified.");
         }
 
         if (commandLine.hasOption(OPT_PAPALIAS)) {
@@ -76,8 +111,34 @@ public class RemovePolicies extends PolicyManagementCLI {
                 }
             }
         } catch (RemoteException e) {
-            System.out.println("ERROR.");
+            System.out.println("error.");
             throw e;
+        }
+        
+        if (purgeResources && purgeActions) {
+            if (verboseMode) {
+                System.out.print("Purging actions and resources... ");
+            }
+            highlevelPolicyMgmtClient.purge(alias, false, true, false, true);
+            if (verboseMode) {
+                System.out.println("ok.");
+            }
+        } else if (purgeResources) {
+            if (verboseMode) {
+                System.out.print("Purging resources... ");
+            }
+            highlevelPolicyMgmtClient.purge(alias, false, false, false, true);
+            if (verboseMode) {
+                System.out.println("ok.");
+            }
+        } else if (purgeActions) {
+            if (verboseMode) {
+                System.out.print("Purging actions... ");
+            }
+            highlevelPolicyMgmtClient.purge(alias, false, true, false, false);
+            if (verboseMode) {
+                System.out.println("ok.");
+            }
         }
 
         if (failure && !partialSuccess)
@@ -87,7 +148,5 @@ public class RemovePolicies extends PolicyManagementCLI {
             return ExitStatus.PARTIAL_SUCCESS.ordinal();
 
         return ExitStatus.SUCCESS.ordinal();
-
     }
-
 }

@@ -52,6 +52,15 @@
 	</wsdl:message>
 	<wsdl:message name="eraseRepositoryResponse">
 	</wsdl:message>
+	<wsdl:message name="purgeRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
+		<wsdl:part name="purgeUnreferencedPolicies" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="purgeEmptyPolicies" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="purgeUnreferencedPolicySets" type="xsd:boolean"></wsdl:part>
+		<wsdl:part name="purgeEmptyPolicySets" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="purgeResponse">
+	</wsdl:message>
 	<wsdl:message name="unbanRequest">
 		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="id" type="xsd:string"></wsdl:part>
@@ -75,6 +84,10 @@
 		<wsdl:operation name="eraseRepository">
 			<wsdl:input message="tns:eraseRepositoryRequest"></wsdl:input>
 			<wsdl:output message="tns:eraseRepositoryResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="purge">
+			<wsdl:input message="tns:purgeRequest"></wsdl:input>
+			<wsdl:output message="tns:purgeResponse"></wsdl:output>
 		</wsdl:operation>
 		<wsdl:operation name="unban">
 			<wsdl:input message="tns:unbanRequest"></wsdl:input>
@@ -117,6 +130,20 @@
 		<wsdl:operation name="eraseRepository">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/eraseRepository" />
+			<wsdl:input>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body
+					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="purge">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management/purge" />
 			<wsdl:input>
 				<soap:body
 					namespace="http://org.glite.authz/wsdl/pap/services/highlevel_policy_management"

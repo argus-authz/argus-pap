@@ -119,9 +119,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
                 policyArray[i] = policyWizard.getXACML();
                 idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
                 tagAndValueArray[i] = policyWizard.getTagAndValue();
-                policyWizard.releaseChildrenDOM();
-                policyWizard.releaseDOM();
-                policyWizard = null;
+                TypeStringUtils.releaseUnneededMemory(policyWizard);
             }
 
             String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias, 0, policySetId, idPrefixArray, policyArray);
