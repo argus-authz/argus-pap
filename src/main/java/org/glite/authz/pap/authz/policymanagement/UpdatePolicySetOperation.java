@@ -11,12 +11,11 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 public class UpdatePolicySetOperation extends BasePAPOperation<Boolean> {
 
-    String alias;
-    String version;
-    PolicySetType policySet;
+    private String alias;
+    private String version;
+    private PolicySetType policySet;
 
     public UpdatePolicySetOperation(String alias, String version, PolicySetType policySet) {
-
         this.alias = alias;
         this.version = version;
         this.policySet = policySet;
@@ -52,8 +51,6 @@ public class UpdatePolicySetOperation extends BasePAPOperation<Boolean> {
 
     @Override
     protected void setupPermissions() {
-        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
-
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE, PermissionFlags.POLICY_READ_LOCAL));
     }
-
 }

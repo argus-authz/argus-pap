@@ -6,30 +6,25 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.opensaml.xacml.policy.PolicySetType;
 
-public class ListPolicySetOperation extends BasePAPOperation<PolicySetType[]> {
+public class ListRemotePolicySetOperation extends BasePAPOperation<PolicySetType[]> {
 
-    String alias;
-    
-    private ListPolicySetOperation(String alias) {
-        this.alias = alias;
+    private PAP ps;
+
+    private ListRemotePolicySetOperation(PAP ps) {
+        this.ps = ps;
     }
 
-    public static ListPolicySetOperation instance(String alias) {
-        return new ListPolicySetOperation(alias);
+    public static ListRemotePolicySetOperation instance(PAP ps) {
+        return new ListRemotePolicySetOperation(ps);
     }
 
     @Override
     protected PolicySetType[] doExecute() {
 
-        if (alias == null) {
-            alias = PAP.DEFAULT_PAP_ALIAS;
-        }
-        
-        PAPContainer localPAP = PAPManager.getInstance().getPAPContainer(alias);
+        PAPContainer localPAP = new PAPContainer(ps);
 
         List<PolicySetType> policySetList = localPAP.getAllPolicySets();
 
@@ -38,17 +33,14 @@ public class ListPolicySetOperation extends BasePAPOperation<PolicySetType[]> {
         for (int i = 0; i < policySetList.size(); i++) {
             policySetArray[i] = policySetList.get(i);
         }
-        
+
         log.info("Returning " + policySetArray.length + " policy sets");
 
         return policySetArray;
-
     }
 
     @Override
     protected void setupPermissions() {
-
-        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_READ_LOCAL));
+        addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_READ_REMOTE));
     }
-
 }

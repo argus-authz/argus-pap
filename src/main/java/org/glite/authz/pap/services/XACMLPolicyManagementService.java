@@ -5,13 +5,20 @@ import java.rmi.RemoteException;
 import org.glite.authz.pap.authz.policymanagement.AddPoliciesOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.AddPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.GetRootPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.GetPolicyOperation;
-import org.glite.authz.pap.authz.policymanagement.GetPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.HasPolicyOperation;
-import org.glite.authz.pap.authz.policymanagement.HasPolicySetOperation;
-import org.glite.authz.pap.authz.policymanagement.ListPoliciesOperation;
-import org.glite.authz.pap.authz.policymanagement.ListPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.GetLocalPolicyOperation;
+import org.glite.authz.pap.authz.policymanagement.GetRemotePolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.GetLocalRootPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.GetRemotePolicyOperation;
+import org.glite.authz.pap.authz.policymanagement.GetLocalPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.GetRemoteRootPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.HasLocalPolicyOperation;
+import org.glite.authz.pap.authz.policymanagement.HasLocalPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.HasRemotePolicyOperation;
+import org.glite.authz.pap.authz.policymanagement.HasRemotePolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.ListLocalPoliciesOperation;
+import org.glite.authz.pap.authz.policymanagement.ListLocalPolicySetOperation;
+import org.glite.authz.pap.authz.policymanagement.ListRemotePoliciesOperation;
+import org.glite.authz.pap.authz.policymanagement.ListRemotePolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.MoveOperation;
 import org.glite.authz.pap.authz.policymanagement.RemoveObjectByIdAndReferencesOperation;
 import org.glite.authz.pap.authz.policymanagement.RemovePolicyOperation;
@@ -20,6 +27,8 @@ import org.glite.authz.pap.authz.policymanagement.StorePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.StorePolicySetOperation;
 import org.glite.authz.pap.authz.policymanagement.UpdatePolicyOperation;
 import org.glite.authz.pap.authz.policymanagement.UpdatePolicySetOperation;
+import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.distribution.PAPManager;
 import org.glite.authz.pap.repository.PAPContainer;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -36,11 +45,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         log.info(String.format("addPolicy(policySetId=\"%s\"\");", policySetId));
 
         try {
-
             synchronized (PAPContainer.highLevelOperationLock) {
 
-                return AddPoliciesOperation.instance(alias, index, policySetId, policyIdPrefixArray, policyArray).execute();
-
+                return AddPoliciesOperation.instance(alias,
+                                                     index,
+                                                     policySetId,
+                                                     policyIdPrefixArray,
+                                                     policyArray).execute();
             }
 
         } catch (RuntimeException e) {
@@ -49,15 +60,17 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public String addPolicy(String alias, int index, String policySetId, String policyIdPrefix, PolicyType policy)
-            throws RemoteException {
+    public String addPolicy(String alias, int index, String policySetId, String policyIdPrefix,
+            PolicyType policy) throws RemoteException {
 
-        log.info(String.format("addPolicy(policySetId=\"%s\", policyIdPrefix=\"%s\");", policySetId, policyIdPrefix));
-
+        log.info(String.format("addPolicy(policySetId=\"%s\", policyIdPrefix=\"%s\");",
+                               policySetId,
+                               policyIdPrefix));
         try {
 
             synchronized (PAPContainer.highLevelOperationLock) {
-                return AddPolicyOperation.instance(alias, index, policySetId, policyIdPrefix, policy).execute();
+                return AddPolicyOperation.instance(alias, index, policySetId, policyIdPrefix, policy)
+                                         .execute();
             }
 
         } catch (RuntimeException e) {
@@ -71,23 +84,31 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         log.info(String.format("addPolicySet(policySetId=\"%s\");", policySet.getPolicySetId()));
 
         try {
-
             synchronized (PAPContainer.highLevelOperationLock) {
                 return AddPolicySetOperation.instance(alias, index, policySet).execute();
             }
-
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
             throw e;
         }
     }
 
-    public PolicySetType getRootPolicySet(String papAlias) throws RemoteException {
-        log.info(String.format("getPAPPolicySet(\"%s\");", papAlias));
+    public PolicySetType getRootPolicySet(String alias) throws RemoteException {
+        log.info(String.format("getPAPPolicySet(\"%s\");", alias));
 
         try {
 
-            return GetRootPolicySetOperation.instance(papAlias).execute();
+            if (alias == null) {
+                alias = PAP.DEFAULT_PAP_ALIAS;
+            }
+
+            PAP ps = PAPManager.getInstance().getPAP(alias);
+
+            if (ps.isLocal()) {
+                return GetLocalRootPolicySetOperation.instance(ps).execute();
+            } else {
+                return GetRemoteRootPolicySetOperation.instance(ps).execute();
+            }
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -100,7 +121,20 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            PolicyType policy = GetPolicyOperation.instance(alias, policyId).execute();
+            if (alias == null) {
+                alias = PAP.DEFAULT_PAP_ALIAS;
+            }
+
+            PAP ps = PAPManager.getInstance().getPAP(alias);
+
+            PolicyType policy;
+
+            if (ps.isLocal()) {
+                policy = GetLocalPolicyOperation.instance(ps, policyId).execute();
+            } else {
+                policy = GetRemotePolicyOperation.instance(ps, policyId).execute();
+            }
+
             return policy;
 
         } catch (RuntimeException e) {
@@ -114,7 +148,19 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            PolicySetType policySet = GetPolicySetOperation.instance(alias, policySetId).execute();
+            if (alias == null) {
+                alias = PAP.DEFAULT_PAP_ALIAS;
+            }
+
+            PAP ps = PAPManager.getInstance().getPAP(alias);
+
+            PolicySetType policySet;
+
+            if (ps.isLocal()) {
+                policySet = GetLocalPolicySetOperation.instance(ps, policySetId).execute();
+            } else {
+                policySet = GetRemotePolicySetOperation.instance(ps, policySetId).execute();
+            }
             return policySet;
 
         } catch (RuntimeException e) {
@@ -127,7 +173,19 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         log.info(String.format("hasPolicy(\"%s\");", policyId));
         try {
 
-            return HasPolicyOperation.instance(alias, policyId).execute();
+            if (alias == null) {
+                alias = PAP.DEFAULT_PAP_ALIAS;
+            }
+
+            PAP ps = PAPManager.getInstance().getPAP(alias);
+
+            synchronized (PAPContainer.highLevelOperationLock) {
+                if (ps.isLocal()) {
+                    return HasLocalPolicyOperation.instance(ps, policyId).execute();
+                } else {
+                    return HasRemotePolicyOperation.instance(ps, policyId).execute();
+                }
+            }
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -139,7 +197,19 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         log.info(String.format("hasPolicySet(\"%s\");", policySetId));
         try {
 
-            return HasPolicySetOperation.instance(alias, policySetId).execute();
+            if (alias == null) {
+                alias = PAP.DEFAULT_PAP_ALIAS;
+            }
+
+            PAP ps = PAPManager.getInstance().getPAP(alias);
+
+            synchronized (PAPContainer.highLevelOperationLock) {
+                if (ps.isLocal()) {
+                    return HasLocalPolicySetOperation.instance(ps, policySetId).execute();
+                } else {
+                    return HasRemotePolicySetOperation.instance(ps, policySetId).execute();
+                }
+            }
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -152,8 +222,18 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
+            if (alias == null) {
+                alias = PAP.DEFAULT_PAP_ALIAS;
+            }
+
+            PAP ps = PAPManager.getInstance().getPAP(alias);
+
             synchronized (PAPContainer.highLevelOperationLock) {
-                return ListPoliciesOperation.instance(alias).execute();
+                if (ps.isLocal()) {
+                    return ListLocalPoliciesOperation.instance(ps).execute();
+                } else {
+                    return ListRemotePoliciesOperation.instance(ps).execute();
+                }
             }
 
         } catch (RuntimeException e) {
@@ -167,8 +247,18 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
+            if (alias == null) {
+                alias = PAP.DEFAULT_PAP_ALIAS;
+            }
+
+            PAP ps = PAPManager.getInstance().getPAP(alias);
+
             synchronized (PAPContainer.highLevelOperationLock) {
-                return ListPolicySetOperation.instance(alias).execute();
+                if (ps.isLocal()) {
+                    return ListLocalPolicySetOperation.instance(ps).execute();
+                } else {
+                    return ListRemotePolicySetOperation.instance(ps).execute();
+                }
             }
 
         } catch (RuntimeException e) {
@@ -249,7 +339,8 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public String storePolicySet(String alias, String idPrefix, PolicySetType policySet) throws RemoteException {
+    public String storePolicySet(String alias, String idPrefix, PolicySetType policySet)
+            throws RemoteException {
         log.info("storePolicySet();");
 
         try {
@@ -277,8 +368,11 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public boolean updatePolicySet(String alias, String version, PolicySetType policySet) throws RemoteException {
-        log.info(String.format("updatePolicySet(version=\"%s\", id=\"%s\");", version, policySet.getPolicySetId()));
+    public boolean updatePolicySet(String alias, String version, PolicySetType policySet)
+            throws RemoteException {
+        log.info(String.format("updatePolicySet(version=\"%s\", id=\"%s\");",
+                               version,
+                               policySet.getPolicySetId()));
 
         try {
 
