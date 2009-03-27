@@ -5,7 +5,7 @@
   <artifactId>org.glite.authz.pap</artifactId>
   <packaging>war</packaging>
   <name>glite-authz-pap</name>
-  <version>0.9.2</version>
+  <version>0.9.3</version>
   <properties>
     <pap-services-namespace> http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
