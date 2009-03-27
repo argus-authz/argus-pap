@@ -15,11 +15,11 @@ public class AttributeWizardTypeConfiguration {
 
     private static AttributeWizardType actionPolicyAttributeWizard = null;
 
+    public static final String UNRECOGNIZED_ATTRIBUTE_ID = "unrecognized-id";
     private static AttributeWizardTypeConfiguration instance = null;
     private static List<AttributeWizardType> list = null;
     private static final Logger log = LoggerFactory.getLogger(AttributeWizardTypeConfiguration.class);
     private static AttributeWizardType resourcePolicySetAttributeWizard = null;
-    private static AttributeWizardType unrecognizedAttributeWizard = null;
 
     private static String baseKey(String id) {
         return id;
@@ -33,7 +33,6 @@ public class AttributeWizardTypeConfiguration {
 
         initResourcePolicySetAttributeWizard();
         initActionPolicyAttributeWizard();
-        initUnrecognizedAttributeWizard();
     }
 
     private static boolean checkIdExist(String id) {
@@ -168,17 +167,6 @@ public class AttributeWizardTypeConfiguration {
         throw new AttributeWizardTypeConfigurationException("Cannot find id \"resource\"");
     }
 
-    private static void initUnrecognizedAttributeWizard() {
-
-        for (AttributeWizardType attributeWizardType : list) {
-            if ("unrecognized-id".equals(attributeWizardType.getId())) {
-                unrecognizedAttributeWizard = attributeWizardType;
-                return;
-            }
-        }
-        throw new AttributeWizardTypeConfigurationException("Cannot find id \"action\"");
-    }
-
     private static String xacmlDataTypeKey(String id) {
         return baseKey(id) + ".xacml-datatype";
     }
@@ -225,8 +213,8 @@ public class AttributeWizardTypeConfiguration {
         return resourcePolicySetAttributeWizard;
     }
     
-    public AttributeWizardType getUnrecognizedAttributeWizard() {
-        return unrecognizedAttributeWizard;
+    public AttributeWizardType getUnrecognizedAttributeWizard(String xacmlId, String dataType) {
+        return new AttributeWizardType(UNRECOGNIZED_ATTRIBUTE_ID, xacmlId, dataType, null, null);
     }
 
     public boolean idExist(String id) {
@@ -251,5 +239,4 @@ public class AttributeWizardTypeConfiguration {
         }
         return false;
     }
-
 }

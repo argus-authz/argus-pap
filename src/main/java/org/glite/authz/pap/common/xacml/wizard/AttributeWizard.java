@@ -19,20 +19,22 @@ public class AttributeWizard {
     public AttributeWizard(AttributeAssignmentType attributeAssignment) {
         String xacmlId = attributeAssignment.getAttributeId();
         try {
-			attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
-		} catch (UnsupportedAttributeException e) {
-			attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard();
-		}
+            attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
+        } catch (UnsupportedAttributeException e) {
+            attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard(xacmlId,
+                                                                                                  attributeAssignment.getDataType());
+        }
         this.value = attributeAssignment.getValue();
     }
 
     public AttributeWizard(AttributeType attribute) {
         String xacmlId = attribute.getAttributeID();
         try {
-			attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
-		} catch (UnsupportedAttributeException e) {
-			attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard();
-		}
+            attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
+        } catch (UnsupportedAttributeException e) {
+            attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard(xacmlId,
+                                                                                                  attribute.getDataType());
+        }
         this.value = CtxAttributeTypeHelper.getFirstValue(attribute);
     }
 
@@ -55,7 +57,8 @@ public class AttributeWizard {
     public static boolean isActionAttribute(AttributeType attribute) {
         String xacmlId = attribute.getAttributeID();
         return AttributeWizardTypeConfiguration.getInstance()
-                                               .xacmlIdMatchesTargetElement(xacmlId, AttributeWizardType.TargetElement.ACTION);
+                                               .xacmlIdMatchesTargetElement(xacmlId,
+                                                                            AttributeWizardType.TargetElement.ACTION);
     }
 
     public static boolean isEnvironmentAttribute(AttributeType attribute) {
@@ -68,13 +71,15 @@ public class AttributeWizard {
     public static boolean isResouceAttribute(AttributeType attribute) {
         String xacmlId = attribute.getAttributeID();
         return AttributeWizardTypeConfiguration.getInstance()
-                                               .xacmlIdMatchesTargetElement(xacmlId, AttributeWizardType.TargetElement.RESOURCE);
+                                               .xacmlIdMatchesTargetElement(xacmlId,
+                                                                            AttributeWizardType.TargetElement.RESOURCE);
     }
 
     public static boolean isSubjectAttribute(AttributeType attribute) {
         String xacmlId = attribute.getAttributeID();
         return AttributeWizardTypeConfiguration.getInstance()
-                                               .xacmlIdMatchesTargetElement(xacmlId, AttributeWizardType.TargetElement.SUBJECT);
+                                               .xacmlIdMatchesTargetElement(xacmlId,
+                                                                            AttributeWizardType.TargetElement.SUBJECT);
     }
 
     public boolean equals(Object object) {
@@ -117,13 +122,15 @@ public class AttributeWizard {
     public AttributeWizardType.TargetElement getTargetElementType() {
         return attributeWizardType.getTargetElement();
     }
-    
+
     public String getValue() {
         return value;
     }
 
     public AttributeType getXACML() {
-        return CtxAttributeTypeHelper.build(attributeWizardType.getXacmlId(), attributeWizardType.getDataType(), value);
+        return CtxAttributeTypeHelper.build(attributeWizardType.getXacmlId(),
+                                            attributeWizardType.getDataType(),
+                                            value);
     }
 
     public String getXacmlId() {
