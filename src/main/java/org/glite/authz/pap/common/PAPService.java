@@ -63,7 +63,7 @@ public final class PAPService {
 
         // Initialize configuaration
         PAPConfiguration conf = PAPConfiguration.initialize(context);
-
+        
         // Start autorization service
         logger.info("Starting authorization engine...");
 

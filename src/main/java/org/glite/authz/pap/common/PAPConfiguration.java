@@ -36,6 +36,7 @@ import org.apache.commons.configuration.CompositeConfiguration;
 import org.apache.commons.configuration.Configuration;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
+import org.glite.authz.pap.common.exceptions.NullArgumentException;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,9 @@ public class PAPConfiguration {
     private CompositeConfiguration configuration;
 
     private INIConfiguration startupConfiguration;
+    
+    
+    
 
     private PAPConfiguration( String papConfigurationDir,
             String papRepositoryDir ) {
@@ -97,8 +101,13 @@ public class PAPConfiguration {
     }
 
     static PAPConfiguration initialize( ServletContext context ) {
+        
+        if ( context == null )
+            throw new NullArgumentException(
+                    "Please provide a value for the 'context' argument! null is not a valid value in this context." );
 
         if ( instance == null ) {
+            
             String papConfDir = context
                     .getInitParameter( "papConfigurationDir" );
             String papRepoDir = context.getInitParameter( "papRepositoryDir" );
@@ -144,8 +153,9 @@ public class PAPConfiguration {
         try {
 
             startupConfiguration = new INIConfiguration( papConfFile );
-
             configuration.addConfiguration( startupConfiguration );
+            
+            
 
         } catch ( org.apache.commons.configuration.ConfigurationException e ) {
 
