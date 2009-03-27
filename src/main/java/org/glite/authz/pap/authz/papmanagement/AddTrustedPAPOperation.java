@@ -46,7 +46,7 @@ public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
     @Override
     protected void setupPermissions() {
 
-        addRequiredPermission( PAPPermission.of( PermissionFlags.CONFIGURATION_READ,PermissionFlags.CONFIGURATION_WRITE ) );
+        addRequiredPermission( PAPPermission.of( PermissionFlags.CONFIGURATION_WRITE ) );
 
     }
 
