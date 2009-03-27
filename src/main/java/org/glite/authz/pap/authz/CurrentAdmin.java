@@ -1,6 +1,5 @@
 package org.glite.authz.pap.authz;
 
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.List;
 

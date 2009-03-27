@@ -59,7 +59,7 @@ public final class PAPService {
 
     public static void start(ServletContext context) {
 
-        logger.info("Starting PAP service...");
+        logger.info("Starting PAP service version {} ...", PAPVersion.instance().getVersion());
 
         // Initialize configuaration
         PAPConfiguration conf = PAPConfiguration.initialize(context);

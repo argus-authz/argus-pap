@@ -11,6 +11,23 @@
     </pap-services-namespace>
   </properties>
   <build>
+  
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <excludes>
+          <exclude>pap-version.properties</exclude>
+        </excludes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <includes>
+          <include>pap-version.properties</include>
+        </includes>
+        <filtering>true</filtering>
+      </resource>
+     
+    </resources>
     <finalName>glite-authz-pap</finalName>
     <plugins>
       <plugin>

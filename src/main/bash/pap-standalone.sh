@@ -55,7 +55,8 @@ kill_pap_proc(){
 		pid=`head -1 $PAP_RUN_FILE`
 		
 		## Use shutdown service hook
-		wget -q --spider http://localhost:8151/shutdown
+		## wget -q --spider http://localhost:8151/shutdown
+		$PAP_SHUTDOWN_CMD
 		
 		if [ $? -ne 0 ]; then
 			echo "Error shutting down PAP service! Will kill the process..."

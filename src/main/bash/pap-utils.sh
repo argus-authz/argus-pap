@@ -10,6 +10,7 @@ fi
 
 PAP_STANDALONE_CLASS="org.glite.authz.pap.server.PAPServer"
 PAP_CLIENT_CLASS="org.glite.authz.pap.ui.cli.PAPCLI"
+PAP_URL_TOUCHER_CLASS="org.glite.authz.pap.common.utils.URLToucher"
 
 TM_DEPS=`ls -x $PAP_LIBS/glite-security-trustmanager-*.jar $PAP_LIBS/glite-security-util-java-*.jar $PAP_LIBS/bcprov-*.jar   | tr '\n' ':'`
 CONFIG_DEPS=`ls -x $PAP_LIBS/commons-configuration-*.jar $PAP_LIBS/commons-collections-*.jar $PAP_LIBS/commons-lang-*.jar $PAP_LIBS/commons-lang-*.jar $PAP_LIBS/commons-logging-*.jar  | tr '\n' ':'`
@@ -33,11 +34,16 @@ PAP_STANDALONE_ENV="-DGLITE_LOCATION=$GLITE_LOCATION -DGLITE_LOCATION_VAR=$GLITE
 PAP_CLIENT_CMD="java $PAP_CLIENT_ENV -DconfigureLog4j=false -DeffectiveUserId=$EUID -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
 PAP_STANDALONE_CMD="java -Xmx$PAP_STANDALONE_MEM_SIZE $PAP_STANDALONE_VM_OPTIONS $PAP_STANDALONE_ENV -cp $PAP_STANDALONE_CP $PAP_STANDALONE_CLASS"
 
+PAP_URL_TOUCHER_CMD="java -cp $PAP_STANDALONE_CP $PAP_URL_TOUCHER_CLASS"
+
 PAP_HOST=`grep 'host =' $GLITE_LOCATION/etc/pap/pap_configuration.ini | awk '{print $3}'`
 PAP_PORT=`grep 'port =' $GLITE_LOCATION/etc/pap/pap_configuration.ini | awk '{print $3}'`
+PAP_SHUTDOWN_PORT=`grep 'shutdown_port =' $GLITE_LOCATION/etc/pap/pap_configuration.ini | awk '{print $3}'`
 
 PAP_CERT=`grep 'sslCertFile' $GLITE_LOCATION/etc/pap/pap_configuration.ini | awk '{print $3}'`
 PAP_KEY=`grep 'sslKey' $GLITE_LOCATION/etc/pap/pap_configuration.ini | awk '{print $3}'`
+
+PAP_SHUTDOWN_CMD="java -cp $PAP_STANDALONE_CP $PAP_URL_TOUCHER_CLASS http://localhost:$PAP_SHUTDOWN_PORT/shutdown"
 
 check_openssl(){
 

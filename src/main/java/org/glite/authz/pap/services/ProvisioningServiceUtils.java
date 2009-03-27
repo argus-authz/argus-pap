@@ -23,6 +23,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
 import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
@@ -84,7 +86,7 @@ public class ProvisioningServiceUtils {
     }
 
     // TODO this method is too long, should be split
-    public static Response createResponse(XACMLPolicyQueryType inResponseTo, List<XACMLObject> policyObjects) {
+    public static Response createResponse(XACMLPolicyQueryType inResponseTo, List<XACMLObject> policyObjects, HttpServletRequest request) {
 
         // get a builder factory
         XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
@@ -116,8 +118,7 @@ public class ProvisioningServiceUtils {
         IssuerBuilder issuerBuilder = (IssuerBuilder) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
         Issuer issuer = issuerBuilder.buildObject();
 
-        // TODO here goes the name of the PAP
-        String endpoint = "localhost";
+        String endpoint = String.format( "%s://%s:%s/glite-authz-pap/services/ProvisioningService", request.getScheme(), request.getServerName(), request.getServerPort() );
         
         issuer.setValue(endpoint);
 

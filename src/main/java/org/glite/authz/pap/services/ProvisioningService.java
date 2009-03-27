@@ -21,6 +21,10 @@ package org.glite.authz.pap.services;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.apache.axis.MessageContext;
+import org.apache.axis.transport.http.HTTPConstants;
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
@@ -41,6 +45,9 @@ public class ProvisioningService implements Provisioning {
 
     public Response XACMLPolicyQuery(XACMLPolicyQueryType query) throws java.rmi.RemoteException {
 
+        HttpServletRequest httpServletRequest = 
+            (HttpServletRequest) MessageContext.getCurrentContext().getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+        
         // lock need to keep memory usage low, it's not possible to re-use opensaml objects so they have to
         // be cloned for every request.
         synchronized (lock) {
@@ -84,7 +91,7 @@ public class ProvisioningService implements Provisioning {
 
                 /* prepare the response */
 
-                Response response = ProvisioningServiceUtils.createResponse(query, resultList);
+                Response response = ProvisioningServiceUtils.createResponse(query, resultList, httpServletRequest);
 
                 log.trace("Sending Response : " + ProvisioningServiceUtils.xmlObjectToString(response));
 
