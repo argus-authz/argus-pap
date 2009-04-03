@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.rpc.ServiceException;
 
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.repository.PAPContainer;
@@ -54,7 +55,7 @@ public class DistributionModule extends Thread {
         }
 
         PAP pap = new PAP("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost",
-            "8150", "/glite-authz-pap/services", false);
+            "8150", "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT+"/services", false);
         System.out.println(pap.toString());
         List<XACMLObject> list = getPoliciesFromPAP(pap);
         System.out.println("Retrieved " + list.size() + " policies");

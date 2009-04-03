@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 #############################################################################
-# Copyright (c) Members of the EGEE Collaboration. 2006.
+# Copyright (c) Members of the EGEE Collaboration. 2009.
 # See http://www.eu-egee.org/partners/ for details on the copyright
 # holders.
 #
@@ -21,8 +21,79 @@
 #     Andrea Ceccanti - andrea.ceccanti@cnaf.infn.it
 #############################################################################
 
-import getopt,sys, os, os.path, commands,shutil, time, re, glob
-from pap_utils import *
+import getopt,sys, os, os.path, commands,shutil, time, re, glob, string
+
+pap_app_name = "pap"
+pap_context_name  = "%s.xml" % pap_app_name
+pap_war_name = "%s.war" % pap_app_name
+pap_jar_name = "%s.jar" % pap_app_name 
+
+pap_home = os.environ.get("PAP_HOME","/opt/authz/pap")
+pap_conf_dir = os.path.join(pap_home,"conf")
+pap_jar_dir = os.path.join(pap_home, "lib")
+pap_war_dir = os.path.join(pap_home, "wars")
+
+pap_dependencies = glob.glob(pap_jar_dir+"/*.jar")
+
+pap_jar = os.path.join(pap_jar_dir,pap_jar_name)
+pap_war = os.path.join(pap_war_dir, pap_war_name)
+
+pap_client_class = "org.glite.authz.pap.ui.cli.PAPCLI"
+pap_standalone_class = "org.glite.authz.pap.server.standalone.PAPServer"
+
+pap_client_classes = os.path.join(pap_conf_dir,"logging","client")
+pap_standalone_classes = os.path.join(pap_conf_dir,"logging","standalone")
+
+env_variables = ['PAP_HOME']
+
+def pap_war_file():
+    if not os.path.exists(pap_war):
+        raise RuntimeError,"PAP webapplication not found in usual location: %s." % pap_war   
+    
+    return pap_war
+
+def catalina_conf_dir():
+    if not os.environ.has_key('CATALINA_HOME'):
+        raise ValueError, "CATALINA_HOME is not defined!"
+    
+    return os.path.join(os.environ['CATALINA_HOME'],"conf","Catalina","localhost")
+
+def catalina_webapp_dir():
+    if not os.environ.has_key('CATALINA_HOME'):
+        raise ValueError, "CATALINA_HOME is not defined!"
+    
+    return os.path.join(os.environ['CATALINA_HOME'],"webapps")
+
+def catalina_webapp_pap_dir():   
+    return os.path.join(catalina_webapp_dir(), pap_app_name)
+
+def catalina_pap_war_file():
+    return os.path.join(catalina_webapp_dir(), pap_war_name)
+
+def catalina_pap_context_file():
+    return os.path.join(catalina_conf_dir(), pap_context_name)
+
+
+def _build_classpath(classes):
+    if len(pap_dependencies) == 0:
+        raise RuntimeError, "PAP jar files not found at usual location: %s" % (pap_jar_dir)
+    
+    pap_dependencies.append(pap_jar)
+    pap_dependencies.append(classes)
+    
+    return string.join(pap_dependencies,":")
+
+def build_standalone_classpath():
+    return _build_classpath(pap_standalone_classes)
+
+
+def build_client_classpath():
+    return _build_classpath(pap_client_classes)
+
+
+def build_env_vars_string():
+    return string.join(map(lambda x: "-D%s=%s" % (x, os.environ[x]), env_variables)," ")
+
 
 def remove_webapp_pap_war():
     if os.path.exists(catalina_pap_war_file()):
@@ -32,7 +103,6 @@ def remove_webapp_pap_dir():
     if os.path.exists(catalina_webapp_pap_dir()):
         shutil.rmtree(catalina_webapp_pap_dir(),
                       True)
-
 
 def usage():
     

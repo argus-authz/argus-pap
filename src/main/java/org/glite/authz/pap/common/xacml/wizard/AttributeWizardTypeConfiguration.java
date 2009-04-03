@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.commons.configuration.ConfigurationException;
-import org.apache.commons.configuration.INIConfiguration;
+import org.apache.commons.configuration.PropertiesConfiguration;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardType.TargetElement;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.AttributeWizardTypeConfigurationException;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
@@ -83,10 +83,10 @@ public class AttributeWizardTypeConfiguration {
 
         String attributeMappingsFile = "/configuration/attribute-mappings.ini";
 
-        INIConfiguration configuration;
+        PropertiesConfiguration configuration;
 
         try {
-            configuration = new INIConfiguration(Object.class.getResource(attributeMappingsFile));
+            configuration = new PropertiesConfiguration(Object.class.getResource(attributeMappingsFile));
         } catch (ConfigurationException e) {
             throw new AttributeWizardTypeConfigurationException("Error reading configuration from resource: "
                     + attributeMappingsFile);

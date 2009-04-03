@@ -1,34 +1,47 @@
 package org.glite.authz.pap.common.exceptions;
 
+/**
+ * Base exception for PAP.
+ * 
+ * 
+ */
 public class PAPException extends RuntimeException {
 
     /**
-     * 
+     * Static version UID
      */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Constructor
+     */
     public PAPException() {
 
-	super();
-	// TODO Auto-generated constructor stub
+        super();
+    
     }
 
-    public PAPException(String message, Throwable cause) {
+    /**
+     * {@inheritDoc}
+     */
+    public PAPException( String message, Throwable cause ) {
 
-	super(message, cause);
-	// TODO Auto-generated constructor stub
+        super( message, cause );
     }
 
-    public PAPException(String message) {
-
-	super(message);
-	// TODO Auto-generated constructor stub
+    /**
+     * {@inheritDoc}
+     */
+    public PAPException( String message ) {
+        super( message );
     }
 
-    public PAPException(Throwable cause) {
+    /**
+     * {@inheritDoc}
+     */
+    public PAPException( Throwable cause ) {
 
-	super(cause);
-	// TODO Auto-generated constructor stub
+        super( cause );
     }
 
 }

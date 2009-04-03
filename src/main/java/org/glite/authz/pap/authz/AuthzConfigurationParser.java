@@ -2,11 +2,9 @@ package org.glite.authz.pap.authz;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.RandomAccessFile;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -19,8 +17,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
- * @author Andrea Ceccanti
+ * This class implements the parsing logic of the PAP authorization configuration file.
+ * A custom parsing has been implemented since the current format for the authz file
+ * isn't really INI compliant, and as such we cannot reuse commons-configuration implementation.
  * 
  */
 public final class AuthzConfigurationParser {
@@ -28,52 +27,76 @@ public final class AuthzConfigurationParser {
     public static final Logger log = LoggerFactory
             .getLogger( AuthzConfigurationParser.class );
 
+    /** The regexp string for matching permission lines **/
     public static final String permissionRegex = "^([^:]+):\\s*((\\w\\|?)+)";
 
+    /** The pattern object for matching permission lines **/
     public static final Pattern permissionPattern = Pattern
             .compile( permissionRegex );
 
+    /** The regexp matching the Any authenticated user string **/
     public static final String anyUserRegex = "^ANYONE\\s*";
 
+    /** The pattern object for matching the Any authenticated user string **/
     public static final Pattern anyUserPattern = Pattern.compile( anyUserRegex );
 
+    /** The regexp string for matching X509 DNs **/
     public static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
 
+    /** The pattern object for matching X509 DNs **/
     public static final Pattern dnPattern = Pattern.compile( dnRegex );
 
+    /** The regexp string for matching empty lines **/
     public static final String emptyLineRegex = "\\s*$";
 
+    /** The pattern object for matching empty lines **/
     public static final Pattern emptyLinePattern = Pattern
             .compile( emptyLineRegex );
 
+    /** The regexp string for matching comments **/
     public static final String commentRegex = "^[#;].*$";
 
+    /** The pattern object for matching comments **/
     public static final Pattern commentPattern = Pattern.compile( commentRegex );
 
+    /** The regexp string for matching INI stanzas **/
     public static final String stanzaRegex = "^(\\[\\w+\\])\\s*$";
 
+    /** The pattern object for matching INI stanzas **/
     public static final Pattern stanzaPattern = Pattern.compile( stanzaRegex );
 
+    /** Allowed sections in the configuration files **/
     enum Sections {
         DN, FQAN
     }
 
+    /** Section names EnumMap based on allowed sections 
+     * @see Sections
+     */
     EnumMap <Sections, String> sectionNames = new EnumMap <Sections, String>(
             Sections.class );
 
+    /** Possible parser states **/
     enum ParserStates {
         DNs, FQANs, UNDEFINED
     }
 
+    /** The ACL of the global context that is the result of the parsing **/
     private ACL globalContextACL;
 
+    /** Current parser state **/
     private ParserStates state = ParserStates.UNDEFINED;
 
+    /** line counter keeps track of parsed lines count **/
     private int lineCounter = 0;
 
-    private void init() {
 
-        // Initialize sectionNames map
+    /** 
+     * Constructor.
+     */
+    private AuthzConfigurationParser() {
+        
+     // Initialize sectionNames map
         sectionNames.put( Sections.DN, "[dn]" );
         sectionNames.put( Sections.FQAN, "[fqan]" );
 
@@ -82,11 +105,11 @@ public final class AuthzConfigurationParser {
 
     }
 
-    private AuthzConfigurationParser() {
-
-        init();
-    }
-
+    /**
+     * Parses a line read from the configuration file
+     * 
+     * @param line
+     */
     protected void parseLine( String line ) {
 
         if ( line.length() == 0 )
@@ -177,6 +200,13 @@ public final class AuthzConfigurationParser {
                     + "' does not match the PRINCIPAL : PERMISSION format!" );
     }
 
+    /**
+     * Parses an authorization configuration file and produces the corresponding
+     * ACL
+     * 
+     * @param f, the authorization configuration file 
+     * @return the corresponding {@link ACL} object
+     */
     public ACL parse( File f ) {
 
         try {
@@ -205,6 +235,12 @@ public final class AuthzConfigurationParser {
 
     }
 
+    /**
+     * Saves in-memory ACL entries to a file
+     * 
+     * @param f, the file where ACL entries will be written
+     * @param globalContextACL, the ACL to be saved
+     */
     public void save( File f, ACL globalContextACL ) {
 
         try {
@@ -262,22 +298,22 @@ public final class AuthzConfigurationParser {
 
     }
 
+    /**
+     * Returns the parsed ACL 
+     * @return
+     */
     public ACL getParsedACL() {
 
         return globalContextACL;
     }
 
+    /**
+     * Returns an instance of this parser.
+     * 
+     * @return
+     */
     public static AuthzConfigurationParser instance() {
 
         return new AuthzConfigurationParser();
-    }
-
-    public static void main( String[] args ) {
-
-        AuthzConfigurationParser parser = AuthzConfigurationParser.instance();
-        parser.parse( new File( "/home/andrea/test_authz_conf.txt" ) );
-
-        log.info( parser.getParsedACL().toString() );
-
     }
 }

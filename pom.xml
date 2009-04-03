@@ -4,14 +4,14 @@
   <groupId>org.glite.authz.pap</groupId>
   <artifactId>org.glite.authz.pap</artifactId>
   <packaging>war</packaging>
-  <name>glite-authz-pap</name>
-  <version>0.9.3</version>
+  <name>pap</name>
+  <version>1.0.0</version>
   <properties>
-    <pap-services-namespace> http://org.glite.authz/wsdl/pap/services
+    <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
   </properties>
   <build>
-  
+
     <resources>
       <resource>
         <directory>src/main/resources</directory>
@@ -26,9 +26,9 @@
         </includes>
         <filtering>true</filtering>
       </resource>
-     
+
     </resources>
-    <finalName>glite-authz-pap</finalName>
+    <finalName>pap</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -85,7 +85,7 @@
               <warName>${project.build.finalName}-standalone
               </warName>
               <webappDirectory>
-                ${project.build.directory}/glite-authz-pap-standalone
+                ${project.build.directory}/${project.build.finalName}-standalone
               </webappDirectory>
             </configuration>
           </execution>
@@ -207,10 +207,11 @@
         <artifactId>maven-assembly-plugin</artifactId>
         <configuration>
           <descriptors>
-            <descriptor>src/main/assembly/service-descriptor.xml
+            <descriptor>src/main/assembly/new-service-descriptor.xml
             </descriptor>
-            <descriptor>src/main/assembly/client-descriptor.xml
-            </descriptor>
+            <!--
+              <descriptor>src/main/assembly/client-descriptor.xml </descriptor>
+            -->
           </descriptors>
         </configuration>
       </plugin>
@@ -239,7 +240,7 @@
       <name>Cnaf Archiva Managed Internal Repository</name>
       <url>
         http://pcceccanti.cnaf.infn.it:11250/archiva/repository/internal/
-			</url>
+      </url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -279,11 +280,11 @@
 
     <dependency>
       <groupId>org.glite</groupId>
-      <artifactId>glite-security-voms-java-api 
+      <artifactId>glite-security-voms-java-api
       </artifactId>
       <version>1.9.0</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15</artifactId>
@@ -419,4 +420,89 @@
       <version>6.1.14</version>
     </dependency>
   </dependencies>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <links>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api/
+            </link>
+          </links>
+          <quiet>true</quiet>
+          <aggregate>true</aggregate>
+          <author>false</author>
+          <version>true</version>
+          <doctitle>${project.name} ${project.version} Java API.</doctitle>
+          <windowtitle>${project.name} ${project.version} Java API.</windowtitle>
+          <overview>src/main/java/overview.html</overview>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <developers>
+    <developer>
+      <id>forti</id>
+      <name>Alberto Forti</name>
+      <organization>INFN CNAF</organization>
+      <organizationUrl>http://www.cnaf.infn.it
+      </organizationUrl>
+      <roles>
+        <role>developer</role>
+        <role>documentation</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>ceccanti</id>
+      <name>Andrea Ceccanti</name>
+      <organization>INFN CNAF</organization>
+      <organizationUrl>http://www.cnaf.infn.it
+      </organizationUrl>
+      <roles>
+        <role>developer</role>
+        <role>documentation</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>ciaschini</id>
+      <name>Vincenzo Ciaschini</name>
+      <organization>INFN CNAF</organization>
+      <organizationUrl>http://www.cnaf.infn.it
+      </organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+    <developer>
+      <id>venturi</id>
+      <name>Valerio Venturi</name>
+      <organization>INFN CNAF</organization>
+      <organizationUrl>http://www.cnaf.infn.it
+      </organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+      <timezone>+1</timezone>
+    </developer>
+  </developers>
+
+  <licenses>
+    <license>
+      <name>Apache 2</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt
+      </url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <organization>
+    <name>EGEE Collaboration</name>
+    <url>http://www.eu-egee.org/</url>
+  </organization>
+
 </project>

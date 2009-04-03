@@ -13,11 +13,12 @@ import org.slf4j.LoggerFactory;
 
 public class DistributionConfiguration {
 
-    private static final String CONFIGURATION_STANZA = "distribution-configuration";
     private static DistributionConfiguration instance = null;
     private static final Logger log = LoggerFactory.getLogger(DistributionConfiguration.class);
 
-    private static final String REMOTE_PAPS_STANZA = "remote-paps";
+    private static final String PAPS_STANZA = "paps";
+    private static final String PAPS_PROPERTIES_STANZA = "paps:properties";
+    
     private PAPConfiguration papConfiguration;
 
     private DistributionConfiguration() {
@@ -31,7 +32,7 @@ public class DistributionConfiguration {
     }
 
     private static String aliasKey(String papAlias) {
-        return REMOTE_PAPS_STANZA + "." + papAlias;
+        return PAPS_STANZA + "." + papAlias;
     }
 
     private static String dnKey(String papAlias) {
@@ -44,16 +45,16 @@ public class DistributionConfiguration {
 
     @SuppressWarnings("unused")
     private static String minKeyLengthKey() {
-        return CONFIGURATION_STANZA + "." + "min-key-length";
+        return PAPS_STANZA + "." + "min_key_length";
     }
 
     @SuppressWarnings("unused")
     private static String minKeyLengthKey(String papAlias) {
-        return aliasKey(papAlias) + "." + "min-key-length";
+        return aliasKey(papAlias) + "." + "min_key_length";
     }
 
     private static String papOrderKey() {
-        return CONFIGURATION_STANZA + "." + "pap-order";
+        return PAPS_PROPERTIES_STANZA + "." + "ordering";
     }
 
     private static String pathKey(String papAlias) {
@@ -61,7 +62,7 @@ public class DistributionConfiguration {
     }
 
     private static String pollIntervallKey() {
-        return CONFIGURATION_STANZA + "." + "poll-interval";
+        return PAPS_PROPERTIES_STANZA + "." + "poll_interval";
     }
 
     private static String portKey(String papAlias) {
@@ -220,7 +221,7 @@ public class DistributionConfiguration {
 
         Set<String> aliasSet = new HashSet<String>();
 
-        Iterator iterator = papConfiguration.getKeys(REMOTE_PAPS_STANZA);
+        Iterator iterator = papConfiguration.getKeys(PAPS_STANZA);
         while (iterator.hasNext()) {
 
             String key = (String) iterator.next();
@@ -243,7 +244,7 @@ public class DistributionConfiguration {
             throw new DistributionConfigurationException("\"type\" is not set for remote PAP \"" + papAlias + "\"");
         }
         
-        PAP.PSType pstype = PAP.PSType.get(type);
+        PAP.PSType pstype = PAP.PSType.fromString(type);
         
         String dn = papConfiguration.getString(dnKey(papAlias));
         if ((dn == null) && (pstype == PAP.PSType.REMOTE)) {

@@ -2,11 +2,11 @@ package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
 
-import org.glite.authz.pap.authz.highlevelpolicymanagement.AddRuleOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.BanOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.EraseRepositoryOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.PurgeOperation;
-import org.glite.authz.pap.authz.highlevelpolicymanagement.UnbanOperation;
+import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.AddRuleOperation;
+import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.BanOperation;
+import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.EraseRepositoryOperation;
+import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.PurgeOperation;
+import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.UnbanOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
 import org.glite.authz.pap.repository.PAPContainer;

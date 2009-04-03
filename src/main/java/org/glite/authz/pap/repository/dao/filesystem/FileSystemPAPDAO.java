@@ -252,7 +252,7 @@ public class FileSystemPAPDAO implements PAPDAO {
         String id = papsINIFile.getString(idKey(papAlias));
         boolean visibilityPublic = papsINIFile.getBoolean(visibilityPublicKey(papAlias));
 
-        PAP pap = new PAP(papAlias, PAP.PSType.get(type), dn, host, port, path, protocol, visibilityPublic);
+        PAP pap = new PAP(papAlias, PAP.PSType.fromString(type), dn, host, port, path, protocol, visibilityPublic);
         pap.setPapId(id);
         
         long policyLastModificationTime;

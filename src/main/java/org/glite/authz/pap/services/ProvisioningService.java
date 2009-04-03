@@ -25,12 +25,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
-import org.glite.authz.pap.authz.provisioning.GetPoliciesForPAPOperation;
-import org.glite.authz.pap.authz.provisioning.GetPoliciesForPDPOperation;
-import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
-import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
-import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
+import org.glite.authz.pap.authz.operations.policy_provisioning.GetPoliciesForPAPOperation;
+import org.glite.authz.pap.authz.operations.policy_provisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
+import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
+import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
+import org.glite.authz.pap.services.provisioning.exceptions.WrongFormatIssuerException;
 import org.opensaml.saml2.common.Extensions;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;

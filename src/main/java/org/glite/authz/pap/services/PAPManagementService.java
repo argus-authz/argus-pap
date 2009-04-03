@@ -2,16 +2,17 @@ package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
 
-import org.glite.authz.pap.authz.papmanagement.AddTrustedPAPOperation;
-import org.glite.authz.pap.authz.papmanagement.GetOrderOperation;
-import org.glite.authz.pap.authz.papmanagement.GetTrustedPAPOperation;
-import org.glite.authz.pap.authz.papmanagement.ListTrustedPAPsOperation;
-import org.glite.authz.pap.authz.papmanagement.RefreshPolicyCacheOperation;
-import org.glite.authz.pap.authz.papmanagement.RemoveTrustedPAPOperation;
-import org.glite.authz.pap.authz.papmanagement.SetOrderOperation;
-import org.glite.authz.pap.authz.papmanagement.TrustedPAPExistsOperation;
-import org.glite.authz.pap.authz.papmanagement.UpdateTrustedPAPOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.AddTrustedPAPOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.GetOrderOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.GetTrustedPAPOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.ListTrustedPAPsOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.RefreshPolicyCacheOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.RemoveTrustedPAPOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.SetOrderOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.TrustedPAPExistsOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.UpdateTrustedPAPOperation;
 import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.PAPVersion;
 import org.glite.authz.pap.distribution.PAPManagerException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
@@ -86,7 +87,7 @@ public class PAPManagementService implements PAPManagement {
 
     public String ping() throws RemoteException {
         log.info("Requested ping()");
-        return "PAP v0.9.2";
+        return "PAP v."+PAPVersion.instance().getVersion();
     }
 
     public boolean refreshCache(String papAlias) throws RemoteException {

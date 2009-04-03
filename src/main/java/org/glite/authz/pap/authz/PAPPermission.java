@@ -6,20 +6,65 @@ import java.util.EnumSet;
 import org.apache.commons.lang.StringUtils;
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
 
+/**
+ * A {@link PAPPermission} describes the set of allowed permissions that can be assigned to a {@link PAPAdmin}
+ * in a given {@link PAPContext} and are required to execute authorized operations on the PAP.
+ *
+ */
 public class PAPPermission {
 
+    /**
+     * 
+     * {@link PermissionFlags} enumerates the set of permission flags currently defined for this PAP 
+     *
+     */
     public enum PermissionFlags {
-        POLICY_READ_LOCAL, POLICY_READ_REMOTE, POLICY_WRITE, CONFIGURATION_READ, CONFIGURATION_WRITE
+        /**
+         * This flag is used to authorize local policy read operations
+         */
+        POLICY_READ_LOCAL,
+        /**
+         * This flag is used to authorize remote policy read operations
+         */
+        POLICY_READ_REMOTE,
+        /**
+         * This flag is used to authorized policy write operations
+         */
+        POLICY_WRITE,
+        /**
+         * This flag is used to authorize pap configuration (ie, authorization & distribution) read operations
+         */
+        CONFIGURATION_READ,
+        /**
+         * This flag is used to authorize pap configuration (ie, authorization & distribution) write operations
+         */
+        CONFIGURATION_WRITE
     }
 
+    /** 
+     * The {@link EnumSet} corresponding to the {@link PermissionFlags} enumeration.
+     */
     private EnumSet <PermissionFlags> permissions;
 
+    /**
+     * Initializes the permissions as empty.
+     */
     protected PAPPermission() {
 
         permissions = EnumSet.noneOf( PermissionFlags.class );
 
     }
 
+    /**
+     * Creates a {@link PAPPermission} object starting from a string array,
+     * like 
+     * <code>
+     * String[] perms = new String[]{"POLICY_READ_LOCAL","POLICY_READ_REMOTE"};
+     * </code>
+     * 
+     * @param perms, a string array of pap permission flags 
+     * @return the {@link PAPPermission} object corresponding to the string array passed as argument
+     */
     public static PAPPermission fromStringArray( String[] perms ) {
 
         PAPPermission perm = new PAPPermission();
@@ -50,7 +95,19 @@ public class PAPPermission {
         return perm;
 
     }
-
+    
+    /**
+     * Creates a {@link PAPPermission} object starting from a | separated string of
+     * permissions, like:
+     * 
+     * <code>
+     * String perms = "POLICY_READ_LOCAL|POLICY_READ_REMOTE";
+     * </code>
+     * 
+     * 
+     * @param s, a | separated string of pap permission flags
+     * @return the {@link PAPPermission} object corresponding to the string passed as argument
+     */
     public static PAPPermission fromString( String s ) {
 
         String[] perms = StringUtils.split( s, "|" );
@@ -81,16 +138,33 @@ public class PAPPermission {
 
     }
 
+    /**
+     * Checks whether this {@link PAPPermission} has the permission flags
+     * passed as argument.
+     * 
+     * @param perm, the permission flags to check
+     * @return
+     */
     public boolean has( PermissionFlags perm ) {
 
         return permissions.contains( perm );
     }
 
+    /**
+     * Checks whether this {@link PAPPermission} has all the permission flags
+     * in the {@link EnumSet} passed as argument
+     * @param perms, the set of permission flags to check
+     * @return
+     */
     public boolean hasAll( EnumSet <PermissionFlags> perms ) {
 
         return permissions.containsAll( perms );
     }
 
+    /**
+     * Returns a string array representation of this {@link PAPPermission} object.
+     * @return
+     */
     public String[] toStringArray() {
 
         String[] perms = new String[permissions.size()];
@@ -103,16 +177,30 @@ public class PAPPermission {
 
     }
 
+    /**
+     * Creates a {@link PAPPermission} object where all the permission flags are set
+     * @return
+     */
     public static PAPPermission getAllPermission() {
 
         return PAPPermission.fromString( "ALL" );
     }
 
+    /**
+     * Creates a {@link PAPPermission} object where no permission flags are set
+     * @return
+     */
     public static PAPPermission getEmptyPermission() {
 
         return new PAPPermission();
     }
 
+    /**
+     * Adds all the permission flags in the {@link PAPPermission} passed as argument
+     * to the current permission
+     * @param o, the {@link PAPPermission} object
+     * @return <true> if the permission set has changed as a result of this call, <false> otherwise.
+     */
     public boolean add( PAPPermission o ) {
 
         if ( o == null )
@@ -121,11 +209,23 @@ public class PAPPermission {
         return addAll( o.permissions );
     }
 
+    /**
+     * Adds all the permission flags in the collection passed as argument to
+     * the current permission's permission flags.
+     * 
+     * @param c, the permission flag collection to be added
+     * @return <true> if the permission set has changed as a result of this call, <false> otherwise.
+     */
     protected boolean addAll( Collection <? extends PermissionFlags> c ) {
 
         return permissions.addAll( c );
     }
 
+    /**
+     * Creates a {@link PAPPermission} with the specified permission flag.
+     * @param p, the permission flag  that will be added
+     * @return a {@link PAPPermission} object with the above permission flag set.
+     */
     public static PAPPermission of( PermissionFlags p ) {
 
         PAPPermission papPerm = new PAPPermission();
@@ -133,6 +233,13 @@ public class PAPPermission {
         return papPerm;
     }
 
+    /**
+     * 
+     * Creates a {@link PAPPermission} with the specified permission flags.
+     * @param first, the first permission flag that will be added
+     * @param second, the second permission flag that will be added.
+     * @return a {@link PAPPermission} object with the above permission flags set.
+     */
     public static PAPPermission of( PermissionFlags first,
             PermissionFlags second ) {
 
@@ -143,6 +250,12 @@ public class PAPPermission {
         return papPerm;
     }
 
+    /**
+     * Creates a {@link PAPPermission} with the permission flags passed as argument.
+     * @param first, the permission flag  that will be added
+     * @param flags, a vararg array of permission flags that will be added to the {@link PAPPermission}
+     * @return a {@link PAPPermission} object with the above permission flags set.
+     */
     public static PAPPermission of( PermissionFlags first,
             PermissionFlags... flags ) {
 

@@ -9,19 +9,31 @@ import org.glite.voms.VOMSValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * This class bootstraps the PAP authorization engine
+ *
+ */
 public class AuthorizationEngine {
     
     public static final Logger logger = LoggerFactory.getLogger( AuthorizationEngine.class );
 
+    /** A flag static whether the authz engine has been initialized **/
     private boolean initialized = false;
 
+    /** The singleton instance for the AuthorizationEngine class **/
     private static AuthorizationEngine instance;
 
+    /** The global context to which all ACLs are currently mapped. **/
     private PAPContext globalContext;
 
-    private AuthorizationEngine( String papConf ) {
+    /**
+     * Constructor 
+     * @param papAuthzConfFile, the configuration file used to initialize the PAP authorization engine  
+     */
+    private AuthorizationEngine( String papAuthzConfFile ) {
 
-        File papConfFile = new File( papConf );
+        File papConfFile = new File( papAuthzConfFile );
 
         if ( !papConfFile.exists() )
             throw new PAPConfigurationException(
@@ -38,10 +50,17 @@ public class AuthorizationEngine {
 
         globalContext.setAcl( confParser.getParsedACL() );
         
-        CurrentAdmin.validator = new VOMSValidator((X509Certificate)null);
+        if (!PAPConfiguration.instance().getBoolean( "security.disable_voms_authz", false ))
+            CurrentAdmin.validator = new VOMSValidator((X509Certificate)null);
         
     }
 
+    /**
+     * Initializes the PAP authorizatione engine
+     * 
+     * @param papAuthzConfFile, the configuration file used to initialize the PAP authorization engine
+     * @return
+     */
     public static AuthorizationEngine initialize( String papAuthzConfFile ) {
 
         if ( instance == null )
@@ -50,6 +69,9 @@ public class AuthorizationEngine {
         return instance;
     }
 
+    /**
+     * Returns an instance of the AuthorizationEngine 
+     */
     public static AuthorizationEngine instance() {
 
         if ( instance == null )
@@ -59,6 +81,9 @@ public class AuthorizationEngine {
         return instance;
     }
 
+    /**
+     * Saves the authorization engine status back to the authz engine configuration file
+     */
     public void saveConfiguration() {
 
         String confFileName = PAPConfiguration.instance()
@@ -70,20 +95,31 @@ public class AuthorizationEngine {
         confParser.save( new File( confFileName ), getGlobalContext().getAcl() );
     }
 
+    /**
+     * Returns the status of the initialization flag for the AuthorizationEngine 
+     */
     public boolean isInitialized() {
 
         return initialized;
     }
 
+    /**
+     * Returns the global context for the authorization engine
+     * @return a {@link PAPContext} object for the global context
+     */
     public PAPContext getGlobalContext() {
 
         return globalContext;
     }
     
+    /**
+     * Performs some cleanup for the service shutdown.
+     */
     public void shutdown(){
         
-        // Cleanup VOMS lib - this will not be required after future voms api refactoring
-        CurrentAdmin.validator.cleanup();
+        if (CurrentAdmin.validator != null)
+            // Cleanup VOMS lib - this will not be required after future voms api refactoring
+            CurrentAdmin.validator.cleanup();
     }
 
 }

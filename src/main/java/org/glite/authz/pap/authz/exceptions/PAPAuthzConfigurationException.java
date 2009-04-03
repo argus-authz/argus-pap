@@ -2,35 +2,49 @@ package org.glite.authz.pap.authz.exceptions;
 
 import org.glite.authz.pap.common.exceptions.PAPException;
 
+/**
+ * 
+ * Exception for authorization configuration problems.
+ * 
+ */
 public class PAPAuthzConfigurationException extends PAPException {
 
     /**
-     * 
+     * Serial version UID.
      */
     private static final long serialVersionUID = 1L;
 
     public PAPAuthzConfigurationException() {
 
-	super();
-	// TODO Auto-generated constructor stub
+        super();
+
     }
 
-    public PAPAuthzConfigurationException(String message, Throwable cause) {
+    /**
+     * {@inheritDoc}
+     */
+    public PAPAuthzConfigurationException( String message, Throwable cause ) {
 
-	super(message, cause);
-	// TODO Auto-generated constructor stub
+        super( message, cause );
+
     }
 
-    public PAPAuthzConfigurationException(String message) {
+    /**
+     * {@inheritDoc}
+     */
+    public PAPAuthzConfigurationException( String message ) {
 
-	super(message);
-	// TODO Auto-generated constructor stub
+        super( message );
+
     }
 
-    public PAPAuthzConfigurationException(Throwable cause) {
+    /**
+     * {@inheritDoc}
+     */
+    public PAPAuthzConfigurationException( Throwable cause ) {
 
-	super(cause);
-	// TODO Auto-generated constructor stub
+        super( cause );
+
     }
 
 }

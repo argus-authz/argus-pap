@@ -25,9 +25,10 @@ import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.glite.authz.pap.provisioning.exceptions.MissingIssuerException;
-import org.glite.authz.pap.provisioning.exceptions.VersionMismatchException;
-import org.glite.authz.pap.provisioning.exceptions.WrongFormatIssuerException;
+import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
+import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
+import org.glite.authz.pap.services.provisioning.exceptions.WrongFormatIssuerException;
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLVersion;
@@ -118,7 +119,7 @@ public class ProvisioningServiceUtils {
         IssuerBuilder issuerBuilder = (IssuerBuilder) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
         Issuer issuer = issuerBuilder.buildObject();
 
-        String endpoint = String.format( "%s://%s:%s/glite-authz-pap/services/ProvisioningService", request.getScheme(), request.getServerName(), request.getServerPort() );
+        String endpoint = String.format( "%s://%s:%s/%s/services/ProvisioningService", request.getScheme(), request.getServerName(), request.getServerPort(), PAPConfiguration.DEFAULT_WEBAPP_CONTEXT );
         
         issuer.setValue(endpoint);
 

@@ -1,15 +1,13 @@
 #!/bin/bash
 
-if [ -z $GLITE_LOCATION ]; then
-	echo "Please define the GLITE_LOCATION environment variable before running this command!"
+# This scripts runs the pap-admin command line client
+
+if [ -z $PAP_HOME ]; then
+	echo "Please define the PAP_HOME environment variable before running this command!"
 	exit 1
 fi
 	
-if [ -z $GLITE_LOCATION_VAR ]; then
-	echo "Please define the GLITE_LOCATION_VAR environment variable before running this command!"
-	exit 1
-fi
 
-. $GLITE_LOCATION/etc/pap/sh/pap-utils.sh
+. $PAP_HOME/bin/pap-env.sh
 
 $PAP_CLIENT_CMD "$@"

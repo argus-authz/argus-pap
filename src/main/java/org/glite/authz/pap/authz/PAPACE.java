@@ -1,7 +1,14 @@
 package org.glite.authz.pap.authz;
-
+/**
+ * A PAP Access Control Entry states which permissions a specific administrator
+ * has in a particular context.
+ * 
+ * @author andrea
+ *
+ */
 public class PAPACE {
 
+    /** The context for this ace **/
     PAPContext context;
 
     PAPAdmin admin;

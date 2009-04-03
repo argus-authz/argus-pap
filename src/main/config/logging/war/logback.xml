@@ -3,7 +3,7 @@
   <appender
     name="FILE"
     class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <File>${catalina.base}/logs/glite-authz-pap.log
+    <File>${catalina.base}/logs/pap.log
     </File>
     <Append>true</Append>
     <layout
@@ -11,7 +11,7 @@
       <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
     </layout>
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">  
-      <FileNamePattern>glite-authz-pap.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>pap.%d{yyyy-MM-dd}.log</FileNamePattern>
     </rollingPolicy> 
   </appender>
 

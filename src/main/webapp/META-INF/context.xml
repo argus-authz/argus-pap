@@ -3,6 +3,6 @@
 -->
 
 <Context path="/pap">
-	<Parameter name="PapConfigurationDir" value="/opt/glite/etc/pap"/>
-	<Parameter name="PapRepositoryDir" value="/var/glite/etc/pap"/>
+	<Parameter name="PapConfigurationDir" value="/opt/authz/pap/conf"/>
+	<Parameter name="PapRepositoryDir" value="/opt/authz/pap/repository"/>
 </Context>

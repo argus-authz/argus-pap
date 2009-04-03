@@ -6,12 +6,26 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * This class provides information about a Policy Administration Point (PAP).
+ *
+ */
 public class PAP {
 
+    /**
+     * 
+     * This PSType describes whether the PAP is a local
+     * or remote PAP.
+     *
+     */
     public static enum PSType {
-        LOCAL, REMOTE;
+        
+        LOCAL, 
+        REMOTE;
 
-        public static PSType get(String type) {
+        
+        public static PSType fromString(String type) {
             if ("local".equals(type.toLowerCase())) {
                 return LOCAL;
             }
@@ -32,7 +46,7 @@ public class PAP {
     public static final String DEFAULT_PAP_ALIAS = "default";
     public static String DEFAULT_PORT = "8150";
     public static String DEFAULT_PROTOCOL = "https";
-    public static String DEFAULT_SERVICES_ROOT_PATH = "/glite-authz-pap/services/";
+    public static String DEFAULT_SERVICES_ROOT_PATH = "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT+"/services/";
 
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PAP.class);
@@ -49,7 +63,7 @@ public class PAP {
     private boolean visibilityPublic;
 
     public PAP(PAPData papData) {
-        this(papData.getAlias(), PSType.get(papData.getType()), papData.getDn(), papData.getHostname(), papData.getPort(),
+        this(papData.getAlias(), PSType.fromString(papData.getType()), papData.getDn(), papData.getHostname(), papData.getPort(),
              papData.getPath(), papData.getProtocol(), papData.isVisibilityPublic());
     }
 
@@ -288,6 +302,14 @@ public class PAP {
         return toFormattedString(indent, 4);
     }
 
+    /**
+     * Returns a formatted version of this PAP 
+     * 
+     * @param indent, the indentation to be used
+     * @param padding, the padding to be used
+     * @return the formatted String representing this PAP
+     * 
+     */
     public String toFormattedString(int indent, int padding) {
 
         String indentString = Utils.fillWithSpaces(indent);
@@ -321,6 +343,7 @@ public class PAP {
         return aliasString + typeString + visibilityString + dnString + endpointString;
     }
 
+    @Override
     public String toString() {
         String visibility = "visibility=";
 

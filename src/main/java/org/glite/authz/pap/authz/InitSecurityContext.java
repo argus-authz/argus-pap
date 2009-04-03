@@ -9,16 +9,27 @@ import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
 import org.glite.security.SecurityContext;
 import org.glite.security.util.DN;
 import org.glite.security.util.DNHandler;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 
+ * This class is responsible for properly initializing the security context as a
+ * consequence of client's request. If no valid X509 certificate chain is found
+ * in the request context, a {@link PAPAuthzException} is thrown
+ * 
+ */
 public class InitSecurityContext {
 
+    /** The index string for the remote address as stored in the security context **/
     static public final String SECURITY_CONTEXT_REMOTE_ADDRESS = "org.glite.authz.pap.remote_address";
 
     static Logger logger = LoggerFactory.getLogger( InitSecurityContext.class );
 
+    /**
+     * Initializes the context from a servlet request.
+     * @param request
+     */
     public static void setContextFromRequest( final ServletRequest request ) {
 
         SecurityContext sc = new SecurityContext();

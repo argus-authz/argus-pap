@@ -1,21 +1,20 @@
 #!/bin/bash
+
+# This scripts starts, stop and restarts the pap standalone service
+
 set -e
+
 prog=pap-standalone
 
-if [ -z $GLITE_LOCATION ]; then
-	echo "Please define the GLITE_LOCATION environment variable before running this command!"
-	exit 1
-fi
-	
-if [ -z $GLITE_LOCATION_VAR ]; then
-	echo "Please define the GLITE_LOCATION_VAR environment variable before running this command!"
+
+if [ -z $PAP_HOME ]; then
+	echo "Please define the PAP_HOME environment variable before running this command!"
 	exit 1
 fi
 
-PAP_RUN_FILE=$GLITE_LOCATION_VAR/lock/subsys/pap-standalone.pid
+PAP_RUN_FILE=$PAP_HOME/.pap-standalone.pid
 
-. $GLITE_LOCATION/etc/pap/sh/pap-utils.sh
-
+. $PAP_HOME/bin/pap-env.sh
 
 pre_checks(){
 	check_openssl
@@ -111,7 +110,7 @@ status(){
 
 alive_and_kicking(){
 
-	$GLITE_LOCATION/bin/pap-admin ping -host $PAP_HOST -port $PAP_PORT -cert $PAP_CERT -key $PAP_KEY >/dev/null 2>&1
+	$PAP_HOME/bin/pap-admin ping -host $PAP_HOST -port $PAP_PORT -cert $PAP_CERT -key $PAP_KEY >/dev/null 2>&1
 	if [ $? -eq 0 ]; then
 		echo "PAP alive and kicking responded to service ping request!"
 		return 0
@@ -141,6 +140,12 @@ start(){
 		
 }
 
+restart(){
+	
+	echo -n "Restarting $prog: "
+	kill_pap_proc && (rm -f $PAP_RUN_FILE; sleep 5; start) || failure "Error restarting pap process!"
+
+}
 stop(){
 	echo -n "Stopping $prog: "
 	kill_pap_proc && (rm -f $PAP_RUN_FILE; success "Ok.") || failure "Error killing PAP process!"
@@ -157,6 +162,10 @@ case "$1" in
 	
 	status)
 		status && success "PAP running!" || failure "PAP not running!"
+		;;
+	
+	restart)
+		restart
 		;;
 	*)
 		echo "Usage: $0 {start|stop|status}"

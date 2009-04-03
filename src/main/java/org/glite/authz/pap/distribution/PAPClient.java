@@ -66,7 +66,7 @@ public class PAPClient {
         } catch (ConfigurationException e) {
             throw new PAPConfigurationException("Error initializing OpenSAML library", e);
         }
-        PAPClient client = new PAPClient("https://pbox3.cnaf.infn.it:8443/glite-authz-pap/services/");
+        PAPClient client = new PAPClient("https://pbox3.cnaf.infn.it:8443/pap/services/");
         List<XACMLObject> list = client.getLocalPolicies();
         System.out.println("Retrieved " + list.size() + " policies");
         System.out.println("OK");

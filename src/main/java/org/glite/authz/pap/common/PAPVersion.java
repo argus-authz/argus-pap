@@ -5,13 +5,25 @@ import java.util.Properties;
 
 import org.glite.authz.pap.common.exceptions.PAPException;
 
-
+/**
+ * A class representing the PAP build time version number (as derived from the maven build file)
+ *  
+ */
 public class PAPVersion {
-    
+   
+    /**
+     * The singleton instance object of this class
+     */
     private static PAPVersion singleton = null;
     
+    /**
+     * The string representation of the version number
+     */
     private String version;
     
+    /**
+     * Costructor
+     */
     private PAPVersion(){
         
         Properties versionProps = new Properties();
@@ -25,6 +37,12 @@ public class PAPVersion {
         }
         
     }
+    
+    /**
+     * Returns the instance of the PAPVersion class.
+     * 
+     * @return
+     */
     public static PAPVersion instance() {
         
         if (singleton == null)
@@ -34,6 +52,11 @@ public class PAPVersion {
     }
     
     
+    /**
+     * Returns the version string for this PAP.
+     * 
+     * @return the string representation of the PAP build time version number, e.g. 0.9.3
+     */
     public String getVersion() {
 
         return version;
