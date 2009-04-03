@@ -49,7 +49,7 @@ public class PAPConfiguration {
     public static final String REPOSITORY_STANZA = "repository";
     
     /** The name of the stanza that contains standalone service configuration **/
-    public static final String STANDALONE_SERVICE_STANZA = "standalone_service";
+    public static final String STANDALONE_SERVICE_STANZA = "standalone-service";
     
     /** The name of the stanza that contains local and remote paps configuration **/
     public static final String PAPS_STANZA = "paps";

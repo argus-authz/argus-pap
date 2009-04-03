@@ -172,7 +172,10 @@ public final class PAPServer {
 
         log.info("Configuring jetty PAP server...");
         
-        papServer = new Server( getIntFromStandaloneConfiguration( "port", PAPStandaloneServiceDefaults.PORT ) );
+        int port = getIntFromStandaloneConfiguration( "port", PAPStandaloneServiceDefaults.PORT );
+        
+        
+        papServer = new Server();
         
         int maxRequestQueueSize = getIntFromStandaloneConfiguration( "max_request_queue_size",
                 PAPStandaloneServiceDefaults.MAX_REQUEST_QUEUE_SIZE );
@@ -210,21 +213,24 @@ public final class PAPServer {
         TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
                 buildTrustmanagerConfiguration() );
 
-        connector.setPort( getIntFromStandaloneConfiguration( "port", PAPStandaloneServiceDefaults.PORT ) );
-        connector.setHost( getStringFromStandaloneConfiguration( "hostname", PAPStandaloneServiceDefaults.HOSTNAME ) );
+        connector.setPort( port );
+        String host = getStringFromStandaloneConfiguration( "hostname", PAPStandaloneServiceDefaults.HOSTNAME );
+        
+        if (! host.equals( PAPStandaloneServiceDefaults.HOSTNAME )){
+            
+            log.info( "PAP service will listen on {}:{}", new Object[]{host,port} );
+            connector.setHost( host );
+        }
 
         papServer.setConnectors( new Connector[] { connector } );
 
-        // Create shutdown service
         JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
                 papServer );
 
-        // Create a Shutdown Service
         JettyShutdownService.startJettyShutdownService( 8151, Collections
                 .singletonList( (Runnable) papShutdownCommand ) );
         
         
-        // Create a webapp context for the PAP web application
         webappContext = new WebAppContext();
 
         webappContext.setContextPath( "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT );
