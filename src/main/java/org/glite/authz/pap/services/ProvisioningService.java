@@ -25,8 +25,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
-import org.glite.authz.pap.authz.operations.policy_provisioning.GetPoliciesForPAPOperation;
-import org.glite.authz.pap.authz.operations.policy_provisioning.GetPoliciesForPDPOperation;
+import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPAPOperation;
+import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
