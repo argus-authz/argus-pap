@@ -30,11 +30,11 @@ public class AddPolicy extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_MOVEAFTER_DESCRIPTION)
                                        .withLongOpt(OPT_MOVEAFTER_LONG)
-                                       .create(OPT_MOVEAFTER));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create(OPT_PAPALIAS));
+                                       .create());
         return options;
     }
 
@@ -67,12 +67,12 @@ public class AddPolicy extends PolicyManagementCLI {
             ruleId = args[5];
         }
         
-        if (commandLine.hasOption(OPT_MOVEAFTER)) {
+        if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
             moveAfter = true;
         }
         
-        if (commandLine.hasOption(OPT_PAPALIAS)) {
-            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
 
         if (verboseMode) {

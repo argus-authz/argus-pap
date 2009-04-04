@@ -9,7 +9,7 @@ import org.apache.commons.cli.ParseException;
 
 public class BanAttribute extends PolicyManagementCLI {
 
-    private static String[] COMMAND_NAME_VALUES = { "ban", "b" };
+    private static String[] COMMAND_NAME_VALUES = { "ban"};
     private static String DESCRIPTION = "Ban an attribute. <id> is any of the attribute ids that can be specified in the "
             + "simplified policy language. By default the attribute is bannen for resource and action both with value \".*\". "
             + "Different values for resource and action can be set using options --" + OPT_RESOURCE_LONG + " and --"
@@ -44,7 +44,7 @@ public class BanAttribute extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create(OPT_PAPALIAS));
+                                       .create());
         return options;
     }
 
@@ -60,8 +60,8 @@ public class BanAttribute extends PolicyManagementCLI {
         String id = args[1];
         String value = args[2];
         
-        if (commandLine.hasOption(OPT_PAPALIAS)) {
-            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
 
         boolean isPublic = true;

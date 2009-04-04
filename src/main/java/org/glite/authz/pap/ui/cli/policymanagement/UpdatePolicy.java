@@ -111,7 +111,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create(OPT_PAPALIAS));
+                                       .create());
         return options;
     }
 
@@ -124,8 +124,8 @@ public class UpdatePolicy extends PolicyManagementCLI {
             throw new ParseException("Wrong number of arguments.");
         }
 
-        if (commandLine.hasOption(OPT_PAPALIAS)) {
-            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
 
         String id = args[1];

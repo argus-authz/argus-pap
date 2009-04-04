@@ -11,7 +11,7 @@ import org.glite.authz.pap.ui.cli.CLIException;
 
 public class UnBanAttribute extends PolicyManagementCLI {
 
-    private static String[] COMMAND_NAME_VALUES = { "un-ban", "ub" };
+    private static String[] COMMAND_NAME_VALUES = { "un-ban", "uban" };
     private static String DESCRIPTION = "Un-ban a previously banned attribute. <id> is any of the attribute ids that can be specified in the "
             + "simplified policy language. By default the attribute is un-bannen for resource and action both with value \"*\". "
             + "Different values for resource and action can be set using options --"
@@ -40,7 +40,7 @@ public class UnBanAttribute extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create(OPT_PAPALIAS));
+                                       .create());
         return options;
     }
 
@@ -56,8 +56,8 @@ public class UnBanAttribute extends PolicyManagementCLI {
         String id = args[1];
         String value = args[2];
         
-        if (commandLine.hasOption(OPT_PAPALIAS)) {
-            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
 
         String resource = null;

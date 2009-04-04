@@ -12,11 +12,11 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 public class UpdatePAP extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "update-pap", "upap" };
-    private static final String DESCRIPTION = "Update information for a PAP. The input is the same as for the \"add-pap\" command, " +
-    		"the effect is to update old iformation with the new one.\n";
+    private static final String DESCRIPTION = "Update pap information. The input is the same as for the \"add-pap\" command, " +
+    		"the effect is to update old information with the new one.\n";
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";
-    private static final String USAGE = "[options] <alias> [<dn> <host> <port> [path]]";
+    private static final String USAGE = "[options] <alias> [<endpoint> <dn>]";
 
     public UpdatePAP() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
@@ -49,7 +49,7 @@ public class UpdatePAP extends PAPManagementCLI {
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
-        if ((args.length != 5) && (args.length != 6) && (args.length != 2)) {
+        if ((args.length != 4) && (args.length != 2)) {
             throw new ParseException("Wrong number of arguments");
         }
 
@@ -75,21 +75,20 @@ public class UpdatePAP extends PAPManagementCLI {
         }
 
         String alias = args[1];
+        String protocol = null;
         String dn = null;
         String host = null;
         String port = null;
         String path = null;
 
         if (args.length != 2) {
-            dn = args[2];
-            host = args[3];
-            port = args[4];
-            if (args.length == 6) {
-                path = args[5];
-            }
+            protocol = AddPAP.getProtocol(args[2]);
+            host = AddPAP.getHostname(args[2]);
+            port = AddPAP.getPort(args[2]);
+            path = AddPAP.getPath(args[2]);
         }
-
-        PAP pap = new PAP(alias, pstype, dn, host, port, path, isPublic);
+        
+        PAP pap = new PAP(alias, pstype, dn, host, port, path, protocol, isPublic);
 
         String msg = "Updating PAP: ";
 
@@ -117,7 +116,7 @@ public class UpdatePAP extends PAPManagementCLI {
         papMgmtClient.updatePAP(papData);
 
         if (verboseMode) {
-            System.out.println("Success: new trusted PAP has been added.");
+            System.out.println("Success: pap has been updated.");
         }
 
         return ExitStatus.SUCCESS.ordinal();

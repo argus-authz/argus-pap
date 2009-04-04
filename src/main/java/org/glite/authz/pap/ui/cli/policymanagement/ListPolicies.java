@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory;
 public class ListPolicies extends PolicyManagementCLI {
 
     private static final String[] commandNameValues = { "list-policies", "lp" };
-    private static final String DESCRIPTION = "List policies authored by the PAP.";
+    private static final String DESCRIPTION = "List policies. If no options are specified then the policies of the default pap are listed.";
     private static final Logger log = LoggerFactory.getLogger(ListPolicies.class);
     private static final String USAGE = "[options]";
 
@@ -106,9 +106,9 @@ public class ListPolicies extends PolicyManagementCLI {
                                        .withLongOpt(OPT_SHOW_XACML_LONG)
                                        .create());
         options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription(OPT_SHOW_IDS_DESCRIPTION)
+                                       .withDescription(OPT_SHOW_RA_IDS_DESCRIPTION)
                                        .withLongOpt(OPT_SHOW_IDS_LONG)
-                                       .create(OPT_SHOW_IDS));
+                                       .create(OPT_SHOW_RA_IDS));
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_SHOW_ALL_IDS_DESCRIPTION)
                                        .withLongOpt(OPT_SHOW_ALL_IDS_LONG)
@@ -120,7 +120,7 @@ public class ListPolicies extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArgs()
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create(OPT_PAPALIAS));
+                                       .create());
         return options;
     }
 
@@ -134,7 +134,7 @@ public class ListPolicies extends PolicyManagementCLI {
             xacmlOutput = true;
         }
 
-        if (commandLine.hasOption(OPT_SHOW_IDS)) {
+        if (commandLine.hasOption(OPT_SHOW_RA_IDS)) {
             showIds = true;
         }
 
@@ -153,8 +153,8 @@ public class ListPolicies extends PolicyManagementCLI {
                 papAliasArray[i] = papDataArray[i].getAlias();
             }
             papInfoArray = getPAPInfoArray(papAliasArray, papDataArray);
-        } else if (commandLine.hasOption(OPT_PAPALIAS)) {
-            papAliasArray = commandLine.getOptionValues(OPT_PAPALIAS);
+        } else if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            papAliasArray = commandLine.getOptionValues(OPT_PAPALIAS_LONG);
             papInfoArray = getPAPInfoArray(papAliasArray, null);
         } else {
             PAPData papData = new PAPData();

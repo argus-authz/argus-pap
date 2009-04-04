@@ -9,7 +9,7 @@ import org.apache.commons.cli.ParseException;
 public class RemovePAP extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "remove-pap", "rpap" };
-    private static final String DESCRIPTION = "Remove a trusted PAP and delete the cached policies.";
+    private static final String DESCRIPTION = "Remove a pap and delete its policies.";
     private static final String USAGE = "<alias>";
 
     public RemovePAP() {

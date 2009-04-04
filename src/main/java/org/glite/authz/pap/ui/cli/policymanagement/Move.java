@@ -11,13 +11,12 @@ import org.glite.authz.pap.ui.cli.CLIException;
 public class Move extends PolicyManagementCLI {
 
     private static final String[] commandNameValues = { "move", "mv" };
-    private static final String DESCRIPTION = "Move a policy (i.e. action <id>) or a policy set (i.e. resource <id>) before/after "
-            + "another, respectively, policy or policySet.";
+    private static final String DESCRIPTION = "Move a resource/action before/after another, respectively, resource/action.";
     private static final String LONG_DESCRIPTION = "<id>        the index of the object (action/resouce) to be moved.\n"
             + "<pivotId>   the index of the target object. <id> is moved before <pivotId> by default.\n"
             + "\nAn action can be moved before/after another action of the same resource. "
             + "A resource cannot be moved inside an action.";
-    private static final String USAGE = "[options] <id> <pivotId> [-a]";
+    private static final String USAGE = "[options] <id> <pivotId>";
 
     private String alias = null;
 
@@ -32,11 +31,11 @@ public class Move extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_MOVEAFTER_DESCRIPTION)
                                        .withLongOpt(OPT_MOVEAFTER_LONG)
-                                       .create(OPT_MOVEAFTER));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create(OPT_PAPALIAS));
+                                       .create());
         return options;
     }
 
@@ -49,8 +48,8 @@ public class Move extends PolicyManagementCLI {
             throw new ParseException("Wrong number of arguments");
         }
 
-        if (commandLine.hasOption(OPT_PAPALIAS)) {
-            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
 
         String id = args[1];
@@ -62,7 +61,7 @@ public class Move extends PolicyManagementCLI {
 
         boolean moveAfter = false;
 
-        if (commandLine.hasOption(OPT_MOVEAFTER)) {
+        if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
             moveAfter = true;
         }
 

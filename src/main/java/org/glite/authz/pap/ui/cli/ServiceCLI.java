@@ -42,7 +42,7 @@ public abstract class ServiceCLI {
     private static final String OPT_CERT_LONG = "cert";
 
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). "
-            + "This option defines the PAP endpoint to be contacted as follows: https://arg:port/pap/services";
+            + "This option defines the PAP endpoint to be contacted as follows: https://arg:port" + PAP.DEFAULT_SERVICES_ROOT_PATH;
     private static final String OPT_HOST_LONG = "host";
 
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
@@ -218,7 +218,7 @@ public abstract class ServiceCLI {
     }
 
     public void printHelpMessage(PrintWriter pw) {
-        String syntax = String.format(" [global-options] %s %s", commandNameValues[0], usageText);
+        String syntax = String.format("pap-admin [global-options] %s %s", commandNameValues[0], usageText);
 
         pw.println();
         helpFormatter.printUsage(pw, helpFormatter.getWidth(), syntax);

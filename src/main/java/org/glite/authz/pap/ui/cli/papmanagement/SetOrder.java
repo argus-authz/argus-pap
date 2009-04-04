@@ -8,8 +8,8 @@ import org.apache.commons.cli.Options;
 public class SetOrder extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "set-paps-order", "spo" };
-    private static final String DESCRIPTION = "Define the order of the remote PAPs.";
-    private static final String USAGE = "[alias_01] [[alias_02]...]";
+    private static final String DESCRIPTION = "Define paps ordering.";
+    private static final String USAGE = "[alias]...";
 
     public SetOrder() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

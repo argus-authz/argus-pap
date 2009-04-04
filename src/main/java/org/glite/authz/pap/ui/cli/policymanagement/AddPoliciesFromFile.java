@@ -25,23 +25,22 @@ import org.slf4j.LoggerFactory;
 public class AddPoliciesFromFile extends PolicyManagementCLI {
 
     private static final Logger log = LoggerFactory.getLogger(AddPoliciesFromFile.class);
-    private static String OPT_PIVOT = "pivot";
     private static String OPT_PIVOT_LONG = "pivot";
-    private static String OPT_PIVOT_DESCRIPTION = "insert after <pivotId> (by default the insertion is before <pivotId>)";
+    private static String OPT_PIVOT_DESCRIPTION = "insert before <id> (option --" + OPT_MOVEAFTER_LONG + " modifies this behavior in: insert afer<id>)";
 
     private static final String[] commandNameValues = { "add-policies-from-file", "apf" };
     private static final String DESCRIPTION = "Add policies defined in the given file.\n"
-            + "[targetId]   resource id in which insert actions.\n"
+            + "[resourceId]   resource id in which insert actions.\n"
             + "<file>       define a set of resource elements or a set of action elements.\n";
-    private static final String LONG_DESCRIPTION = "If <file> defines a set of resource elements \"targetId\" must not "
-            + "be provided, otherwise if only action elements are defined \"targetId\" indentifies the resource element "
+    private static final String LONG_DESCRIPTION = "If <file> defines a set of resource elements \"resourceId\" must not "
+            + "be provided, otherwise if only action elements are defined \"resourceId\" indentifies the resource element "
             + "in which insert the given action elements. If option --" + OPT_PIVOT_LONG + " is not specified all the "
             + "elements are inserted in the last available position, otherwise they are inserted before \"pivotId\" "
             + "(or after \"pivotId\" if option --" + OPT_MOVEAFTER_LONG + " is set).";
-    private static final String USAGE = "[options] <file> [targetId]";
+    private static final String USAGE = "[options] <file> [resourceId]";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
     private List<XACMLWizard> xacmlWizardList;
-    private String targetId = null;
+    private String resourceId = null;
     private String pivotId = null;
     private String alias = null;
     private boolean moveAfter = false;
@@ -60,8 +59,8 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             }
         }
 
-        if (targetId != null) {
-            System.out.println("Error cannot use \"targetId\" to insert resource elements.");
+        if (resourceId != null) {
+            System.out.println("Error cannot use \"resourceId\" to insert resource elements.");
             return false;
         }
 
@@ -159,12 +158,12 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             policyWizardList.add((PolicyWizard) xacmlWizard);
         }
 
-        if (targetId == null) {
-            System.out.println("Error \"targetId\" is needed to insert action elements");
+        if (resourceId == null) {
+            System.out.println("Error \"resourceId\" is needed to insert action elements");
             return false;
         }
 
-        PolicySetType targetolicySet = xacmlPolicyMgmtClient.getPolicySet(alias, targetId);
+        PolicySetType targetolicySet = xacmlPolicyMgmtClient.getPolicySet(alias, resourceId);
 
         int position = -1;
 
@@ -172,7 +171,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             position = PolicySetHelper.getPolicyIdReferenceIndex(targetolicySet, pivotId);
             TypeStringUtils.releaseUnneededMemory(targetolicySet);
             if (position == -1) {
-                System.out.println("Pivot id \"" + pivotId + "\" not found inside resource id \"" + targetId + "\".");
+                System.out.println("Pivot id \"" + pivotId + "\" not found inside resource id \"" + resourceId + "\".");
                 return false;
             }
             if (moveAfter) {
@@ -198,7 +197,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
 
         log.debug("Inserting actions into position: " + position);
 
-        String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias, position, targetId, idPrefixArray, policyArray);
+        String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias, position, resourceId, idPrefixArray, policyArray);
 
         for (int i = 0; i < size; i++) {
             String policyId = policyIdArray[i];
@@ -228,15 +227,15 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_MOVEAFTER_DESCRIPTION)
                                        .withLongOpt(OPT_MOVEAFTER_LONG)
-                                       .create(OPT_MOVEAFTER));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PIVOT_DESCRIPTION)
                                        .withLongOpt(OPT_PIVOT_LONG)
-                                       .create(OPT_PIVOT));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create(OPT_PAPALIAS));
+                                       .create());
         return options;
     }
 
@@ -248,24 +247,24 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             throw new ParseException("Wrong number of arguments.");
         }
 
-        if (commandLine.hasOption(OPT_PAPALIAS)) {
-            alias = commandLine.getOptionValue(OPT_PAPALIAS);
+        if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
 
-        if (commandLine.hasOption(OPT_PIVOT)) {
-            pivotId = commandLine.getOptionValue(OPT_PIVOT);
+        if (commandLine.hasOption(OPT_PIVOT_LONG)) {
+            pivotId = commandLine.getOptionValue(OPT_PIVOT_LONG);
         }
 
         if ((args.length == 3)) {
-            targetId = args[2];
+            resourceId = args[2];
         }
 
-        if (commandLine.hasOption(OPT_MOVEAFTER)) {
+        if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
             moveAfter = true;
         }
 
         log.debug("args.lengh=" + args.length);
-        log.debug("targetId=" + targetId);
+        log.debug("resourceId=" + resourceId);
         log.debug("pivotId=" + pivotId);
         log.debug("moveAfter=" + moveAfter);
 

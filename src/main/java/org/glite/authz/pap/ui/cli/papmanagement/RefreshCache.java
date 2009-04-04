@@ -13,9 +13,9 @@ public class RefreshCache extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "refresh-cache", "rc" };
     private static final String DESCRIPTION = "Invalidates the local policy cache and retrieves policies "
-            + "from remote PAPs. The arguments identify the PAPs that will be contacted. If no arguments are "
-            + "given, all the trusted PAPs are contacted.";
-    private static final String USAGE = "[alias] [[alias]...]";
+            + "from remote paps. The arguments identify the paps that will be contacted. If no arguments are "
+            + "given, all the remote paps are contacted.";
+    private static final String USAGE = "[alias]...]";
 
     public RefreshCache() {
         super(commandNameValues, USAGE, DESCRIPTION, null);

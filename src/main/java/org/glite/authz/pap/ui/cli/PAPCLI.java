@@ -28,6 +28,7 @@ import org.glite.authz.pap.ui.cli.policymanagement.AddPolicy;
 import org.glite.authz.pap.ui.cli.policymanagement.BanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.Move;
+import org.glite.authz.pap.ui.cli.policymanagement.Purge;
 import org.glite.authz.pap.ui.cli.policymanagement.RemoveAllPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.RemovePolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.UnBanAttribute;
@@ -186,6 +187,7 @@ public class PAPCLI {
         policyMgmtCommandList.add(new UpdatePolicy());
         policyMgmtCommandList.add(new RemovePolicies());
         policyMgmtCommandList.add(new RemoveAllPolicies());
+        policyMgmtCommandList.add(new Purge());
         policyMgmtCommandList.add(new ListPolicies());
         policyMgmtCommandList.add(new Move());
 
@@ -254,7 +256,7 @@ public class PAPCLI {
         PrintWriter pw = new PrintWriter(System.out);
 
         pw.println();
-        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin [global-options] <subcommand> [options] [args]");
+        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin [global-options] <command> [options] [args]");
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP command-line client.");
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(),

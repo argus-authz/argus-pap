@@ -12,15 +12,18 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 public class AddPAP extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "add-pap", "apap" };
-    private static final String DESCRIPTION = "Add a trusted PAP to get policies from.\n"
-            + "<alias> is a friendly name (it has to be unique) used to identify the PAP\n" + "<dn> DN of the PAP\n"
-            + "<host> hostname of the PAP machine\n" + "<port> the port the PAP is listening to\n"
-            + "[path] root path of the services of the PAP (the default is " + PAP.DEFAULT_SERVICES_ROOT_PATH + ")\n";
-    private static final String LONG_DESCRIPTION = "\nExample:\n" + "\t pap-admin " + commandNameValues[0]
-            + "cnaf_pap \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\" " + "test.cnaf.infn.it " + PAP.DEFAULT_PORT;
+    private static final String DESCRIPTION = "Add a remote or local pap.\n"
+            + "<alias> is a friendly name (it has to be unique) used to identify the PAP\n"
+            + "<endpoint> endpoint of the pap in the following format: [<protocol>://]<host>:[<port>/[path]]\n"
+            + "<dn> DN of the PAP\n" + "<host> hostname of the PAP machine\n";
+    private static final String LONG_DESCRIPTION = "Default protocol is: " + PAP.DEFAULT_PROTOCOL + "\n"
+            + "Default port is: " + PAP.DEFAULT_PORT + "\n"
+            + "Default path is: " + PAP.DEFAULT_SERVICES_ROOT_PATH + "\n"
+    		+ "Example:\n" + "\t pap-admin " + commandNameValues[0]
+            + " cnaf_pap test.cnaf.infn.it \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\"";
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";
-    private static final String USAGE = "[options] <alias> [<dn> <host> <port> [path]]";
+    private static final String USAGE = "[options] <alias> [<endpoint> <dn>]";
 
     public AddPAP() {
         super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
@@ -53,7 +56,7 @@ public class AddPAP extends PAPManagementCLI {
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
         String[] args = commandLine.getArgs();
 
-        if ((args.length != 5) && (args.length != 6) && (args.length != 2)) {
+        if ((args.length != 4) && (args.length != 2)) {
             throw new ParseException("Wrong number of arguments");
         }
 
@@ -79,21 +82,20 @@ public class AddPAP extends PAPManagementCLI {
         }
 
         String alias = args[1];
+        String protocol = null;
         String dn = null;
         String host = null;
         String port = null;
         String path = null;
 
         if (args.length != 2) {
-            dn = args[2];
-            host = args[3];
-            port = args[4];
-            if (args.length == 6) {
-                path = args[5];
-            }
+            protocol = getProtocol(args[2]);
+            host = getHostname(args[2]);
+            port = getPort(args[2]);
+            path = getPath(args[2]);
         }
-
-        PAP pap = new PAP(alias, pstype, dn, host, port, path, isPublic);
+        
+        PAP pap = new PAP(alias, pstype, dn, host, port, path, protocol, isPublic);
 
         String msg = "Adding trusted PAP: ";
 
@@ -121,9 +123,83 @@ public class AddPAP extends PAPManagementCLI {
         papMgmtClient.addPAP(papData);
 
         if (verboseMode) {
-            System.out.println("Success: new trusted PAP has been added.");
+            System.out.println("Success: new pap has been added.");
         }
 
         return ExitStatus.SUCCESS.ordinal();
+    }
+
+    protected static String getHostname(String endpoint) {
+
+        int start = endpoint.indexOf("://");
+        
+        if (start == -1) {
+            start = 0;
+        } else {
+            start +=3;
+        }
+        
+        int end = endpoint.indexOf(':', start);
+        
+        if (end == -1) {
+            end = endpoint.length();
+        }
+
+        return endpoint.substring(start, end);
+    }
+    
+    protected static String getPath(String endpoint) {
+        int start = endpoint.indexOf("://");
+        
+        if (start == -1) {
+            start = 0;
+        } else {
+            start +=3;
+        }
+        
+        start = endpoint.indexOf('/', start);
+        
+        
+        if (start == -1) {
+            return null;
+        }
+        
+        int end = endpoint.length();
+        
+        return endpoint.substring(start, end);
+    }
+    
+    protected static String getPort(String endpoint) {
+        int start = endpoint.indexOf("://");
+        
+        if (start == -1) {
+            start = 0;
+        } else {
+            start +=3;
+        }
+        
+        start = endpoint.indexOf(':', start);
+        
+        int end = endpoint.indexOf('/', start);
+        
+        if (start == -1) {
+            return null;
+        }
+        
+        if (end == -1) {
+            end = endpoint.length();
+        }
+        
+        return endpoint.substring(start, end);
+    }
+    
+    protected static String getProtocol(String endpoint) {
+
+        int index = endpoint.indexOf("://");
+
+        if (index == -1) {
+            return null;
+        }
+        return endpoint.substring(0, index);
     }
 }
