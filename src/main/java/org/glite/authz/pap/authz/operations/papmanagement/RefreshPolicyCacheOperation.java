@@ -6,7 +6,7 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.distribution.DistributionModule;
-import org.glite.authz.pap.distribution.PAPManager;
+import org.glite.authz.pap.papmanagement.PAPManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 public class RefreshPolicyCacheOperation extends BasePAPOperation<Boolean> {

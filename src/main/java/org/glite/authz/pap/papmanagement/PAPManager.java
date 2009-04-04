@@ -1,4 +1,4 @@
-package org.glite.authz.pap.distribution;
+package org.glite.authz.pap.papmanagement;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.distribution.DistributionConfiguration;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;

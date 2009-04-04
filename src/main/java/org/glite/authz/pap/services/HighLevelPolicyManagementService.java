@@ -9,7 +9,7 @@ import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.PurgeOpera
 import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.UnbanOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
-import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.papmanagement.PAPContainer;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.slf4j.Logger;

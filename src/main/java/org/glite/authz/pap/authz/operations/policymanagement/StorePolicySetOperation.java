@@ -6,8 +6,8 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
-import org.glite.authz.pap.distribution.PAPManager;
-import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.papmanagement.PAPContainer;
+import org.glite.authz.pap.papmanagement.PAPManager;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicySetType;
 

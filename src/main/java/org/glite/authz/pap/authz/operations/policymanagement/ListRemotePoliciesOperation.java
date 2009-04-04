@@ -6,7 +6,7 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.papmanagement.PAPContainer;
 import org.opensaml.xacml.policy.PolicyType;
 
 public class ListRemotePoliciesOperation extends BasePAPOperation<PolicyType[]> {

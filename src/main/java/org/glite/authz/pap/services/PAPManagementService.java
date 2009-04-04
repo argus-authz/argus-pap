@@ -13,7 +13,7 @@ import org.glite.authz.pap.authz.operations.papmanagement.TrustedPAPExistsOperat
 import org.glite.authz.pap.authz.operations.papmanagement.UpdateTrustedPAPOperation;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPVersion;
-import org.glite.authz.pap.distribution.PAPManagerException;
+import org.glite.authz.pap.papmanagement.PAPManagerException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.slf4j.Logger;

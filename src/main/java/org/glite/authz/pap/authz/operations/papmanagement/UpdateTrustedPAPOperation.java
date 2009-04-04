@@ -4,8 +4,8 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.distribution.PAPManager;
-import org.glite.authz.pap.distribution.PAPManagerException;
+import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PAPManagerException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 

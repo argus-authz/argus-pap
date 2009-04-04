@@ -1,4 +1,4 @@
-package org.glite.authz.pap.repository;
+package org.glite.authz.pap.papmanagement;
 
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -12,6 +12,7 @@ import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;

@@ -28,8 +28,8 @@ import org.glite.authz.pap.authz.operations.policymanagement.StorePolicySetOpera
 import org.glite.authz.pap.authz.operations.policymanagement.UpdatePolicyOperation;
 import org.glite.authz.pap.authz.operations.policymanagement.UpdatePolicySetOperation;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.distribution.PAPManager;
-import org.glite.authz.pap.repository.PAPContainer;
+import org.glite.authz.pap.papmanagement.PAPContainer;
+import org.glite.authz.pap.papmanagement.PAPManager;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;

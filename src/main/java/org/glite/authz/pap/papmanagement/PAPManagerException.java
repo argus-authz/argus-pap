@@ -1,4 +1,4 @@
-package org.glite.authz.pap.distribution;
+package org.glite.authz.pap.papmanagement;
 
 public class PAPManagerException extends RuntimeException {
 
