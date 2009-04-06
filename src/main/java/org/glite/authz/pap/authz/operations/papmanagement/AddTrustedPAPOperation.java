@@ -6,7 +6,6 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
 public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
@@ -14,13 +13,13 @@ public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
     Pap pap;
     
     
-    protected AddTrustedPAPOperation(PAPData pap) {
+    protected AddTrustedPAPOperation(Pap pap) {
 
-        this.pap = new Pap(pap);
+        this.pap = pap;
         
     }
     
-    public static AddTrustedPAPOperation instance(PAPData pap) {
+    public static AddTrustedPAPOperation instance(Pap pap) {
 
         return new AddTrustedPAPOperation(pap);
     }

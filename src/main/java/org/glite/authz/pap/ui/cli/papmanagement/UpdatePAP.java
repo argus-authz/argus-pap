@@ -7,7 +7,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class UpdatePAP extends PAPManagementCLI {
 
@@ -53,21 +52,21 @@ public class UpdatePAP extends PAPManagementCLI {
             throw new ParseException("Wrong number of arguments");
         }
 
-        Pap.PapType pstype;
+        boolean isLocal;
         boolean isPublic = false;
 
         if (args.length != 2) {
-            pstype = Pap.PapType.REMOTE;
+            isLocal = false;
         } else {
-            pstype = Pap.PapType.LOCAL;
+            isLocal = true;
         }
 
         if (commandLine.hasOption(OPT_LOCAL)) {
-            pstype = Pap.PapType.LOCAL;
+            isLocal = true;
         }
 
         if (commandLine.hasOption(OPT_REMOTE)) {
-            pstype = Pap.PapType.REMOTE;
+            isLocal = true;
         }
 
         if (commandLine.hasOption(LOPT_PUBLIC)) {
@@ -88,7 +87,7 @@ public class UpdatePAP extends PAPManagementCLI {
             path = AddPAP.getPath(args[2]);
         }
         
-        Pap pap = new Pap(alias, pstype, dn, host, port, path, protocol, isPublic);
+        Pap pap = new Pap(alias, isLocal, dn, host, port, path, protocol, isPublic);
 
         String msg = "Updating PAP: ";
 
@@ -101,19 +100,7 @@ public class UpdatePAP extends PAPManagementCLI {
             return ExitStatus.FAILURE.ordinal();
         }
 
-        PAPData papData = new PAPData();
-
-        papData.setAlias(pap.getAlias());
-        papData.setType(pstype.toString());
-        papData.setDn(pap.getDn());
-        papData.setHostname(pap.getHostname());
-        papData.setId(pap.getId());
-        papData.setPath(pap.getPath());
-        papData.setPort(pap.getPort());
-        papData.setProtocol(pap.getProtocol());
-        papData.setVisibilityPublic(pap.isVisibilityPublic());
-
-        papMgmtClient.updatePAP(papData);
+        papMgmtClient.updatePAP(pap);
 
         if (verboseMode) {
             System.out.println("Success: pap has been updated.");

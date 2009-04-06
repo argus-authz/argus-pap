@@ -132,6 +132,7 @@
                 <nsExclude>
                   urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol
                 </nsExclude>
+                <nsExclude>http://org.glite.authz/wsdl/pap/services/pap_management/pap</nsExclude>
               </nsExcludes>
 
               <!-- *********** Mappings ********** -->
@@ -171,6 +172,10 @@
                   <targetPackage>
                     org.glite.authz.pap.services.provisioning.axis_skeletons
                   </targetPackage>
+                </mapping>
+                <mapping>
+                  <namespace>http://org.glite.authz/wsdl/pap/services/pap_management/pap</namespace>
+                  <targetPackage>org.glite.authz.pap.common</targetPackage>
                 </mapping>
                 <mapping>
                   <namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os

@@ -7,10 +7,9 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
-public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
+public class ListTrustedPAPsOperation extends BasePAPOperation<Pap[]> {
 
     
     
@@ -27,31 +26,17 @@ public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
     
     
     @Override
-    protected PAPData[] doExecute() {
+    protected Pap[] doExecute() {
         
         List<Pap> remotePapList = PapManager.getInstance().getAllPaps();
         
-        PAPData[] papDataArray = new PAPData[remotePapList.size()];
+        Pap[] papArray = new Pap[remotePapList.size()];
         
-        for (int i=0; i<papDataArray.length; i++) {
-            Pap pap = remotePapList.get(i);
-            
-            PAPData papData = new PAPData();
-            
-            papData.setAlias(pap.getAlias());
-            papData.setType(pap.getTypeAsString());
-            papData.setDn(pap.getDn());
-            papData.setHostname(pap.getHostname());
-            papData.setId(pap.getId());
-            papData.setPath(pap.getPath());
-            papData.setPort(pap.getPort());
-            papData.setProtocol(pap.getProtocol());
-            papData.setVisibilityPublic(pap.isVisibilityPublic());
-            
-            papDataArray[i] = papData;
+        for (int i=0; i<papArray.length; i++) {
+            papArray[i] = remotePapList.get(i);
         }
 
-        return papDataArray;
+        return papArray;
     }
 
     @Override

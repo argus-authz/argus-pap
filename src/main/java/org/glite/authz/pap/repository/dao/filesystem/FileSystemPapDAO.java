@@ -252,7 +252,7 @@ public class FileSystemPapDAO implements PapDAO {
         String id = papsINIFile.getString(idKey(papAlias));
         boolean visibilityPublic = papsINIFile.getBoolean(visibilityPublicKey(papAlias));
 
-        Pap pap = new Pap(papAlias, Pap.PapType.fromString(type), dn, host, port, path, protocol, visibilityPublic);
+        Pap pap = new Pap(papAlias, Pap.isLocal(type), dn, host, port, path, protocol, visibilityPublic);
         pap.setId(id);
         
         long policyLastModificationTime;
@@ -312,7 +312,7 @@ public class FileSystemPapDAO implements PapDAO {
 
         String papAlias = pap.getAlias();
 
-        papsINIFile.setProperty(typeKey(papAlias), pap.getType().toString());
+        papsINIFile.setProperty(typeKey(papAlias), pap.getTypeAsString());
         papsINIFile.setProperty(dnKey(papAlias), pap.getDn());
         papsINIFile.setProperty(hostnameKey(papAlias), pap.getHostname());
         papsINIFile.setProperty(portKey(papAlias), pap.getPort());

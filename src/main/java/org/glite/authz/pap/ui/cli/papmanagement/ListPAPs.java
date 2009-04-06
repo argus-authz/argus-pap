@@ -7,7 +7,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class ListPAPs extends PAPManagementCLI {
 
@@ -39,18 +38,31 @@ public class ListPAPs extends PAPManagementCLI {
         if (commandLine.hasOption(OPT_LONGLIST_FORMAT))
             logListFormat = true;
 
-        PAPData[] papDataArray = papMgmtClient.getAllPAPs();
+        Pap[] papArray = papMgmtClient.getAllPAPs();
 
-        if (papDataArray.length == 0) {
+        if (papArray.length == 0) {
             System.out.println("No remote PAPs has been found.");
             return ExitStatus.SUCCESS.ordinal();
         }
 
-        for (PAPData papData : papDataArray) {
+        for (Pap pap : papArray) {
             if (logListFormat)
-                System.out.println((new Pap(papData)).toFormattedString());
-            else
-                System.out.println(String.format("alias = %s (%s)", papData.getAlias(), papData.getType()));
+                System.out.println(pap.toFormattedString());
+            else {
+                String visibility;
+                
+                if (pap.isVisibilityPublic()) {
+                    visibility = "public";
+                } else {
+                    visibility = "private";
+                }
+                
+                if (pap.isLocal()) {
+                    System.out.println(String.format("alias = %s (%s, %s)", pap.getAlias(), pap.getTypeAsString(), visibility));
+                } else {
+                    System.out.println(String.format("alias = %s (%s, %s, %s)", pap.getAlias(), pap.getTypeAsString(), visibility, pap.getEndpoint()));
+                }
+            }
         }
 
         return ExitStatus.SUCCESS.ordinal();

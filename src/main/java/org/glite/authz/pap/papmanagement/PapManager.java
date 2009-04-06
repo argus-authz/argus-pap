@@ -5,14 +5,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.distribution.DistributionConfiguration;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PapDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
-import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,13 +66,8 @@ public class PapManager {
         distributionConfiguration.savePAP(pap);
         papDAO.store(pap);
 
-        // create the root policy set
-        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getId(),
-                                                                         PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
-        rootPolicySet.setVersion("0");
-
         PapContainer papContainer = new PapContainer(pap);
-        papContainer.storePolicySet(rootPolicySet);
+        papContainer.createRootPolicySet();
     }
 
     public void deletePap(String papAlias) throws NotFoundException {
@@ -312,11 +305,10 @@ public class PapManager {
                     continue;
                 }
 
-                // PAP in the repository but must be updated with the
-                // information
-                // of the PAP found in configuration. The cache must be removed
-                // so we can delete the PAP and store it again
-                log.info("Settings for PAP \"" + papAlias + "\" has been updated. Invalidating cache");
+                // paps in the repository but must be updated with the information
+                // of the paps found in the configuration. Since the cache must be removed
+                // we can delete the pap and store it again
+                log.info("Settings for pap \"" + papAlias + "\" has been updated. Invalidating cache");
                 papDAO.delete(papAlias);
 
             } catch (NotFoundException e) {
@@ -324,6 +316,8 @@ public class PapManager {
             }
 
             papDAO.store(papFromConfiguration);
+            PapContainer papContainer = new PapContainer(papFromConfiguration);
+            papContainer.createRootPolicySet();
         }
 
         // remove from the repository PAPs that are not in the distribution

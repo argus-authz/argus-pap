@@ -5,10 +5,9 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
-public class GetTrustedPAPOperation extends BasePAPOperation<PAPData> {
+public class GetTrustedPAPOperation extends BasePAPOperation<Pap> {
 
     String papId;
     
@@ -23,23 +22,10 @@ public class GetTrustedPAPOperation extends BasePAPOperation<PAPData> {
     }
     
     @Override
-    protected PAPData doExecute() {
+    protected Pap doExecute() {
         
         Pap pap = PapManager.getInstance().getPap( papId );
-        
-        PAPData papData = new PAPData();
-        
-        papData.setAlias(pap.getAlias());
-        papData.setType(pap.getTypeAsString());
-        papData.setDn(pap.getDn());
-        papData.setHostname(pap.getHostname());
-        papData.setId(pap.getId());
-        papData.setPath(pap.getPath());
-        papData.setPort(pap.getPort());
-        papData.setProtocol(pap.getProtocol());
-        papData.setVisibilityPublic(pap.isVisibilityPublic());
-
-        return papData;
+        return pap;
         
     }
 

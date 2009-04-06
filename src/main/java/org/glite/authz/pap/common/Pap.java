@@ -2,53 +2,25 @@ package org.glite.authz.pap.common;
 
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * 
  * This class provides information about a Policy Administration Point (PAP).
- *
+ * 
  */
 public class Pap {
-
-    /**
-     * 
-     * This PSType describes whether the Pap is a local or remote.
-     *
-     */
-    public static enum PapType {
-        
-        LOCAL, 
-        REMOTE;
-
-        public static PapType fromString(String type) {
-            if ("local".equals(type.toLowerCase())) {
-                return LOCAL;
-            }
-            if ("remote".equals(type.toLowerCase())) {
-                return REMOTE;
-            }
-            return LOCAL;
-        }
-
-        public String toString() {
-            return super.toString().toLowerCase();
-        }
-    }
-
-    public static String DEFAULT_DN = "invalid_dn";
 
     public static String DEFAULT_HOST = "localhost";
     public static final String DEFAULT_PAP_ALIAS = "default";
     public static String DEFAULT_PORT = "8150";
     public static String DEFAULT_PROTOCOL = "https";
-    public static String DEFAULT_SERVICES_ROOT_PATH = "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT+"/services/";
+    public static String DEFAULT_SERVICES_ROOT_PATH = "/" + PAPConfiguration.DEFAULT_WEBAPP_CONTEXT
+            + "/services/";
 
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(Pap.class);
-
     private String alias = null;
     private String dn = null;
     private String hostname = null;
@@ -57,39 +29,37 @@ public class Pap {
     private long policyLastModificationTimeInMillis = 0;
     private String port = null;
     private String protocol = null;
-    private PapType pstype = null;
+    private boolean local = true;
     private boolean visibilityPublic;
 
-    public Pap(PAPData papData) {
-        this(papData.getAlias(), PapType.fromString(papData.getType()), papData.getDn(), papData.getHostname(), papData.getPort(),
-             papData.getPath(), papData.getProtocol(), papData.isVisibilityPublic());
+    public Pap() {
     }
 
     public Pap(String alias) {
-        this(alias, PapType.LOCAL, null, null, null, null, null, false);
+        this(alias, true, null, null, null, null, null, false);
     }
-    
+
     public Pap(String alias, boolean visibilityPublic) {
-        this(alias, PapType.LOCAL, null, null, null, null, null, visibilityPublic);
+        this(alias, true, null, null, null, null, null, visibilityPublic);
     }
 
-    public Pap(String alias, PapType pstype, String dn, String hostname, String port, String servicesRootPath,
-            boolean visibilityPublic) {
-        this(alias, pstype, dn, hostname, port, servicesRootPath, null, visibilityPublic);
+    public Pap(String alias, boolean isLocal, String dn, String hostname, String port,
+            String servicesRootPath, boolean visibilityPublic) {
+        this(alias, isLocal, dn, hostname, port, servicesRootPath, null, visibilityPublic);
     }
 
-    public Pap(String alias, PapType pstype, String dn, String hostname, String port, String servicesRootPath, String protocol,
-            boolean visibilityPublic) {
+    public Pap(String alias, boolean isLocal, String dn, String hostname, String port,
+            String servicesRootPath, String protocol, boolean visibilityPublic) {
 
         assert (alias != null) && (alias.length() > 0) : "alias cannot be null or empty";
 
         this.alias = alias;
         this.visibilityPublic = visibilityPublic;
-        this.pstype = pstype;
+        this.local = isLocal;
 
         id = WizardUtils.generateId(alias);
 
-        if (pstype == PapType.REMOTE) {
+        if (!isLocal) {
             this.hostname = DEFAULT_HOST;
             this.port = DEFAULT_PORT;
             this.path = DEFAULT_SERVICES_ROOT_PATH;
@@ -113,11 +83,19 @@ public class Pap {
     }
 
     public Pap(String alias, String dn, String hostname, boolean isPublic) {
-        this(alias, PapType.REMOTE, dn, hostname, null, null, null, isPublic);
+        this(alias, false, dn, hostname, null, null, null, isPublic);
     }
 
-    public Pap(String alias, String dn, String hostname, String port, String servicesRootPath, boolean visibilityPublic) {
-        this(alias, PapType.REMOTE, dn, hostname, port, servicesRootPath, null, visibilityPublic);
+    public Pap(String alias, String dn, String hostname, String port, String servicesRootPath,
+            boolean visibilityPublic) {
+        this(alias, false, dn, hostname, port, servicesRootPath, null, visibilityPublic);
+    }
+
+    public static boolean isLocal(String type) {
+        if ("local".equals(type.toLowerCase())) {
+            return true;
+        }
+        return false;
     }
 
     public static Pap makeDefaultPAP() {
@@ -129,19 +107,19 @@ public class Pap {
         if (pap == null) {
             return false;
         }
-        
+
         if (!alias.equals(pap.getAlias())) {
             return false;
         }
-        
-        if (!(pstype == pap.getType())) {
+
+        if (!(local == pap.isLocal())) {
             return false;
         }
-        
+
         if (!(visibilityPublic == pap.isVisibilityPublic())) {
             return false;
         }
-        
+
         if (dn != null) {
             if (!dn.equals(pap.getDn())) {
                 return false;
@@ -149,7 +127,7 @@ public class Pap {
         } else if (pap.getDn() != null) {
             return false;
         }
-        
+
         if (hostname != null) {
             if (!hostname.equals(pap.getHostname())) {
                 return false;
@@ -157,7 +135,7 @@ public class Pap {
         } else if (pap.getHostname() != null) {
             return false;
         }
-        
+
         if (port != null) {
             if (!port.equals(pap.getPort())) {
                 return false;
@@ -165,7 +143,7 @@ public class Pap {
         } else if (pap.getPort() != null) {
             return false;
         }
-        
+
         if (path != null) {
             if (!path.equals(pap.getPath())) {
                 return false;
@@ -173,7 +151,7 @@ public class Pap {
         } else if (pap.getPath() != null) {
             return false;
         }
-        
+
         if (protocol != null) {
             if (!protocol.equals(pap.getProtocol())) {
                 return false;
@@ -210,7 +188,7 @@ public class Pap {
     }
 
     public String getPolicyLastModificationTimeInSecondsString() {
-        return String.valueOf( policyLastModificationTimeInMillis / 1000 );
+        return String.valueOf(policyLastModificationTimeInMillis / 1000);
     }
 
     public String getPort() {
@@ -221,26 +199,19 @@ public class Pap {
         return protocol;
     }
 
-    public PapType getType() {
-        return pstype;
-    }
-
     public String getTypeAsString() {
-        return pstype.toString();
+        if (local) {
+            return "local";
+        }
+        return "remote";
     }
 
     public boolean isLocal() {
-        if (pstype == PapType.LOCAL) {
-            return true;
-        }
-        return false;
+        return local;
     }
 
     public boolean isRemote() {
-        if (pstype == PapType.REMOTE) {
-            return true;
-        }
-        return false;
+        return !local;
     }
 
     public boolean isVisibilityPublic() {
@@ -263,6 +234,10 @@ public class Pap {
         this.id = papId;
     }
 
+    public void setLocal(boolean local) {
+        this.local = local;
+    }
+
     public void setPath(String path) {
         this.path = path;
     }
@@ -283,10 +258,6 @@ public class Pap {
         this.visibilityPublic = isPublic;
     }
 
-    public void setType(PapType pstype) {
-        this.pstype = pstype;
-    }
-
     public void setVisibilityPublic(boolean visibilityPublic) {
         this.visibilityPublic = visibilityPublic;
     }
@@ -300,10 +271,10 @@ public class Pap {
     }
 
     /**
-     * Returns a formatted version of this PAP 
+     * Returns a formatted version of this PAP
      * 
-     * @param indent, the indentation to be used
-     * @param padding, the padding to be used
+     * @param indent , the indentation to be used
+     * @param padding , the padding to be used
      * @return the formatted String representing this PAP
      * 
      */
@@ -320,18 +291,18 @@ public class Pap {
         }
 
         String aliasString = String.format("%salias=%s\n", indentString, alias);
-        String typeString = String.format("%stype=%s\n", paddingString, pstype);
+        String typeString = String.format("%sisLocal=%b\n", paddingString, local);
         String visibilityString = String.format("%svisibility=%s\n", paddingString, visibility);
 
         String dnString = String.format("%sdn=%s\n", paddingString, dn);
         String endpointString = String.format("%sendpoint=%s\n", paddingString, getEndpoint());
 
-        if (pstype == PapType.LOCAL) {
-            
+        if (local) {
+
             if (dn == null) {
                 dnString = "";
             }
-            
+
             if ((hostname == null) && (port == null)) {
                 endpointString = "";
             }
@@ -342,16 +313,16 @@ public class Pap {
 
     @Override
     public String toString() {
-        String visibility = "visibility=";
+        String visibility;
 
         if (visibilityPublic) {
-            visibility += "public";
+            visibility = "public";
         } else {
-            visibility += "private";
+            visibility = "private";
         }
-        return String.format("alias=\"%s\" type=\"%s\" visibility=\"%s\" dn=\"%s\" endpoint=\"%s\" id=\"%s\"",
+        return String.format("alias=\"%s\" isLocal=\"%b\" visibility=\"%s\" dn=\"%s\" endpoint=\"%s\" id=\"%s\"",
                              alias,
-                             pstype,
+                             local,
                              visibility,
                              dn,
                              getEndpoint(),

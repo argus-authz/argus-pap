@@ -7,7 +7,6 @@ import java.util.List;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class RefreshCache extends PAPManagementCLI {
 
@@ -24,11 +23,11 @@ public class RefreshCache extends PAPManagementCLI {
     private List<String> getAllAliases() throws RemoteException {
         List<String> aliasList = new LinkedList<String>();
 
-        PAPData[] papDataArray = papMgmtClient.getAllPAPs();
+        Pap[] papArray = papMgmtClient.getAllPAPs();
 
-        for (PAPData papData : papDataArray) {
-            if (Pap.PapType.REMOTE.toString().equals(papData.getType())) {
-                aliasList.add(papData.getAlias());
+        for (Pap pap : papArray) {
+            if (pap.isRemote()) {
+                aliasList.add(pap.getAlias());
             }
         }
 

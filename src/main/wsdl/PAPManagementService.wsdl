@@ -2,31 +2,43 @@
 
 <wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	xmlns:tns="http://org.glite.authz/wsdl/pap/services/pap_management"
+	xmlns:papns="http://org.glite.authz/wsdl/pap/services/pap_management/pap"
 	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	name="PAPManagementService" targetNamespace="http://org.glite.authz/wsdl/pap/services/pap_management">
 
 	<wsdl:types>
 		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-			targetNamespace="http://org.glite.authz/wsdl/pap/services/pap_management">
-			<xsd:complexType name="PAPData">
+			targetNamespace="http://org.glite.authz/wsdl/pap/services/pap_management/pap">
+			<xsd:complexType name="Pap">
 				<xsd:sequence>
-					<xsd:element name="alias" type="xsd:string" maxOccurs="1" minOccurs="1"></xsd:element>
-					<xsd:element name="id" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="dn" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="hostname" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="port" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="path" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="protocol" type="xsd:string" maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="visibilityPublic"
-						type="xsd:boolean" maxOccurs="1" minOccurs="1">
+					<xsd:element name="alias" type="xsd:string" maxOccurs="1"
+						minOccurs="1"></xsd:element>
+					<xsd:element name="id" type="xsd:string" maxOccurs="1"
+						minOccurs="0"></xsd:element>
+					<xsd:element name="dn" type="xsd:string" maxOccurs="1"
+						minOccurs="0"></xsd:element>
+					<xsd:element name="hostname" type="xsd:string"
+						maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="port" type="xsd:string" maxOccurs="1"
+						minOccurs="0"></xsd:element>
+					<xsd:element name="path" type="xsd:string" maxOccurs="1"
+						minOccurs="0"></xsd:element>
+					<xsd:element name="protocol" type="xsd:string"
+						maxOccurs="1" minOccurs="0"></xsd:element>
+					<xsd:element name="visibilityPublic" type="xsd:boolean"
+						maxOccurs="1" minOccurs="1">
 					</xsd:element>
-					<xsd:element name="type" type="xsd:string" maxOccurs="1" minOccurs="1"></xsd:element>
+					<xsd:element name="local" type="xsd:boolean" maxOccurs="1"
+						minOccurs="1"></xsd:element>
 				</xsd:sequence>
 			</xsd:complexType>
-			<xsd:complexType name="PAPDataList">
+		</xsd:schema>
+		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+			targetNamespace="http://org.glite.authz/wsdl/pap/services/pap_management">
+			<xsd:complexType name="PapList">
 				<xsd:sequence>
-					<xsd:element name="papData" type="tns:PAPData"
-						maxOccurs="unbounded" minOccurs="0"></xsd:element>
+					<xsd:element name="papData" type="papns:Pap" maxOccurs="unbounded"
+						minOccurs="0"></xsd:element>
 				</xsd:sequence>
 			</xsd:complexType>
 			<xsd:complexType name="StringArray">
@@ -39,7 +51,7 @@
 	</wsdl:types>
 
 	<wsdl:message name="addPAPRequest">
-		<wsdl:part name="pap" type="tns:PAPData" />
+		<wsdl:part name="pap" type="papns:Pap" />
 	</wsdl:message>
 	<wsdl:message name="addPAPResponse">
 		<wsdl:part name="addPAPResponse" type="xsd:boolean" />
@@ -53,13 +65,13 @@
 	<wsdl:message name="getAllPAPsRequest">
 	</wsdl:message>
 	<wsdl:message name="getAllPAPsResponse">
-		<wsdl:part name="getAllPAPsResponse" type="tns:PAPDataList"></wsdl:part>
+		<wsdl:part name="getAllPAPsResponse" type="tns:PapList"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="getPAPRequest">
 		<wsdl:part name="papAlias" type="xsd:string"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="getPAPResponse">
-		<wsdl:part name="getPAPResponse" type="tns:PAPData"></wsdl:part>
+		<wsdl:part name="getPAPResponse" type="papns:Pap"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="pingRequest">
 	</wsdl:message>
@@ -79,7 +91,7 @@
 		<wsdl:part name="removePAPResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePAPRequest">
-		<wsdl:part name="pap" type="tns:PAPData"></wsdl:part>
+		<wsdl:part name="pap" type="papns:Pap"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="updatePAPResponse">
 		<wsdl:part name="updatePAPResponse" type="xsd:boolean"></wsdl:part>
@@ -95,7 +107,7 @@
 	<wsdl:message name="setOrderResponse">
 		<wsdl:part name="setOrderResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
-	
+
 	<wsdl:portType name="PAPManagement">
 		<wsdl:operation name="addPAP">
 			<wsdl:input message="tns:addPAPRequest" />

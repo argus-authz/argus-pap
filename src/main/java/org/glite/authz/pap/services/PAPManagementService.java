@@ -11,10 +11,9 @@ import org.glite.authz.pap.authz.operations.papmanagement.RemoveTrustedPAPOperat
 import org.glite.authz.pap.authz.operations.papmanagement.SetOrderOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.TrustedPAPExistsOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.UpdateTrustedPAPOperation;
-import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPVersion;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManagerException;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,12 +22,12 @@ public class PAPManagementService implements PAPManagement {
 
     private static final Logger log = LoggerFactory.getLogger(PAPManagementService.class);
 
-    public boolean addPAP(PAPData papData) throws RemoteException {
+    public boolean addPAP(Pap pap) throws RemoteException {
         log.info("addTrustedPAP();");
 
         try {
 
-            return AddTrustedPAPOperation.instance(papData).execute();
+            return AddTrustedPAPOperation.instance(pap).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -50,7 +49,7 @@ public class PAPManagementService implements PAPManagement {
 
     }
 
-    public PAPData[] getAllPAPs() throws RemoteException {
+    public Pap[] getAllPAPs() throws RemoteException {
         log.info("listTrustedPAPs();");
         try {
 
@@ -73,7 +72,7 @@ public class PAPManagementService implements PAPManagement {
         }
     }
 
-    public PAPData getPAP(String papAlias) throws RemoteException {
+    public Pap getPAP(String papAlias) throws RemoteException {
         log.info("getTrustedPAP(" + papAlias + ");");
         try {
 
@@ -125,15 +124,15 @@ public class PAPManagementService implements PAPManagement {
         }
     }
 
-    public boolean updatePAP(PAPData papData) throws RemoteException {
-        log.info("updateTrustedPAP(" + papData.getAlias() + "," + papData + ");");
+    public boolean updatePAP(Pap pap) throws RemoteException {
+        log.info("updateTrustedPAP(" + pap.getAlias() + "," + pap + ");");
         try {
 
-            if (Pap.DEFAULT_PAP_ALIAS.equals(papData.getAlias())) {
+            if (Pap.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
                 throw new PapManagerException(String.format("Invalid request. \"%s\" cannot be updated", Pap.DEFAULT_PAP_ALIAS));
             }
 
-            return UpdateTrustedPAPOperation.instance(papData).execute();
+            return UpdateTrustedPAPOperation.instance(pap).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

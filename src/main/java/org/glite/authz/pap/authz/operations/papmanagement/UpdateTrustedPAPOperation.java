@@ -7,22 +7,19 @@ import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.papmanagement.PapManagerException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
 public class UpdateTrustedPAPOperation extends BasePAPOperation<Boolean> {
 
     Pap pap;
     
-    protected UpdateTrustedPAPOperation(PAPData papData){
-        
-        this.pap = new Pap(papData);
-        
+    protected UpdateTrustedPAPOperation(Pap pap){
+        this.pap = pap;
     }
         
-    public static UpdateTrustedPAPOperation instance(PAPData papData) {
+    public static UpdateTrustedPAPOperation instance(Pap pap) {
 
-        return new UpdateTrustedPAPOperation(papData);
+        return new UpdateTrustedPAPOperation(pap);
     }
     
     @Override
@@ -43,9 +40,6 @@ public class UpdateTrustedPAPOperation extends BasePAPOperation<Boolean> {
 
     @Override
     protected void setupPermissions() {
-
         addRequiredPermission( PAPPermission.of( PermissionFlags.CONFIGURATION_READ, PermissionFlags.CONFIGURATION_WRITE ) );
-
     }
-
 }

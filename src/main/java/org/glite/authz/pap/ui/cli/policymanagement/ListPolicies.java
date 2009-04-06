@@ -13,7 +13,6 @@ import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicySetWizardException;
-import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.ui.cli.CLIException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -147,29 +146,30 @@ public class ListPolicies extends PolicyManagementCLI {
         String[] papInfoArray = null;
 
         if (commandLine.hasOption(OPT_ALLPAPS)) {
-            PAPData[] papDataArray = papMgmtClient.getAllPAPs();
-            papAliasArray = new String[papDataArray.length];
-            for (int i = 0; i < papDataArray.length; i++) {
-                papAliasArray[i] = papDataArray[i].getAlias();
+            
+            Pap[] papArray = papMgmtClient.getAllPAPs();
+            papAliasArray = new String[papArray.length];
+            for (int i = 0; i < papArray.length; i++) {
+                papAliasArray[i] = papArray[i].getAlias();
             }
-            papInfoArray = getPAPInfoArray(papAliasArray, papDataArray);
+            papInfoArray = getPAPInfoArray(papAliasArray, papArray);
+            
         } else if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+            
             papAliasArray = commandLine.getOptionValues(OPT_PAPALIAS_LONG);
             papInfoArray = getPAPInfoArray(papAliasArray, null);
+            
         } else {
-            PAPData papData = new PAPData();
+            
+            Pap pap = new Pap(Pap.DEFAULT_PAP_ALIAS, true);
 
-            papData.setAlias(Pap.DEFAULT_PAP_ALIAS);
-            papData.setType(Pap.PapType.LOCAL.toString());
-            papData.setVisibilityPublic(true);
-
-            PAPData[] papDataArray = new PAPData[1];
-            papDataArray[0] = papData;
+            Pap[] papArray = new Pap[1];
+            papArray[0] = pap;
 
             papAliasArray = new String[1];
-            papAliasArray[0] = papData.getAlias();
+            papAliasArray[0] = pap.getAlias();
 
-            papInfoArray = getPAPInfoArray(papAliasArray, papDataArray);
+            papInfoArray = getPAPInfoArray(papAliasArray, papArray);
         }
 
         XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
@@ -189,7 +189,7 @@ public class ListPolicies extends PolicyManagementCLI {
         return ExitStatus.SUCCESS.ordinal();
     }
 
-    private String[] getPAPInfoArray(String[] papAliasArray, PAPData[] papDataArray) throws RemoteException {
+    private String[] getPAPInfoArray(String[] papAliasArray, Pap[] papArray) throws RemoteException {
 
         int size = papAliasArray.length;
         String[] papInfoArray = new String[size];
@@ -198,18 +198,18 @@ public class ListPolicies extends PolicyManagementCLI {
 
             String alias = papAliasArray[i];
 
-            PAPData papData;
+            Pap pap;
 
-            if (papDataArray != null) {
-                papData = papDataArray[i];
+            if (papArray != null) {
+                pap = papArray[i];
             } else {
-                papData = papMgmtClient.getPAP(alias);
+                pap = papMgmtClient.getPAP(alias);
             }
 
-            if (Pap.PapType.LOCAL.toString().equals(papData.getType())) {
-                papInfoArray[i] = String.format("%s (local):", papData.getAlias());
+            if (pap.isLocal()) {
+                papInfoArray[i] = String.format("%s (local):", pap.getAlias());
             } else {
-                papInfoArray[i] = String.format("%s (%s:%s):", papData.getAlias(), papData.getHostname(), papData.getPort());
+                papInfoArray[i] = String.format("%s (%s:%s):", pap.getAlias(), pap.getHostname(), pap.getPort());
             }
         }
         return papInfoArray;
