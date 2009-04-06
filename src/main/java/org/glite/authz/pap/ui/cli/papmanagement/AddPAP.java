@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class AddPAP extends PAPManagementCLI {
@@ -16,9 +16,9 @@ public class AddPAP extends PAPManagementCLI {
             + "<alias> is a friendly name (it has to be unique) used to identify the PAP\n"
             + "<endpoint> endpoint of the pap in the following format: [<protocol>://]<host>:[<port>/[path]]\n"
             + "<dn> DN of the PAP\n" + "<host> hostname of the PAP machine\n";
-    private static final String LONG_DESCRIPTION = "Default protocol is: " + PAP.DEFAULT_PROTOCOL + "\n"
-            + "Default port is: " + PAP.DEFAULT_PORT + "\n"
-            + "Default path is: " + PAP.DEFAULT_SERVICES_ROOT_PATH + "\n"
+    private static final String LONG_DESCRIPTION = "Default protocol is: " + Pap.DEFAULT_PROTOCOL + "\n"
+            + "Default port is: " + Pap.DEFAULT_PORT + "\n"
+            + "Default path is: " + Pap.DEFAULT_SERVICES_ROOT_PATH + "\n"
     		+ "Example:\n" + "\t pap-admin " + commandNameValues[0]
             + " cnaf_pap test.cnaf.infn.it \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\"";
     private static final String LOPT_PRIVATE = "private";
@@ -60,21 +60,21 @@ public class AddPAP extends PAPManagementCLI {
             throw new ParseException("Wrong number of arguments");
         }
 
-        PAP.PSType pstype;
+        Pap.PapType pstype;
         boolean isPublic = false;
 
         if (args.length != 2) {
-            pstype = PAP.PSType.REMOTE;
+            pstype = Pap.PapType.REMOTE;
         } else {
-            pstype = PAP.PSType.LOCAL;
+            pstype = Pap.PapType.LOCAL;
         }
 
         if (commandLine.hasOption(OPT_LOCAL)) {
-            pstype = PAP.PSType.LOCAL;
+            pstype = Pap.PapType.LOCAL;
         }
 
         if (commandLine.hasOption(OPT_REMOTE)) {
-            pstype = PAP.PSType.REMOTE;
+            pstype = Pap.PapType.REMOTE;
         }
 
         if (commandLine.hasOption(LOPT_PUBLIC)) {
@@ -95,7 +95,7 @@ public class AddPAP extends PAPManagementCLI {
             path = getPath(args[2]);
         }
         
-        PAP pap = new PAP(alias, pstype, dn, host, port, path, protocol, isPublic);
+        Pap pap = new Pap(alias, pstype, dn, host, port, path, protocol, isPublic);
 
         String msg = "Adding trusted PAP: ";
 
@@ -114,7 +114,7 @@ public class AddPAP extends PAPManagementCLI {
         papData.setType(pstype.toString());
         papData.setDn(pap.getDn());
         papData.setHostname(pap.getHostname());
-        papData.setId(pap.getPapId());
+        papData.setId(pap.getId());
         papData.setPath(pap.getPath());
         papData.setPort(pap.getPort());
         papData.setProtocol(pap.getProtocol());

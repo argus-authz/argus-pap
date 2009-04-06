@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class UpdatePAP extends PAPManagementCLI {
@@ -53,21 +53,21 @@ public class UpdatePAP extends PAPManagementCLI {
             throw new ParseException("Wrong number of arguments");
         }
 
-        PAP.PSType pstype;
+        Pap.PapType pstype;
         boolean isPublic = false;
 
         if (args.length != 2) {
-            pstype = PAP.PSType.REMOTE;
+            pstype = Pap.PapType.REMOTE;
         } else {
-            pstype = PAP.PSType.LOCAL;
+            pstype = Pap.PapType.LOCAL;
         }
 
         if (commandLine.hasOption(OPT_LOCAL)) {
-            pstype = PAP.PSType.LOCAL;
+            pstype = Pap.PapType.LOCAL;
         }
 
         if (commandLine.hasOption(OPT_REMOTE)) {
-            pstype = PAP.PSType.REMOTE;
+            pstype = Pap.PapType.REMOTE;
         }
 
         if (commandLine.hasOption(LOPT_PUBLIC)) {
@@ -88,7 +88,7 @@ public class UpdatePAP extends PAPManagementCLI {
             path = AddPAP.getPath(args[2]);
         }
         
-        PAP pap = new PAP(alias, pstype, dn, host, port, path, protocol, isPublic);
+        Pap pap = new Pap(alias, pstype, dn, host, port, path, protocol, isPublic);
 
         String msg = "Updating PAP: ";
 
@@ -107,7 +107,7 @@ public class UpdatePAP extends PAPManagementCLI {
         papData.setType(pstype.toString());
         papData.setDn(pap.getDn());
         papData.setHostname(pap.getHostname());
-        papData.setId(pap.getPapId());
+        papData.setId(pap.getId());
         papData.setPath(pap.getPath());
         papData.setPort(pap.getPort());
         papData.setProtocol(pap.getProtocol());

@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.distribution.exceptions.AliasNotFoundException;
 import org.glite.authz.pap.distribution.exceptions.DistributionConfigurationException;
@@ -103,20 +103,20 @@ public class DistributionConfiguration {
         return pollIntervalInSecs * 1000;
     }
 
-    public PAP[] getRemotePAPArray() {
+    public Pap[] getRemotePAPArray() {
 
         Set<String> aliasSet = getAliasSet();
 
-        PAP[] papArray = new PAP[aliasSet.size()];
+        Pap[] papArray = new Pap[aliasSet.size()];
 
         int idx = 0;
         for (String papAlias : aliasSet) {
 
-            if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
+            if (Pap.DEFAULT_PAP_ALIAS.equals(papAlias)) {
                 continue;
             }
 
-            PAP pap = getPAPFromProperties(papAlias);
+            Pap pap = getPAPFromProperties(papAlias);
             papArray[idx] = pap;
             idx++;
 
@@ -154,7 +154,7 @@ public class DistributionConfiguration {
         papConfiguration.saveStartupConfiguration();
     }
 
-    public void savePAP(PAP pap) {
+    public void savePAP(Pap pap) {
         setPAPProperties(pap);
         papConfiguration.saveStartupConfiguration();
     }
@@ -194,7 +194,7 @@ public class DistributionConfiguration {
         if (isEmpty(alias))
             return false;
 
-        if (PAP.DEFAULT_PAP_ALIAS.equals(alias)) {
+        if (Pap.DEFAULT_PAP_ALIAS.equals(alias)) {
             return true;
         }
 
@@ -237,22 +237,22 @@ public class DistributionConfiguration {
         return aliasSet;
     }
 
-    private PAP getPAPFromProperties(String papAlias) {
+    private Pap getPAPFromProperties(String papAlias) {
 
         String type = papConfiguration.getString(typeKey(papAlias));
         if (type == null) {
             throw new DistributionConfigurationException("\"type\" is not set for remote PAP \"" + papAlias + "\"");
         }
         
-        PAP.PSType pstype = PAP.PSType.fromString(type);
+        Pap.PapType pstype = Pap.PapType.fromString(type);
         
         String dn = papConfiguration.getString(dnKey(papAlias));
-        if ((dn == null) && (pstype == PAP.PSType.REMOTE)) {
+        if ((dn == null) && (pstype == Pap.PapType.REMOTE)) {
             throw new DistributionConfigurationException("DN is not set for remote PAP \"" + papAlias + "\"");
         }
 
         String hostname = papConfiguration.getString(hostnameKey(papAlias));
-        if ((hostname == null) && (pstype == PAP.PSType.REMOTE)) {
+        if ((hostname == null) && (pstype == Pap.PapType.REMOTE)) {
             throw new DistributionConfigurationException("\"hostname\" is not set for remote PAP \"" + papAlias + "\"");
         }
         
@@ -262,7 +262,7 @@ public class DistributionConfiguration {
         boolean visibilityPublic = papConfiguration.getBoolean(visibilityPublicKey(papAlias));
 
         // port, path and protocol can be null or empty
-        return new PAP(papAlias, pstype, dn, hostname, port, path, protocol, visibilityPublic);
+        return new Pap(papAlias, pstype, dn, hostname, port, path, protocol, visibilityPublic);
     }
 
     private boolean isEmpty(String s) {
@@ -273,7 +273,7 @@ public class DistributionConfiguration {
         return false;
     }
 
-    private void setPAPProperties(PAP pap) {
+    private void setPAPProperties(Pap pap) {
 
         String papAlias = pap.getAlias();
 

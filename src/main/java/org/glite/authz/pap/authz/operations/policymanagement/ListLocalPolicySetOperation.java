@@ -5,19 +5,19 @@ import java.util.List;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.opensaml.xacml.policy.PolicySetType;
 
 public class ListLocalPolicySetOperation extends BasePAPOperation<PolicySetType[]> {
 
-    private PAP ps;
+    private Pap ps;
 
-    private ListLocalPolicySetOperation(PAP ps) {
+    private ListLocalPolicySetOperation(Pap ps) {
         this.ps = ps;
     }
 
-    public static ListLocalPolicySetOperation instance(PAP ps) {
+    public static ListLocalPolicySetOperation instance(Pap ps) {
         return new ListLocalPolicySetOperation(ps);
     }
 

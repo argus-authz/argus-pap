@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.papmanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
@@ -11,12 +11,12 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
 
-    PAP pap;
+    Pap pap;
     
     
     protected AddTrustedPAPOperation(PAPData pap) {
 
-        this.pap = new PAP(pap);
+        this.pap = new Pap(pap);
         
     }
     
@@ -33,7 +33,7 @@ public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
         
         try {
             
-            PapManager.getInstance().addPAP( pap );
+            PapManager.getInstance().addPap( pap );
             
         } catch (AlreadyExistsException e) {
             return false;

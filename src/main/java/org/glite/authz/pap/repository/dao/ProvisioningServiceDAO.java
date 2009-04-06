@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -41,7 +42,7 @@ public class ProvisioningServiceDAO {
 
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        List<PapContainer> papContainerList = new ArrayList<PapContainer>(PapContainer.getContainers(papManager.getPublicPAPs()));
+        List<PapContainer> papContainerList = new ArrayList<PapContainer>(PapContainer.getContainers(papManager.getPublicPaps()));
         
         PolicySetType rootPolicySet = makeRootPolicySet();
         resultList.add(rootPolicySet);
@@ -95,7 +96,7 @@ public class ProvisioningServiceDAO {
 
         resultList.add(rootPolicySet);
 
-        List<PapContainer> papContainerList = PapContainer.getContainers(papManager.getAllPAPs());
+        List<PapContainer> papContainerList = PapContainer.getContainers(papManager.getAllPaps());
 
         // Add references to the remote PAPs
         for (PapContainer papContainer : papContainerList) {
@@ -207,18 +208,18 @@ public class ProvisioningServiceDAO {
             }
         }
 
-        log.debug("Adding " + resultPolicySetList.size() + " PolicySet elements from PAP \"" + papContainer.getPAP().getPapId()
+        log.debug("Adding " + resultPolicySetList.size() + " PolicySet elements from PAP \"" + papContainer.getPAP().getId()
                 + "\"");
         resultList.addAll(resultPolicySetList);
 
-        log.debug("Adding " + policyList.size() + " Policy elements from PAP \"" + papContainer.getPAP().getPapId() + "\"");
+        log.debug("Adding " + policyList.size() + " Policy elements from PAP \"" + papContainer.getPAP().getId() + "\"");
         resultList.addAll(resultPolicyList);
 
         return resultList;
     }
 
     private PolicySetType makeRootPolicySet() {
-    	String rootPolicySetId = "root-" + PapManager.getInstance().getDefaultPAP().getPapId();
+    	String rootPolicySetId = "root-" + PapManager.getInstance().getPap(Pap.DEFAULT_PAP_ALIAS).getId();
         PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(rootPolicySetId,
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         rootPolicySet.setVersion(RepositoryManager.getVersion());

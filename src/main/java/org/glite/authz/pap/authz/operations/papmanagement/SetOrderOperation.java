@@ -20,7 +20,7 @@ public class SetOrderOperation extends BasePAPOperation<Boolean> {
     @Override
     protected Boolean doExecute() {
 
-        PapManager.getInstance().setPAPOrder(aliasArray);
+        PapManager.getInstance().setPapOrdering(aliasArray);
         return true;
 
     }

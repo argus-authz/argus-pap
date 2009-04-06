@@ -6,6 +6,7 @@ import java.util.NoSuchElementException;
 import javax.servlet.ServletContext;
 
 import org.glite.authz.pap.authz.AuthorizationEngine;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.PAPVersion;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
@@ -37,13 +38,13 @@ public final class PAPService {
         PapManager papManager = PapManager.getInstance();
 
         // Property: number of local policies
-        int numberOfLocalPolicies = papManager.getDefaultPAPContainer().getNumberOfPolicies();
+        int numberOfLocalPolicies = papManager.getPapContainer(Pap.DEFAULT_PAP_ALIAS).getNumberOfPolicies();
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME,
                 numberOfLocalPolicies);
 
         // Property: number of remote policies
         int numOfRemotePolicies = 0;
-        for (PapContainer papContainer : PapContainer.getContainers(papManager.getOrderedRemotePAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(papManager.getOrderedRemotePaps())) {
             numOfRemotePolicies += papContainer.getNumberOfPolicies();
         }
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME,
@@ -54,7 +55,7 @@ public final class PAPService {
                 numberOfLocalPolicies + numOfRemotePolicies);
 
         // Property: policy last modification time
-        String policyLastModificationTimeString = papManager.getDefaultPAP().getPolicyLastModificationTimeInSecondsString();
+        String policyLastModificationTimeString = papManager.getPap(Pap.DEFAULT_PAP_ALIAS).getPolicyLastModificationTimeInSecondsString();
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
                 policyLastModificationTimeString);
     }

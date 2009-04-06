@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.papmanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
@@ -25,7 +25,7 @@ public class GetTrustedPAPOperation extends BasePAPOperation<PAPData> {
     @Override
     protected PAPData doExecute() {
         
-        PAP pap = PapManager.getInstance().getPAP( papId );
+        Pap pap = PapManager.getInstance().getPap( papId );
         
         PAPData papData = new PAPData();
         
@@ -33,7 +33,7 @@ public class GetTrustedPAPOperation extends BasePAPOperation<PAPData> {
         papData.setType(pap.getTypeAsString());
         papData.setDn(pap.getDn());
         papData.setHostname(pap.getHostname());
-        papData.setId(pap.getPapId());
+        papData.setId(pap.getId());
         papData.setPath(pap.getPath());
         papData.setPort(pap.getPort());
         papData.setProtocol(pap.getProtocol());

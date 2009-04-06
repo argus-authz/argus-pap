@@ -14,7 +14,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.exceptions.PAPException;
 
 public abstract class ServiceCLI {
@@ -42,7 +42,7 @@ public abstract class ServiceCLI {
     private static final String OPT_CERT_LONG = "cert";
 
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). "
-            + "This option defines the PAP endpoint to be contacted as follows: https://arg:port" + PAP.DEFAULT_SERVICES_ROOT_PATH;
+            + "This option defines the PAP endpoint to be contacted as follows: https://arg:port" + Pap.DEFAULT_SERVICES_ROOT_PATH;
     private static final String OPT_HOST_LONG = "host";
 
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
@@ -53,7 +53,7 @@ public abstract class ServiceCLI {
 
     private static final String OPT_PORT = "p";
     private static final String OPT_PORT_DESCRIPTION = "Specifies the port on which the target PAP is listening "
-            + "(default is " + PAP.DEFAULT_PORT + ")";
+            + "(default is " + Pap.DEFAULT_PORT + ")";
     private static final String OPT_PORT_LONG = "port";
 
     private static final String OPT_URL_LONG = "url";
@@ -143,8 +143,8 @@ public abstract class ServiceCLI {
 
         } else {
 
-            String host = PAP.DEFAULT_HOST;
-            String port = PAP.DEFAULT_PORT;
+            String host = Pap.DEFAULT_HOST;
+            String port = Pap.DEFAULT_PORT;
 
             if (commandLine.hasOption(OPT_HOST_LONG))
                 host = commandLine.getOptionValue(OPT_HOST_LONG);
@@ -155,7 +155,7 @@ public abstract class ServiceCLI {
             serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL,
                                                           host,
                                                           port,
-                                                          PAP.DEFAULT_SERVICES_ROOT_PATH));
+                                                          Pap.DEFAULT_SERVICES_ROOT_PATH));
 
         }
 
@@ -263,9 +263,9 @@ public abstract class ServiceCLI {
                                        .withLongOpt(OPT_URL_LONG)
                                        .withDescription("Specifies the target PAP endpoint (default: "
                                                + String.format(DEFAULT_SERVICE_URL,
-                                                               PAP.DEFAULT_HOST,
-                                                               PAP.DEFAULT_PORT,
-                                                               PAP.DEFAULT_SERVICES_ROOT_PATH) + ").")
+                                                               Pap.DEFAULT_HOST,
+                                                               Pap.DEFAULT_PORT,
+                                                               Pap.DEFAULT_SERVICES_ROOT_PATH) + ").")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_HOST_LONG)

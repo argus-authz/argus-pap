@@ -6,7 +6,7 @@ import java.util.List;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
@@ -53,10 +53,10 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         unbanResult.setConflictingPolicies(new String[0]);
 
         if (alias == null) {
-            alias = PAP.DEFAULT_PAP_ALIAS;
+            alias = Pap.DEFAULT_PAP_ALIAS;
         }
 
-        PAP pap = PapManager.getInstance().getPAP(alias);
+        Pap pap = PapManager.getInstance().getPap(alias);
 
         if (pap.isRemote()) {
             throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");

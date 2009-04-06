@@ -5,7 +5,7 @@ import java.rmi.RemoteException;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.ui.cli.CLIException;
 
 public class Ping extends PAPManagementCLI {
@@ -13,9 +13,9 @@ public class Ping extends PAPManagementCLI {
     private static final String[] commandNameValues = { "ping" };
     private static final String DESCRIPTION = "Ping a PAP (default endpoint is: "
             + String.format(DEFAULT_SERVICE_URL,
-                            PAP.DEFAULT_HOST,
-                            PAP.DEFAULT_PORT,
-                            PAP.DEFAULT_SERVICES_ROOT_PATH) + ").";
+                            Pap.DEFAULT_HOST,
+                            Pap.DEFAULT_PORT,
+                            Pap.DEFAULT_SERVICES_ROOT_PATH) + ").";
     private static final String USAGE = "";
 
     public Ping() {

@@ -2,7 +2,7 @@ package org.glite.authz.pap.repository.dao;
 
 import java.util.List;
 
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 
 public interface PapDAO {
 
@@ -10,16 +10,16 @@ public interface PapDAO {
 
     public boolean exists(String papAlias);
 
-    public PAP get(String papAlias);
+    public Pap get(String papAlias);
 
-    public List<PAP> getAll();
+    public List<Pap> getAll();
     
     public String[] getAllAliases();
     
     public String getVersion();
     
-    public void store(PAP pap);
+    public void store(Pap pap);
 
-    public void update(PAP pap);
+    public void update(Pap pap);
 
 }

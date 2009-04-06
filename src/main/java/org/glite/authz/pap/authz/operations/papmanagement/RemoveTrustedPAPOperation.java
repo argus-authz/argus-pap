@@ -25,7 +25,7 @@ public class RemoveTrustedPAPOperation extends BasePAPOperation <Boolean> {
     protected Boolean doExecute() {
 
         try {
-            PapManager.getInstance().deletePAP( papAlias );
+            PapManager.getInstance().deletePap( papAlias );
         } catch (NotFoundException e) {
             return false;
         }

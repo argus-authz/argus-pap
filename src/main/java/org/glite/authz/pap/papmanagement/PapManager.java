@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.distribution.DistributionConfiguration;
 import org.glite.authz.pap.repository.RepositoryManager;
@@ -29,7 +29,7 @@ public class PapManager {
 
         papDAO = RepositoryManager.getDAOFactory().getPapDAO();
 
-        createDefaultPAPIfNotExists();
+        createDefaultPapIfNotExists();
 
         distributionConfiguration = DistributionConfiguration.getInstance();
 
@@ -53,11 +53,11 @@ public class PapManager {
         }
     }
 
-    public void addPAP(PAP pap) {
+    public void addPap(Pap pap) {
 
         String papAlias = pap.getAlias();
 
-        if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
+        if (Pap.DEFAULT_PAP_ALIAS.equals(papAlias)) {
             throw new PapManagerException("Forbidden alias: " + papAlias);
         }
 
@@ -69,7 +69,7 @@ public class PapManager {
         papDAO.store(pap);
 
         // create the root policy set
-        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getPapId(),
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getId(),
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         rootPolicySet.setVersion("0");
 
@@ -77,34 +77,9 @@ public class PapManager {
         papContainer.storePolicySet(rootPolicySet);
     }
 
-    public void createDefaultPAPIfNotExists() {
+    public void deletePap(String papAlias) throws NotFoundException {
 
-        PAP defaultPAP;
-
-        if (!papDAO.exists(PAP.DEFAULT_PAP_ALIAS)) {
-
-            defaultPAP = PAP.makeDefaultPAP();
-            papDAO.store(defaultPAP);
-
-        } else {
-            defaultPAP = papDAO.get(PAP.DEFAULT_PAP_ALIAS);
-        }
-
-        // PAPContainer defaultPAPContainer = new PAPContainer(defaultPAP);
-        PapContainer defaultPAPContainer = getDefaultPAPContainer();
-
-        // check if the root policy set exists
-        if (defaultPAPContainer.hasPolicySet(defaultPAPContainer.getPAPRootPolicySetId())) {
-            return;
-        }
-
-        // create the root policy set
-        defaultPAPContainer.createRootPolicySet();
-    }
-
-    public void deletePAP(String papAlias) throws NotFoundException {
-
-        if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
+        if (Pap.DEFAULT_PAP_ALIAS.equals(papAlias)) {
             throw new PapManagerException("Delete the default PAP is not allowed");
         }
 
@@ -116,26 +91,15 @@ public class PapManager {
         return papDAO.exists(papAlias);
     }
 
-    public List<PAP> getAllPAPs() {
-        return getPAPList();
+    public List<Pap> getAllPaps() {
+        return getPapList();
     }
 
-    public PAP getDefaultPAP() {
-        if (!papDAO.exists(PAP.DEFAULT_PAP_ALIAS)) {
-            throw new NotFoundException("Critical error (probably a BUG): default PAP not found.");
-        }
-        return papDAO.get(PAP.DEFAULT_PAP_ALIAS);
-    }
+    public List<Pap> getLocalPaps() {
 
-    public PapContainer getDefaultPAPContainer() {
-        return new PapContainer(getDefaultPAP());
-    }
+        List<Pap> resultList = new LinkedList<Pap>();
 
-    public List<PAP> getLocalPAPs() {
-
-        List<PAP> resultList = new LinkedList<PAP>();
-
-        for (PAP pap : getPAPList()) {
+        for (Pap pap : getPapList()) {
             if (pap.isLocal()) {
                 resultList.add(pap);
             }
@@ -143,11 +107,11 @@ public class PapManager {
         return resultList;
     }
 
-    public List<PAP> getOrderedRemotePAPs() {
+    public List<Pap> getOrderedRemotePaps() {
 
-        List<PAP> remotePapList = new LinkedList<PAP>();
+        List<Pap> remotePapList = new LinkedList<Pap>();
 
-        for (PAP pap : getPAPList()) {
+        for (Pap pap : getPapList()) {
             if (pap.isRemote()) {
                 remotePapList.add(pap);
             }
@@ -155,50 +119,50 @@ public class PapManager {
         return remotePapList;
     }
 
-    public PAP getPAP(String papAlias) throws NotFoundException {
+    public Pap getPap(String papAlias) throws NotFoundException {
         return papDAO.get(papAlias);
     }
 
-    public String[] getPAPConfigurationOrder() {
+    public PapContainer getPapContainer(String papAlias) {
+        return new PapContainer(getPap(papAlias));
+    }
+
+    public String[] getPapOrdering() {
         return configurationAliasOrderedArray;
     }
 
-    public PapContainer getPAPContainer(String papAlias) {
-        return new PapContainer(getPAP(papAlias));
-    }
-    
-    public List<PAP> getPublicPAPs() {
+    public List<Pap> getPublicPaps() {
 
-        List<PAP> resultList = new LinkedList<PAP>();
+        List<Pap> resultList = new LinkedList<Pap>();
 
-        for (PAP pap : getPAPList()) {
+        for (Pap pap : getPapList()) {
             if (pap.isVisibilityPublic()) {
                 resultList.add(pap);
             }
         }
         return resultList;
     }
-
-    public void setPAPOrder(String[] aliasArray) {
+    
+    public void setPapOrdering(String[] aliasArray) {
         distributionConfiguration.savePAPOrder(aliasArray);
 
         // updated the internal list with the new order
         configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
     }
 
-    public void updatePAP(PAP newpap) {
+    public void updatePap(Pap newpap) {
     	
     	String alias = newpap.getAlias();
 
-        if (PAP.DEFAULT_PAP_ALIAS.equals(alias)) {
-            updateDefaultPAP(newpap);
+        if (Pap.DEFAULT_PAP_ALIAS.equals(alias)) {
+            updateDefaultPap(newpap);
             return;
         }
         
-        PAP oldPAP = papDAO.get(alias);
+        Pap oldPAP = papDAO.get(alias);
         
         // id (and alias) cannot change
-        newpap.setPapId(oldPAP.getPapId());
+        newpap.setId(oldPAP.getId());
 
         papDAO.update(newpap);
     }
@@ -213,7 +177,7 @@ public class PapManager {
             throw new PapManagerException("BUG: configuration contains more PAPs than the repository");
         }
 
-        int defaultPAPAliasIdx = getAliasIndex(PAP.DEFAULT_PAP_ALIAS, repositoryAliasArray);
+        int defaultPAPAliasIdx = getAliasIndex(Pap.DEFAULT_PAP_ALIAS, repositoryAliasArray);
 
         if (defaultPAPAliasIdx == -1) {
             throw new PapManagerException("BUG: default PAP does not exist in the repository");
@@ -224,8 +188,8 @@ public class PapManager {
         List<String> configurationAliasOrderedList = new LinkedList<String>();
 
         // if the default PAP is not specified in the order in configuration then it goes for first
-        if (getAliasIndex(PAP.DEFAULT_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
-            configurationAliasOrderedList.add(PAP.DEFAULT_PAP_ALIAS);
+        if (getAliasIndex(Pap.DEFAULT_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
+            configurationAliasOrderedList.add(Pap.DEFAULT_PAP_ALIAS);
         }
 
         for (int i = 0; i < configurationArraySize; i++) {
@@ -249,6 +213,31 @@ public class PapManager {
         return repositoryAliasArray;
     }
 
+    private void createDefaultPapIfNotExists() {
+
+        Pap defaultPAP;
+
+        if (!papDAO.exists(Pap.DEFAULT_PAP_ALIAS)) {
+
+            defaultPAP = Pap.makeDefaultPAP();
+            papDAO.store(defaultPAP);
+
+        } else {
+            defaultPAP = papDAO.get(Pap.DEFAULT_PAP_ALIAS);
+        }
+
+        // PAPContainer defaultPAPContainer = new PAPContainer(defaultPAP);
+        PapContainer defaultPapContainer = getPapContainer(Pap.DEFAULT_PAP_ALIAS);
+
+        // check if the root policy set exists
+        if (defaultPapContainer.hasPolicySet(defaultPapContainer.getPAPRootPolicySetId())) {
+            return;
+        }
+
+        // create the root policy set
+        defaultPapContainer.createRootPolicySet();
+    }
+
     private int getAliasIndex(String alias, String[] aliasArray) {
 
         if (alias == null) {
@@ -265,9 +254,9 @@ public class PapManager {
         return -1;
     }
 
-    private List<PAP> getPAPList() {
+    private List<Pap> getPapList() {
         String[] aliasOrderedArray = buildOrderedAliasArray();
-        List<PAP> papList = new ArrayList<PAP>(aliasOrderedArray.length);
+        List<Pap> papList = new ArrayList<Pap>(aliasOrderedArray.length);
 
         for (String alias : aliasOrderedArray) {
             papList.add(papDAO.get(alias));
@@ -304,7 +293,7 @@ public class PapManager {
 
     private void synchronizeRepositoryWithConfiguration() {
 
-        PAP[] papListFromConfiguration = DistributionConfiguration.getInstance().getRemotePAPArray();
+        Pap[] papListFromConfiguration = DistributionConfiguration.getInstance().getRemotePAPArray();
 
         if (papListFromConfiguration.length == 0) {
             log.info("No remote PAPs has been defined");
@@ -312,12 +301,12 @@ public class PapManager {
 
         // make sure that all PAPs defined in the configuration are also in the
         // repository
-        for (PAP papFromConfiguration : papListFromConfiguration) {
+        for (Pap papFromConfiguration : papListFromConfiguration) {
             try {
 
                 String papAlias = papFromConfiguration.getAlias();
 
-                PAP papFromRepository = papDAO.get(papAlias);
+                Pap papFromRepository = papDAO.get(papAlias);
 
                 if (papFromConfiguration.equals(papFromRepository)) {
                     continue;
@@ -342,12 +331,12 @@ public class PapManager {
         for (String alias : papDAO.getAllAliases()) {
 
             // do not remove the local PAP
-            if (alias.equals(PAP.DEFAULT_PAP_ALIAS)) {
+            if (alias.equals(Pap.DEFAULT_PAP_ALIAS)) {
                 continue;
             }
 
             boolean notFoundInConfiguration = true;
-            for (PAP papFromConfiguration : papListFromConfiguration) {
+            for (Pap papFromConfiguration : papListFromConfiguration) {
                 if (alias.equals(papFromConfiguration.getAlias())) {
                     notFoundInConfiguration = false;
                     break;
@@ -362,15 +351,15 @@ public class PapManager {
         }
     }
 
-    private void updateDefaultPAP(PAP newDefaultPAP) {
+    private void updateDefaultPap(Pap newDefaultPAP) {
 
-        if (!PAP.DEFAULT_PAP_ALIAS.equals(newDefaultPAP.getAlias())) {
+        if (!Pap.DEFAULT_PAP_ALIAS.equals(newDefaultPAP.getAlias())) {
             throw new RepositoryException("Invalid alias for default PAP. Cannot perform updateDefaultPAP request.");
         }
 
-        PAP oldDefaultPAP = getDefaultPAP();
+        Pap oldDefaultPAP = getPap(Pap.DEFAULT_PAP_ALIAS);
 
-        newDefaultPAP.setPapId(oldDefaultPAP.getPapId());
+        newDefaultPAP.setId(oldDefaultPAP.getId());
 
         papDAO.update(newDefaultPAP);
     }

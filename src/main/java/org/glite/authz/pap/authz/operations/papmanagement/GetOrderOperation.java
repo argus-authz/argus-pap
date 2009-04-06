@@ -17,7 +17,7 @@ public class GetOrderOperation extends BasePAPOperation<String[]> {
     protected String[] doExecute() {
 
         String[] papOrderArray = null;
-        papOrderArray = PapManager.getInstance().getPAPConfigurationOrder();
+        papOrderArray = PapManager.getInstance().getPapOrdering();
         return papOrderArray;
 
     }

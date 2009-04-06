@@ -6,7 +6,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 public class ListPAPs extends PAPManagementCLI {
@@ -48,7 +48,7 @@ public class ListPAPs extends PAPManagementCLI {
 
         for (PAPData papData : papDataArray) {
             if (logListFormat)
-                System.out.println((new PAP(papData)).toFormattedString());
+                System.out.println((new Pap(papData)).toFormattedString());
             else
                 System.out.println(String.format("alias = %s (%s)", papData.getAlias(), papData.getType()));
         }

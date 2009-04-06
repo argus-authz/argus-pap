@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.xml.rpc.ServiceException;
 
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
@@ -38,7 +38,7 @@ public class DistributionModule extends Thread {
         return instance;
     }
 
-    public static List<XACMLObject> getPoliciesFromPAP(PAP remotePAP) throws RemoteException, ServiceException {
+    public static List<XACMLObject> getPoliciesFromPAP(Pap remotePAP) throws RemoteException, ServiceException {
 
         PAPClient client = new PAPClient(remotePAP.getEndpoint());
 
@@ -55,7 +55,7 @@ public class DistributionModule extends Thread {
             throw new PAPConfigurationException("Error initializing OpenSAML library", e);
         }
 
-        PAP pap = new PAP("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost",
+        Pap pap = new Pap("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost",
             "8150", "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT+"/services", false);
         System.out.println(pap.toString());
         List<XACMLObject> list = getPoliciesFromPAP(pap);
@@ -63,7 +63,7 @@ public class DistributionModule extends Thread {
         System.out.println("OK");
     }
 
-    public static void refreshCache(PAP pap) throws RemoteException, ServiceException {
+    public static void refreshCache(Pap pap) throws RemoteException, ServiceException {
         log.info("Refreshing cache of remote PAP " + pap.getAlias());
         List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
         log.info(String.format("Retrieved %d XACML objects from PAP %s (%s)",
@@ -73,16 +73,16 @@ public class DistributionModule extends Thread {
         storePAPPolicies(pap, papPolicies);
     }
 
-    private static void storePAPPolicies(PAP pap, List<XACMLObject> papPolicies) {
+    private static void storePAPPolicies(Pap pap, List<XACMLObject> papPolicies) {
 
         if (papPolicies.isEmpty()) {
             return;
         }
 
-        log.debug(String.format("Storing policies for PAP %s (id=%s)", pap.getAlias(), pap.getPapId()));
+        log.debug(String.format("Storing policies for PAP %s (id=%s)", pap.getAlias(), pap.getId()));
 
         PapManager papManager = PapManager.getInstance();
-        PapContainer papContainer = papManager.getPAPContainer(pap.getAlias());
+        PapContainer papContainer = papManager.getPapContainer(pap.getAlias());
 
         synchronized (storePoliciesLock) {
 
@@ -93,7 +93,7 @@ public class DistributionModule extends Thread {
 
             if (papRoot instanceof PolicySetType) {
 
-                ((PolicySetType) papRoot).setPolicySetId(papContainer.getPAP().getPapId());
+                ((PolicySetType) papRoot).setPolicySetId(papContainer.getPAP().getId());
 
                 for (XACMLObject xacmlObject : papPolicies) {
 
@@ -133,7 +133,7 @@ public class DistributionModule extends Thread {
 
                 log.info("Starting refreshing cache process...");
 
-                for (PAP pap : PapManager.getInstance().getOrderedRemotePAPs()) {
+                for (Pap pap : PapManager.getInstance().getOrderedRemotePaps()) {
 
                     if (this.isInterrupted())
                         break;

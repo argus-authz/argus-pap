@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.papmanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.papmanagement.PapManager;
@@ -28,10 +28,10 @@ public class RefreshPolicyCacheOperation extends BasePAPOperation<Boolean> {
 
         PapManager papManager = PapManager.getInstance();
 
-        PAP pap;
+        Pap pap;
 
         try {
-            pap = papManager.getPAP(papAlias);
+            pap = papManager.getPap(papAlias);
 
         } catch (NotFoundException e) {
             log.error("Unable to refresh cache, PAP not found: " + papAlias);

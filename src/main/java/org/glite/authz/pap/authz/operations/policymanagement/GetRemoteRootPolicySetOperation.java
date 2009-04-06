@@ -3,19 +3,19 @@ package org.glite.authz.pap.authz.operations.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.opensaml.xacml.policy.PolicySetType;
 
 public class GetRemoteRootPolicySetOperation extends BasePAPOperation<PolicySetType> {
 
-    private PAP ps;
+    private Pap ps;
 
-    protected GetRemoteRootPolicySetOperation(PAP ps) {
+    protected GetRemoteRootPolicySetOperation(Pap ps) {
         this.ps = ps;
     }
 
-    public static GetRemoteRootPolicySetOperation instance(PAP ps) {
+    public static GetRemoteRootPolicySetOperation instance(Pap ps) {
         return new GetRemoteRootPolicySetOperation(ps);
     }
 

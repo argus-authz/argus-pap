@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PapDAO;
@@ -132,9 +132,9 @@ public class FileSystemPapDAO implements PapDAO {
         return existsInINIFile(papAlias);
     }
 
-    public PAP get(String papAlias) {
+    public Pap get(String papAlias) {
 
-        PAP pap = getPAPFromINIFile(papAlias);
+        Pap pap = getPAPFromINIFile(papAlias);
 
         if (pap == null)
             throw new NotFoundException(aliasNotFoundExceptionMsg(papAlias));
@@ -142,11 +142,11 @@ public class FileSystemPapDAO implements PapDAO {
         return pap;
     }
 
-    public List<PAP> getAll() {
+    public List<Pap> getAll() {
 
         String[] aliasArray = getAllAliases();
 
-        List<PAP> papList = new ArrayList<PAP>(aliasArray.length);
+        List<Pap> papList = new ArrayList<Pap>(aliasArray.length);
 
         for (String alias : aliasArray) {
             papList.add(getPAPFromINIFile(alias));
@@ -188,24 +188,24 @@ public class FileSystemPapDAO implements PapDAO {
 		return papsINIFile.getString(VERSION_KEY);
 	}
 
-    public void store(PAP pap) {
+    public void store(Pap pap) {
 
         String papAlias = pap.getAlias();
 
         if (exists(papAlias))
             throw new AlreadyExistsException(aliasAlreadyExistsExceptionMsg(papAlias));
 
-        File directory = new File(getPAPDirAbsolutePath(pap.getPapId()));
+        File directory = new File(getPAPDirAbsolutePath(pap.getId()));
         if (!directory.mkdir())
             throw new RepositoryException(String.format("Cannot create directory for PAP: %s (id=%s) (dir=%s)",
                                                         papAlias,
-                                                        pap.getPapId(),
+                                                        pap.getId(),
                                                         directory));
 
         saveToINIFile(pap);
     }
 
-    public void update(PAP pap) {
+    public void update(Pap pap) {
 
         String papAlias = pap.getAlias();
 
@@ -235,7 +235,7 @@ public class FileSystemPapDAO implements PapDAO {
         return dbPath + File.separator + papId;
     }
 
-    private PAP getPAPFromINIFile(String papAlias) {
+    private Pap getPAPFromINIFile(String papAlias) {
 
         if (papAlias == null)
             return null;
@@ -252,8 +252,8 @@ public class FileSystemPapDAO implements PapDAO {
         String id = papsINIFile.getString(idKey(papAlias));
         boolean visibilityPublic = papsINIFile.getBoolean(visibilityPublicKey(papAlias));
 
-        PAP pap = new PAP(papAlias, PAP.PSType.fromString(type), dn, host, port, path, protocol, visibilityPublic);
-        pap.setPapId(id);
+        Pap pap = new Pap(papAlias, Pap.PapType.fromString(type), dn, host, port, path, protocol, visibilityPublic);
+        pap.setId(id);
         
         long policyLastModificationTime;
         try {
@@ -293,7 +293,7 @@ public class FileSystemPapDAO implements PapDAO {
         }
     }
 
-    private void saveToINIFile(PAP pap) throws RepositoryException {
+    private void saveToINIFile(Pap pap) throws RepositoryException {
 
         if (pap == null)
             throw new RepositoryException("BUG: PAP is null");
@@ -308,7 +308,7 @@ public class FileSystemPapDAO implements PapDAO {
         }
     }
 
-	private void setPAPProperties(PAP pap) {
+	private void setPAPProperties(Pap pap) {
 
         String papAlias = pap.getAlias();
 
@@ -318,7 +318,7 @@ public class FileSystemPapDAO implements PapDAO {
         papsINIFile.setProperty(portKey(papAlias), pap.getPort());
         papsINIFile.setProperty(pathKey(papAlias), pap.getPath());
         papsINIFile.setProperty(protocolKey(papAlias), pap.getProtocol());
-        papsINIFile.setProperty(idKey(papAlias), pap.getPapId());
+        papsINIFile.setProperty(idKey(papAlias), pap.getId());
         papsINIFile.setProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
         papsINIFile.setProperty(policyLastModificationTimeKey(papAlias), pap.getPolicyLastModificationTimeInSecondsString());
     }

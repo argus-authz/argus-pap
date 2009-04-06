@@ -27,7 +27,7 @@ import org.glite.authz.pap.authz.operations.policymanagement.StorePolicyOperatio
 import org.glite.authz.pap.authz.operations.policymanagement.StorePolicySetOperation;
 import org.glite.authz.pap.authz.operations.policymanagement.UpdatePolicyOperation;
 import org.glite.authz.pap.authz.operations.policymanagement.UpdatePolicySetOperation;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
@@ -99,10 +99,10 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             if (alias == null) {
-                alias = PAP.DEFAULT_PAP_ALIAS;
+                alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            PAP ps = PapManager.getInstance().getPAP(alias);
+            Pap ps = PapManager.getInstance().getPap(alias);
 
             if (ps.isLocal()) {
                 return GetLocalRootPolicySetOperation.instance(ps).execute();
@@ -122,10 +122,10 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             if (alias == null) {
-                alias = PAP.DEFAULT_PAP_ALIAS;
+                alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            PAP ps = PapManager.getInstance().getPAP(alias);
+            Pap ps = PapManager.getInstance().getPap(alias);
 
             PolicyType policy;
 
@@ -149,10 +149,10 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             if (alias == null) {
-                alias = PAP.DEFAULT_PAP_ALIAS;
+                alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            PAP ps = PapManager.getInstance().getPAP(alias);
+            Pap ps = PapManager.getInstance().getPap(alias);
 
             PolicySetType policySet;
 
@@ -174,10 +174,10 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             if (alias == null) {
-                alias = PAP.DEFAULT_PAP_ALIAS;
+                alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            PAP ps = PapManager.getInstance().getPAP(alias);
+            Pap ps = PapManager.getInstance().getPap(alias);
 
             synchronized (PapContainer.highLevelOperationLock) {
                 if (ps.isLocal()) {
@@ -198,10 +198,10 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             if (alias == null) {
-                alias = PAP.DEFAULT_PAP_ALIAS;
+                alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            PAP ps = PapManager.getInstance().getPAP(alias);
+            Pap ps = PapManager.getInstance().getPap(alias);
 
             synchronized (PapContainer.highLevelOperationLock) {
                 if (ps.isLocal()) {
@@ -223,10 +223,10 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             if (alias == null) {
-                alias = PAP.DEFAULT_PAP_ALIAS;
+                alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            PAP ps = PapManager.getInstance().getPAP(alias);
+            Pap ps = PapManager.getInstance().getPap(alias);
 
             synchronized (PapContainer.highLevelOperationLock) {
                 if (ps.isLocal()) {
@@ -248,10 +248,10 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         try {
 
             if (alias == null) {
-                alias = PAP.DEFAULT_PAP_ALIAS;
+                alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            PAP ps = PapManager.getInstance().getPAP(alias);
+            Pap ps = PapManager.getInstance().getPap(alias);
 
             synchronized (PapContainer.highLevelOperationLock) {
                 if (ps.isLocal()) {

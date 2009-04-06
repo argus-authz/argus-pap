@@ -20,7 +20,7 @@ public class RepositoryUtils {
     public static boolean checkForLoops(boolean repair) {
         boolean result = true;
         
-        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getAllPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getAllPaps())) {
             if (checkForLoops(papContainer, papContainer.getPAPRootPolicySet(), new LinkedList<String>(), repair) == false) {
                 result = false;
             }
@@ -31,7 +31,7 @@ public class RepositoryUtils {
     
     public static boolean checkXMLValidation() {
 
-        List<PapContainer> containerList = PapContainer.getContainers(PapManager.getInstance().getLocalPAPs());
+        List<PapContainer> containerList = PapContainer.getContainers(PapManager.getInstance().getLocalPaps());
 
         for (PapContainer papContainer : containerList) {
 
@@ -50,7 +50,7 @@ public class RepositoryUtils {
         
         boolean result = true;
 
-        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPaps())) {
 
             PolicySetType rootPS;
             
@@ -148,13 +148,13 @@ public class RepositoryUtils {
     }
     
     public static void purgeUnreferencesPolicies() {
-        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPaps())) {
             papContainer.purgeUnreferencesPolicies();
         }
     }
 
     public static void purgeUnreferencesPolicySets() {
-        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPaps())) {
             papContainer.purgeUnreferencedPolicySets();
         }
     }

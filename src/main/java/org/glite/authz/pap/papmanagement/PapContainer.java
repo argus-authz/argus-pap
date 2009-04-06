@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
@@ -30,25 +30,25 @@ public class PapContainer {
 
     private static final Logger log = LoggerFactory.getLogger(PapContainer.class);
 
-    private final PAP pap;
+    private final Pap pap;
     private final String papId;
     private final PolicyDAO policyDAO;
     private final PolicySetDAO policySetDAO;
     private final String rootPolicySetId;
 
-    public PapContainer(PAP pap) {
+    public PapContainer(Pap pap) {
         this.pap = pap;
-        papId = pap.getPapId();
+        papId = pap.getId();
         rootPolicySetId = papId;
         policySetDAO = DAOFactory.getDAOFactory().getPolicySetDAO();
         policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
     }
 
-    public static List<PapContainer> getContainers(List<PAP> papList) {
+    public static List<PapContainer> getContainers(List<Pap> papList) {
 
         List<PapContainer> papContainerList = new ArrayList<PapContainer>(papList.size());
 
-        for (PAP pap : papList) {
+        for (Pap pap : papList) {
             papContainerList.add(new PapContainer(pap));
         }
         return papContainerList;
@@ -132,7 +132,7 @@ public class PapContainer {
 
     public void createRootPolicySet() {
 
-        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getPapId(),
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(pap.getId(),
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         rootPolicySet.setVersion("0");
 
@@ -211,7 +211,7 @@ public class PapContainer {
         return numberOfRules;
     }
 
-    public PAP getPAP() {
+    public Pap getPAP() {
         return this.pap;
     }
 
@@ -426,7 +426,7 @@ public class PapContainer {
 
         String propName;
 
-        if (PAP.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
+        if (Pap.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
             propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
         } else {
             propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
@@ -456,7 +456,7 @@ public class PapContainer {
 
         String propName;
 
-        if (PAP.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
+        if (Pap.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
             propName = MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME;
         } else {
             propName = MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME;
@@ -484,7 +484,7 @@ public class PapContainer {
 
     private void notifyPolicyLastModificationTimeUpdate() {
 
-        if (!PAP.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
+        if (!Pap.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
             return;
         }
 

@@ -3,20 +3,20 @@ package org.glite.authz.pap.authz.operations.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 
 public class HasRemotePolicySetOperation extends BasePAPOperation<Boolean> {
 
-    private PAP ps;
+    private Pap ps;
     private String policySetId;
 
-    protected HasRemotePolicySetOperation(PAP ps, String policySetId) {
+    protected HasRemotePolicySetOperation(Pap ps, String policySetId) {
         this.ps = ps;
         this.policySetId = policySetId;
     }
 
-    public static HasRemotePolicySetOperation instance(PAP ps, String policySetId) {
+    public static HasRemotePolicySetOperation instance(Pap ps, String policySetId) {
         return new HasRemotePolicySetOperation(ps, policySetId);
     }
 

@@ -8,7 +8,7 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
@@ -159,8 +159,8 @@ public class ListPolicies extends PolicyManagementCLI {
         } else {
             PAPData papData = new PAPData();
 
-            papData.setAlias(PAP.DEFAULT_PAP_ALIAS);
-            papData.setType(PAP.PSType.LOCAL.toString());
+            papData.setAlias(Pap.DEFAULT_PAP_ALIAS);
+            papData.setType(Pap.PapType.LOCAL.toString());
             papData.setVisibilityPublic(true);
 
             PAPData[] papDataArray = new PAPData[1];
@@ -206,7 +206,7 @@ public class ListPolicies extends PolicyManagementCLI {
                 papData = papMgmtClient.getPAP(alias);
             }
 
-            if (PAP.PSType.LOCAL.toString().equals(papData.getType())) {
+            if (Pap.PapType.LOCAL.toString().equals(papData.getType())) {
                 papInfoArray[i] = String.format("%s (local):", papData.getAlias());
             } else {
                 papInfoArray[i] = String.format("%s (%s:%s):", papData.getAlias(), papData.getHostname(), papData.getPort());

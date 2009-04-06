@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -11,15 +11,15 @@ import org.opensaml.xacml.policy.PolicySetType;
 
 public class GetLocalPolicySetOperation extends BasePAPOperation <PolicySetType>{
 
-    private PAP ps;
+    private Pap ps;
     private String policySetId;
     
-    protected GetLocalPolicySetOperation( PAP ps, String policySetId ) {
+    protected GetLocalPolicySetOperation( Pap ps, String policySetId ) {
         this.ps = ps;
         this.policySetId = policySetId;
     }
 
-    public static GetLocalPolicySetOperation instance(PAP ps, String policySetId) {
+    public static GetLocalPolicySetOperation instance(Pap ps, String policySetId) {
         return new GetLocalPolicySetOperation(ps, policySetId);
     }
     

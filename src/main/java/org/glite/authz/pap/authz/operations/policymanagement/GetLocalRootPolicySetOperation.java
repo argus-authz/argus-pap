@@ -3,19 +3,19 @@ package org.glite.authz.pap.authz.operations.policymanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.common.PAP;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.opensaml.xacml.policy.PolicySetType;
 
 public class GetLocalRootPolicySetOperation extends BasePAPOperation<PolicySetType> {
 
-    private PAP ps;
+    private Pap ps;
 
-    protected GetLocalRootPolicySetOperation(PAP ps) {
+    protected GetLocalRootPolicySetOperation(Pap ps) {
         this.ps = ps;
     }
 
-    public static GetLocalRootPolicySetOperation instance(PAP ps) {
+    public static GetLocalRootPolicySetOperation instance(Pap ps) {
         return new GetLocalRootPolicySetOperation(ps);
     }
 
