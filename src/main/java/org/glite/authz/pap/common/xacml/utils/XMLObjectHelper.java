@@ -55,7 +55,7 @@ public class XMLObjectHelper<T extends XMLObject> {
     protected XMLObjectHelper() {}
 
     /**
-     * Unmarshalls an <code>Element</code> into an <code>XMLObject</code>.
+     * Unmarshalls an <code>Element</code> into an <code>XMLObject</code>. Thread safe method.
      * <p>
      * This unmarshalling method is used inside the Axis deserialization process. If
      * <code>Element</code> is unmarshalled into a <code>PolicyType</code> or
@@ -94,6 +94,8 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Build an <code>XMLObject</code> from an <code>Element</code>.
+     * 
      * @param element an element representing an OpenSAML <code>XMLObject</code>.
      * @return the given element as an OpenSAML <code>XMLObject</code>.
      * 
@@ -111,6 +113,8 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Build an <code>XMLObject</code> from an <code>InputStream</code>.
+     * 
      * @param inputStream input stream representing an OpenSAML <code>XMLObject</code>.
      * @return the given input stream as an OpenSAML <code>XMLObject</code>.
      * 
@@ -122,6 +126,8 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Build an <code>XMLObject</code> from file.
+     * 
      * @param file a file containing an OpenSAML <code>XMLObject</code>.
      * @return the OpenSAML <code>XMLObject</code>.
      * 
@@ -135,6 +141,8 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Build an <code>XMLObject</code> from file.
+     * 
      * @param fileName <code>String</code> representing the file name containing an OpenSAML
      *            <code>XMLObject</code>.
      * @return the OpenSAML <code>XMLObject</code>.
@@ -148,6 +156,8 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Get the DOM of an <code>XMLObject</code>.
+     * 
      * @param xmlObject
      * @return the DOM of the given object.
      * 
@@ -265,7 +275,7 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
-     * Unmarshalls an <code>Element</code> into an <code>XMLObject</code>.
+     * Unmarshalls an <code>Element</code> into an <code>XMLObject</code>. Thread safe method.
      * 
      * @param element the <code>Element</code> to be marshalled.
      * @return the corresponding <code>XMLObject</code>.
@@ -327,8 +337,11 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Get a <code>Document</code> from a <code>File</code>.
+     * 
      * @param file the file to read the document from.
      * @return the file content as <code>Document</code>.
+     * 
      * @throws XMLObjectParserException if the XML parsing fails.
      * @throws XMLObjectException wrapping a <code>FileNotFoundException</code> if file does not
      *             exist.
@@ -345,6 +358,8 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Get a <code>Document</code> from an <code>InputStream</code>.
+     * 
      * @param inputStream
      * @return the given input stream as <code>Document</code>.
      * 
@@ -364,8 +379,11 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Get a <code>Document</code> from a <code>Reader</code>.
+     * 
      * @param reader
      * @return the given reader stream as <code>Document</code>.
+     * 
      * @throws XMLObjectParserException if the XML parsing fails.
      */
     private static Document readDocument(Reader reader) {
@@ -382,8 +400,11 @@ public class XMLObjectHelper<T extends XMLObject> {
     }
 
     /**
+     * Builds an object of type <code>T</code> from an <code>Element</code>.
+     * 
      * @param element an element representing an OpenSAML <code>XMLObject</code>.
      * @return the OpenSAML object of class <code>T</code> extending <code>XMLObject</code>.
+     * 
      * @throws XMLObjectUnmarshallingException if unmarshalling fails.
      */
     @SuppressWarnings("unchecked")
