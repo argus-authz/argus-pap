@@ -6,16 +6,12 @@ import java.util.List;
 import javax.xml.rpc.ServiceException;
 
 import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.opensaml.DefaultBootstrap;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
-import org.opensaml.xml.ConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,22 +41,6 @@ public class DistributionModule extends Thread {
         List<XACMLObject> papPolicies = client.getLocalPolicies();
 
         return papPolicies;
-    }
-
-    public static void main(String[] args) throws RemoteException, ServiceException {
-
-        try {
-            DefaultBootstrap.bootstrap();
-        } catch (ConfigurationException e) {
-            throw new PAPConfigurationException("Error initializing OpenSAML library", e);
-        }
-
-        Pap pap = new Pap("prova", "/C=IT/ST=Test/O=Voms-Admin/OU=Voms-Admin testing/CN=macceccanti.cnaf.infn.it", "localhost",
-            "8150", "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT+"/services", false);
-        System.out.println(pap.toString());
-        List<XACMLObject> list = getPoliciesFromPAP(pap);
-        System.out.println("Retrieved " + list.size() + " policies");
-        System.out.println("OK");
     }
 
     public static void refreshCache(Pap pap) throws RemoteException, ServiceException {

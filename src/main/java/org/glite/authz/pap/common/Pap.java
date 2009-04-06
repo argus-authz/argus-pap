@@ -6,17 +6,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 
- * This class provides information about a Policy Administration Point (PAP).
- * 
+ * The <code>Pap</code> class represents a pap and is JavaBean compliant.
+ * <p>
+ * The PAP service (PAP uppercase) is organized units and each unit is called pap (pap lowercase). A
+ * pap can be local or remote. The policies of a local pap are written by the administrator of the
+ * PAP service, on the other side the policies of a remote pap are retrieved remotely (downloaded
+ * from the owner PAP). Information like hostname, port, protocol and path are used to build the
+ * endpoint of a remote pap. A pap can also be private or public. When a PAP requests policies to
+ * another PAP, the policies that are actually sent are all the public policies belonging to a
+ * public pap.
  */
 public class Pap {
 
-    public static String DEFAULT_HOST = "localhost";
+    /** Default host: {@value} */
+    public static final String DEFAULT_HOST = "localhost";
+    /** Alias of the default pap: {@value} */
     public static final String DEFAULT_PAP_ALIAS = "default";
-    public static String DEFAULT_PORT = "8150";
-    public static String DEFAULT_PROTOCOL = "https";
-    public static String DEFAULT_SERVICES_ROOT_PATH = "/" + PAPConfiguration.DEFAULT_WEBAPP_CONTEXT
+    /** Default port: {@value} */
+    public static final String DEFAULT_PORT = "8150";
+    /** Default protocol: {@value} */
+    public static final String DEFAULT_PROTOCOL = "https";
+    /** Default service path: {@value} */
+    public static final String DEFAULT_SERVICES_ROOT_PATH = "/" + PAPConfiguration.DEFAULT_WEBAPP_CONTEXT
             + "/services/";
 
     @SuppressWarnings("unused")
@@ -30,24 +41,32 @@ public class Pap {
     private String port = null;
     private String protocol = null;
     private boolean local = true;
-    private boolean visibilityPublic;
+    private boolean visibilityPublic = false;
 
-    public Pap() {
-    }
+    /**
+     * Constructor with no parameters. Needed for JavaBean compatibility and used by Axis
+     * serialization methods.
+     */
+    public Pap() {}
 
-    public Pap(String alias) {
-        this(alias, true, null, null, null, null, null, false);
-    }
-
-    public Pap(String alias, boolean visibilityPublic) {
-        this(alias, true, null, null, null, null, null, visibilityPublic);
-    }
-
-    public Pap(String alias, boolean isLocal, String dn, String hostname, String port,
-            String servicesRootPath, boolean visibilityPublic) {
-        this(alias, isLocal, dn, hostname, port, servicesRootPath, null, visibilityPublic);
-    }
-
+    /**
+     * Constructor.
+     * 
+     * @param alias alias of the pap (it must be a unique name).
+     * @param isLocal if <code>true</code> the pap is local, if <code>false</code> the pap is
+     *            remote.
+     * @param dn DN of the pap (remote pap). Can be <code>null</code>.
+     * @param hostname hostname of the pap (remote pap). If <code>null</code> or empty the default
+     *            value is {@link #DEFAULT_HOST}.
+     * @param port port port of the pap (remote pap). If <code>null</code> or empty the default
+     *            value is {@link #DEFAULT_PORT}.
+     * @param servicesRootPath service path of the pap (remote pap). If <code>null</code> or empty
+     *            the default value is {@link #DEFAULT_SERVICES_ROOT_PATH}.
+     * @param protocol protocol of the pap (remote pap). If <code>null</code> or empty the default
+     *            value is {@link #DEFAULT_PROTOCOL}.
+     * @param visibilityPublic if <code>true</code> the pap is public, if <code>false</code> the pap
+     *            is private.
+     */
     public Pap(String alias, boolean isLocal, String dn, String hostname, String port,
             String servicesRootPath, String protocol, boolean visibilityPublic) {
 
@@ -56,41 +75,40 @@ public class Pap {
         this.alias = alias;
         this.visibilityPublic = visibilityPublic;
         this.local = isLocal;
+        this.dn = dn;
 
         id = WizardUtils.generateId(alias);
 
-        if (!isLocal) {
+        if (Utils.isDefined(hostname)) {
+            this.hostname = hostname;
+        } else {
             this.hostname = DEFAULT_HOST;
-            this.port = DEFAULT_PORT;
-            this.path = DEFAULT_SERVICES_ROOT_PATH;
-            this.protocol = DEFAULT_PROTOCOL;
         }
 
-        if (Utils.isDefined(dn))
-            this.dn = dn;
-        if (Utils.isDefined(hostname))
-            this.hostname = hostname;
-        if (Utils.isDefined(port))
+        if (Utils.isDefined(port)) {
             this.port = port;
-        if (Utils.isDefined(servicesRootPath))
+        } else {
+            this.port = DEFAULT_PORT;
+        }
+
+        if (Utils.isDefined(servicesRootPath)) {
             this.path = servicesRootPath;
-        if (Utils.isDefined(protocol))
+        } else {
+            this.path = DEFAULT_SERVICES_ROOT_PATH;
+        }
+
+        if (Utils.isDefined(protocol)) {
             this.protocol = protocol;
+        } else {
+            this.protocol = DEFAULT_PROTOCOL;
+        }
     }
 
-    public Pap(String alias, String dn, String hostname) {
-        this(alias, dn, hostname, false);
-    }
-
-    public Pap(String alias, String dn, String hostname, boolean isPublic) {
-        this(alias, false, dn, hostname, null, null, null, isPublic);
-    }
-
-    public Pap(String alias, String dn, String hostname, String port, String servicesRootPath,
-            boolean visibilityPublic) {
-        this(alias, false, dn, hostname, port, servicesRootPath, null, visibilityPublic);
-    }
-
+    /**
+     * @param type a <code>String</code> to be compared with the <code>Strinf</code> "local".
+     * @return <code>true</code> if <code>type</code> is equal to "local" (not case sensitive),
+     *         <code>false</code> otherwise.
+     */
     public static boolean isLocal(String type) {
         if ("local".equals(type.toLowerCase())) {
             return true;
@@ -98,10 +116,23 @@ public class Pap {
         return false;
     }
 
+    /**
+     * Constructor.
+     * 
+     * @return the default pap (alias={@value #DEFAULT_PAP_ALIAS}, local and public)).
+     */
     public static Pap makeDefaultPAP() {
-        return new Pap(DEFAULT_PAP_ALIAS, true);
+        return new Pap(DEFAULT_PAP_ALIAS, true, null, null, null, null, null, true);
     }
 
+    /**
+     * Compares this <code>Pap</code> to the specified object. The result is <code>true</code> if
+     * and only if the argument is not <code>null</code> and is a <code>Pap</code> object whose
+     * members value is the same as this object.
+     * 
+     * @param pap
+     * @return
+     */
     public boolean equals(Pap pap) {
 
         if (pap == null) {
@@ -171,6 +202,13 @@ public class Pap {
         return dn;
     }
 
+    /**
+     * Returns the endpoint of the pap in the form: protocol://hostname:port/path.
+     * 
+     * @return a <code>String</code> representing the endpoint. No check is performed on protocol,
+     *         hostname, port and path. If some of them are <code>null</code> then the corresponding
+     *         part of the endpoint string reports a "null" string.
+     */
     public String getEndpoint() {
         return protocol + "://" + hostname + ":" + port + path;
     }
@@ -271,12 +309,12 @@ public class Pap {
     }
 
     /**
-     * Returns a formatted version of this PAP
+     * Returns a formatted <code>String</code> version of this <code>Pap</code>. Multiple lines are
+     * used and indentation.
      * 
-     * @param indent , the indentation to be used
-     * @param padding , the padding to be used
-     * @return the formatted String representing this PAP
-     * 
+     * @param indent the indentation to be used.
+     * @param padding the padding to be used.
+     * @return the formatted <code>String</code> representing this <code>Pap</code>.
      */
     public String toFormattedString(int indent, int padding) {
 
@@ -311,6 +349,10 @@ public class Pap {
         return aliasString + typeString + visibilityString + dnString + endpointString;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
     @Override
     public String toString() {
         String visibility;

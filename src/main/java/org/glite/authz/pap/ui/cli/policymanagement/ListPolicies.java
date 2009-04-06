@@ -161,7 +161,7 @@ public class ListPolicies extends PolicyManagementCLI {
             
         } else {
             
-            Pap pap = new Pap(Pap.DEFAULT_PAP_ALIAS, true);
+            Pap pap = Pap.makeDefaultPAP();
 
             Pap[] papArray = new Pap[1];
             papArray[0] = pap;

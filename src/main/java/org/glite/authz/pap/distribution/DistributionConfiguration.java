@@ -247,11 +247,8 @@ public class DistributionConfiguration {
         boolean isLocal = Pap.isLocal(type);
         
         String dn = papConfiguration.getString(dnKey(papAlias));
-        if ((dn == null) && (!isLocal)) {
-            throw new DistributionConfigurationException("DN is not set for remote PAP \"" + papAlias + "\"");
-        }
-
         String hostname = papConfiguration.getString(hostnameKey(papAlias));
+        
         if ((hostname == null) && (!isLocal)) {
             throw new DistributionConfigurationException("\"hostname\" is not set for remote PAP \"" + papAlias + "\"");
         }
@@ -261,7 +258,6 @@ public class DistributionConfiguration {
         String protocol = papConfiguration.getString(protocolKey(papAlias));
         boolean visibilityPublic = papConfiguration.getBoolean(visibilityPublicKey(papAlias));
 
-        // port, path and protocol can be null or empty
         return new Pap(papAlias, isLocal, dn, hostname, port, path, protocol, visibilityPublic);
     }
 
