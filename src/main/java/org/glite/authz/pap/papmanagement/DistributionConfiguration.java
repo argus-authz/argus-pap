@@ -1,4 +1,4 @@
-package org.glite.authz.pap.distribution;
+package org.glite.authz.pap.papmanagement;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -6,8 +6,6 @@ import java.util.Set;
 
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.distribution.exceptions.AliasNotFoundException;
-import org.glite.authz.pap.distribution.exceptions.DistributionConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

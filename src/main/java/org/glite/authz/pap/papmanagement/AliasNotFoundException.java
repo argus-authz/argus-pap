@@ -1,4 +1,5 @@
-package org.glite.authz.pap.distribution.exceptions;
+package org.glite.authz.pap.papmanagement;
+
 
 public class AliasNotFoundException extends DistributionConfigurationException {
 

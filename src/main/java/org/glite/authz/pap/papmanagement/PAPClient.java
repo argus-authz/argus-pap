@@ -1,4 +1,4 @@
-package org.glite.authz.pap.distribution;
+package org.glite.authz.pap.papmanagement;
 
 import java.rmi.RemoteException;
 import java.util.LinkedList;
