@@ -4,8 +4,8 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 
@@ -31,13 +31,13 @@ public class RemovePolicySetOperation extends BasePAPOperation<Boolean> {
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
         
-        PAP pap = PAPManager.getInstance().getPAP(alias);
+        PAP pap = PapManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {
             throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
         }
 
-        PAPContainer papContainer = new PAPContainer(pap);
+        PapContainer papContainer = new PapContainer(pap);
 
         try {
             papContainer.deletePolicySet(policySetId);

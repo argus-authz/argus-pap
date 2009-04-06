@@ -7,8 +7,8 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
@@ -41,13 +41,13 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
         
-        PAP pap = PAPManager.getInstance().getPAP(alias);
+        PAP pap = PapManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {
             throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
         }
 
-        PAPContainer papContainer = new PAPContainer(pap);
+        PapContainer papContainer = new PapContainer(pap);
 
         if (papContainer.getPAPRootPolicySetId().equals(id)) {
             throw new RepositoryException("Invalid operation: cannot remove the local PAP root policy set");
@@ -75,7 +75,7 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
 
     }
     
-    private void removeRule(PAPContainer papContainer, String id) {
+    private void removeRule(PapContainer papContainer, String id) {
         List<PolicyType> policyList = papContainer.getAllPolicies();
         PolicyType targetPolicy = null;
         RuleType targetRule = null;

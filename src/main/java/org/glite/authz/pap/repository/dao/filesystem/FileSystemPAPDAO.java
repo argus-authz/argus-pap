@@ -10,7 +10,7 @@ import java.util.Set;
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPContainer;
+import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PAPDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
@@ -116,7 +116,7 @@ public class FileSystemPAPDAO implements PAPDAO {
 
         String papId = papsINIFile.getString(idKey(papAlias));
 
-        PAPContainer papContainer = new PAPContainer(get(papAlias));
+        PapContainer papContainer = new PapContainer(get(papAlias));
 
         papContainer.deleteAllPolicies();
         papContainer.deleteAllPolicySets();

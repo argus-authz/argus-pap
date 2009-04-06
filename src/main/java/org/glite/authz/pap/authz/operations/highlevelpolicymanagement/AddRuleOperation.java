@@ -11,8 +11,8 @@ import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.RuleWizard;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -60,13 +60,13 @@ public class AddRuleOperation extends BasePAPOperation<String> {
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
 
-        PAP pap = PAPManager.getInstance().getPAP(alias);
+        PAP pap = PapManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {
             throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
         }
 
-        PAPContainer papContainer = new PAPContainer(pap);
+        PapContainer papContainer = new PapContainer(pap);
 
         PolicyType policy = papContainer.getPolicy(actionId);
 

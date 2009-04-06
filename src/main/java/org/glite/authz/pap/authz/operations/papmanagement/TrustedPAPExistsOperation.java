@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.papmanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapManager;
 
 
 public class TrustedPAPExistsOperation extends BasePAPOperation<Boolean> {
@@ -25,7 +25,7 @@ public class TrustedPAPExistsOperation extends BasePAPOperation<Boolean> {
     @Override
     protected Boolean doExecute() {
 
-        return PAPManager.getInstance().exists( papAlias );
+        return PapManager.getInstance().exists( papAlias );
         
     }
 

@@ -4,8 +4,8 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.HighLevelPolicyManagementServiceException;
 
 public class PurgeOperation extends BasePAPOperation<Object> {
@@ -40,13 +40,13 @@ public class PurgeOperation extends BasePAPOperation<Object> {
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
 
-        PAP pap = PAPManager.getInstance().getPAP(alias);
+        PAP pap = PapManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {
             throw new HighLevelPolicyManagementServiceException("Forbidden operation for a remote PAP");
         }
 
-        PAPContainer papContainer = new PAPContainer(pap);
+        PapContainer papContainer = new PapContainer(pap);
 
         if (purgeUnreferencedPolicies) {
             papContainer.purgeUnreferencesPolicies();

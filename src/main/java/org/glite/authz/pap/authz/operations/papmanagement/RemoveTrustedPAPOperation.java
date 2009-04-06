@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.papmanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 
@@ -25,7 +25,7 @@ public class RemoveTrustedPAPOperation extends BasePAPOperation <Boolean> {
     protected Boolean doExecute() {
 
         try {
-            PAPManager.getInstance().deletePAP( papAlias );
+            PapManager.getInstance().deletePAP( papAlias );
         } catch (NotFoundException e) {
             return false;
         }

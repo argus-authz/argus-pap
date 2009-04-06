@@ -4,8 +4,8 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPManager;
-import org.glite.authz.pap.papmanagement.PAPManagerException;
+import org.glite.authz.pap.papmanagement.PapManager;
+import org.glite.authz.pap.papmanagement.PapManagerException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
@@ -29,11 +29,11 @@ public class UpdateTrustedPAPOperation extends BasePAPOperation<Boolean> {
     protected Boolean doExecute() {
     	
     	if (PAP.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
-    		throw new PAPManagerException("Forbidden operation: the default PAP is read-only.");
+    		throw new PapManagerException("Forbidden operation: the default PAP is read-only.");
     	}
 
         try {
-            PAPManager.getInstance().updatePAP( pap );
+            PapManager.getInstance().updatePAP( pap );
         } catch (NotFoundException e) {
             return false;
         }

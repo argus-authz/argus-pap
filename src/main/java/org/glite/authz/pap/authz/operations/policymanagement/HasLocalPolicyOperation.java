@@ -4,7 +4,7 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPContainer;
+import org.glite.authz.pap.papmanagement.PapContainer;
 
 public class HasLocalPolicyOperation extends BasePAPOperation<Boolean> {
 
@@ -22,7 +22,7 @@ public class HasLocalPolicyOperation extends BasePAPOperation<Boolean> {
 
     @Override
     protected Boolean doExecute() {
-        PAPContainer localPAP = new PAPContainer(ps);
+        PapContainer localPAP = new PapContainer(ps);
         return localPAP.hasPolicy(policyId);
     }
 

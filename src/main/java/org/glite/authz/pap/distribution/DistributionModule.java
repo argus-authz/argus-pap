@@ -9,8 +9,8 @@ import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -81,8 +81,8 @@ public class DistributionModule extends Thread {
 
         log.debug(String.format("Storing policies for PAP %s (id=%s)", pap.getAlias(), pap.getPapId()));
 
-        PAPManager papManager = PAPManager.getInstance();
-        PAPContainer papContainer = papManager.getPAPContainer(pap.getAlias());
+        PapManager papManager = PapManager.getInstance();
+        PapContainer papContainer = papManager.getPAPContainer(pap.getAlias());
 
         synchronized (storePoliciesLock) {
 
@@ -133,7 +133,7 @@ public class DistributionModule extends Thread {
 
                 log.info("Starting refreshing cache process...");
 
-                for (PAP pap : PAPManager.getInstance().getOrderedRemotePAPs()) {
+                for (PAP pap : PapManager.getInstance().getOrderedRemotePAPs()) {
 
                     if (this.isInterrupted())
                         break;

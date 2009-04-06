@@ -4,7 +4,7 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPContainer;
+import org.glite.authz.pap.papmanagement.PapContainer;
 import org.opensaml.xacml.policy.PolicySetType;
 
 public class GetLocalRootPolicySetOperation extends BasePAPOperation<PolicySetType> {
@@ -22,7 +22,7 @@ public class GetLocalRootPolicySetOperation extends BasePAPOperation<PolicySetTy
     @Override
     protected PolicySetType doExecute() {
 
-        PAPContainer psContainer = new PAPContainer(ps);
+        PapContainer psContainer = new PapContainer(ps);
 
         PolicySetType policySet = psContainer.getPAPRootPolicySet();
 

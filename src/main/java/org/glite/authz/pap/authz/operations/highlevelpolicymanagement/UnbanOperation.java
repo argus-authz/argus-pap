@@ -12,8 +12,8 @@ import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.TargetWizard;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -56,13 +56,13 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
 
-        PAP pap = PAPManager.getInstance().getPAP(alias);
+        PAP pap = PapManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {
             throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
         }
 
-        PAPContainer papContainer = new PAPContainer(pap);
+        PapContainer papContainer = new PapContainer(pap);
 
         List<PolicySetType> targetPolicySetList = getTargetPolicySetList(papContainer);
 
@@ -111,7 +111,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
                                                PermissionFlags.POLICY_READ_LOCAL));
     }
 
-    private PolicyType getTargetPolicy(PAPContainer papContainer, PolicySetType targetPolicySet) {
+    private PolicyType getTargetPolicy(PapContainer papContainer, PolicySetType targetPolicySet) {
 
         List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
         TypeStringUtils.releaseUnneededMemory(targetPolicySet);
@@ -130,7 +130,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
         return null;
     }
 
-    private List<PolicySetType> getTargetPolicySetList(PAPContainer papContainer) {
+    private List<PolicySetType> getTargetPolicySetList(PapContainer papContainer) {
 
         List<PolicySetType> targetPolicySetList = new LinkedList<PolicySetType>();
 

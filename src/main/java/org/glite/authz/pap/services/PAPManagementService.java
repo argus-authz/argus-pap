@@ -13,7 +13,7 @@ import org.glite.authz.pap.authz.operations.papmanagement.TrustedPAPExistsOperat
 import org.glite.authz.pap.authz.operations.papmanagement.UpdateTrustedPAPOperation;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.PAPVersion;
-import org.glite.authz.pap.papmanagement.PAPManagerException;
+import org.glite.authz.pap.papmanagement.PapManagerException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.slf4j.Logger;
@@ -130,7 +130,7 @@ public class PAPManagementService implements PAPManagement {
         try {
 
             if (PAP.DEFAULT_PAP_ALIAS.equals(papData.getAlias())) {
-                throw new PAPManagerException(String.format("Invalid request. \"%s\" cannot be updated", PAP.DEFAULT_PAP_ALIAS));
+                throw new PapManagerException(String.format("Invalid request. \"%s\" cannot be updated", PAP.DEFAULT_PAP_ALIAS));
             }
 
             return UpdateTrustedPAPOperation.instance(papData).execute();

@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.papmanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapManager;
 
 public class SetOrderOperation extends BasePAPOperation<Boolean> {
 
@@ -20,7 +20,7 @@ public class SetOrderOperation extends BasePAPOperation<Boolean> {
     @Override
     protected Boolean doExecute() {
 
-        PAPManager.getInstance().setPAPOrder(aliasArray);
+        PapManager.getInstance().setPAPOrder(aliasArray);
         return true;
 
     }

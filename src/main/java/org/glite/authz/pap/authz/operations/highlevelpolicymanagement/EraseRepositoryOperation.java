@@ -4,8 +4,8 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 
 public class EraseRepositoryOperation extends BasePAPOperation<Object> {
     
@@ -25,7 +25,7 @@ public class EraseRepositoryOperation extends BasePAPOperation<Object> {
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
         
-        PAPContainer papContainer = PAPManager.getInstance().getPAPContainer(alias);
+        PapContainer papContainer = PapManager.getInstance().getPAPContainer(alias);
         
         papContainer.deleteAllPolicySets();
         papContainer.deleteAllPolicies();

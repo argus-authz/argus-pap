@@ -12,8 +12,8 @@ import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.TargetWizard;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.PolicySetType;
@@ -52,13 +52,13 @@ public class BanOperation extends BasePAPOperation<String> {
             alias = PAP.DEFAULT_PAP_ALIAS;
         }
         
-        PAP pap = PAPManager.getInstance().getPAP(alias);
+        PAP pap = PapManager.getInstance().getPAP(alias);
 
         if (pap.isRemote()) {
             throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
         }
 
-        PAPContainer papContainer = new PAPContainer(pap);
+        PapContainer papContainer = new PapContainer(pap);
 
         PolicySetType targetPolicySet = getTargetPolicySet(papContainer);
 
@@ -125,7 +125,7 @@ public class BanOperation extends BasePAPOperation<String> {
         addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
     }
 
-    private PolicyType getTargetPolicy(PAPContainer papContainer, PolicySetType policySet) {
+    private PolicyType getTargetPolicy(PapContainer papContainer, PolicySetType policySet) {
 
         List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
 
@@ -150,7 +150,7 @@ public class BanOperation extends BasePAPOperation<String> {
         return policy;
     }
 
-    private PolicySetType getTargetPolicySet(PAPContainer papContainer) {
+    private PolicySetType getTargetPolicySet(PapContainer papContainer) {
 
         // get the target policy set, it must be the very first policy set (if it exists)
         PolicySetType targetPolicySet = null;

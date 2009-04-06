@@ -12,8 +12,8 @@ import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
 import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.RepositoryUtils;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
@@ -34,7 +34,7 @@ public final class PAPService {
                         .setMonitoringProperty(MonitoredProperties.SERVICE_STARTUP_TIME_PROP_NAME,
                                                ((new GregorianCalendar()).getTimeInMillis() / 1000));
 
-        PAPManager papManager = PAPManager.getInstance();
+        PapManager papManager = PapManager.getInstance();
 
         // Property: number of local policies
         int numberOfLocalPolicies = papManager.getDefaultPAPContainer().getNumberOfPolicies();
@@ -43,7 +43,7 @@ public final class PAPService {
 
         // Property: number of remote policies
         int numOfRemotePolicies = 0;
-        for (PAPContainer papContainer : PAPContainer.getContainers(papManager.getOrderedRemotePAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(papManager.getOrderedRemotePAPs())) {
             numOfRemotePolicies += papContainer.getNumberOfPolicies();
         }
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME,
@@ -90,7 +90,7 @@ public final class PAPService {
         logger.info("Starting repository manager...");
         RepositoryManager.bootstrap();
         
-        PAPManager.initialize();
+        PapManager.initialize();
         
         boolean performRepositoryValidationCheck;
 

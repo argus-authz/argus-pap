@@ -6,7 +6,7 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.PAP;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPData;
 
 
@@ -29,7 +29,7 @@ public class ListTrustedPAPsOperation extends BasePAPOperation<PAPData[]> {
     @Override
     protected PAPData[] doExecute() {
         
-        List<PAP> remotePapList = PAPManager.getInstance().getAllPAPs();
+        List<PAP> remotePapList = PapManager.getInstance().getAllPAPs();
         
         PAPData[] papDataArray = new PAPData[remotePapList.size()];
         

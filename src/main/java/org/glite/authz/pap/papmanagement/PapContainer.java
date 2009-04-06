@@ -24,11 +24,11 @@ import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PAPContainer {
+public class PapContainer {
 
     public static final Object highLevelOperationLock = new Object();
 
-    private static final Logger log = LoggerFactory.getLogger(PAPContainer.class);
+    private static final Logger log = LoggerFactory.getLogger(PapContainer.class);
 
     private final PAP pap;
     private final String papId;
@@ -36,7 +36,7 @@ public class PAPContainer {
     private final PolicySetDAO policySetDAO;
     private final String rootPolicySetId;
 
-    public PAPContainer(PAP pap) {
+    public PapContainer(PAP pap) {
         this.pap = pap;
         papId = pap.getPapId();
         rootPolicySetId = papId;
@@ -44,12 +44,12 @@ public class PAPContainer {
         policyDAO = DAOFactory.getDAOFactory().getPolicyDAO();
     }
 
-    public static List<PAPContainer> getContainers(List<PAP> papList) {
+    public static List<PapContainer> getContainers(List<PAP> papList) {
 
-        List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(papList.size());
+        List<PapContainer> papContainerList = new ArrayList<PapContainer>(papList.size());
 
         for (PAP pap : papList) {
-            papContainerList.add(new PAPContainer(pap));
+            papContainerList.add(new PapContainer(pap));
         }
         return papContainerList;
     }

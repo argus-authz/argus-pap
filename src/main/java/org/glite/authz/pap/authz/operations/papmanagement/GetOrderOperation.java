@@ -3,7 +3,7 @@ package org.glite.authz.pap.authz.operations.papmanagement;
 import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapManager;
 
 public class GetOrderOperation extends BasePAPOperation<String[]> {
 
@@ -17,7 +17,7 @@ public class GetOrderOperation extends BasePAPOperation<String[]> {
     protected String[] doExecute() {
 
         String[] papOrderArray = null;
-        papOrderArray = PAPManager.getInstance().getPAPConfigurationOrder();
+        papOrderArray = PapManager.getInstance().getPAPConfigurationOrder();
         return papOrderArray;
 
     }

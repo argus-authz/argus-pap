@@ -16,16 +16,16 @@ import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class PAPManager {
+public class PapManager {
 
-    private static PAPManager instance = null;
-    private static final Logger log = LoggerFactory.getLogger(PAPManager.class);
+    private static PapManager instance = null;
+    private static final Logger log = LoggerFactory.getLogger(PapManager.class);
 
     private String[] configurationAliasOrderedArray;
     private DistributionConfiguration distributionConfiguration;
     private PAPDAO papDAO;
 
-    private PAPManager() {
+    private PapManager() {
 
         papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
 
@@ -38,10 +38,10 @@ public class PAPManager {
         synchronizeRepositoryWithConfiguration();
     }
 
-    public static PAPManager getInstance() {
+    public static PapManager getInstance() {
 
         if (instance == null) {
-            throw new PAPManagerException("Please initialize configuration before calling the instance method!");
+            throw new PapManagerException("Please initialize configuration before calling the instance method!");
         }
 
         return instance;
@@ -49,7 +49,7 @@ public class PAPManager {
 
     public static void initialize() {
         if (instance == null) {
-            instance = new PAPManager();
+            instance = new PapManager();
         }
     }
 
@@ -58,7 +58,7 @@ public class PAPManager {
         String papAlias = pap.getAlias();
 
         if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
-            throw new PAPManagerException("Forbidden alias: " + papAlias);
+            throw new PapManagerException("Forbidden alias: " + papAlias);
         }
 
         if (exists(papAlias)) {
@@ -73,7 +73,7 @@ public class PAPManager {
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         rootPolicySet.setVersion("0");
 
-        PAPContainer papContainer = new PAPContainer(pap);
+        PapContainer papContainer = new PapContainer(pap);
         papContainer.storePolicySet(rootPolicySet);
     }
 
@@ -91,7 +91,7 @@ public class PAPManager {
         }
 
         // PAPContainer defaultPAPContainer = new PAPContainer(defaultPAP);
-        PAPContainer defaultPAPContainer = getDefaultPAPContainer();
+        PapContainer defaultPAPContainer = getDefaultPAPContainer();
 
         // check if the root policy set exists
         if (defaultPAPContainer.hasPolicySet(defaultPAPContainer.getPAPRootPolicySetId())) {
@@ -105,7 +105,7 @@ public class PAPManager {
     public void deletePAP(String papAlias) throws NotFoundException {
 
         if (PAP.DEFAULT_PAP_ALIAS.equals(papAlias)) {
-            throw new PAPManagerException("Delete the default PAP is not allowed");
+            throw new PapManagerException("Delete the default PAP is not allowed");
         }
 
         distributionConfiguration.removePAP(papAlias);
@@ -127,8 +127,8 @@ public class PAPManager {
         return papDAO.get(PAP.DEFAULT_PAP_ALIAS);
     }
 
-    public PAPContainer getDefaultPAPContainer() {
-        return new PAPContainer(getDefaultPAP());
+    public PapContainer getDefaultPAPContainer() {
+        return new PapContainer(getDefaultPAP());
     }
 
     public List<PAP> getLocalPAPs() {
@@ -163,8 +163,8 @@ public class PAPManager {
         return configurationAliasOrderedArray;
     }
 
-    public PAPContainer getPAPContainer(String papAlias) {
-        return new PAPContainer(getPAP(papAlias));
+    public PapContainer getPAPContainer(String papAlias) {
+        return new PapContainer(getPAP(papAlias));
     }
     
     public List<PAP> getPublicPAPs() {
@@ -210,13 +210,13 @@ public class PAPManager {
         int configurationArraySize = configurationAliasOrderedArray.length;
 
         if (configurationArraySize > repositoryAliasArray.length) {
-            throw new PAPManagerException("BUG: configuration contains more PAPs than the repository");
+            throw new PapManagerException("BUG: configuration contains more PAPs than the repository");
         }
 
         int defaultPAPAliasIdx = getAliasIndex(PAP.DEFAULT_PAP_ALIAS, repositoryAliasArray);
 
         if (defaultPAPAliasIdx == -1) {
-            throw new PAPManagerException("BUG: default PAP does not exist in the repository");
+            throw new PapManagerException("BUG: default PAP does not exist in the repository");
         }
 
         /* enforce the order specified in the configuration file */
@@ -239,7 +239,7 @@ public class PAPManager {
             int aliasIndex = getAliasIndex(alias, repositoryAliasArray);
 
             if (aliasIndex == -1) {
-                throw new PAPManagerException(
+                throw new PapManagerException(
                     "BUG: initialization error. PAP defined in the configuration is not in the repository");
             }
 

@@ -9,7 +9,7 @@ import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.PurgeOpera
 import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.UnbanOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
-import org.glite.authz.pap.papmanagement.PAPContainer;
+import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.slf4j.Logger;
@@ -29,7 +29,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                ruleId,
                                moveAfter));
         try {
-            synchronized (PAPContainer.highLevelOperationLock) {
+            synchronized (PapContainer.highLevelOperationLock) {
                 return AddRuleOperation.instance(alias,
                                                  isPermit,
                                                  new AttributeWizard(id, value),
@@ -60,7 +60,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
-            synchronized (PAPContainer.highLevelOperationLock) {
+            synchronized (PapContainer.highLevelOperationLock) {
                 return BanOperation.instance(alias,
                                              banAttributeWizard,
                                              resourceAttributeWizard,
@@ -78,7 +78,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
         try {
 
-            synchronized (PAPContainer.highLevelOperationLock) {
+            synchronized (PapContainer.highLevelOperationLock) {
                 EraseRepositoryOperation.instance(alias).execute();
             }
 
@@ -97,7 +97,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                purgeUnreferencedPolicySets,
                                purgeEmptyPolicySets));
         try {
-            synchronized (PAPContainer.highLevelOperationLock) {
+            synchronized (PapContainer.highLevelOperationLock) {
                 PurgeOperation.instance(alias,
                                         purgeUnreferencedPolicies,
                                         purgeEmptyPolicies,
@@ -127,7 +127,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
-            synchronized (PAPContainer.highLevelOperationLock) {
+            synchronized (PapContainer.highLevelOperationLock) {
                 return UnbanOperation.instance(alias,
                                                bannedAttributeWizard,
                                                resourceAttributeWizard,

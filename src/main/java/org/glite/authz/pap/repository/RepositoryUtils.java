@@ -6,8 +6,8 @@ import java.util.List;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
@@ -20,7 +20,7 @@ public class RepositoryUtils {
     public static boolean checkForLoops(boolean repair) {
         boolean result = true;
         
-        for (PAPContainer papContainer : PAPContainer.getContainers(PAPManager.getInstance().getAllPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getAllPAPs())) {
             if (checkForLoops(papContainer, papContainer.getPAPRootPolicySet(), new LinkedList<String>(), repair) == false) {
                 result = false;
             }
@@ -31,9 +31,9 @@ public class RepositoryUtils {
     
     public static boolean checkXMLValidation() {
 
-        List<PAPContainer> containerList = PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs());
+        List<PapContainer> containerList = PapContainer.getContainers(PapManager.getInstance().getLocalPAPs());
 
-        for (PAPContainer papContainer : containerList) {
+        for (PapContainer papContainer : containerList) {
 
             try {
                 papContainer.getAllPolicySets();
@@ -50,7 +50,7 @@ public class RepositoryUtils {
         
         boolean result = true;
 
-        for (PAPContainer papContainer : PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPAPs())) {
 
             PolicySetType rootPS;
             
@@ -148,18 +148,18 @@ public class RepositoryUtils {
     }
     
     public static void purgeUnreferencesPolicies() {
-        for (PAPContainer papContainer : PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPAPs())) {
             papContainer.purgeUnreferencesPolicies();
         }
     }
 
     public static void purgeUnreferencesPolicySets() {
-        for (PAPContainer papContainer : PAPContainer.getContainers(PAPManager.getInstance().getLocalPAPs())) {
+        for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getLocalPAPs())) {
             papContainer.purgeUnreferencedPolicySets();
         }
     }
     
-    private static boolean checkForLoops(PAPContainer papContainer, PolicySetType policySet, List<String> forbiddenIdList, boolean repair) {
+    private static boolean checkForLoops(PapContainer papContainer, PolicySetType policySet, List<String> forbiddenIdList, boolean repair) {
         
         boolean result = true;
         

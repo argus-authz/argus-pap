@@ -8,8 +8,8 @@ import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.distribution.DistributionModule;
-import org.glite.authz.pap.papmanagement.PAPContainer;
-import org.glite.authz.pap.papmanagement.PAPManager;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.opensaml.xacml.XACMLObject;
@@ -29,10 +29,10 @@ public class ProvisioningServiceDAO {
         return instance;
     }
 
-    private final PAPManager papManager;
+    private final PapManager papManager;
 
     private ProvisioningServiceDAO() {
-        papManager = PAPManager.getInstance();
+        papManager = PapManager.getInstance();
     }
 
     public List<XACMLObject> papQuery() {
@@ -41,7 +41,7 @@ public class ProvisioningServiceDAO {
 
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        List<PAPContainer> papContainerList = new ArrayList<PAPContainer>(PAPContainer.getContainers(papManager.getPublicPAPs()));
+        List<PapContainer> papContainerList = new ArrayList<PapContainer>(PapContainer.getContainers(papManager.getPublicPAPs()));
         
         PolicySetType rootPolicySet = makeRootPolicySet();
         resultList.add(rootPolicySet);
@@ -56,7 +56,7 @@ public class ProvisioningServiceDAO {
 //            papContainerList.addAll(publicPAPContainerList);
 //        }
 
-        for (PAPContainer papContainer : papContainerList) {
+        for (PapContainer papContainer : papContainerList) {
 
             List<XACMLObject> papXACMLObjectList = getPublic(papContainer);
             
@@ -95,10 +95,10 @@ public class ProvisioningServiceDAO {
 
         resultList.add(rootPolicySet);
 
-        List<PAPContainer> papContainerList = PAPContainer.getContainers(papManager.getAllPAPs());
+        List<PapContainer> papContainerList = PapContainer.getContainers(papManager.getAllPAPs());
 
         // Add references to the remote PAPs
-        for (PAPContainer papContainer : papContainerList) {
+        for (PapContainer papContainer : papContainerList) {
             log.info("Adding PAP: " + papContainer.getPAP().getAlias());
 
             try {
@@ -124,7 +124,7 @@ public class ProvisioningServiceDAO {
         return resultList;
     }
 
-    private PolicySetType getPolicySetNoReferences(PAPContainer papContainer, String policySetId) {
+    private PolicySetType getPolicySetNoReferences(PapContainer papContainer, String policySetId) {
 
         PolicySetType policySetNoRef = papContainer.getPolicySet(policySetId);
 
@@ -167,7 +167,7 @@ public class ProvisioningServiceDAO {
         return policySetNoRef;
     }
 
-    private List<XACMLObject> getPublic(PAPContainer papContainer) {
+    private List<XACMLObject> getPublic(PapContainer papContainer) {
 
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
@@ -218,7 +218,7 @@ public class ProvisioningServiceDAO {
     }
 
     private PolicySetType makeRootPolicySet() {
-    	String rootPolicySetId = "root-" + PAPManager.getInstance().getDefaultPAP().getPapId();
+    	String rootPolicySetId = "root-" + PapManager.getInstance().getDefaultPAP().getPapId();
         PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(rootPolicySetId,
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
         rootPolicySet.setVersion(RepositoryManager.getVersion());
