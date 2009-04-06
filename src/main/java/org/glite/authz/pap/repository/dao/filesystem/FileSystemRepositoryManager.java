@@ -48,7 +48,7 @@ public class FileSystemRepositoryManager extends RepositoryManager {
     	if (!initialized) {
     		throw new RepositoryException("FileSytemRepository not initialized");
     	}
-		return FileSystemPAPDAO.getInstance().getVersion();
+		return FileSystemPapDAO.getInstance().getVersion();
 	}
 
     public static String getXACMLFileNameExtension() {

@@ -494,7 +494,7 @@ public class PapContainer {
 
     private void updatePAPPolicyLastModificationTime() {
         pap.setPolicyLastModificationTime((new GregorianCalendar()).getTimeInMillis());
-        RepositoryManager.getDAOFactory().getPAPDAO().update(pap);
+        RepositoryManager.getDAOFactory().getPapDAO().update(pap);
         notifyPolicyLastModificationTimeUpdate();
     }
 

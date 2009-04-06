@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.PAP;
 
-public interface PAPDAO {
+public interface PapDAO {
 
     public void delete(String papAlias);
 

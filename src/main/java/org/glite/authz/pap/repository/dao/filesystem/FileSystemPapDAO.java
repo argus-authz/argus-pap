@@ -12,20 +12,20 @@ import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
-import org.glite.authz.pap.repository.dao.PAPDAO;
+import org.glite.authz.pap.repository.dao.PapDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class FileSystemPAPDAO implements PAPDAO {
+public class FileSystemPapDAO implements PapDAO {
 
     private static String dbPath = FileSystemRepositoryManager.getFileSystemDatabaseDir();
 
-    private static FileSystemPAPDAO instance = null;
+    private static FileSystemPapDAO instance = null;
     @SuppressWarnings("unused")
-    private static final Logger log = LoggerFactory.getLogger(FileSystemPAPDAO.class);
+    private static final Logger log = LoggerFactory.getLogger(FileSystemPapDAO.class);
 
     private static final String PAP_FILE_NAME = "pap_info.ini";
     private static final String REMOTE_PAP_STANZA = "paps";
@@ -33,7 +33,7 @@ public class FileSystemPAPDAO implements PAPDAO {
 
     private INIConfiguration papsINIFile;
 
-    private FileSystemPAPDAO() {
+    private FileSystemPapDAO() {
         papsINIFile = new INIConfiguration();
 
         File iniPAPConfigurationFile = new File(dbPath + File.separator + PAP_FILE_NAME);
@@ -55,9 +55,9 @@ public class FileSystemPAPDAO implements PAPDAO {
 
     }
 
-    public static FileSystemPAPDAO getInstance() {
+    public static FileSystemPapDAO getInstance() {
         if (instance == null)
-            instance = new FileSystemPAPDAO();
+            instance = new FileSystemPapDAO();
         return instance;
     }
 

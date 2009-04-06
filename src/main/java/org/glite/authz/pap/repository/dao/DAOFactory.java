@@ -12,6 +12,6 @@ public abstract class DAOFactory {
 
     public abstract PolicyDAO getPolicyDAO();
 
-    public abstract PAPDAO getPAPDAO();
+    public abstract PapDAO getPapDAO();
 
 }

@@ -8,7 +8,7 @@ import org.glite.authz.pap.common.PAP;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.distribution.DistributionConfiguration;
 import org.glite.authz.pap.repository.RepositoryManager;
-import org.glite.authz.pap.repository.dao.PAPDAO;
+import org.glite.authz.pap.repository.dao.PapDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
@@ -23,11 +23,11 @@ public class PapManager {
 
     private String[] configurationAliasOrderedArray;
     private DistributionConfiguration distributionConfiguration;
-    private PAPDAO papDAO;
+    private PapDAO papDAO;
 
     private PapManager() {
 
-        papDAO = RepositoryManager.getDAOFactory().getPAPDAO();
+        papDAO = RepositoryManager.getDAOFactory().getPapDAO();
 
         createDefaultPAPIfNotExists();
 

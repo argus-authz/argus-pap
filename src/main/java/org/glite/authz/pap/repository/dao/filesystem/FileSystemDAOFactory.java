@@ -1,7 +1,7 @@
 package org.glite.authz.pap.repository.dao.filesystem;
 
 import org.glite.authz.pap.repository.dao.DAOFactory;
-import org.glite.authz.pap.repository.dao.PAPDAO;
+import org.glite.authz.pap.repository.dao.PapDAO;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 
@@ -28,8 +28,8 @@ public class FileSystemDAOFactory extends DAOFactory {
     }
 
     @Override
-    public PAPDAO getPAPDAO() {
-        return FileSystemPAPDAO.getInstance();
+    public PapDAO getPapDAO() {
+        return FileSystemPapDAO.getInstance();
     }
 
 }
