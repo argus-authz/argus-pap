@@ -216,12 +216,13 @@ public final class PAPServer {
         connector.setPort( port );
         String host = getStringFromStandaloneConfiguration( "hostname", PAPStandaloneServiceDefaults.HOSTNAME );
         
-        if (! host.equals( PAPStandaloneServiceDefaults.HOSTNAME )){
-            
-            log.info( "PAP service will listen on {}:{}", new Object[]{host,port} );
+        if (! host.equals( PAPStandaloneServiceDefaults.HOSTNAME ))
             connector.setHost( host );
-        }
-
+        else
+        	// Will listen on any IP on the local machine
+        	connector.setHost("0.0.0.0");        	
+                
+        log.info( "PAP service will listen on {}:{}", new Object[]{host,port} );
         papServer.setConnectors( new Connector[] { connector } );
 
         JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
