@@ -1,4 +1,4 @@
-package org.glite.authz.pap.papmanagement;
+package org.glite.authz.pap.distribution;
 
 import java.rmi.RemoteException;
 import java.util.List;
@@ -7,6 +7,8 @@ import javax.xml.rpc.ServiceException;
 
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;

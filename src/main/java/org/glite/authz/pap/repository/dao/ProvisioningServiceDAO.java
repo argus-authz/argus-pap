@@ -8,7 +8,7 @@ import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
-import org.glite.authz.pap.papmanagement.DistributionModule;
+import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.RepositoryManager;

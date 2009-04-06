@@ -5,7 +5,7 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.exceptions.PAPException;
-import org.glite.authz.pap.papmanagement.DistributionModule;
+import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 

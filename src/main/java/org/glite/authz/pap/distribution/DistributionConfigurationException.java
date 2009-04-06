@@ -1,4 +1,4 @@
-package org.glite.authz.pap.papmanagement;
+package org.glite.authz.pap.distribution;
 
 public class DistributionConfigurationException extends RuntimeException {
 

@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.Pap;
+import org.glite.authz.pap.distribution.DistributionConfiguration;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PapDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;

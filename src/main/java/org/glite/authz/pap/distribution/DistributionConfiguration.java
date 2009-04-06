@@ -1,4 +1,4 @@
-package org.glite.authz.pap.papmanagement;
+package org.glite.authz.pap.distribution;
 
 import java.util.HashSet;
 import java.util.Iterator;
