@@ -9,6 +9,9 @@ import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicySetType;
 
+/**
+ * This is the interface for the policy set DAO.
+ */
 public interface PolicySetDAO {
 
     /**
