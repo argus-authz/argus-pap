@@ -1,44 +1,74 @@
 package org.glite.authz.pap.repository;
 
+import java.io.File;
+import java.util.List;
+import java.util.NoSuchElementException;
+
+import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.Pap;
+import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
+import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
+import org.glite.authz.pap.common.xacml.wizard.XACMLWizard;
+import org.glite.authz.pap.encoder.EncodingException;
+import org.glite.authz.pap.encoder.PolicyFileEncoder;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager;
 import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
+import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This is an Abstract class used to bootstrap and initialize the repository. This class must be extended by the
+ * specific repository implementation class.
+ * <p>
+ * 
+ * @see FileSystemRepositoryManager
+ * @see DAOFactory
+ */
 public abstract class RepositoryManager {
 
-	public static final String REPOSITORY_VERSION = "1";
-    private static boolean initialized = false;
+    public static final String REPOSITORY_MANAGER_VERSION = "1";
+
     private static final Logger log = LoggerFactory.getLogger(RepositoryManager.class);
+    private static boolean initialized = false;
 
     protected RepositoryManager() {}
 
     /**
      * Call the bootstrap() method before using this class.
      */
-
     public static void bootstrap() {
 
-        FileSystemRepositoryManager.initialize();
-        
+        FileSystemRepositoryManager.getInstance().initialize();
+
         checkVersion();
-		
+
         initialized = true;
     }
-    
-    public static DAOFactory getDAOFactory() {
-        return DAOFactory.getDAOFactory();
-    }
 
-    public static String getVersion() {
-        return REPOSITORY_VERSION;
+    /**
+     * Checks that the version of an already existing repository is supported by this manager.
+     * 
+     * @throws InvalidVersionException if the version of the existing repository is not supported.
+     */
+    private static void checkVersion() {
+        String repositoryVersion = FileSystemRepositoryManager.getInstance().getRepositoryVersion();
+
+        if (!(REPOSITORY_MANAGER_VERSION.equals(repositoryVersion))) {
+            throw new InvalidVersionException("Invalid repository version (v" + repositoryVersion
+                    + "). Requested version is v" + REPOSITORY_MANAGER_VERSION);
+        }
+
+        log.info("Repository version: v" + repositoryVersion);
     }
-    
+     
     /**
      * Initialize the repository reading policies from the configuration file.
      */
-//    public static void setLocalPoliciesFromConfigurationFileIfSetIntoConfiguration() {
+//     private static void setLocalPoliciesFromFile() {
 //
 //        if (!initialized) {
 //            throw new RepositoryException("Trying to use the repository before initilization. Please use the bootstrap() method.");
@@ -58,7 +88,7 @@ public abstract class RepositoryManager {
 //
 //        PolicyFileEncoder pse = new PolicyFileEncoder();
 //
-//        // File policyConfigurationFile = new File(PAPConfiguration.instance().getPapPolicyConfigurationFileName());
+//         File policyConfigurationFile = new File(PAPConfiguration.instance().getPapPolicyConfigurationFileName());
 //
 //        log.info("Reading policy configuration file: " + policyConfigurationFile.getAbsolutePath());
 //
@@ -74,7 +104,7 @@ public abstract class RepositoryManager {
 //            throw new RepositoryException(e);
 //        }
 //
-//        PAPContainer localPapContainer = PAPManager.getInstance().getDefaultPAPContainer();
+//        PapContainer localPapContainer = PapManager.getInstance().getPapContainer(Pap.DEFAULT_PAP_ALIAS);
 //
 //        localPapContainer.deleteAllPolicies();
 //        localPapContainer.deleteAllPolicySets();
@@ -98,14 +128,18 @@ public abstract class RepositoryManager {
 //        }
 //    }
 
-    private static void checkVersion() {
-        String repositoryVersion = FileSystemRepositoryManager.getVersion();
+    /**
+     * Returns the version of the existing repository.
+     * 
+     * @return the version of the repository as <code>String</code>. The version is an integer
+     *         number, higher is that number and more recent is the repository version.
+     */
+    protected abstract String getRepositoryVersion();
 
-        if (!(REPOSITORY_VERSION.equals(repositoryVersion))) {
-            throw new InvalidVersionException("Invalid repository version (v" + repositoryVersion
-                    + "). Requested version is v" + REPOSITORY_VERSION);
-        }
-
-        log.info("Repository version: v" + repositoryVersion);
-    }
+    /**
+     * Initialize the repository. These method is called by the <code>bootstrap()</code> method of
+     * {@link RepositoryManager} before calling any other method of the repository manager class
+     * implementation.
+     */
+    protected abstract void initialize();
 }

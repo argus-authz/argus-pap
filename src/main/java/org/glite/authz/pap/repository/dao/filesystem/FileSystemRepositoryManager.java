@@ -17,19 +17,28 @@ public class FileSystemRepositoryManager extends RepositoryManager {
     private static final String POLICY_FILENAME_PREFIX = "Policy_";
     private static final String POLICYSET_FILENAME_PREFIX = "PolicySet_";
     private static final String XACML_FILENAME_EXTENSION = ".xml";
+    private static FileSystemRepositoryManager instance = null;
 
     /**
      * Call the initialize() method before using this class.
      */
 
     private FileSystemRepositoryManager() {}
-
+    
     public static String getFileNameExt() {
         return XACML_FILENAME_EXTENSION;
     }
 
     public static String getFileSystemDatabaseDir() {
         return fileSystemDatabaseDir;
+    }
+
+    public static FileSystemRepositoryManager getInstance() {
+        
+        if (instance == null) {
+            instance = new FileSystemRepositoryManager();
+        }
+        return instance;
     }
 
     public static String getPAPDirAbsolutePath(String papId) {
@@ -44,34 +53,10 @@ public class FileSystemRepositoryManager extends RepositoryManager {
         return POLICYSET_FILENAME_PREFIX;
     }
 
-    public static String getVersion() {
-    	if (!initialized) {
-    		throw new RepositoryException("FileSytemRepository not initialized");
-    	}
-		return FileSystemPapDAO.getInstance().getVersion();
-	}
-
     public static String getXACMLFileNameExtension() {
         return XACML_FILENAME_EXTENSION;
     }
 
-    public static void initialize() {
-        log.info("Initializing filesystem repository...");
-
-        fileSystemDatabaseDir = PAPConfiguration.instance().getPAPRepositoryDir();
-
-        File rootDir = new File(fileSystemDatabaseDir);
-
-        try {
-            createDirectoryPath(rootDir);
-        } catch (RepositoryException e) {
-            throw new RepositoryException("Cannot create the repository root directory: " + rootDir.getAbsolutePath(), e);
-        }
-
-        initialized = true;
-        log.info("Repository root directory is set to: " + rootDir.getAbsolutePath());
-    }
-    
     private static void createDirectoryPath(File dir) {
 
         if (!dir.exists()) {
@@ -93,5 +78,29 @@ public class FileSystemRepositoryManager extends RepositoryManager {
         } catch (IOException e) {
             throw new RepositoryException("Execute permission not set: " + dir.getAbsolutePath(), e);
         }
+    }
+
+    public String getRepositoryVersion() {
+    	if (!initialized) {
+    		throw new RepositoryException("FileSytemRepository not initialized");
+    	}
+		return FileSystemPapDAO.getInstance().getVersion();
+	}
+    
+    public void initialize() {
+        log.info("Initializing filesystem repository...");
+
+        fileSystemDatabaseDir = PAPConfiguration.instance().getPAPRepositoryDir();
+
+        File rootDir = new File(fileSystemDatabaseDir);
+
+        try {
+            createDirectoryPath(rootDir);
+        } catch (RepositoryException e) {
+            throw new RepositoryException("Cannot create the repository root directory: " + rootDir.getAbsolutePath(), e);
+        }
+
+        initialized = true;
+        log.info("Repository root directory is set to: " + rootDir.getAbsolutePath());
     }
 }

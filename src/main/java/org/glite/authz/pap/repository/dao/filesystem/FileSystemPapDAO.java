@@ -43,7 +43,7 @@ public class FileSystemPapDAO implements PapDAO {
         try {
 
             if (!iniPAPConfigurationFile.exists()) {
-            	papsINIFile.setProperty(VERSION_KEY, RepositoryManager.REPOSITORY_VERSION);
+            	papsINIFile.setProperty(VERSION_KEY, RepositoryManager.REPOSITORY_MANAGER_VERSION);
                 papsINIFile.save();
                 papsINIFile.clearProperty(VERSION_KEY);
             }

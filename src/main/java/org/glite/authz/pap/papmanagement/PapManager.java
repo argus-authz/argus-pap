@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.distribution.DistributionConfiguration;
-import org.glite.authz.pap.repository.RepositoryManager;
+import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PapDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
@@ -25,7 +25,7 @@ public class PapManager {
 
     private PapManager() {
 
-        papDAO = RepositoryManager.getDAOFactory().getPapDAO();
+        papDAO = DAOFactory.getDAOFactory().getPapDAO();
 
         createDefaultPapIfNotExists();
 

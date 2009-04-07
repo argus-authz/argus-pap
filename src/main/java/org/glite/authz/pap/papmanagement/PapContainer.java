@@ -6,13 +6,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
-import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
@@ -494,7 +493,7 @@ public class PapContainer {
 
     private void updatePAPPolicyLastModificationTime() {
         pap.setPolicyLastModificationTime((new GregorianCalendar()).getTimeInMillis());
-        RepositoryManager.getDAOFactory().getPapDAO().update(pap);
+        DAOFactory.getDAOFactory().getPapDAO().update(pap);
         notifyPolicyLastModificationTimeUpdate();
     }
 

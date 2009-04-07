@@ -276,7 +276,7 @@ public class ProvisioningServiceUtils {
         
         PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(rootPolicySetId,
                                                                          PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
-        rootPolicySet.setVersion(RepositoryManager.getVersion());
+        rootPolicySet.setVersion(RepositoryManager.REPOSITORY_MANAGER_VERSION);
         
         return rootPolicySet;
     }
