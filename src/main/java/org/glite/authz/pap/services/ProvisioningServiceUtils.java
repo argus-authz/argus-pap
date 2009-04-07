@@ -26,6 +26,10 @@ import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.Pap;
+import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
+import org.glite.authz.pap.papmanagement.PapManager;
+import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
 import org.glite.authz.pap.services.provisioning.exceptions.WrongFormatIssuerException;
@@ -52,15 +56,9 @@ import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyQueryType;
 import org.opensaml.xacml.profile.saml.XACMLPolicyStatementType;
 import org.opensaml.xacml.profile.saml.impl.XACMLPolicyStatementTypeImplBuilder;
-import org.opensaml.xml.XMLObject;
 import org.opensaml.xml.XMLObjectBuilderFactory;
-import org.opensaml.xml.io.Marshaller;
-import org.opensaml.xml.io.MarshallerFactory;
-import org.opensaml.xml.io.MarshallingException;
-import org.opensaml.xml.util.XMLHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Element;
 
 /**
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
@@ -71,115 +69,32 @@ public class ProvisioningServiceUtils {
     @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.getLogger(ProvisioningServiceUtils.class);
 
-    public static String xmlObjectToString(XMLObject xmlObject) {
+    public static void checkQuery(XACMLPolicyQueryType query) throws VersionMismatchException,
+            MissingIssuerException, WrongFormatIssuerException {
 
-        try {
+        /* check the version attribute is for a SAML V2.0 query */
 
-            MarshallerFactory marshallerFactory = Configuration.getMarshallerFactory();
-            Marshaller queryMarshaller = marshallerFactory.getMarshaller(xmlObject);
-            Element queryElement = queryMarshaller.marshall(xmlObject);
-            return XMLHelper.nodeToString(queryElement);
-
-        } catch (MarshallingException e) {
-            throw new RuntimeException(e);
+        if (query.getVersion() != SAMLVersion.VERSION_20) {
+            throw new VersionMismatchException();
         }
 
-    }
+        /* TODO check issue instant */
 
-    // TODO this method is too long, should be split
-    public static Response createResponse(XACMLPolicyQueryType inResponseTo, List<XACMLObject> policyObjects, HttpServletRequest request) {
+        /* check the issuer is present and has the expected format */
 
-        // get a builder factory
-        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
+        Issuer issuer = query.getIssuer();
 
-        /* prepare the Response object to return */
-
-        // build a response object
-        ResponseBuilder responseBuilder = (ResponseBuilder) builderFactory.getBuilder(Response.DEFAULT_ELEMENT_NAME);
-        Response response = responseBuilder.buildObject();
-
-        // set a few attributes for the response
-        response.setID("_" + UUID.randomUUID().toString());
-        response.setVersion(SAMLVersion.VERSION_20);
-        response.setIssueInstant(new DateTime());
-        response.setInResponseTo(inResponseTo.getID());
-
-        /* add the Assertion element */
-
-        // build an assertion object
-        AssertionBuilder assertionBuilder = (AssertionBuilder) builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME);
-        Assertion assertion = assertionBuilder.buildObject();
-
-        // set a few attributes for the assertion
-        assertion.setID("_" + UUID.randomUUID().toString());
-        assertion.setVersion(SAMLVersion.VERSION_20);
-        assertion.setIssueInstant(new DateTime());
-
-        // build an issuer object
-        IssuerBuilder issuerBuilder = (IssuerBuilder) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
-        Issuer issuer = issuerBuilder.buildObject();
-
-        String endpoint = String.format( "%s://%s:%s/%s/services/ProvisioningService", request.getScheme(), request.getServerName(), request.getServerPort(), PAPConfiguration.DEFAULT_WEBAPP_CONTEXT );
-        
-        issuer.setValue(endpoint);
-
-        assertion.setIssuer(issuer);
-
-        /* build policy statements objects */
-
-        XACMLPolicyStatementTypeImplBuilder policyStatementBuilder = (XACMLPolicyStatementTypeImplBuilder) builderFactory.getBuilder(XACMLPolicyStatementType.TYPE_NAME_XACML20);
-
-        XACMLPolicyStatementType policyStatement = policyStatementBuilder.buildObject(Statement.DEFAULT_ELEMENT_NAME,
-                                                                                      XACMLPolicyStatementType.TYPE_NAME_XACML20);
-
-        Iterator<XACMLObject> iterator = policyObjects.iterator();
-
-        while (iterator.hasNext()) {
-
-            XACMLObject xacmlObject = iterator.next();
-
-            if (xacmlObject instanceof PolicySetType) {
-                
-                policyStatement.getPolicySets().add((PolicySetType) xacmlObject);
-                
-//                if (xacmlObject instanceof PolicySetTypeString) {
-//                    ((PolicySetTypeString) xacmlObject).releasePolicySetType();
-//                }
-
-            } else {
-
-                policyStatement.getPolicies().add((PolicyType) xacmlObject);
-                
-//                if (xacmlObject instanceof PolicyTypeString) {
-//                    ((PolicyTypeString) xacmlObject).releasePolicyType();
-//                }
-
-            }
-
-            // add the statement to the assertion
-            assertion.getStatements().add(policyStatement);
+        if (issuer == null) {
+            throw new MissingIssuerException();
         }
 
-        // add the assertion to the response
-        response.getAssertions().add(assertion);
+        String issuerFormat = issuer.getFormat();
 
-        /* add the Status element */
+        if (issuerFormat != null && !issuerFormat.equals(NameID.ENTITY))
+            throw new WrongFormatIssuerException(issuerFormat);
 
-        // build a status object
-        StatusBuilder statusBuilder = (StatusBuilder) builderFactory.getBuilder(Status.DEFAULT_ELEMENT_NAME);
-        Status status = statusBuilder.buildObject();
+        // TODO Check that the issuer is the same as in the transport
 
-        // build a status code object
-        StatusCodeBuilder statusCodeBuilder = (StatusCodeBuilder) builderFactory.getBuilder(StatusCode.DEFAULT_ELEMENT_NAME);
-        StatusCode statusCode = statusCodeBuilder.buildObject();
-
-        statusCode.setValue(StatusCode.SUCCESS_URI);
-
-        status.setStatusCode(statusCode);
-
-        response.setStatus(status);
-
-        return response;
     }
 
     public static Response createResponse(XACMLPolicyQueryType inResponseTo, Exception e) {
@@ -254,32 +169,116 @@ public class ProvisioningServiceUtils {
         return response;
     }
 
-    public static void checkQuery(XACMLPolicyQueryType query) throws VersionMismatchException, MissingIssuerException,
-            WrongFormatIssuerException {
+    // TODO this method is too long, should be split
+    public static Response createResponse(XACMLPolicyQueryType inResponseTo, List<XACMLObject> policyObjects,
+            HttpServletRequest request) {
 
-        /* check the version attribute is for a SAML V2.0 query */
+        // get a builder factory
+        XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
-        if (query.getVersion() != SAMLVersion.VERSION_20) {
-            throw new VersionMismatchException();
+        /* prepare the Response object to return */
+
+        // build a response object
+        ResponseBuilder responseBuilder = (ResponseBuilder) builderFactory.getBuilder(Response.DEFAULT_ELEMENT_NAME);
+        Response response = responseBuilder.buildObject();
+
+        // set a few attributes for the response
+        response.setID("_" + UUID.randomUUID().toString());
+        response.setVersion(SAMLVersion.VERSION_20);
+        response.setIssueInstant(new DateTime());
+        response.setInResponseTo(inResponseTo.getID());
+
+        /* add the Assertion element */
+
+        // build an assertion object
+        AssertionBuilder assertionBuilder = (AssertionBuilder) builderFactory.getBuilder(Assertion.DEFAULT_ELEMENT_NAME);
+        Assertion assertion = assertionBuilder.buildObject();
+
+        // set a few attributes for the assertion
+        assertion.setID("_" + UUID.randomUUID().toString());
+        assertion.setVersion(SAMLVersion.VERSION_20);
+        assertion.setIssueInstant(new DateTime());
+
+        // build an issuer object
+        IssuerBuilder issuerBuilder = (IssuerBuilder) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
+        Issuer issuer = issuerBuilder.buildObject();
+
+        String endpoint = String.format("%s://%s:%s/%s/services/ProvisioningService",
+                                        request.getScheme(),
+                                        request.getServerName(),
+                                        request.getServerPort(),
+                                        PAPConfiguration.DEFAULT_WEBAPP_CONTEXT);
+
+        issuer.setValue(endpoint);
+
+        assertion.setIssuer(issuer);
+
+        /* build policy statements objects */
+
+        XACMLPolicyStatementTypeImplBuilder policyStatementBuilder = (XACMLPolicyStatementTypeImplBuilder) builderFactory.getBuilder(XACMLPolicyStatementType.TYPE_NAME_XACML20);
+
+        XACMLPolicyStatementType policyStatement = policyStatementBuilder.buildObject(Statement.DEFAULT_ELEMENT_NAME,
+                                                                                      XACMLPolicyStatementType.TYPE_NAME_XACML20);
+
+        Iterator<XACMLObject> iterator = policyObjects.iterator();
+
+        while (iterator.hasNext()) {
+
+            XACMLObject xacmlObject = iterator.next();
+
+            if (xacmlObject instanceof PolicySetType) {
+
+                policyStatement.getPolicySets().add((PolicySetType) xacmlObject);
+
+                // if (xacmlObject instanceof PolicySetTypeString) {
+                // ((PolicySetTypeString) xacmlObject).releasePolicySetType();
+                // }
+
+            } else {
+
+                policyStatement.getPolicies().add((PolicyType) xacmlObject);
+
+                // if (xacmlObject instanceof PolicyTypeString) {
+                // ((PolicyTypeString) xacmlObject).releasePolicyType();
+                // }
+
+            }
+
+            // add the statement to the assertion
+            assertion.getStatements().add(policyStatement);
         }
 
-        /* TODO check issue instant */
+        // add the assertion to the response
+        response.getAssertions().add(assertion);
 
-        /* check the issuer is present and has the expected format */
+        /* add the Status element */
 
-        Issuer issuer = query.getIssuer();
+        // build a status object
+        StatusBuilder statusBuilder = (StatusBuilder) builderFactory.getBuilder(Status.DEFAULT_ELEMENT_NAME);
+        Status status = statusBuilder.buildObject();
 
-        if (issuer == null) {
-            throw new MissingIssuerException();
-        }
+        // build a status code object
+        StatusCodeBuilder statusCodeBuilder = (StatusCodeBuilder) builderFactory.getBuilder(StatusCode.DEFAULT_ELEMENT_NAME);
+        StatusCode statusCode = statusCodeBuilder.buildObject();
 
-        String issuerFormat = issuer.getFormat();
+        statusCode.setValue(StatusCode.SUCCESS_URI);
 
-        if (issuerFormat != null && !issuerFormat.equals(NameID.ENTITY))
-            throw new WrongFormatIssuerException(issuerFormat);
+        status.setStatusCode(statusCode);
 
-        // TODO Check that the issuer is the same as in the transport
+        response.setStatus(status);
 
+        return response;
+    }
+
+    public static PolicySetType makeRootPolicySet() {
+        
+        String rootPolicySetId = "root-" + PapManager.getInstance().getPap(Pap.DEFAULT_PAP_ALIAS).getId();
+        
+        PolicySetType rootPolicySet = PolicySetHelper.buildWithAnyTarget(rootPolicySetId,
+                                                                         PolicySetHelper.COMB_ALG_FIRST_APPLICABLE);
+        rootPolicySet.setVersion(RepositoryManager.getVersion());
+        
+        return rootPolicySet;
     }
 
 }

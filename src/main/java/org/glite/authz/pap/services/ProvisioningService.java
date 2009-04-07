@@ -27,6 +27,7 @@ import org.apache.axis.MessageContext;
 import org.apache.axis.transport.http.HTTPConstants;
 import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPDPOperation;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
@@ -54,7 +55,7 @@ public class ProvisioningService implements Provisioning {
 
             try {
                 // log the received query
-                log.trace("Received XACLMPolicyQuery " + ProvisioningServiceUtils.xmlObjectToString(query));
+                log.trace("Received XACLMPolicyQuery " + XMLObjectHelper.toString(query));
 
                 /* check a few things about the query */
                 try {
@@ -93,7 +94,7 @@ public class ProvisioningService implements Provisioning {
 
                 Response response = ProvisioningServiceUtils.createResponse(query, resultList, httpServletRequest);
 
-                log.trace("Sending Response : " + ProvisioningServiceUtils.xmlObjectToString(response));
+                log.trace("Sending Response : " + XMLObjectHelper.toString(query));
 
                 return response;
 
