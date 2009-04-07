@@ -1,10 +1,12 @@
 package org.glite.authz.pap.papmanagement;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.Pap;
+import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.distribution.DistributionConfiguration;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PapDAO;
@@ -31,7 +33,7 @@ public class PapManager {
 
         distributionConfiguration = DistributionConfiguration.getInstance();
 
-        configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
+        configurationAliasOrderedArray = distributionConfiguration.getPapOrdering();
 
         synchronizeRepositoryWithConfiguration();
     }
@@ -140,7 +142,7 @@ public class PapManager {
         distributionConfiguration.savePAPOrder(aliasArray);
 
         // updated the internal list with the new order
-        configurationAliasOrderedArray = distributionConfiguration.getPAPOrderArray();
+        configurationAliasOrderedArray = distributionConfiguration.getPapOrdering();
     }
 
     public void updatePap(Pap newpap) {
@@ -160,17 +162,17 @@ public class PapManager {
         papDAO.update(newpap);
     }
 
-    private String[] buildOrderedAliasArray() {
+    private List<String> buildOrderedAliasList() {
 
-        String[] repositoryAliasArray = papDAO.getAllAliases();
+        List<String> repositoryAliasList = papDAO.getAliasList();
 
         int configurationArraySize = configurationAliasOrderedArray.length;
 
-        if (configurationArraySize > repositoryAliasArray.length) {
+        if (configurationArraySize > repositoryAliasList.size()) {
             throw new PapManagerException("BUG: configuration contains more PAPs than the repository");
         }
 
-        int defaultPAPAliasIdx = getAliasIndex(Pap.DEFAULT_PAP_ALIAS, repositoryAliasArray);
+        int defaultPAPAliasIdx = repositoryAliasList.indexOf(Pap.DEFAULT_PAP_ALIAS);
 
         if (defaultPAPAliasIdx == -1) {
             throw new PapManagerException("BUG: default PAP does not exist in the repository");
@@ -181,7 +183,7 @@ public class PapManager {
         List<String> configurationAliasOrderedList = new LinkedList<String>();
 
         // if the default PAP is not specified in the order in configuration then it goes for first
-        if (getAliasIndex(Pap.DEFAULT_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
+        if (Utils.indexOf(Pap.DEFAULT_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
             configurationAliasOrderedList.add(Pap.DEFAULT_PAP_ALIAS);
         }
 
@@ -193,17 +195,17 @@ public class PapManager {
         for (int i = 0; i < configurationAliasOrderedList.size(); i++) {
             String alias = configurationAliasOrderedList.get(i);
 
-            int aliasIndex = getAliasIndex(alias, repositoryAliasArray);
+            int aliasIndex = repositoryAliasList.indexOf(alias);
 
             if (aliasIndex == -1) {
                 throw new PapManagerException(
                     "BUG: initialization error. PAP defined in the configuration is not in the repository");
             }
-
-            swapElementsOfArray(aliasIndex, i, repositoryAliasArray);
+            
+            Collections.swap(repositoryAliasList, aliasIndex, i);
         }
 
-        return repositoryAliasArray;
+        return repositoryAliasList;
     }
 
     private void createDefaultPapIfNotExists() {
@@ -231,57 +233,14 @@ public class PapManager {
         defaultPapContainer.createRootPolicySet();
     }
 
-    private int getAliasIndex(String alias, String[] aliasArray) {
-
-        if (alias == null) {
-            return -1;
-        }
-
-        for (int i = 0; i < aliasArray.length; i++) {
-
-            if (alias.equals(aliasArray[i])) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
     private List<Pap> getPapList() {
-        String[] aliasOrderedArray = buildOrderedAliasArray();
-        List<Pap> papList = new ArrayList<Pap>(aliasOrderedArray.length);
-
-        for (String alias : aliasOrderedArray) {
+        List<String> aliasOrderedList = buildOrderedAliasList();
+        List<Pap> papList = new ArrayList<Pap>(aliasOrderedList.size());
+        
+        for (String alias : aliasOrderedList) {
             papList.add(papDAO.get(alias));
         }
         return papList;
-    }
-
-    private void swapElementsOfArray(int idx1, int idx2, String[] array) {
-
-        if (idx1 == idx2) {
-            return;
-        }
-
-        int size = array.length;
-
-        if (size == 0) {
-            return;
-        }
-
-        if ((idx1 < 0) || (idx1 >= size)) {
-            return;
-        }
-
-        if ((idx2 < 0) || (idx2 >= size)) {
-            return;
-        }
-
-        String temp = array[idx1];
-        array[idx1] = array[idx2];
-        array[idx2] = temp;
-
-        return;
     }
 
     private void synchronizeRepositoryWithConfiguration() {
@@ -322,7 +281,7 @@ public class PapManager {
 
         // remove from the repository PAPs that are not in the distribution
         // configuration
-        for (String alias : papDAO.getAllAliases()) {
+        for (String alias : papDAO.getAliasList()) {
 
             // do not remove the local PAP
             if (alias.equals(Pap.DEFAULT_PAP_ALIAS)) {

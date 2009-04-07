@@ -4,8 +4,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.Pap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,17 +79,17 @@ public class DistributionConfiguration {
         return aliasKey(papAlias) + "." + "public";
     }
 
-    public String[] getPAPOrderArray() throws AliasNotFoundException {
+    public String[] getPapOrdering() throws AliasNotFoundException {
 
-        String[] papOrderArray = papConfiguration.getStringArray(papOrderKey());
+        String[] papOrderingArray = papConfiguration.getStringArray(papOrderKey());
 
-        if (papOrderArray == null) {
-            papOrderArray = new String[0];
+        if (papOrderingArray == null) {
+            papOrderingArray = new String[0];
         }
 
-        validatePAPOrder(papOrderArray);
-
-        return papOrderArray;
+        validatePapOrder(papOrderingArray);
+        
+        return papOrderingArray;
     }
 
     public long getPollIntervallInMilliSecs() {
@@ -128,7 +128,7 @@ public class DistributionConfiguration {
 
         clearPAPProperties(papAlias);
 
-        String[] oldAliasOrderArray = getPAPOrderArray();
+        String[] oldAliasOrderArray = getPapOrdering();
 
         int newArraySize = oldAliasOrderArray.length - 1;
 
@@ -165,7 +165,7 @@ public class DistributionConfiguration {
             return;
         }
 
-        validatePAPOrder(aliasArray);
+        validatePapOrder(aliasArray);
 
         if (aliasArray.length == 0) {
             papConfiguration.clearDistributionProperty(papOrderKey());
@@ -280,7 +280,7 @@ public class DistributionConfiguration {
         papConfiguration.setDistributionProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
     }
 
-    private void validatePAPOrder(String[] aliasArray) {
+    private void validatePapOrder(String[] aliasArray) {
 
         if (aliasArray == null) {
             throw new DistributionConfigurationException("aliasArray is null");

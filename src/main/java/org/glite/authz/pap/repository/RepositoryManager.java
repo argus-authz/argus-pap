@@ -132,7 +132,7 @@ public abstract class RepositoryManager {
      * Returns the version of the existing repository.
      * 
      * @return the version of the repository as <code>String</code>. The version is an integer
-     *         number, higher is that number and more recent is the repository version.
+     *         number, higher that number is and more recent is the version of the repository.
      */
     protected abstract String getRepositoryVersion();
 
