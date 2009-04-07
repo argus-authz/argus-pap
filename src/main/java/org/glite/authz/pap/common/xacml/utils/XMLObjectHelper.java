@@ -132,8 +132,7 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @return the OpenSAML <code>XMLObject</code>.
      * 
      * @throws XMLObjectParserException if the XML parsing fails.
-     * @throws XMLObjectException wrapping a <code>FileNotFoundException</code> if file does not
-     *             exist.
+     * @throws XMLObjectException wrapping a {@link FileNotFoundException} if file does not exist.
      */
     public static XMLObject buildXMLObjectFromFile(File file) {
         Document doc = readDocument(file);
@@ -148,8 +147,7 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @return the OpenSAML <code>XMLObject</code>.
      * 
      * @throws XMLObjectParserException if the XML parsing fails.
-     * @throws XMLObjectException wrapping a <code>FileNotFoundException</code> if file does not
-     *             exist.
+     * @throws XMLObjectException wrapping a {@link FileNotFoundException} if file does not exist.
      */
     public static XMLObject buildXMLObjectFromFile(String fileName) {
         return buildXMLObjectFromFile(new File(fileName));
@@ -180,6 +178,7 @@ public class XMLObjectHelper<T extends XMLObject> {
      * 
      * @param xmlObject
      * @return the marshalled <code>XMLObject</code>.
+     * 
      * @throws MarshallingException
      */
     public static Element marshall(XMLObject xmlObject) throws MarshallingException {
@@ -198,9 +197,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param file
      * @param xmlObject
      * 
-     * @throws XMLObjectException wrapping a <code>FileNotFoundException</code>, a
-     *             <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link FileNotFoundException}, a
+     *             {@link TransformerConfigurationException} or a {@link TransformerException}.
      */
     public static void toFile(File file, XMLObject xmlObject) {
         FileOutputStream fos;
@@ -220,9 +218,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param fileName the file name as <code>String</code>.
      * @param xmlObject
      * 
-     * @throws XMLObjectException wrapping a <code>FileNotFoundException</code>, a
-     *             <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link FileNotFoundException}, a
+     *             {@link TransformerConfigurationException} or a {@link TransformerException}.
      */
     public static void toFile(String fileName, XMLObject xmlObject) {
         File file = new File(fileName);
@@ -235,8 +232,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param element
      * @return <code>String</code> representation of the element.
      * 
-     * @throws XMLObjectException wrapping a <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link TransformerConfigurationException} or a
+     *             {@link TransformerException}.
      */
     public static String toString(Element element) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -250,8 +247,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param element
      * @return <code>String</code> representation of the element.
      * 
-     * @throws XMLObjectException wrapping a <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link TransformerConfigurationException} or a
+     *             {@link TransformerException}.
      */
     public static String toString(XMLObject xmlObject) {
         return toString(xmlObject, 4);
@@ -265,8 +262,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param indent indent value.
      * @return <code>String</code> representation of the element.
      * 
-     * @throws XMLObjectException wrapping a <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link TransformerConfigurationException} or a
+     *             {@link TransformerException}.
      */
     public static String toString(XMLObject xmlObject, int indent) {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -297,8 +294,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param outputStream
      * @param element
      * 
-     * @throws XMLObjectException wrapping a <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link TransformerConfigurationException} or a
+     *             {@link TransformerException}.
      */
     public static void write(OutputStream outputStream, Element element) {
         try {
@@ -319,8 +316,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param xmlObject
      * @param indent indentation value.
      * 
-     * @throws XMLObjectException wrapping a <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link TransformerConfigurationException} or a
+     *             {@link TransformerException}.
      */
     public static void write(OutputStream outputStream, XMLObject xmlObject, int indent) {
         try {
@@ -343,8 +340,7 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @return the file content as <code>Document</code>.
      * 
      * @throws XMLObjectParserException if the XML parsing fails.
-     * @throws XMLObjectException wrapping a <code>FileNotFoundException</code> if file does not
-     *             exist.
+     * @throws XMLObjectException wrapping a {@link FileNotFoundException} if file does not exist.
      */
     private static Document readDocument(File file) {
         FileInputStream fileInputStream;
@@ -420,8 +416,7 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @return the object <code>T</code> representing the content of the file.
      * 
      * @throws XMLObjectParserException if the XML parsing fails.
-     * @throws XMLObjectException wrapping a <code>FileNotFoundException</code> if file does not
-     *             exist.
+     * @throws XMLObjectException wrapping a {@link FileNotFoundException} if file does not exist.
      */
     public T buildFromFile(File file) {
         Document doc = readDocument(file);
@@ -448,8 +443,8 @@ public class XMLObjectHelper<T extends XMLObject> {
      * @param xmlObject <code>XMLObject</code> to be cloned.
      * @return a clone of the given object.
      * 
-     * @throws XMLObjectException wrapping a <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code> .
+     * @throws XMLObjectException wrapping a {@link TransformerConfigurationException} or a
+     *             {@link TransformerException} .
      * @throws XMLObjectParserException if the XML parsing fails.
      */
     public T clone(T xmlObject) {
@@ -470,10 +465,9 @@ public class XMLObjectHelper<T extends XMLObject> {
      *         file.
      * 
      * @throws XMLObjectParserException if the XML parsing fails.
-     * @throws XMLObjectException wrapping a <code>FileNotFoundException</code> if file does not
-     *             exist.
-     * @throws XMLObjectException wrapping a <code>TransformerConfigurationException</code> or a
-     *             <code>TransformerException</code>.
+     * @throws XMLObjectException wrapping a {@link FileNotFoundException} if file does not exist.
+     * @throws XMLObjectException wrapping a {@link TransformerConfigurationException} or a
+     *             {@link TransformerException} .
      */
     public String readFromFileAsString(File file) {
 
