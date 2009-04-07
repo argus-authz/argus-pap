@@ -11,19 +11,29 @@ import org.glite.authz.pap.common.xacml.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
+import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Filesystem implementation of the {@link PolicySetDAO} interface.
+ * <p>
+ * This DAO stores information about the policy sets of a pap. The name of the file of the policy
+ * sets follows that form: <i>prefix</i> + <i>policySetId</i> + .<i>extension</i><br>
+ * The value for <i>prefix</i> is: {@link FileSystemRepositoryManager#POLICYSET_FILENAME_PREFIX}.<br>
+ * The value for <i>extension</i> is: {@link FileSystemRepositoryManager#XACML_FILENAME_EXTENSION}.
+ * <br>
+ */
 public class FileSystemPolicySetDAO implements PolicySetDAO {
 
     private static final Logger log = LoggerFactory.getLogger(FileSystemPolicySetDAO.class);
-    
+
     /** Cache of the policy sets */
     private static final Map<String, Map<String, PolicySetTypeString>> cache = new ConcurrentHashMap<String, Map<String, PolicySetTypeString>>();
-    
+
     private static final PolicySetHelper policySetHelper = PolicySetHelper.getInstance();
     private static FileSystemPolicySetDAO instance = null;
 
@@ -36,14 +46,34 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return instance;
     }
 
+    /**
+     * Returns the absolute pathname string of the policy set file.
+     * 
+     * @param papId pap id containing the policy.
+     * @param policySetId the policy id.
+     * @return the absolute pathname string.
+     */
     private static String getPolicySetAbsolutePath(String papId, String policySetId) {
         return FileSystemRepositoryManager.getPAPDirAbsolutePath(papId) + getPolicySetFileName(policySetId);
     }
 
+    /**
+     * Returns the file name of the policy set from the policy id.
+     * 
+     * @param policySetId the policy set id.
+     * @return the policy set file name (just the name, not the absolute path).
+     */
     private static String getPolicySetFileName(String policySetId) {
-        return FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX + policySetId + FileSystemRepositoryManager.XACML_FILENAME_EXTENSION;
+        return FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX + policySetId
+                + FileSystemRepositoryManager.XACML_FILENAME_EXTENSION;
     }
 
+    /**
+     * Returns the policy set id from the file name of the policy set.
+     * 
+     * @param fileName the file name.
+     * @return the policy set id.
+     */
     private static String getPolicySetIdFromFileName(String fileName) {
         int start = FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX.length();
         int end = fileName.length() - FileSystemRepositoryManager.XACML_FILENAME_EXTENSION.length();
@@ -54,8 +84,6 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return "Not found PAP directory: " + papDirPAth;
     }
 
-    // TODO: maybe it's better to create different exception classes instead of
-    // different exception messages
     private static String policySetExceptionMsg(String policySetId) {
         return String.format("policySetId=\"%s\"", policySetId);
     }
@@ -65,6 +93,9 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return msg;
     }
 
+    /**
+     * {@Inherited}
+     */
     public synchronized void delete(String papId, String policySetId) {
 
         Map<String, PolicySetTypeString> papCache = cache.get(papId);
@@ -90,6 +121,9 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         }
     }
 
+    /**
+     * {@Inherited}
+     */
     public synchronized void deleteAll(String papId) {
 
         Map<String, PolicySetTypeString> papCache = cache.get(papId);
@@ -118,6 +152,9 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         }
     }
 
+    /**
+     * {@Inherited}
+     */
     public synchronized boolean exists(String papId, String policySetId) {
 
         File policySetFile = new File(getPolicySetAbsolutePath(papId, policySetId));
@@ -131,15 +168,18 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return result;
     }
 
+    /**
+     * {@Inherited}
+     */
     public synchronized List<PolicySetType> getAll(String papId) {
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
         if (!papDir.exists()) {
-            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+            throw new NotFoundException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
         }
 
-        Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicySetTypeString> papCache = getPapCache(papId);
 
         List<PolicySetType> policySetList = new LinkedList<PolicySetType>();
 
@@ -154,24 +194,25 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             if (fileName.startsWith(FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX)) {
 
                 String policySetId = getPolicySetIdFromFileName(fileName);
-                
+
                 PolicySetTypeString policySet = papCache.get(policySetId);
 
                 if (policySet == null) {
                     try {
-                        policySet = new PolicySetTypeString(policySetId, policySetHelper.readFromFileAsString(file));
+                        policySet = new PolicySetTypeString(policySetId,
+                                                            policySetHelper.readFromFileAsString(file));
                         log.debug("getAll(): PolicySet retrieved from file: id=" + policySetId);
                     } catch (Throwable e) {
                         throw new RepositoryException(e);
                     }
-                    
+
                     papCache.put(policySetId, policySet);
                 } else {
                     log.debug("getAll(): PolicySet retrieved from cache: id=" + policySetId);
                 }
-                
+
                 policySetList.add(new PolicySetTypeString(policySetId, policySet.getPolicySetString()));
-                
+
                 if (policySet.isDOMLoaded()) {
                     log.warn("getAll(): DOM not released for PolicySet id=" + policySetId);
                 }
@@ -180,9 +221,12 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return policySetList;
     }
 
+    /**
+     * {@Inherited}
+     */
     public synchronized PolicySetType getById(String papId, String policySetId) {
 
-        Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicySetTypeString> papCache = getPapCache(papId);
 
         PolicySetTypeString policySet = papCache.get(policySetId);
 
@@ -197,7 +241,8 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             }
 
             try {
-                policySet = new PolicySetTypeString(policySetId, policySetHelper.readFromFileAsString(policySetFile));
+                policySet = new PolicySetTypeString(policySetId,
+                                                    policySetHelper.readFromFileAsString(policySetFile));
             } catch (Throwable e) {
                 throw new RepositoryException(e);
             }
@@ -216,16 +261,19 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         return new PolicySetTypeString(policySetId, policySet.getPolicySetString());
     }
 
+    /**
+     * {@Inherited}
+     */
     public synchronized void store(String papId, PolicySetType policySet) {
-        
+
         PolicySetTypeString policySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
-        
+
         TypeStringUtils.releaseUnneededMemory(policySet);
 
         File papDir = new File(FileSystemRepositoryManager.getPAPDirAbsolutePath(papId));
 
         if (!papDir.exists())
-            throw new RepositoryException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
+            throw new NotFoundException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
 
         String policySetId = policySetTypeString.getPolicySetId();
 
@@ -238,7 +286,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 
         TypeStringUtils.releaseUnneededMemory(policySetTypeString);
 
-        getPAPCache(papId).put(policySetId, policySetTypeString);
+        getPapCache(papId).put(policySetId, policySetTypeString);
     }
 
     public synchronized void update(String papId, String policySetVersion, PolicySetType newPolicySet) {
@@ -250,7 +298,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
         }
 
-        Map<String, PolicySetTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicySetTypeString> papCache = getPapCache(papId);
         PolicySetTypeString oldPolicySetString = papCache.get(policySetId);
 
         if (oldPolicySetString == null) {
@@ -267,11 +315,10 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         PolicySetTypeString oldPolicySet = new PolicySetTypeString(oldPolicySetString);
 
         if (!(oldPolicySet.getVersion().equals(policySetVersion))) {
-            throw new RepositoryException(
-                String.format("Attempting to update the wrong version of PolicySetId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
-                              policySetId,
-                              policySetVersion,
-                              oldPolicySet.getVersion()));
+            throw new InvalidVersionException(String.format("Attempting to update the wrong version of PolicySetId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
+                                                            policySetId,
+                                                            policySetVersion,
+                                                            oldPolicySet.getVersion()));
         }
 
         TypeStringUtils.releaseUnneededMemory(oldPolicySetString);
@@ -283,7 +330,14 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
         papCache.put(policySetId, newPolicySetTypeString);
     }
 
-    private Map<String, PolicySetTypeString> getPAPCache(String papId) {
+    /**
+     * Returns the cached policy sets of a pap.
+     * 
+     * @param papId <code>id</code> of the pap.
+     * @return {@code Map<String, PolicySetTypeString>} where the <code>key</code> is the
+     *         policySetId and the <code>value</code> is the policy set.
+     */
+    private Map<String, PolicySetTypeString> getPapCache(String papId) {
         Map<String, PolicySetTypeString> papCache = cache.get(papId);
 
         if (papCache == null) {

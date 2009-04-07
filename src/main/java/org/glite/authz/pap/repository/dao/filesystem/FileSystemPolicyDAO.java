@@ -23,6 +23,8 @@ import org.slf4j.LoggerFactory;
  * <p>
  * This DAO stores information about the policies of a pap. The name of the file of the policies
  * follows that form: <i>prefix</i> + <i>policyId</i> + .<i>extension</i>
+ * The value for <i>prefix</i> is: {@link FileSystemRepositoryManager#POLICYSET_FILENAME_PREFIX}.<br>
+ * The value for <i>extension</i> is: {@link FileSystemRepositoryManager#XACML_FILENAME_EXTENSION}.<br>
  */
 public class FileSystemPolicyDAO implements PolicyDAO {
 
@@ -175,7 +177,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             throw new NotFoundException(papDirNotFoundExceptionMsg(papDir.getAbsolutePath()));
         }
 
-        Map<String, PolicyTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicyTypeString> papCache = getPapCache(papId);
 
         List<PolicyType> policyList = new LinkedList<PolicyType>();
 
@@ -216,7 +218,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
      */
     public synchronized PolicyType getById(String papId, String policyId) {
 
-        Map<String, PolicyTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicyTypeString> papCache = getPapCache(papId);
 
         PolicyTypeString policy = papCache.get(policyId);
 
@@ -271,7 +273,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
 
         PolicyHelper.toFile(policyFile, policyTypeString);
 
-        getPAPCache(papId).put(policyId, policyTypeString);
+        getPapCache(papId).put(policyId, policyTypeString);
 
         TypeStringUtils.releaseUnneededMemory(policyTypeString);
 
@@ -294,7 +296,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
             throw new NotFoundException(policyNotFoundExceptionMsg(policyId));
         }
 
-        Map<String, PolicyTypeString> papCache = getPAPCache(papId);
+        Map<String, PolicyTypeString> papCache = getPapCache(papId);
 
         PolicyTypeString oldPolicy = papCache.get(policyId);
 
@@ -329,7 +331,7 @@ public class FileSystemPolicyDAO implements PolicyDAO {
      * @return {@code Map<String, PolicyTypeString>} where the <code>key</code> is the policyId and
      *         the <code>value</code> is the policy.
      */
-    private Map<String, PolicyTypeString> getPAPCache(String papId) {
+    private Map<String, PolicyTypeString> getPapCache(String papId) {
         Map<String, PolicyTypeString> papCache = cache.get(papId);
 
         if (papCache == null) {
