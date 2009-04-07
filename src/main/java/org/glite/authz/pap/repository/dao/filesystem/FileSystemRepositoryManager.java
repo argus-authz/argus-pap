@@ -11,12 +11,18 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemRepositoryManager extends RepositoryManager {
 
+    /** Prefix used for the file names of the policies: {@value} */
+    protected static final String POLICY_FILENAME_PREFIX = "Policy_";
+    
+    /** Prefix used for the file names of the policy sets: {@value} */
+    protected static final String POLICYSET_FILENAME_PREFIX = "PolicySet_";
+    
+    /** Extension used for the file names of the policies: {@value} */
+    protected static final String XACML_FILENAME_EXTENSION = ".xml";
+
+    private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
     private static String fileSystemDatabaseDir;
     private static boolean initialized = false;
-    private static final Logger log = LoggerFactory.getLogger(FileSystemRepositoryManager.class);
-    private static final String POLICY_FILENAME_PREFIX = "Policy_";
-    private static final String POLICYSET_FILENAME_PREFIX = "PolicySet_";
-    private static final String XACML_FILENAME_EXTENSION = ".xml";
     private static FileSystemRepositoryManager instance = null;
 
     /**

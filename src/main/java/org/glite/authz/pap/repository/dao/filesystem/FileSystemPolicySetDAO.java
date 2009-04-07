@@ -19,10 +19,11 @@ import org.slf4j.LoggerFactory;
 
 public class FileSystemPolicySetDAO implements PolicySetDAO {
 
-    private static final Map<String, Map<String, PolicySetTypeString>> cache = new ConcurrentHashMap<String, Map<String, PolicySetTypeString>>();
-    private static final String FILE_EXT = FileSystemRepositoryManager.getFileNameExt();
     private static final Logger log = LoggerFactory.getLogger(FileSystemPolicySetDAO.class);
-    private static final String POLICY_SET_FILE_NAME_PREFIX = FileSystemRepositoryManager.getPolicySetFileNamePrefix();
+    
+    /** Cache of the policy sets */
+    private static final Map<String, Map<String, PolicySetTypeString>> cache = new ConcurrentHashMap<String, Map<String, PolicySetTypeString>>();
+    
     private static final PolicySetHelper policySetHelper = PolicySetHelper.getInstance();
     private static FileSystemPolicySetDAO instance = null;
 
@@ -40,12 +41,12 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
     }
 
     private static String getPolicySetFileName(String policySetId) {
-        return POLICY_SET_FILE_NAME_PREFIX + policySetId + FILE_EXT;
+        return FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX + policySetId + FileSystemRepositoryManager.XACML_FILENAME_EXTENSION;
     }
 
     private static String getPolicySetIdFromFileName(String fileName) {
-        int start = POLICY_SET_FILE_NAME_PREFIX.length();
-        int end = fileName.length() - FILE_EXT.length();
+        int start = FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX.length();
+        int end = fileName.length() - FileSystemRepositoryManager.XACML_FILENAME_EXTENSION.length();
         return fileName.substring(start, end);
     }
 
@@ -111,7 +112,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             }
 
             String fileName = file.getName();
-            if (fileName.startsWith(POLICY_SET_FILE_NAME_PREFIX)) {
+            if (fileName.startsWith(FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX)) {
                 file.delete();
             }
         }
@@ -150,7 +151,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 
             String fileName = file.getName();
 
-            if (fileName.startsWith(POLICY_SET_FILE_NAME_PREFIX)) {
+            if (fileName.startsWith(FileSystemRepositoryManager.POLICYSET_FILENAME_PREFIX)) {
 
                 String policySetId = getPolicySetIdFromFileName(fileName);
                 
