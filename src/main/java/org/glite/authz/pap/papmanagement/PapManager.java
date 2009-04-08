@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
  * Therefore it is possible to specify an ordering for the <code>Pap</code> objects (which are
  * containers of policies). The policies of <code>Pap</code> <i>A</i> are evaluated before the
  * policies of <code>Pap</code> <i>B</i> if <i>A</i> comes before <i>B</i> in the order. There are
- * two points concerning the pap ordering that must be kept on mind:<br>
+ * two points concerning the pap ordering that must be kept in mind:<br>
  * 1. if the <i>defdault</i> pap is <b>not</b> listed in the pap ordering then it is automatically
  * placed as the first pap in the order;<br>
  * 2. if the pap ordering does not contains all the defined paps then the paps not listed in the
