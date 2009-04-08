@@ -17,14 +17,29 @@ import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.XMLConfigurator;
 import org.opensaml.xml.Configuration;
 import org.opensaml.xml.ConfigurationException;
+import org.glite.authz.pap.encoder.parser.BWParser;
+import org.glite.authz.pap.encoder.parser.ParseException;
 
+/**
+ * This class is the public interface to parser of the simplified
+ * policy files.
+ *
+ * @author Vincenzo Ciaschini
+ */
 public class PolicyFileEncoder {
-    BWParser parser;
+    BWParser parser; // The effective unerlying parser
 
+    /**
+     * Basic constructor
+     */
     public PolicyFileEncoder() {
         parser = null;
     }
 
+    /**
+     * Initializes the parser to read from a specified stream.
+     * @param stream The {@code InputStream} object from which to read the policy.
+     */
     private void init(InputStream stream) {
         if (parser != null) { 
             parser.ReInit(stream);
@@ -34,6 +49,13 @@ public class PolicyFileEncoder {
         }
     }
 
+    /**
+     * This function parses the input and returns a list of 
+     * {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard}
+     * objects containing the parsed policies.
+     * @return a {@code List} {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard} objects containing the parsed policies.
+     * @throws EncodingException when there are problems during parsing
+     */
     private List<XACMLWizard> doParse() throws EncodingException {
         try {
             return parser.Text();
@@ -43,16 +65,52 @@ public class PolicyFileEncoder {
         }
     }
 
+    /**
+     * This function parses the input and returns a list of 
+     * {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard}
+     * objects containing the parsed policies.
+     *
+     * This function may be called multiple times, with different inputs, and each time
+     * will parse the new input and provide a new set of parsed policies.
+     *
+     * @param stream The {@code InputStream} object to parse.
+     * @return a {@code List} {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard} objects containing the parsed policies.
+     * @throws EncodingException when there are problems during parsing
+     */
     public  List<XACMLWizard> parse(InputStream stream) throws EncodingException {
         init(stream);
         return doParse();
     }
 
+    /**
+     * This function parses the input and returns a list of 
+     * {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard}
+     * objects containing the parsed policies.
+     *
+     * This function may be called multiple times, with different inputs, and each time
+     * will parse the new input and provide a new set of parsed policies.
+     *
+     * @param text The {@code String} object containing the policies to parse.
+     * @return a {@code List} {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard} objects containing the parsed policies.
+     * @throws EncodingException when there are problems during parsing
+     */
     public  List<XACMLWizard> parse(String text) throws EncodingException {
         init(new ByteArrayInputStream(text.getBytes()));
         return doParse();
     }
 
+    /**
+     * This function parses the input and returns a list of 
+     * {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard}
+     * objects containing the parsed policies.
+     *
+     * This function may be called multiple times, with different inputs, and each time
+     * will parse the new input and provide a new set of parsed policies.
+     *
+     * @param file The {@code File} object containing the policies to parse.
+     * @return a {@code List} {@link org.glite.authz.pap.common.xacml.wizard.XACMLWizard} objects containing the parsed policies.
+     * @throws EncodingException when there are problems during parsing
+     */
     public  List<XACMLWizard> parse(File file) throws EncodingException {
         try {
             init(new FileInputStream(file));
