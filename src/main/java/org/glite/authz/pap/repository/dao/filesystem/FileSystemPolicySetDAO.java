@@ -303,7 +303,7 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
 
         if (oldPolicySetString == null) {
             try {
-                oldPolicySetString = new PolicySetTypeString(policySetHelper.readFromFileAsString(policySetFile));
+                oldPolicySetString = new PolicySetTypeString(policySetHelper.buildFromFile(policySetFile));
                 log.debug("update(): PolicySet retrieved from file: id=" + policySetId);
             } catch (Throwable e) {
                 throw new RepositoryException(e);
@@ -312,16 +312,15 @@ public class FileSystemPolicySetDAO implements PolicySetDAO {
             log.debug("update(): PolicySet retrieved from cache: id=" + policySetId);
         }
 
-        PolicySetTypeString oldPolicySet = new PolicySetTypeString(oldPolicySetString);
+        String repositoryVersion = oldPolicySetString.getVersion();
+        TypeStringUtils.releaseUnneededMemory(oldPolicySetString);
 
-        if (!(oldPolicySet.getVersion().equals(policySetVersion))) {
+        if (!(repositoryVersion.equals(policySetVersion))) {
             throw new InvalidVersionException(String.format("Attempting to update the wrong version of PolicySetId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
                                                             policySetId,
                                                             policySetVersion,
-                                                            oldPolicySet.getVersion()));
+                                                            repositoryVersion));
         }
-
-        TypeStringUtils.releaseUnneededMemory(oldPolicySetString);
 
         PolicySetHelper.toFile(policySetFile, newPolicySet);
 

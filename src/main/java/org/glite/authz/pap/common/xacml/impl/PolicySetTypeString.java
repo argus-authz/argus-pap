@@ -28,6 +28,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Element;
 
+/**
+ * This class provides an implementation for the {@link PolicySetType} interface. The
+ * implementation, which is based on the one provided by OpenSAML, adds the facility to store the
+ * <i>PolicySet</i> as a string in order to cut on memory usage.
+ * <p>
+ * The following methods does not need to build the DOM: {@link #getPolicySetId()},
+ * {@link #getPolicySetString()}.<br>
+ * All the other methods build the DOM object.<br>
+ * In order to release the memory an holding just the <i>string</i> and the <i>id</i> use the
+ * utility method {@link TypeStringUtils#releaseUnneededMemory(Object)}.
+ * 
+ */
 public class PolicySetTypeString implements PolicySetType {
 
     private static final Logger log = LoggerFactory.getLogger(PolicySetTypeString.class);
@@ -48,7 +60,7 @@ public class PolicySetTypeString implements PolicySetType {
         this(policySetString);
         this.policySetId = policySetId;
     }
-    
+
     public void addNamespace(Namespace arg0) {
         initPolicySetTypeIfNotSet();
         policySet.addNamespace(arg0);
@@ -223,8 +235,8 @@ public class PolicySetTypeString implements PolicySetType {
     }
 
     public boolean isDOMLoaded() {
-		return (policySet != null);
-	}
+        return (policySet != null);
+    }
 
     @SuppressWarnings("unchecked")
     public void registerValidator(Validator arg0) {
@@ -322,7 +334,7 @@ public class PolicySetTypeString implements PolicySetType {
         invalidatePolicySetId();
         releaseDOM();
     }
-    
+
     public void setPolicySetString(String policySetId, String policySetString) {
         this.policySetString = policySetString;
         this.policySetId = policySetId;
@@ -359,7 +371,7 @@ public class PolicySetTypeString implements PolicySetType {
             policySetString = PolicyHelper.toString(policySet);
             policySetId = policySet.getPolicySetId();
         } else {
-//            log.debug("policySetString already initialized, skipping initialization step");
+            // log.debug("policySetString already initialized, skipping initialization step");
         }
     }
 
@@ -369,7 +381,7 @@ public class PolicySetTypeString implements PolicySetType {
             policySetId = policySet.getPolicySetId();
             log.trace("Initializing policySetType id=" + policySetId);
         } else {
-//            log.debug("policySetType already initialized, skipping initialization step");
+            // log.debug("policySetType already initialized, skipping initialization step");
         }
     }
 
