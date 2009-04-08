@@ -78,7 +78,7 @@ public class PapManager {
             throw new PapManagerException("Delete the default PAP is not allowed");
         }
 
-        distributionConfiguration.removePAP(papAlias);
+        distributionConfiguration.removePap(papAlias);
         papDAO.delete(papAlias);
     }
 
@@ -139,7 +139,7 @@ public class PapManager {
     }
     
     public void setPapOrdering(String[] aliasArray) {
-        distributionConfiguration.savePAPOrder(aliasArray);
+        distributionConfiguration.savePapOrdering(aliasArray);
 
         // updated the internal list with the new order
         configurationAliasOrderedArray = distributionConfiguration.getPapOrdering();
@@ -245,9 +245,9 @@ public class PapManager {
 
     private void synchronizeRepositoryWithConfiguration() {
 
-        Pap[] papListFromConfiguration = DistributionConfiguration.getInstance().getRemotePAPArray();
+        List<Pap> papListFromConfiguration = DistributionConfiguration.getInstance().getPapList();
 
-        if (papListFromConfiguration.length == 0) {
+        if (papListFromConfiguration.isEmpty()) {
             log.info("No remote PAPs has been defined");
         }
 

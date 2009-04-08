@@ -2,14 +2,13 @@ package org.glite.authz.pap.repository.dao.filesystem;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.INIConfiguration;
 import org.glite.authz.pap.common.Pap;
+import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.dao.PapDAO;
@@ -221,7 +220,7 @@ public class FileSystemPapDAO implements PapDAO {
      * {@inheritDoc}
      */
     public List<String> getAliasList() {
-        return new ArrayList<String>(getAliasSet());
+        return new ArrayList<String>(Utils.getAliasSet(iniConfiguration, PAPS_STANZA));
     }
 
     /**
@@ -229,7 +228,7 @@ public class FileSystemPapDAO implements PapDAO {
      */
     public List<Pap> getAll() {
 
-        Set<String> aliases = getAliasSet();
+        Set<String> aliases = Utils.getAliasSet(iniConfiguration, PAPS_STANZA);
 
         List<Pap> papList = new ArrayList<Pap>(aliases.size());
 
@@ -294,25 +293,6 @@ public class FileSystemPapDAO implements PapDAO {
 
     private boolean existsInINIConfiguration(String papAlias) {
         return keyExists(idKey(papAlias));
-    }
-
-    @SuppressWarnings("unchecked")
-    private Set<String> getAliasSet() {
-
-        Set<String> aliasSet = new HashSet<String>();
-
-        Iterator<String> iterator = iniConfiguration.getKeys(PAPS_STANZA);
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-
-            int firstAliasChar = key.indexOf('.') + 1;
-            int lastAliasChar = key.indexOf('.', firstAliasChar);
-
-            String alias = key.substring(firstAliasChar, lastAliasChar);
-
-            aliasSet.add(alias);
-        }
-        return aliasSet;
     }
 
     private String getPapDirAbsolutePath(String papId) {

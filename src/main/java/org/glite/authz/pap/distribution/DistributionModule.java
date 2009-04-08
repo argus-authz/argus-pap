@@ -1,6 +1,7 @@
 package org.glite.authz.pap.distribution;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.rpc.ServiceException;
@@ -15,12 +16,24 @@ import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class implements the distribution module, that means running a thread which regularly polls
+ * remote paps to fetch policies.
+ * <p>
+ * Start the thread that polls remote paps by calling the
+ * {@link DistributionModule#startDistributionModule()} method and stop it by calling the
+ * {@link DistributionModule#stopDistributionModule()} method.
+ * <p>
+ * The {@link DistributionModule#refreshCache(Pap)} method can be used to force a refresh of the
+ * remote paps cache asynchronously.
+ */
 public class DistributionModule extends Thread {
 
+    /** lock used when the cache of a pap is refreshed. */
     public static final Object storePoliciesLock = new Object();
 
-    private static DistributionModule instance = null;
     private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
+    private static DistributionModule instance = null;
 
     private long sleepTime;
 
@@ -34,26 +47,57 @@ public class DistributionModule extends Thread {
         return instance;
     }
 
-    public static List<XACMLObject> getPoliciesFromPAP(Pap remotePAP) throws RemoteException, ServiceException {
-
-        PAPClient client = new PAPClient(remotePAP.getEndpoint());
-
-        List<XACMLObject> papPolicies = client.getLocalPolicies();
-
-        return papPolicies;
-    }
-
+    /**
+     * Refreshes the policies of a pap, that means fetching the policies and storing them in the
+     * repository. If the given pap is not remote then nothing happens.
+     * 
+     * @param pap
+     * 
+     * @throws RemoteException
+     * @throws ServiceException
+     */
     public static void refreshCache(Pap pap) throws RemoteException, ServiceException {
         log.info("Refreshing cache of remote PAP " + pap.getAlias());
-        List<XACMLObject> papPolicies = getPoliciesFromPAP(pap);
+        List<XACMLObject> papPolicies = getPoliciesFromPap(pap);
         log.info(String.format("Retrieved %d XACML objects from PAP %s (%s)",
                                papPolicies.size(),
                                pap.getAlias(),
                                pap.getEndpoint()));
-        storePAPPolicies(pap, papPolicies);
+        storePapPolicies(pap, papPolicies);
     }
 
-    private static void storePAPPolicies(Pap pap, List<XACMLObject> papPolicies) {
+    /**
+     * Fetches policies from a remote pap.
+     * 
+     * @param remotePap the remote pap to fetch policies from.
+     * @return the list of policy sets and policies of the pap. The first element is the root policy
+     *         set of the pap. Returns an empty list if the pap wasn't a remote pap.
+     * 
+     * @throws RemoteException
+     * @throws ServiceException
+     */
+    private static List<XACMLObject> getPoliciesFromPap(Pap remotePap) throws RemoteException,
+            ServiceException {
+
+        if (!remotePap.isRemote()) {
+            log.error("Attempting to fetch policies from the local pap: " + remotePap.getAlias());
+            return new ArrayList<XACMLObject>(0);
+        }
+
+        PAPClient client = new PAPClient(remotePap.getEndpoint());
+
+        List<XACMLObject> papPolicies = client.retrievePolicies();
+
+        return papPolicies;
+    }
+
+    /**
+     * Replace the policy cache of the given pap with the given policies.
+     * 
+     * @param pap
+     * @param papPolicies
+     */
+    private static void storePapPolicies(Pap pap, List<XACMLObject> papPolicies) {
 
         if (papPolicies.isEmpty()) {
             return;
@@ -89,7 +133,9 @@ public class DistributionModule extends Thread {
                         PolicyType policy = (PolicyType) xacmlObject;
                         papContainer.storePolicy(policy);
 
-                        log.debug(String.format("Stored Policy \"%s\" into pap \"%s\"", policy.getPolicyId(), pap.getAlias()));
+                        log.debug(String.format("Stored Policy \"%s\" into pap \"%s\"",
+                                                policy.getPolicyId(),
+                                                pap.getAlias()));
                     } else {
 
                         log.error(String.format("Invalid object (not a Policy or PolicySet) received from PAP %s (%s)",
@@ -106,6 +152,11 @@ public class DistributionModule extends Thread {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Thread#run()
+     */
     public void run() {
 
         try {
@@ -121,9 +172,15 @@ public class DistributionModule extends Thread {
                     try {
                         refreshCache(pap);
                     } catch (RemoteException e) {
-                        log.error(String.format("Error connecting to %s (%s): %s", pap.getAlias(), pap.getEndpoint(), e.getMessage()));
+                        log.error(String.format("Error connecting to %s (%s): %s",
+                                                pap.getAlias(),
+                                                pap.getEndpoint(),
+                                                e.getMessage()));
                     } catch (ServiceException e) {
-                        log.error(String.format("Cannot connect to: %s (%s)", pap.getAlias(), pap.getEndpoint(), e.getMessage()));
+                        log.error(String.format("Cannot connect to: %s (%s)",
+                                                pap.getAlias(),
+                                                pap.getEndpoint(),
+                                                e.getMessage()));
                     }
 
                 }
@@ -154,5 +211,4 @@ public class DistributionModule extends Thread {
 
         sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMilliSecs();
     }
-
 }
