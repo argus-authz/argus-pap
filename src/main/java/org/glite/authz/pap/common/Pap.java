@@ -2,19 +2,28 @@ package org.glite.authz.pap.common;
 
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
+import org.glite.authz.pap.papmanagement.PapContainer;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The <code>Pap</code> class represents a pap and is JavaBean compliant.
+ * The <code>Pap</code> class is a JavaBean describing the information associated to a pap.
  * <p>
- * The PAP service (PAP uppercase) is organized units and each unit is called pap (pap lowercase). A
- * pap can be local or remote. The policies of a local pap are written by the administrator of the
+ * The PAP service (PAP uppercase) is organized units and each unit is called pap (pap lowercase).
+ * Basically a pap is a container for policies. This class models the information associated to a
+ * pap and not its content (for managing the policies of a pap see {@link PapContainer}.
+ * <p>
+ * A pap can be local or remote. The policies of a local pap are written by the administrator of the
  * PAP service, on the other side the policies of a remote pap are retrieved remotely (downloaded
  * from the owner PAP). Information like hostname, port, protocol and path are used to build the
  * endpoint of a remote pap. A pap can also be private or public. When a PAP requests policies to
  * another PAP, the policies that are actually sent are all the public policies belonging to a
  * public pap.
+ * 
+ * @see PapManager
+ * @see PapContainer
+ * 
  */
 public class Pap {
 
@@ -105,6 +114,9 @@ public class Pap {
     }
 
     /**
+     * Return <code>true</code> if the given string equals "local" (not case sentitive).<br>
+     * Convenience method used for reading the type from configuration file.
+     * 
      * @param type a <code>String</code> to be compared with the <code>Strinf</code> "local".
      * @return <code>true</code> if <code>type</code> is equal to "local" (not case sensitive),
      *         <code>false</code> otherwise.
@@ -117,7 +129,9 @@ public class Pap {
     }
 
     /**
-     * Constructor.
+     * Constructor for the <i>default</i> pap.
+     * <p>
+     * The default pap alias is defined by {@link Pap#DEFAULT_PAP_ALIAS}.
      * 
      * @return the default pap (alias={@value #DEFAULT_PAP_ALIAS}, local and public)).
      */
@@ -351,6 +365,7 @@ public class Pap {
 
     /*
      * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override

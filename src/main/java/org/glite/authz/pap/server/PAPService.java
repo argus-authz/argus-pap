@@ -44,7 +44,7 @@ public final class PAPService {
 
         // Property: number of remote policies
         int numOfRemotePolicies = 0;
-        for (PapContainer papContainer : PapContainer.getContainers(papManager.getOrderedRemotePaps())) {
+        for (PapContainer papContainer : PapContainer.getContainers(papManager.getRemotePaps())) {
             numOfRemotePolicies += papContainer.getNumberOfPolicies();
         }
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME,

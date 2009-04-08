@@ -9,6 +9,7 @@ import java.util.Set;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.utils.Utils;
+import org.glite.authz.pap.papmanagement.PapManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,9 @@ import org.slf4j.LoggerFactory;
  * This class has methods to read distribution information from configuration and to write back
  * these information to the configuration file. The reason for having both read and write facilities
  * is that these information can be modified through the command line.
+ * 
+ * @see PapManager
+ * @see Pap
  */
 public class DistributionConfiguration {
 
@@ -260,7 +264,7 @@ public class DistributionConfiguration {
      * 
      * @param pap the pap to be saved.
      */
-    public void savePAP(Pap pap) {
+    public void savePap(Pap pap) {
         setPapProperties(pap);
         papConfiguration.saveStartupConfiguration();
     }

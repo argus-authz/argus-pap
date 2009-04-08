@@ -55,7 +55,7 @@ public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObjec
 
                 synchronized (DistributionModule.storePoliciesLock) {
                     papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
-                                                                        papContainer.getPAPRootPolicySetId());
+                                                                        papContainer.getPapRootPolicySetId());
                 }
 
                 PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);

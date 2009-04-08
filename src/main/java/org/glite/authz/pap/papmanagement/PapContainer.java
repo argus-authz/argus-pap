@@ -218,7 +218,7 @@ public class PapContainer {
         return policySetDAO.getById(papId, rootPolicySetId);
     }
 
-    public String getPAPRootPolicySetId() {
+    public String getPapRootPolicySetId() {
         return rootPolicySetId;
     }
 

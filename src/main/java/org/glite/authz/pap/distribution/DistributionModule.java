@@ -164,7 +164,7 @@ public class DistributionModule extends Thread {
 
                 log.info("Starting refreshing cache process...");
 
-                for (Pap pap : PapManager.getInstance().getOrderedRemotePaps()) {
+                for (Pap pap : PapManager.getInstance().getRemotePaps()) {
 
                     if (this.isInterrupted())
                         break;
