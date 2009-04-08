@@ -21,7 +21,7 @@ public class PapManager {
     private static PapManager instance = null;
     private static final Logger log = LoggerFactory.getLogger(PapManager.class);
 
-    private String[] configurationAliasOrderedArray;
+    private String[] configurationPapOrdering;
     private DistributionConfiguration distributionConfiguration;
     private PapDAO papDAO;
 
@@ -33,7 +33,7 @@ public class PapManager {
 
         distributionConfiguration = DistributionConfiguration.getInstance();
 
-        configurationAliasOrderedArray = distributionConfiguration.getPapOrdering();
+        configurationPapOrdering = distributionConfiguration.getPapOrdering();
 
         synchronizeRepositoryWithConfiguration();
     }
@@ -123,7 +123,7 @@ public class PapManager {
     }
 
     public String[] getPapOrdering() {
-        return configurationAliasOrderedArray;
+        return configurationPapOrdering;
     }
 
     public List<Pap> getPublicPaps() {
@@ -142,7 +142,7 @@ public class PapManager {
         distributionConfiguration.savePapOrdering(aliasArray);
 
         // updated the internal list with the new order
-        configurationAliasOrderedArray = distributionConfiguration.getPapOrdering();
+        configurationPapOrdering = distributionConfiguration.getPapOrdering();
     }
 
     public void updatePap(Pap newpap) {
@@ -166,7 +166,7 @@ public class PapManager {
 
         List<String> repositoryAliasList = papDAO.getAliasList();
 
-        int configurationArraySize = configurationAliasOrderedArray.length;
+        int configurationArraySize = configurationPapOrdering.length;
 
         if (configurationArraySize > repositoryAliasList.size()) {
             throw new PapManagerException("BUG: configuration contains more PAPs than the repository");
@@ -183,12 +183,12 @@ public class PapManager {
         List<String> configurationAliasOrderedList = new LinkedList<String>();
 
         // if the default PAP is not specified in the order in configuration then it goes for first
-        if (Utils.indexOf(Pap.DEFAULT_PAP_ALIAS, configurationAliasOrderedArray) == -1) {
+        if (Utils.indexOf(Pap.DEFAULT_PAP_ALIAS, configurationPapOrdering) == -1) {
             configurationAliasOrderedList.add(Pap.DEFAULT_PAP_ALIAS);
         }
 
         for (int i = 0; i < configurationArraySize; i++) {
-            configurationAliasOrderedList.add(configurationAliasOrderedArray[i]);
+            configurationAliasOrderedList.add(configurationPapOrdering[i]);
         }
 
         // follow the order specified in the configuration file

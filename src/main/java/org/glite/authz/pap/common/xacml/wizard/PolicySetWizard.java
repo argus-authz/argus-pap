@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.glite.authz.pap.common.utils.Utils;
-import org.glite.authz.pap.common.xacml.PolicySetTypeString;
-import org.glite.authz.pap.common.xacml.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.impl.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.DescriptionTypeHelper;
 import org.glite.authz.pap.common.xacml.utils.ObligationsHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;

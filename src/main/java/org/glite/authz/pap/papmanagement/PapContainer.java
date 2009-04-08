@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.common.xacml.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.monitoring.MonitoredProperties;

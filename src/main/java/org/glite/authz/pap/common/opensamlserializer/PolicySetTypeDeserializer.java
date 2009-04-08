@@ -20,7 +20,7 @@ package org.glite.authz.pap.common.opensamlserializer;
 import org.apache.axis.encoding.DeserializationContext;
 import org.apache.axis.encoding.DeserializerImpl;
 import org.apache.axis.message.MessageElement;
-import org.glite.authz.pap.common.xacml.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.impl.PolicySetTypeString;
 import org.xml.sax.SAXException;
 
 public class PolicySetTypeDeserializer extends DeserializerImpl {

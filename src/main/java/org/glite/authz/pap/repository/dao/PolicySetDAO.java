@@ -2,7 +2,7 @@ package org.glite.authz.pap.repository.dao;
 
 import java.util.List;
 
-import org.glite.authz.pap.common.xacml.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.impl.PolicySetTypeString;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;

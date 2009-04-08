@@ -7,7 +7,7 @@ import java.util.List;
 import javax.xml.rpc.ServiceException;
 
 import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.common.xacml.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.opensaml.xacml.XACMLObject;

@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.glite.authz.pap.common.xacml.PolicyTypeString;
-import org.glite.authz.pap.common.xacml.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.impl.PolicyTypeString;
+import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.repository.dao.PolicyDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;

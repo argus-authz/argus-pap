@@ -9,8 +9,8 @@ import javax.xml.rpc.ServiceException;
 
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
-import org.glite.authz.pap.common.xacml.PolicySetTypeString;
-import org.glite.authz.pap.common.xacml.PolicyTypeString;
+import org.glite.authz.pap.common.xacml.impl.PolicySetTypeString;
+import org.glite.authz.pap.common.xacml.impl.PolicyTypeString;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.joda.time.DateTime;
 import org.opensaml.common.SAMLVersion;

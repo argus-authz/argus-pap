@@ -3,7 +3,7 @@ package org.glite.authz.pap.repository;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.glite.authz.pap.common.xacml.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.papmanagement.PapContainer;

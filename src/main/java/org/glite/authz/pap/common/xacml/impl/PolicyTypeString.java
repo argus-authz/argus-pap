@@ -1,4 +1,4 @@
-package org.glite.authz.pap.common.xacml;
+package org.glite.authz.pap.common.xacml.impl;
 
 import java.util.List;
 import java.util.Set;
