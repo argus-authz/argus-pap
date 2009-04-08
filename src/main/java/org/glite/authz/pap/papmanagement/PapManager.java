@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
  * {@link Pap#DEFAULT_PAP_ALIAS} (its value is {@value Pap#DEFAULT_PAP_ALIAS}). The <i>default</i>
  * pap is local and public.
  * <p>
- * <b><code>Pap</code> ordering</b><br>
+ * <b>Paps ordering</b><br>
  * For the policy evaluation process (performed by the <i>PDP</i>) the oder of the policies matters.
  * Therefore it is possible to specify an ordering for the <code>Pap</code> objects (which are
  * containers of policies). The policies of <code>Pap</code> <i>A</i> are evaluated before the
