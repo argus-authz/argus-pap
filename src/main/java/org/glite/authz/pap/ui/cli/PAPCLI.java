@@ -15,14 +15,14 @@ import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.ui.cli.authzmanagement.AddACE;
 import org.glite.authz.pap.ui.cli.authzmanagement.ListACL;
 import org.glite.authz.pap.ui.cli.authzmanagement.RemoveACE;
-import org.glite.authz.pap.ui.cli.papmanagement.AddPAP;
+import org.glite.authz.pap.ui.cli.papmanagement.AddPap;
 import org.glite.authz.pap.ui.cli.papmanagement.GetOrder;
-import org.glite.authz.pap.ui.cli.papmanagement.ListPAPs;
+import org.glite.authz.pap.ui.cli.papmanagement.ListPaps;
 import org.glite.authz.pap.ui.cli.papmanagement.Ping;
 import org.glite.authz.pap.ui.cli.papmanagement.RefreshCache;
-import org.glite.authz.pap.ui.cli.papmanagement.RemovePAP;
+import org.glite.authz.pap.ui.cli.papmanagement.RemovePap;
 import org.glite.authz.pap.ui.cli.papmanagement.SetOrder;
-import org.glite.authz.pap.ui.cli.papmanagement.UpdatePAP;
+import org.glite.authz.pap.ui.cli.papmanagement.UpdatePap;
 import org.glite.authz.pap.ui.cli.policymanagement.AddPoliciesFromFile;
 import org.glite.authz.pap.ui.cli.policymanagement.AddPolicy;
 import org.glite.authz.pap.ui.cli.policymanagement.BanAttribute;
@@ -193,10 +193,10 @@ public class PAPCLI {
 
         // PAP Management
         papMgmtCommandList.add(new Ping());
-        papMgmtCommandList.add(new AddPAP());
-        papMgmtCommandList.add(new RemovePAP());
-        papMgmtCommandList.add(new UpdatePAP());
-        papMgmtCommandList.add(new ListPAPs());
+        papMgmtCommandList.add(new AddPap());
+        papMgmtCommandList.add(new RemovePap());
+        papMgmtCommandList.add(new UpdatePap());
+        papMgmtCommandList.add(new ListPaps());
         papMgmtCommandList.add(new RefreshCache());
         papMgmtCommandList.add(new GetOrder());
         papMgmtCommandList.add(new SetOrder());

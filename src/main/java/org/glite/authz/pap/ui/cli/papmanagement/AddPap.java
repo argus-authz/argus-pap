@@ -8,13 +8,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.Pap;
 
-public class AddPAP extends PAPManagementCLI {
+public class AddPap extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "add-pap", "apap" };
     private static final String DESCRIPTION = "Add a remote or local pap.\n"
-            + "<alias> is a friendly name (it has to be unique) used to identify the PAP\n"
-            + "<endpoint> endpoint of the pap in the following format: [<protocol>://]<host>:[<port>/[path]]\n"
-            + "<dn> DN of the PAP\n" + "<host> hostname of the PAP machine\n";
+            + "<alias> is a friendly name (it has to be unique) used to identify the pap\n"
+            + "<endpoint> endpoint of the PAP in the following format: [<protocol>://]<host>:[<port>/[path]]\n";
     private static final String LONG_DESCRIPTION = "Default protocol is: " + Pap.DEFAULT_PROTOCOL + "\n"
             + "Default port is: " + Pap.DEFAULT_PORT + "\n"
             + "Default path is: " + Pap.DEFAULT_SERVICES_ROOT_PATH + "\n"
@@ -24,7 +23,7 @@ public class AddPAP extends PAPManagementCLI {
     private static final String LOPT_PUBLIC = "public";
     private static final String USAGE = "[options] <alias> [<endpoint> <dn>]";
 
-    public AddPAP() {
+    public AddPap() {
         super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
     }
 
@@ -33,11 +32,11 @@ public class AddPAP extends PAPManagementCLI {
     protected Options defineCommandOptions() {
         Options options = new Options();
         options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription("Set the remote PAP as public (allow to distribute its policies)")
+                                       .withDescription("Set the pap as public (allow to distribute its policies)")
                                        .withLongOpt(LOPT_PUBLIC)
                                        .create());
         options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription("Set the remote PAP as private (default)")
+                                       .withDescription("Set the pap as private (default)")
                                        .withLongOpt(LOPT_PRIVATE)
                                        .create());
         options.addOption(OptionBuilder.hasArg(false)
@@ -97,14 +96,14 @@ public class AddPAP extends PAPManagementCLI {
         
         Pap pap = new Pap(alias, isLocal, dn, host, port, path, protocol, isPublic);
 
-        String msg = "Adding trusted PAP: ";
+        String msg = "Adding pap: ";
 
         if (verboseMode) {
             System.out.println(msg + pap.toFormattedString(0, msg.length()));
         }
 
         if (papMgmtClient.exists(pap.getAlias())) {
-            System.out.println("PAP already exists.");
+            System.out.println("pap already exists.");
             return ExitStatus.FAILURE.ordinal();
         }
 

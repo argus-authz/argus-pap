@@ -8,7 +8,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.Pap;
 
-public class ListPAPs extends PAPManagementCLI {
+public class ListPaps extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "list-paps", "lpaps" };
     private static final String DESCRIPTION = "List all defined paps.";
@@ -16,7 +16,7 @@ public class ListPAPs extends PAPManagementCLI {
     private static final String OPT_LONGLIST_FORMAT_DESCRIPTION = "Use a long list format (displays all the information of a pap).";
     private static final String USAGE = "[options]";
 
-    public ListPAPs() {
+    public ListPaps() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 

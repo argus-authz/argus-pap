@@ -8,7 +8,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.Pap;
 
-public class UpdatePAP extends PAPManagementCLI {
+public class UpdatePap extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "update-pap", "upap" };
     private static final String DESCRIPTION = "Update pap information. The input is the same as for the \"add-pap\" command, " +
@@ -17,7 +17,7 @@ public class UpdatePAP extends PAPManagementCLI {
     private static final String LOPT_PUBLIC = "public";
     private static final String USAGE = "[options] <alias> [<endpoint> <dn>]";
 
-    public UpdatePAP() {
+    public UpdatePap() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 
@@ -81,10 +81,10 @@ public class UpdatePAP extends PAPManagementCLI {
         String path = null;
 
         if (args.length != 2) {
-            protocol = AddPAP.getProtocol(args[2]);
-            host = AddPAP.getHostname(args[2]);
-            port = AddPAP.getPort(args[2]);
-            path = AddPAP.getPath(args[2]);
+            protocol = AddPap.getProtocol(args[2]);
+            host = AddPap.getHostname(args[2]);
+            port = AddPap.getPort(args[2]);
+            path = AddPap.getPath(args[2]);
         }
         
         Pap pap = new Pap(alias, isLocal, dn, host, port, path, protocol, isPublic);

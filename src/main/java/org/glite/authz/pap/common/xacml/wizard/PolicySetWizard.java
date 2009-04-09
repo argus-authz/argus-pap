@@ -38,7 +38,8 @@ public class PolicySetWizard extends XACMLWizard {
     public PolicySetWizard(AttributeWizard attributeWizard) {
 
         if (attributeWizard.getAttributeWizardType() != attributeWizardType) {
-            throw new UnsupportedPolicySetWizardException("Attribute not supported: " + attributeWizard.getId());
+            throw new UnsupportedPolicySetWizardException("Attribute not supported: "
+                    + attributeWizard.getId());
         }
 
         resourceValue = attributeWizard.getValue();
@@ -49,7 +50,8 @@ public class PolicySetWizard extends XACMLWizard {
         policySetWizardList = new LinkedList<PolicySetWizard>();
     }
 
-    public PolicySetWizard(PolicySetType policySet, List<PolicyWizard> policyWizardList, PolicySetType[] childPolicySetList) {
+    public PolicySetWizard(PolicySetType policySet, List<PolicyWizard> policyWizardList,
+            PolicySetType[] childPolicySetList) {
 
         this.policySet = policySet;
         policySetId = policySet.getPolicySetId();
@@ -114,7 +116,9 @@ public class PolicySetWizard extends XACMLWizard {
             boolean found = false;
             for (PolicySetType childPolicySet : childPolicySetList) {
                 if (policySetIdReference.equals(childPolicySet.getPolicySetId())) {
-                    PolicySetWizard psw = new PolicySetWizard(childPolicySet, policyWizardList, childPolicySetList);
+                    PolicySetWizard psw = new PolicySetWizard(childPolicySet,
+                                                              policyWizardList,
+                                                              childPolicySetList);
                     policySetWizardList.add(psw);
                     TypeStringUtils.releaseUnneededMemory(psw);
                     TypeStringUtils.releaseUnneededMemory(childPolicySet);
@@ -135,7 +139,8 @@ public class PolicySetWizard extends XACMLWizard {
             version = (new Integer(policySet.getVersion())).intValue();
             version++;
         } catch (NumberFormatException e) {
-            log.error("Unrecognized version format, setting version to 1. PolicySetId=" + policySet.getPolicySetId());
+            log.error("Unrecognized version format, setting version to 1. PolicySetId="
+                    + policySet.getPolicySetId());
             version = 1;
         }
 
@@ -278,7 +283,8 @@ public class PolicySetWizard extends XACMLWizard {
         return toFormattedString(0, 4, printIds, printRulesId);
     }
 
-    public String toFormattedString(int baseIndentation, int internalIndentation, boolean printIds, boolean printRulesId) {
+    public String toFormattedString(int baseIndentation, int internalIndentation, boolean printIds,
+            boolean printRulesId) {
 
         String baseIndentString = Utils.fillWithSpaces(baseIndentation);
         String indentString = Utils.fillWithSpaces(baseIndentation + internalIndentation);
@@ -295,7 +301,8 @@ public class PolicySetWizard extends XACMLWizard {
         }
 
         for (ObligationWizard obligationWizard : obligationWizardList) {
-            sb.append(obligationWizard.toFormattedString(baseIndentation + internalIndentation, internalIndentation));
+            sb.append(obligationWizard.toFormattedString(baseIndentation + internalIndentation,
+                                                         internalIndentation));
             sb.append('\n');
         }
 
@@ -316,7 +323,22 @@ public class PolicySetWizard extends XACMLWizard {
 
     public String toXACMLString() {
         initPolicySetTypeIfNotSet();
-        return XMLObjectHelper.toString(policySet);
+
+        StringBuffer sb = new StringBuffer();
+
+        sb.append(XMLObjectHelper.toString(policySet));
+        sb.append('\n');
+
+        for (PolicySetWizard policySetWizard : policySetWizardList) {
+            sb.append(policySetWizard.toXACMLString());
+            sb.append('\n');
+        }
+
+        for (PolicyWizard policyWizard : policyWizardList) {
+            sb.append(policyWizard.toXACMLString());
+            sb.append('\n');
+        }
+        return sb.toString();
     }
 
     private PolicySetTypeString buildXACMLNoReferences() {

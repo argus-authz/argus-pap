@@ -6,13 +6,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
-public class RemovePAP extends PAPManagementCLI {
+public class RemovePap extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "remove-pap", "rpap" };
     private static final String DESCRIPTION = "Remove a pap and delete its policies.";
     private static final String USAGE = "<alias>";
 
-    public RemovePAP() {
+    public RemovePap() {
         super(commandNameValues, USAGE, DESCRIPTION, null);
     }
 
