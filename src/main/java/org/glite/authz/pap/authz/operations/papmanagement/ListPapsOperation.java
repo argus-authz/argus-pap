@@ -9,19 +9,19 @@ import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
 
 
-public class ListTrustedPAPsOperation extends BasePAPOperation<Pap[]> {
+public class ListPapsOperation extends BasePAPOperation<Pap[]> {
 
     
     
-    protected ListTrustedPAPsOperation() {
+    protected ListPapsOperation() {
 
         // TODO Auto-generated constructor stub
     }
     
     
-    public static ListTrustedPAPsOperation instance() {
+    public static ListPapsOperation instance() {
 
-        return new ListTrustedPAPsOperation();
+        return new ListPapsOperation();
     }
     
     

@@ -9,17 +9,17 @@ import org.glite.authz.pap.papmanagement.PapManagerException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 
 
-public class UpdateTrustedPAPOperation extends BasePAPOperation<Boolean> {
+public class UpdatePapOperation extends BasePAPOperation<Boolean> {
 
     Pap pap;
     
-    protected UpdateTrustedPAPOperation(Pap pap){
+    protected UpdatePapOperation(Pap pap){
         this.pap = pap;
     }
         
-    public static UpdateTrustedPAPOperation instance(Pap pap) {
+    public static UpdatePapOperation instance(Pap pap) {
 
-        return new UpdateTrustedPAPOperation(pap);
+        return new UpdatePapOperation(pap);
     }
     
     @Override

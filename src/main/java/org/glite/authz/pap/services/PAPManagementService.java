@@ -2,15 +2,15 @@ package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
 
-import org.glite.authz.pap.authz.operations.papmanagement.AddTrustedPAPOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.AddPapOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.GetOrderOperation;
-import org.glite.authz.pap.authz.operations.papmanagement.GetTrustedPAPOperation;
-import org.glite.authz.pap.authz.operations.papmanagement.ListTrustedPAPsOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.GetPapOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.ListPapsOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.RefreshPolicyCacheOperation;
-import org.glite.authz.pap.authz.operations.papmanagement.RemoveTrustedPAPOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.RemovePapOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.SetOrderOperation;
-import org.glite.authz.pap.authz.operations.papmanagement.TrustedPAPExistsOperation;
-import org.glite.authz.pap.authz.operations.papmanagement.UpdateTrustedPAPOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.PapExistsOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.UpdatePapOperation;
 import org.glite.authz.pap.common.PAPVersion;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManagerException;
@@ -27,7 +27,7 @@ public class PAPManagementService implements PAPManagement {
 
         try {
 
-            return AddTrustedPAPOperation.instance(pap).execute();
+            return AddPapOperation.instance(pap).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -40,7 +40,7 @@ public class PAPManagementService implements PAPManagement {
 
         try {
 
-            return TrustedPAPExistsOperation.instance(papAlias).execute();
+            return PapExistsOperation.instance(papAlias).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -53,7 +53,7 @@ public class PAPManagementService implements PAPManagement {
         log.info("listTrustedPAPs();");
         try {
 
-            return ListTrustedPAPsOperation.instance().execute();
+            return ListPapsOperation.instance().execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -76,7 +76,7 @@ public class PAPManagementService implements PAPManagement {
         log.info("getTrustedPAP(" + papAlias + ");");
         try {
 
-            return GetTrustedPAPOperation.instance(papAlias).execute();
+            return GetPapOperation.instance(papAlias).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -105,7 +105,7 @@ public class PAPManagementService implements PAPManagement {
         log.info("removeTrustedPAP(" + papAlias + ");");
         try {
 
-            return RemoveTrustedPAPOperation.instance(papAlias).execute();
+            return RemovePapOperation.instance(papAlias).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
@@ -132,7 +132,7 @@ public class PAPManagementService implements PAPManagement {
                 throw new PapManagerException(String.format("Invalid request. \"%s\" cannot be updated", Pap.DEFAULT_PAP_ALIAS));
             }
 
-            return UpdateTrustedPAPOperation.instance(pap).execute();
+            return UpdatePapOperation.instance(pap).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

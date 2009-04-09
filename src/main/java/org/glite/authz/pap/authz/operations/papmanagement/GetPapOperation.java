@@ -7,18 +7,18 @@ import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManager;
 
 
-public class GetTrustedPAPOperation extends BasePAPOperation<Pap> {
+public class GetPapOperation extends BasePAPOperation<Pap> {
 
     String papId;
     
-    protected GetTrustedPAPOperation(String papId){
+    protected GetPapOperation(String papId){
         
         this.papId = papId;
     }
     
-    public static GetTrustedPAPOperation instance(String papId) {
+    public static GetPapOperation instance(String papId) {
 
-        return new GetTrustedPAPOperation(papId);
+        return new GetPapOperation(papId);
     }
     
     @Override

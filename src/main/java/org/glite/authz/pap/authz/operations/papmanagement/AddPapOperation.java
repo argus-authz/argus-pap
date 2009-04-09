@@ -8,20 +8,20 @@ import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 
 
-public class AddTrustedPAPOperation extends BasePAPOperation <Boolean> {
+public class AddPapOperation extends BasePAPOperation <Boolean> {
 
     Pap pap;
     
     
-    protected AddTrustedPAPOperation(Pap pap) {
+    protected AddPapOperation(Pap pap) {
 
         this.pap = pap;
         
     }
     
-    public static AddTrustedPAPOperation instance(Pap pap) {
+    public static AddPapOperation instance(Pap pap) {
 
-        return new AddTrustedPAPOperation(pap);
+        return new AddPapOperation(pap);
     }
     
     

@@ -6,19 +6,19 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.papmanagement.PapManager;
 
 
-public class TrustedPAPExistsOperation extends BasePAPOperation<Boolean> {
+public class PapExistsOperation extends BasePAPOperation<Boolean> {
 
     
     String papAlias;
     
-    protected TrustedPAPExistsOperation(String papAlias) {
+    protected PapExistsOperation(String papAlias) {
 
         this.papAlias = papAlias;
     }
     
-    public static TrustedPAPExistsOperation instance(String papAlias) {
+    public static PapExistsOperation instance(String papAlias) {
 
-        return new TrustedPAPExistsOperation(papAlias);
+        return new PapExistsOperation(papAlias);
     }
     
     
