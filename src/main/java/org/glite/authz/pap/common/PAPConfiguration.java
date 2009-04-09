@@ -28,7 +28,7 @@ public class PAPConfiguration {
     private static final String DEFAULT_PAP_HOMEDIR_NAME = "pap";
     
     /** Default directory path for PAP home directory **/
-    private static final String DEFAULT_PAP_HOME = DEFAULT_AUTHZ_PATH_PREFIX + DEFAULT_PAP_HOMEDIR_NAME; 
+    private static final String DEFAULT_PAP_HOME = DEFAULT_AUTHZ_PATH_PREFIX + "/"+ DEFAULT_PAP_HOMEDIR_NAME; 
     
     /** Default directory under which the PAP will look for its configuration **/
     private static final String DEFAULT_PAP_CONFIGURATION_DIR = DEFAULT_PAP_HOME+"/conf";
