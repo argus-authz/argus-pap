@@ -38,7 +38,7 @@ public class ListPaps extends PAPManagementCLI {
         if (commandLine.hasOption(OPT_LONGLIST_FORMAT))
             logListFormat = true;
 
-        Pap[] papArray = papMgmtClient.getAllPAPs();
+        Pap[] papArray = papMgmtClient.getAllPaps();
 
         if (papArray.length == 0) {
             System.out.println("No remote PAPs has been found.");

@@ -22,7 +22,7 @@ public class PAPManagementService implements PAPManagement {
 
     private static final Logger log = LoggerFactory.getLogger(PAPManagementService.class);
 
-    public boolean addPAP(Pap pap) throws RemoteException {
+    public boolean addPap(Pap pap) throws RemoteException {
         log.info("addTrustedPAP();");
 
         try {
@@ -49,7 +49,7 @@ public class PAPManagementService implements PAPManagement {
 
     }
 
-    public Pap[] getAllPAPs() throws RemoteException {
+    public Pap[] getAllPaps() throws RemoteException {
         log.info("listTrustedPAPs();");
         try {
 
@@ -72,7 +72,7 @@ public class PAPManagementService implements PAPManagement {
         }
     }
 
-    public Pap getPAP(String papAlias) throws RemoteException {
+    public Pap getPap(String papAlias) throws RemoteException {
         log.info("getTrustedPAP(" + papAlias + ");");
         try {
 
@@ -101,7 +101,7 @@ public class PAPManagementService implements PAPManagement {
         }
     }
 
-    public boolean removePAP(String papAlias) throws RemoteException {
+    public boolean removePap(String papAlias) throws RemoteException {
         log.info("removeTrustedPAP(" + papAlias + ");");
         try {
 
@@ -124,7 +124,7 @@ public class PAPManagementService implements PAPManagement {
         }
     }
 
-    public boolean updatePAP(Pap pap) throws RemoteException {
+    public boolean updatePap(Pap pap) throws RemoteException {
         log.info("updateTrustedPAP(" + pap.getAlias() + "," + pap + ");");
         try {
 
@@ -139,5 +139,4 @@ public class PAPManagementService implements PAPManagement {
             throw e;
         }
     }
-
 }

@@ -23,7 +23,7 @@ public class RefreshCache extends PAPManagementCLI {
     private List<String> getAllAliases() throws RemoteException {
         List<String> aliasList = new LinkedList<String>();
 
-        Pap[] papArray = papMgmtClient.getAllPAPs();
+        Pap[] papArray = papMgmtClient.getAllPaps();
 
         for (Pap pap : papArray) {
             if (pap.isRemote()) {

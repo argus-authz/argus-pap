@@ -100,7 +100,7 @@ public class UpdatePap extends PAPManagementCLI {
             return ExitStatus.FAILURE.ordinal();
         }
 
-        papMgmtClient.updatePAP(pap);
+        papMgmtClient.updatePap(pap);
 
         if (verboseMode) {
             System.out.println("Success: pap has been updated.");

@@ -107,7 +107,7 @@ public class AddPap extends PAPManagementCLI {
             return ExitStatus.FAILURE.ordinal();
         }
 
-        papMgmtClient.addPAP(pap);
+        papMgmtClient.addPap(pap);
 
         if (verboseMode) {
             System.out.println("Success: new pap has been added.");

@@ -147,7 +147,7 @@ public class ListPolicies extends PolicyManagementCLI {
 
         if (commandLine.hasOption(OPT_ALLPAPS)) {
             
-            Pap[] papArray = papMgmtClient.getAllPAPs();
+            Pap[] papArray = papMgmtClient.getAllPaps();
             papAliasArray = new String[papArray.length];
             for (int i = 0; i < papArray.length; i++) {
                 papAliasArray[i] = papArray[i].getAlias();
@@ -203,7 +203,7 @@ public class ListPolicies extends PolicyManagementCLI {
             if (papArray != null) {
                 pap = papArray[i];
             } else {
-                pap = papMgmtClient.getPAP(alias);
+                pap = papMgmtClient.getPap(alias);
             }
 
             if (pap.isLocal()) {
