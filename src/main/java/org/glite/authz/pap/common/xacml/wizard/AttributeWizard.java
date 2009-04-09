@@ -43,6 +43,33 @@ public class AttributeWizard {
         this.value = value;
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param idEqualValue a string in the form "id=value".
+     * 
+     * @throws UnsupportedAttributeException if the id is not supported or the given string is not
+     *             in the right form.
+     */
+    public AttributeWizard(String idEqualValue) {
+        int index = idEqualValue.indexOf('=');
+
+        if (index == -1) {
+            throw new UnsupportedAttributeException("invalid \"id=value\" string: " + idEqualValue);
+        }
+
+        String id = idEqualValue.substring(0, index);
+        String value = idEqualValue.substring(index + 1);
+
+        attributeWizardType = attributeWizardTypeConfiguration.getById(id);
+
+        if (attributeWizardType == null) {
+            throw new UnsupportedAttributeException("id=" + id);
+        }
+
+        this.value = value;
+    }
+
     public AttributeWizard(String identifier, String value) {
 
         attributeWizardType = attributeWizardTypeConfiguration.getById(identifier);

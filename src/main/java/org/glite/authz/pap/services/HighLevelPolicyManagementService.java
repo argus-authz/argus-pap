@@ -1,6 +1,8 @@
 package org.glite.authz.pap.services;
 
 import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.AddRuleOperation;
 import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.BanOperation;
@@ -18,20 +20,24 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     private static final Logger log = LoggerFactory.getLogger(HighLevelPolicyManagementService.class);
 
-    public String addRule(String alias, boolean isPermit, String id, String value, String actionId,
+    public String addRule(String alias, boolean isPermit, String[] attributeList, String actionId,
             String ruleId, boolean moveAfter) throws RemoteException {
-        log.info(String.format("Received addRule(isPermit=%b, id=\"%s\", value=\"%s\", actionId=\"%s\", ruleId=\"%s\", moveAfter=%b);",
+        log.info(String.format("Received addRule(isPermit=%b, ..., actionId=\"%s\", ruleId=\"%s\", moveAfter=%b);",
                                isPermit,
-                               id,
-                               value,
                                actionId,
                                ruleId,
                                moveAfter));
         try {
             synchronized (ServicesUtils.highLevelOperationLock) {
+                List<AttributeWizard> attributeWizardList = new ArrayList<AttributeWizard>(attributeList.length);
+                
+                for (String attribute : attributeList) {
+                    attributeWizardList.add(new AttributeWizard(attribute));
+                }
+                
                 return AddRuleOperation.instance(alias,
                                                  isPermit,
-                                                 new AttributeWizard(id, value),
+                                                 attributeWizardList,
                                                  actionId,
                                                  ruleId,
                                                  moveAfter).execute();
