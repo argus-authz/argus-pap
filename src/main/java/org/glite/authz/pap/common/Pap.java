@@ -10,9 +10,10 @@ import org.slf4j.LoggerFactory;
 /**
  * The <code>Pap</code> class is a JavaBean describing the information associated to a pap.
  * <p>
- * The PAP service (PAP uppercase) is organized units and each unit is called pap (pap lowercase).
- * Basically a pap is a container for policies. This class models the information associated to a
- * pap and not its content (for managing the policies of a pap see {@link PapContainer}.
+ * The PAP service (PAP uppercase) is organized in units and each unit is called pap (pap
+ * lowercase). Basically a pap is a container for policies. This class models the information
+ * associated to a pap and not its content (for managing the policies of a pap see
+ * {@link PapContainer}.
  * <p>
  * A pap can be local or remote. The policies of a local pap are written by the administrator of the
  * PAP service, on the other side the policies of a remote pap are retrieved remotely (downloaded
