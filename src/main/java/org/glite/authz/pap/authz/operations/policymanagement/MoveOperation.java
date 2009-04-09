@@ -4,13 +4,17 @@ import org.glite.authz.pap.authz.BasePAPOperation;
 import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
+import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
+import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicySetType;
+import org.opensaml.xacml.policy.PolicyType;
+import org.opensaml.xacml.policy.RuleType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,36 +51,39 @@ public class MoveOperation extends BasePAPOperation<Object> {
         if (alias == null) {
             alias = Pap.DEFAULT_PAP_ALIAS;
         }
-        
+
         Pap pap = PapManager.getInstance().getPap(alias);
 
         if (pap.isRemote()) {
-            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
+            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote pap");
         }
 
         PapContainer papContainer = new PapContainer(pap);
 
         if (papContainer.hasPolicySet(id)) {
 
-            movePolicySetId(papContainer);
+            movePolicySet(papContainer);
+
+        } else if (papContainer.hasPolicy(id)) {
+
+            movePolicy(papContainer);
 
         } else {
-
-            movePolicyId(papContainer);
-
+            moveRule(papContainer);
         }
 
         return null;
     }
 
-    private void movePolicySetId(PapContainer papContainer) {
+    private void movePolicySet(PapContainer papContainer) {
 
-        // now we have only two levels so... all the policy sets (resource <id>) are referenced by the PAP
+        // now we have only two levels so... all the policy sets (resource <id>) are referenced by
+        // the PAP
         // root policy set
         PolicySetType rootPAPPolicySet = papContainer.getRootPolicySet();
 
         if (!(PolicySetHelper.hasPolicySetReferenceId(rootPAPPolicySet, pivotId))) {
-            throw new RepositoryException("Id not found: " + pivotId);
+            throw new RepositoryException("Id not found or not a resource-id: " + pivotId);
         }
 
         if (!(PolicySetHelper.deletePolicySetReference(rootPAPPolicySet, id))) {
@@ -101,7 +108,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
         papContainer.updatePolicySet(version, rootPAPPolicySet);
     }
 
-    private void movePolicyId(PapContainer papContainer) {
+    private void movePolicy(PapContainer papContainer) {
         PolicySetType targetPolicySet = null;
 
         // get the target policy set
@@ -116,7 +123,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
         }
 
         if (targetPolicySet == null) {
-            throw new RepositoryException("Id not found: " + pivotId);
+            throw new RepositoryException("Id not found or not an action-id: " + pivotId);
         }
 
         if (!(PolicySetHelper.deletePolicyReference(targetPolicySet, id))) {
@@ -139,6 +146,44 @@ public class MoveOperation extends BasePAPOperation<Object> {
         PolicySetWizard.increaseVersion(targetPolicySet);
 
         papContainer.updatePolicySet(version, targetPolicySet);
+    }
+
+    private void moveRule(PapContainer papContainer) {
+
+        PolicyType targetPolicy = null;
+
+        for (PolicyType policy : papContainer.getAllPolicies()) {
+            if (PolicyHelper.hasRuleId(policy, pivotId)) {
+                targetPolicy = policy;
+                break;
+            }
+        }
+
+        if (targetPolicy == null) {
+            throw new RepositoryException("Id not found or not a rule-id: " + pivotId);
+        }
+
+        RuleType rule = PolicyHelper.removeRule(targetPolicy, id);
+
+        if (rule == null) {
+            throw new RepositoryException(String.format("Id \"%s\" not found into action \"%s\"",
+                                                        id,
+                                                        targetPolicy.getPolicyId()));
+        }
+
+        int pivotIndex = PolicyHelper.indexOfRule(targetPolicy, pivotId);
+
+        if (moveAfter) {
+            pivotIndex++;
+        }
+
+        PolicyHelper.addRule(targetPolicy, pivotIndex, rule);
+
+        String version = targetPolicy.getVersion();
+
+        PolicyWizard.increaseVersion(targetPolicy);
+
+        papContainer.updatePolicy(version, targetPolicy);
     }
 
     @Override
