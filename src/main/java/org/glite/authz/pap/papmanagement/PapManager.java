@@ -372,7 +372,7 @@ public class PapManager {
         PapContainer defaultPapContainer = getPapContainer(Pap.DEFAULT_PAP_ALIAS);
 
         // check if the root policy set exists
-        if (defaultPapContainer.hasPolicySet(defaultPapContainer.getPapRootPolicySetId())) {
+        if (defaultPapContainer.hasPolicySet(defaultPapContainer.getRootPolicySetId())) {
             return;
         }
 

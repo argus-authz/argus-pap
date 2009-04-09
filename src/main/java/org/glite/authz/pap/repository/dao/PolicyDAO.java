@@ -62,6 +62,7 @@ public interface PolicyDAO {
      * @return the policy as {@link PolicyTypeString} object.
      * 
      * @throws NotFoundException if <code>papId</code> and/or <code>policyId</code> were not found.
+     * @throws RepositoryException if an error occurred (e.g. a corrupted policy file).
      */
     public PolicyType getById(String papId, String policyId);
 

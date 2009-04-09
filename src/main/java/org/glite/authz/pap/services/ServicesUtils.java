@@ -11,7 +11,7 @@
  * distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and limitations under the License.
  * 
- * File : ProvisioningServiceUtils.java
+ * File : ServicesUtils.java
  * 
  * Authors: Valerio Venturi <valerio.venturi@cnaf.infn.it>
  * 
@@ -64,10 +64,11 @@ import org.slf4j.LoggerFactory;
  * @author Valerio Venturi <valerio.venturi@cnaf.infn.it>
  * 
  */
-public class ProvisioningServiceUtils {
+public class ServicesUtils {
 
     @SuppressWarnings("unused")
-    private static Logger logger = LoggerFactory.getLogger(ProvisioningServiceUtils.class);
+    private static Logger logger = LoggerFactory.getLogger(ServicesUtils.class);
+    public static final Object highLevelOperationLock = new Object();
 
     public static void checkQuery(XACMLPolicyQueryType query) throws VersionMismatchException,
             MissingIssuerException, WrongFormatIssuerException {

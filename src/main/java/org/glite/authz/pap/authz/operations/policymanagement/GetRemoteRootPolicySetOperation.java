@@ -24,7 +24,7 @@ public class GetRemoteRootPolicySetOperation extends BasePAPOperation<PolicySetT
 
         PapContainer psContainer = new PapContainer(ps);
 
-        PolicySetType policySet = psContainer.getPAPRootPolicySet();
+        PolicySetType policySet = psContainer.getRootPolicySet();
 
         return policySet;
     }

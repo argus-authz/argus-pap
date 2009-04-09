@@ -12,7 +12,7 @@ import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.glite.authz.pap.services.ProvisioningServiceUtils;
+import org.glite.authz.pap.services.ServicesUtils;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -39,7 +39,7 @@ public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObjec
 
         List<XACMLObject> resultList = new LinkedList<XACMLObject>();
 
-        PolicySetType rootPolicySet = ProvisioningServiceUtils.makeRootPolicySet();
+        PolicySetType rootPolicySet = ServicesUtils.makeRootPolicySet();
 
         resultList.add(rootPolicySet);
 
@@ -48,14 +48,14 @@ public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObjec
 
         // Add references to the remote PAPs
         for (PapContainer papContainer : papContainerList) {
-            log.info("Adding PAP: " + papContainer.getPAP().getAlias());
+            log.info("Adding PAP: " + papContainer.getPap().getAlias());
 
             try {
                 PolicySetType papPolicySetNoReferences;
 
                 synchronized (DistributionModule.storePoliciesLock) {
                     papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
-                                                                        papContainer.getPapRootPolicySetId());
+                                                                        papContainer.getRootPolicySetId());
                 }
 
                 PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);

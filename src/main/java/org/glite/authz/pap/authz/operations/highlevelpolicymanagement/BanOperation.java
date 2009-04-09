@@ -156,7 +156,7 @@ public class BanOperation extends BasePAPOperation<String> {
         PolicySetType targetPolicySet = null;
         TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
 
-        PolicySetType papRootPolicySet = papContainer.getPAPRootPolicySet();
+        PolicySetType papRootPolicySet = papContainer.getRootPolicySet();
 
         List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(papRootPolicySet);
 

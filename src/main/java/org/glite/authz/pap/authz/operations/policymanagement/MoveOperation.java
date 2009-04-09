@@ -73,7 +73,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
         // now we have only two levels so... all the policy sets (resource <id>) are referenced by the PAP
         // root policy set
-        PolicySetType rootPAPPolicySet = papContainer.getPAPRootPolicySet();
+        PolicySetType rootPAPPolicySet = papContainer.getRootPolicySet();
 
         if (!(PolicySetHelper.hasPolicySetReferenceId(rootPAPPolicySet, pivotId))) {
             throw new RepositoryException("Id not found: " + pivotId);

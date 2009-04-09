@@ -136,7 +136,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
         TargetWizard policySetTargetWizard = new TargetWizard(resourceAttributeWizard);
 
-        PolicySetType rootPAPPolicySet = papContainer.getPAPRootPolicySet();
+        PolicySetType rootPAPPolicySet = papContainer.getRootPolicySet();
 
         List<String> policySetIdList = PolicySetHelper.getPolicySetIdReferencesValues(rootPAPPolicySet);
 

@@ -12,7 +12,7 @@ import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.glite.authz.pap.services.ProvisioningServiceUtils;
+import org.glite.authz.pap.services.ServicesUtils;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -43,7 +43,7 @@ public class GetPoliciesForPAPOperation extends BasePAPOperation<List<XACMLObjec
         List<PapContainer> papContainerList = new ArrayList<PapContainer>(PapContainer.getContainers(PapManager.getInstance()
                                                                                                                .getPublicPaps()));
 
-        PolicySetType rootPolicySet = ProvisioningServiceUtils.makeRootPolicySet();
+        PolicySetType rootPolicySet = ServicesUtils.makeRootPolicySet();
         resultList.add(rootPolicySet);
 
         for (PapContainer papContainer : papContainerList) {
@@ -125,11 +125,11 @@ public class GetPoliciesForPAPOperation extends BasePAPOperation<List<XACMLObjec
         }
 
         log.debug("Adding " + resultPolicySetList.size() + " PolicySet elements from PAP \""
-                + papContainer.getPAP().getId() + "\"");
+                + papContainer.getPap().getId() + "\"");
         resultList.addAll(resultPolicySetList);
 
         log.debug("Adding " + policyList.size() + " Policy elements from PAP \""
-                + papContainer.getPAP().getId() + "\"");
+                + papContainer.getPap().getId() + "\"");
         resultList.addAll(resultPolicyList);
 
         return resultList;

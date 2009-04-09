@@ -59,16 +59,16 @@ public class ProvisioningService implements Provisioning {
 
                 /* check a few things about the query */
                 try {
-                    ProvisioningServiceUtils.checkQuery(query);
+                    ServicesUtils.checkQuery(query);
                 } catch (VersionMismatchException e) {
                     log.error(e.getMessage(), e);
-                    return ProvisioningServiceUtils.createResponse(query, e);
+                    return ServicesUtils.createResponse(query, e);
                 } catch (MissingIssuerException e) {
                     log.error(e.getMessage(), e);
-                    return ProvisioningServiceUtils.createResponse(query, e);
+                    return ServicesUtils.createResponse(query, e);
                 } catch (WrongFormatIssuerException e) {
                     log.error(e.getMessage(), e);
-                    return ProvisioningServiceUtils.createResponse(query, e);
+                    return ServicesUtils.createResponse(query, e);
                 }
 
                 /* get local policies */
@@ -92,7 +92,7 @@ public class ProvisioningService implements Provisioning {
 
                 /* prepare the response */
 
-                Response response = ProvisioningServiceUtils.createResponse(query, resultList, httpServletRequest);
+                Response response = ServicesUtils.createResponse(query, resultList, httpServletRequest);
 
                 log.trace("Sending Response : " + XMLObjectHelper.toString(query));
 

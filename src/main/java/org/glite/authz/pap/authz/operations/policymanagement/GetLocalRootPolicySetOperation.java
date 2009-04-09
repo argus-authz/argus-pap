@@ -24,7 +24,7 @@ public class GetLocalRootPolicySetOperation extends BasePAPOperation<PolicySetTy
 
         PapContainer psContainer = new PapContainer(ps);
 
-        PolicySetType policySet = psContainer.getPAPRootPolicySet();
+        PolicySetType policySet = psContainer.getRootPolicySet();
 
         return policySet;
     }

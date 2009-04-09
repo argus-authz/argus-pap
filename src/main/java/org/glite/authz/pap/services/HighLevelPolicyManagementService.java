@@ -9,7 +9,6 @@ import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.PurgeOpera
 import org.glite.authz.pap.authz.operations.highlevelpolicymanagement.UnbanOperation;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
-import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.slf4j.Logger;
@@ -29,7 +28,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                ruleId,
                                moveAfter));
         try {
-            synchronized (PapContainer.highLevelOperationLock) {
+            synchronized (ServicesUtils.highLevelOperationLock) {
                 return AddRuleOperation.instance(alias,
                                                  isPermit,
                                                  new AttributeWizard(id, value),
@@ -60,7 +59,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
-            synchronized (PapContainer.highLevelOperationLock) {
+            synchronized (ServicesUtils.highLevelOperationLock) {
                 return BanOperation.instance(alias,
                                              banAttributeWizard,
                                              resourceAttributeWizard,
@@ -78,7 +77,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
         try {
 
-            synchronized (PapContainer.highLevelOperationLock) {
+            synchronized (ServicesUtils.highLevelOperationLock) {
                 EraseRepositoryOperation.instance(alias).execute();
             }
 
@@ -97,7 +96,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                purgeUnreferencedPolicySets,
                                purgeEmptyPolicySets));
         try {
-            synchronized (PapContainer.highLevelOperationLock) {
+            synchronized (ServicesUtils.highLevelOperationLock) {
                 PurgeOperation.instance(alias,
                                         purgeUnreferencedPolicies,
                                         purgeEmptyPolicies,
@@ -127,7 +126,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
             AttributeWizard actionAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()
                                                                                                         .getActionAttributeWizard(),
                                                                         action);
-            synchronized (PapContainer.highLevelOperationLock) {
+            synchronized (ServicesUtils.highLevelOperationLock) {
                 return UnbanOperation.instance(alias,
                                                bannedAttributeWizard,
                                                resourceAttributeWizard,

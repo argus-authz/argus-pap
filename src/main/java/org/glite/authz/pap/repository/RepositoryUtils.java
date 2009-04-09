@@ -34,7 +34,7 @@ public class RepositoryUtils {
 
         for (PapContainer papContainer : PapContainer.getContainers(PapManager.getInstance().getAllPaps())) {
             if (checkForLoops(papContainer,
-                              papContainer.getPAPRootPolicySet(),
+                              papContainer.getRootPolicySet(),
                               new LinkedList<String>(),
                               repair) == false) {
                 result = false;
@@ -87,9 +87,9 @@ public class RepositoryUtils {
             PolicySetType rootPS;
 
             try {
-                rootPS = papContainer.getPAPRootPolicySet();
+                rootPS = papContainer.getRootPolicySet();
             } catch (RepositoryException e) {
-                String rootAlias = papContainer.getPAP().getAlias();
+                String rootAlias = papContainer.getPap().getAlias();
                 String action = String.format("remove all policies and and policy sets for root policy set %s",
                                               rootAlias);
                 log.error(String.format("The root policy set %s (id=%s) is corrupted. Suggested action: %s",

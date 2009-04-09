@@ -65,6 +65,7 @@ public interface PolicySetDAO {
      * 
      * @throws NotFoundException if <code>papId</code> and/or <code>policySetId</code> were not
      *             found.
+     * @throws RepositoryException if an error occurred (e.g. a corrupted policy set file).
      */
     public PolicySetType getById(String papId, String policySetId) throws NotFoundException,
             RepositoryException;
