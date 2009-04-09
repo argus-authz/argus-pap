@@ -195,7 +195,7 @@ public class DistributionModule extends Thread {
         }
     }
 
-    public synchronized void startDistributionModule() {
+    public void startDistributionModule() {
         this.start();
     }
 
@@ -204,17 +204,13 @@ public class DistributionModule extends Thread {
         this.interrupt();
     }
 
-    public synchronized void stopDistributionModule() {
+    public void stopDistributionModule() {
 
-        log.info("Shutting down distribution module...");
-        
         stayRunning = false;
         
         this.interrupt();
 
         while (this.isAlive());
-
-        log.info("Distribution module stopped");
     }
 
     protected void initialize() {
