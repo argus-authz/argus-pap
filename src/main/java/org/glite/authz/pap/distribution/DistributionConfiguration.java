@@ -213,15 +213,26 @@ public class DistributionConfiguration {
     /**
      * Reads the <i>polling interval</i> from the configuration.
      * 
-     * @return the <i>polling interval</i> in milliseconds.
+     * @return the <i>polling interval</i> in seconds.
      */
-    public long getPollIntervallInMilliSecs() {
+    public long getPollIntervall() {
 
         long pollIntervalInSecs = papConfiguration.getLong(pollIntervallKey());
 
         log.info("Polling interval for remote PAPs is set to: " + pollIntervalInSecs + " seconds");
 
-        return pollIntervalInSecs * 1000;
+        return pollIntervalInSecs;
+    }
+    
+    /**
+     * Set the polling interval into configuration.
+     * 
+     * @param seconds new polling interval in seconds
+     */
+    public void savePollInterval(long seconds) {
+        papConfiguration.clearDistributionProperty(pollIntervallKey());
+        papConfiguration.setDistributionProperty(pollIntervallKey(), seconds);
+        papConfiguration.saveStartupConfiguration();
     }
 
     /**

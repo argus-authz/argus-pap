@@ -37,6 +37,8 @@ public class DistributionModule extends Thread {
 
     private long sleepTime;
 
+    private boolean stayRunning = true;
+
     private DistributionModule() {
         initialize();
     }
@@ -159,46 +161,55 @@ public class DistributionModule extends Thread {
      */
     public void run() {
 
-        try {
-            while (!this.isInterrupted()) {
+        while (stayRunning) {
+            try {
+                while (!this.isInterrupted()) {
 
-                log.info("Starting refreshing cache process...");
+                    log.info("Starting refreshing cache process...");
 
-                for (Pap pap : PapManager.getInstance().getRemotePaps()) {
+                    for (Pap pap : PapManager.getInstance().getRemotePaps()) {
 
-                    if (this.isInterrupted())
-                        break;
+                        if (this.isInterrupted())
+                            break;
 
-                    try {
-                        refreshCache(pap);
-                    } catch (RemoteException e) {
-                        log.error(String.format("Error connecting to %s (%s): %s",
-                                                pap.getAlias(),
-                                                pap.getEndpoint(),
-                                                e.getMessage()));
-                    } catch (ServiceException e) {
-                        log.error(String.format("Cannot connect to: %s (%s)",
-                                                pap.getAlias(),
-                                                pap.getEndpoint(),
-                                                e.getMessage()));
+                        try {
+                            refreshCache(pap);
+                        } catch (RemoteException e) {
+                            log.error(String.format("Error connecting to %s (%s): %s",
+                                                    pap.getAlias(),
+                                                    pap.getEndpoint(),
+                                                    e.getMessage()));
+                        } catch (ServiceException e) {
+                            log.error(String.format("Cannot connect to: %s (%s)",
+                                                    pap.getAlias(),
+                                                    pap.getEndpoint(),
+                                                    e.getMessage()));
+                        }
                     }
 
+                    log.info("Refreshing cache process has finished");
+
+                    sleep(sleepTime);
                 }
-
-                log.info("Refreshing cache process has finished");
-
-                sleep(sleepTime);
-            }
-        } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {}
+        }
     }
 
-    public void startDistributionModule() {
+    public synchronized void startDistributionModule() {
         this.start();
     }
 
-    public void stopDistributionModule() {
+    public void setSleepTime(long seconds) {
+        sleepTime = seconds * 1000;
+        this.interrupt();
+    }
+
+    public synchronized void stopDistributionModule() {
 
         log.info("Shutting down distribution module...");
+        
+        stayRunning = false;
+        
         this.interrupt();
 
         while (this.isAlive());
@@ -208,7 +219,6 @@ public class DistributionModule extends Thread {
 
     protected void initialize() {
         log.info("Initilizing distribution module...");
-
-        sleepTime = DistributionConfiguration.getInstance().getPollIntervallInMilliSecs();
+        sleepTime = DistributionConfiguration.getInstance().getPollIntervall() * 1000;
     }
 }

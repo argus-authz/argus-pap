@@ -5,11 +5,13 @@ import java.rmi.RemoteException;
 import org.glite.authz.pap.authz.operations.papmanagement.AddPapOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.GetOrderOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.GetPapOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.GetPollingIntervalOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.ListPapsOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.RefreshPolicyCacheOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.RemovePapOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.SetOrderOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.PapExistsOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.SetPollingIntervalOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.UpdatePapOperation;
 import org.glite.authz.pap.common.PAPVersion;
 import org.glite.authz.pap.common.Pap;
@@ -84,6 +86,18 @@ public class PAPManagementService implements PAPManagement {
         }
     }
 
+    public float getPollingInterval() throws RemoteException {
+        log.info("getPollingInterval();");
+        try {
+
+            return GetPollingIntervalOperation.instance().execute();
+
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
+
     public String ping() throws RemoteException {
         log.info("Requested ping()");
         return "PAP v."+PAPVersion.instance().getVersion();
@@ -117,6 +131,18 @@ public class PAPManagementService implements PAPManagement {
         try {
 
             return SetOrderOperation.instance(aliasArray).execute();
+
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
+
+    public void setPollingInterval(float seconds) throws RemoteException {
+        log.info("setPollingInterval("+ seconds + ");");
+        try {
+
+            SetPollingIntervalOperation.instance((long) seconds).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);

@@ -101,13 +101,23 @@
 	<wsdl:message name="getOrderResponse">
 		<wsdl:part name="getOrderResponse" type="tns:StringArray"></wsdl:part>
 	</wsdl:message>
+		<wsdl:message name="getPollingIntervalRequest">
+	</wsdl:message>
+	<wsdl:message name="getPollingIntervalResponse">
+		<wsdl:part name="seconds" type="xsd:float"></wsdl:part>
+	</wsdl:message>
 	<wsdl:message name="setOrderRequest">
 		<wsdl:part name="aliasArray" type="tns:StringArray"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="setOrderResponse">
 		<wsdl:part name="setOrderResponse" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
-
+	<wsdl:message name="setPollingIntervalRequest">
+		<wsdl:part name="seconds" type="xsd:float"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="setPollingIntervalResponse">
+	</wsdl:message>
+	
 	<wsdl:portType name="PAPManagement">
 		<wsdl:operation name="addPap">
 			<wsdl:input message="tns:addPapRequest" />
@@ -145,9 +155,17 @@
 			<wsdl:input message="tns:getOrderRequest"></wsdl:input>
 			<wsdl:output message="tns:getOrderResponse"></wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="getPollingInterval">
+			<wsdl:input message="tns:getPollingIntervalRequest"></wsdl:input>
+			<wsdl:output message="tns:getPollingIntervalResponse"></wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="setOrder">
 			<wsdl:input message="tns:setOrderRequest"></wsdl:input>
 			<wsdl:output message="tns:setOrderResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="setPollingInterval">
+			<wsdl:input message="tns:setPollingIntervalRequest"></wsdl:input>
+			<wsdl:output message="tns:setPollingIntervalResponse"></wsdl:output>
 		</wsdl:operation>
 	</wsdl:portType>
 
@@ -262,9 +280,33 @@
 					use="literal" />
 			</wsdl:output>
 		</wsdl:operation>
+		<wsdl:operation name="getPollingInterval">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/getPollingInterval" />
+			<wsdl:input>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
 		<wsdl:operation name="setOrder">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/updatePap" />
+			<wsdl:input>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="setPollingInterval">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/setPollingInterval" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />
