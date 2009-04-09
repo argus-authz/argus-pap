@@ -26,11 +26,11 @@ public class UpdatePap extends PAPManagementCLI {
     protected Options defineCommandOptions() {
         Options options = new Options();
         options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription("Set the remote PAP as public (allow to distribute its policies)")
+                                       .withDescription("Set the remote pap as public (allow to distribute its policies)")
                                        .withLongOpt(LOPT_PUBLIC)
                                        .create());
         options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription("Set the remote PAP as private (default)")
+                                       .withDescription("Set the remote pap as private (default)")
                                        .withLongOpt(LOPT_PRIVATE)
                                        .create());
         options.addOption(OptionBuilder.hasArg(false)

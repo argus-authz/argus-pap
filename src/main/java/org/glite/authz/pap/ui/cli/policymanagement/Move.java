@@ -14,8 +14,7 @@ public class Move extends PolicyManagementCLI {
     private static final String DESCRIPTION = "Move a resource/action before/after another, respectively, resource/action.";
     private static final String LONG_DESCRIPTION = "<id>        the index of the object (action/resouce) to be moved.\n"
             + "<pivotId>   the index of the target object. <id> is moved before <pivotId> by default.\n"
-            + "\nAn action can be moved before/after another action of the same resource. "
-            + "A resource cannot be moved inside an action.";
+            + "\nA resource can be moved before/after another resource, an action can be moved before/after another action in the same resource. ";
     private static final String USAGE = "[options] <id> <pivotId>";
 
     private String alias = null;
