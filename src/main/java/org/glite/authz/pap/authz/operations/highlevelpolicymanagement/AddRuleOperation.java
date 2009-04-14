@@ -23,17 +23,17 @@ public class AddRuleOperation extends BasePAPOperation<String> {
     private String alias;
     private List<AttributeWizard> attributeWizardList;
     private EffectType effect;
-    private boolean moveAfter;
+    private boolean after;
     private String ruleId;
 
     protected AddRuleOperation(String alias, boolean isPermit, List<AttributeWizard> attributeWizardList,
-            String actionId, String ruleId, boolean moveAfter) {
+            String actionId, String ruleId, boolean after) {
 
         this.alias = alias;
         this.attributeWizardList = attributeWizardList;
         this.actionId = actionId;
         this.ruleId = ruleId;
-        this.moveAfter = moveAfter;
+        this.after = after;
 
         if (isPermit) {
             effect = EffectType.Permit;
@@ -44,8 +44,8 @@ public class AddRuleOperation extends BasePAPOperation<String> {
     }
 
     public static AddRuleOperation instance(String alias, boolean isPermit,
-            List<AttributeWizard> attributeWizardList, String actionId, String ruleId, boolean moveAfter) {
-        return new AddRuleOperation(alias, isPermit, attributeWizardList, actionId, ruleId, moveAfter);
+            List<AttributeWizard> attributeWizardList, String actionId, String ruleId, boolean after) {
+        return new AddRuleOperation(alias, isPermit, attributeWizardList, actionId, ruleId, after);
     }
 
     protected String doExecute() {
@@ -74,9 +74,13 @@ public class AddRuleOperation extends BasePAPOperation<String> {
                 throw new XACMLPolicyManagementServiceException("ruleId not found: " + ruleId);
             }
 
-            if (moveAfter) {
+            if (after) {
                 index++;
             }
+        }
+        
+        if ((ruleId == null) && (after)) {
+            index = -1;
         }
 
         RuleWizard ruleWizard = new RuleWizard(attributeWizardList, effect);

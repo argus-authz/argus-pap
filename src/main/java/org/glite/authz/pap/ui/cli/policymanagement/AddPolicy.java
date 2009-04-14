@@ -14,6 +14,8 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeEx
 
 public class AddPolicy extends PolicyManagementCLI {
 
+    private static final String OPT_BOTTOM_LONG = "bottom";
+    private static final String OPT_BOTTOM_DESCRIPTION = "Add the policy at the end of the list of rules of the given action.";
     private static String[] COMMAND_NAME_VALUES = { "add-policy", "ap" };
     private static String DESCRIPTION = "Add a permit/deny policy.\n"
             + "<permit|deny>  \"permit\" or \"deny\" to add a, respectively, permit/deny policy.\n"
@@ -36,6 +38,10 @@ public class AddPolicy extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_MOVEAFTER_DESCRIPTION)
                                        .withLongOpt(OPT_MOVEAFTER_LONG)
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(false)
+                                       .withDescription(OPT_BOTTOM_DESCRIPTION)
+                                       .withLongOpt(OPT_BOTTOM_LONG)
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
@@ -64,11 +70,11 @@ public class AddPolicy extends PolicyManagementCLI {
         }
 
         AttributeWizardTypeConfiguration.bootstrap();
-        
+
         List<String> attributeList = new LinkedList<String>();
 
         for (int i = 2; i < args.length; i++) {
-            
+
             try {
                 new AttributeWizard(args[i]);
                 attributeList.add(args[i]);
@@ -77,42 +83,68 @@ public class AddPolicy extends PolicyManagementCLI {
             }
         }
         
+        if (attributeList.size() == 0) {
+            throw new ParseException("Wrong number of arguments. Specify at least one attribute <id=value>");
+        }
+
         int actionIdIndex = attributeList.size() + 2;
-        
+
         if (actionIdIndex >= args.length) {
             throw new ParseException("Wrong number of arguments. Usage: " + USAGE);
         }
-        
+
         String actionId = args[actionIdIndex];
-        
+
         int ruleIdIndex = actionIdIndex + 1;
         String ruleId = null;
-        
+
         if (ruleIdIndex < args.length) {
             ruleId = args[ruleIdIndex++];
         }
-        
+
         if (ruleIdIndex != args.length) {
             throw new ParseException("Wrong number of arguments. Usage: " + USAGE);
         }
-        
-        boolean moveAfter = false;
+
+        boolean after = false;
 
         if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
-            moveAfter = true;
+            if (ruleId == null) {
+                throw new ParseException("Wrong number of arguments. --" + OPT_MOVEAFTER_LONG + " option needs the \"rule-id\" to be specified.");
+            }
+            after = true;
         }
 
         if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
             alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
+        
+        boolean bottom = false;
+        
+        if (commandLine.hasOption(OPT_BOTTOM_LONG)) {
+            bottom = true;
+        }
+        
+        if (bottom && (ruleId != null)) {
+            throw new ParseException("Specify one of --" + OPT_BOTTOM_LONG + " option or \"rule-id\", not both at the same time.");
+        }
+        
+        if (bottom) {
+            after = true;
+        }
 
         if (verboseMode) {
             System.out.print("Adding policy... ");
         }
-
+        
         String policyId = null;
 
-        policyId = highlevelPolicyMgmtClient.addRule(alias, isPermit, attributeList.toArray(new String[attributeList.size()]), actionId, ruleId, moveAfter);
+        policyId = highlevelPolicyMgmtClient.addRule(alias,
+                                                     isPermit,
+                                                     attributeList.toArray(new String[attributeList.size()]),
+                                                     actionId,
+                                                     ruleId,
+                                                     after);
 
         if (policyId == null) {
             printOutputMessage(String.format("error."));
