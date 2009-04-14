@@ -141,6 +141,7 @@ public class PolicyHelper extends XMLObjectHelper<PolicyType> {
 
         if (index == -1) {
             policy.getRules().add(rule);
+            return;
         } 
         // workaround for a bug in opensaml
         List<RuleType> ruleList = new ArrayList<RuleType>(policy.getRules());
