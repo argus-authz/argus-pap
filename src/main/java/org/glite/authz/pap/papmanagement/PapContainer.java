@@ -491,19 +491,34 @@ public class PapContainer {
             throw new NotFoundException("PolicyId \"" + policyId + "\" does not exists");
         }
 
+        boolean policyAlreadyRemoved = false;
+        
         List<PolicySetType> policySetList = policySetDAO.getAll(papId);
 
         for (PolicySetType policySet : policySetList) {
 
             if (PolicySetHelper.deletePolicyReference(policySet, policyId)) {
 
-                String oldVersion = policySet.getVersion();
-                PolicySetWizard.increaseVersion(policySet);
+                if (policySet.getPolicyIdReferences().size() == 0) {
+                    
+                    removePolicySetAndReferences(policySet.getPolicySetId());
+                    
+                    policyAlreadyRemoved = true;
+                    
+                } else {
 
-                policySetDAO.update(papId, oldVersion, policySet);
+                    String oldVersion = policySet.getVersion();
+                    PolicySetWizard.increaseVersion(policySet);
+
+                    policySetDAO.update(papId, oldVersion, policySet);
+                }
 
                 TypeStringUtils.releaseUnneededMemory(policySet);
             }
+        }
+        
+        if (policyAlreadyRemoved) {
+            return;
         }
 
         PolicyType policy = policyDAO.getById(papId, policyId);

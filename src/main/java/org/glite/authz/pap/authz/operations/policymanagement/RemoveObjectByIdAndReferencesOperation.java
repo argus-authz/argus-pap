@@ -36,11 +36,11 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
         if (id == null) {
             throw new XACMLPolicyManagementServiceException("id is null");
         }
-        
+
         if (alias == null) {
             alias = Pap.DEFAULT_PAP_ALIAS;
         }
-        
+
         Pap pap = PapManager.getInstance().getPap(alias);
 
         if (pap.isRemote()) {
@@ -62,7 +62,7 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
             papContainer.removePolicySetAndReferences(id);
             return true;
         }
-        
+
         removeRule(papContainer, id);
 
         return true;
@@ -74,12 +74,12 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
         addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_WRITE));
 
     }
-    
+
     private void removeRule(PapContainer papContainer, String id) {
         List<PolicyType> policyList = papContainer.getAllPolicies();
         PolicyType targetPolicy = null;
         RuleType targetRule = null;
-        
+
         for (PolicyType policy : policyList) {
             List<RuleType> ruleList = policy.getRules();
 
@@ -89,22 +89,28 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
                     break;
                 }
             }
-            
+
             if (targetRule != null) {
                 ruleList.remove(targetRule);
                 targetPolicy = policy;
                 break;
             }
         }
-        
+
         if (targetPolicy == null) {
             throw new NotFoundException("RuleId not found: " + id);
         }
-        
-        String version = targetPolicy.getVersion();
-        
-        PolicyWizard.increaseVersion(targetPolicy);
-        
-        papContainer.updatePolicy(version, targetPolicy);
+
+        if (targetPolicy.getRules().size() == 0) {
+            
+            papContainer.removePolicyAndReferences(targetPolicy.getPolicyId());
+            
+        } else {
+            String version = targetPolicy.getVersion();
+
+            PolicyWizard.increaseVersion(targetPolicy);
+
+            papContainer.updatePolicy(version, targetPolicy);
+        }
     }
 }

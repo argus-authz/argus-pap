@@ -92,10 +92,17 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
 
         if (policyWizard.removeDenyRuleForAttribute(bannedAttributeWizard)) {
             log.debug("ban rule found, updating policy");
+            
+            if (policyWizard.getNumberOfRules() == 0) {
+                
+                papContainer.removePolicyAndReferences(policyWizard.getPolicyId());
+                
+            } else {
 
-            String oldVersion = policyWizard.getVersionString();
-            policyWizard.increaseVersion();
-            papContainer.updatePolicy(oldVersion, policyWizard.getXACML());
+                String oldVersion = policyWizard.getVersionString();
+                policyWizard.increaseVersion();
+                papContainer.updatePolicy(oldVersion, policyWizard.getXACML());
+            }
 
             unbanResult.setStatusCode(0);
             return unbanResult;
