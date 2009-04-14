@@ -48,6 +48,11 @@ public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObjec
 
         // Add references to the remote PAPs
         for (PapContainer papContainer : papContainerList) {
+            
+            if (!papContainer.getPap().isEnabled()) {
+                continue;
+            }
+            
             log.info("Adding PAP: " + papContainer.getPap().getAlias());
 
             try {

@@ -9,11 +9,11 @@ import org.glite.authz.pap.papmanagement.PapManager;
 
 public class GetPapOperation extends BasePAPOperation<Pap> {
 
-    String papId;
+    private String alias;
     
     protected GetPapOperation(String papId){
         
-        this.papId = papId;
+        this.alias = papId;
     }
     
     public static GetPapOperation instance(String papId) {
@@ -24,7 +24,7 @@ public class GetPapOperation extends BasePAPOperation<Pap> {
     @Override
     protected Pap doExecute() {
         
-        Pap pap = PapManager.getInstance().getPap( papId );
+        Pap pap = PapManager.getInstance().getPap( alias );
         return pap;
         
     }

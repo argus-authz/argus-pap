@@ -11,25 +11,36 @@
 			targetNamespace="http://org.glite.authz/wsdl/pap/services/pap_management/pap">
 			<xsd:complexType name="Pap">
 				<xsd:sequence>
-					<xsd:element name="alias" type="xsd:string" maxOccurs="1"
-						minOccurs="1"></xsd:element>
-					<xsd:element name="id" type="xsd:string" maxOccurs="1"
-						minOccurs="0"></xsd:element>
-					<xsd:element name="dn" type="xsd:string" maxOccurs="1"
-						minOccurs="0"></xsd:element>
-					<xsd:element name="hostname" type="xsd:string"
-						maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="port" type="xsd:string" maxOccurs="1"
-						minOccurs="0"></xsd:element>
-					<xsd:element name="path" type="xsd:string" maxOccurs="1"
-						minOccurs="0"></xsd:element>
-					<xsd:element name="protocol" type="xsd:string"
-						maxOccurs="1" minOccurs="0"></xsd:element>
-					<xsd:element name="visibilityPublic" type="xsd:boolean"
+					<xsd:element name="alias" type="xsd:string"
 						maxOccurs="1" minOccurs="1">
 					</xsd:element>
-					<xsd:element name="local" type="xsd:boolean" maxOccurs="1"
-						minOccurs="1"></xsd:element>
+					<xsd:element name="id" type="xsd:string"
+						maxOccurs="1" minOccurs="0">
+					</xsd:element>
+					<xsd:element name="dn" type="xsd:string"
+						maxOccurs="1" minOccurs="0">
+					</xsd:element>
+					<xsd:element name="hostname" type="xsd:string"
+						maxOccurs="1" minOccurs="0">
+					</xsd:element>
+					<xsd:element name="port" type="xsd:string"
+						maxOccurs="1" minOccurs="0">
+					</xsd:element>
+					<xsd:element name="path" type="xsd:string"
+						maxOccurs="1" minOccurs="0">
+					</xsd:element>
+					<xsd:element name="protocol" type="xsd:string"
+						maxOccurs="1" minOccurs="0">
+					</xsd:element>
+					<xsd:element name="visibilityPublic"
+						type="xsd:boolean" maxOccurs="1" minOccurs="1">
+					</xsd:element>
+					<xsd:element name="local" type="xsd:boolean"
+						maxOccurs="1" minOccurs="1">
+					</xsd:element>
+					<xsd:element name="enabled" type="xsd:boolean"
+						maxOccurs="1" minOccurs="1">
+					</xsd:element>
 				</xsd:sequence>
 			</xsd:complexType>
 		</xsd:schema>
@@ -117,6 +128,12 @@
 	</wsdl:message>
 	<wsdl:message name="setPollingIntervalResponse">
 	</wsdl:message>
+	<wsdl:message name="setEnabledRequest">
+		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
+		<wsdl:part name="enabled" type="xsd:boolean"></wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="setEnabledResponse">
+	</wsdl:message>
 	
 	<wsdl:portType name="PAPManagement">
 		<wsdl:operation name="addPap">
@@ -166,6 +183,10 @@
 		<wsdl:operation name="setPollingInterval">
 			<wsdl:input message="tns:setPollingIntervalRequest"></wsdl:input>
 			<wsdl:output message="tns:setPollingIntervalResponse"></wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="setEnabled">
+			<wsdl:input message="tns:setEnabledRequest"></wsdl:input>
+			<wsdl:output message="tns:setEnabledResponse"></wsdl:output>
 		</wsdl:operation>
 	</wsdl:portType>
 
@@ -307,6 +328,18 @@
 		<wsdl:operation name="setPollingInterval">
 			<soap:operation
 				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/setPollingInterval" />
+			<wsdl:input>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
+					use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+		<wsdl:operation name="setEnabled">
+			<soap:operation
+				soapAction="http://org.glite.authz/wsdl/pap/services/pap_management/setEnabled" />
 			<wsdl:input>
 				<soap:body namespace="http://org.glite.authz/wsdl/pap/services/pap_management"
 					use="literal" />

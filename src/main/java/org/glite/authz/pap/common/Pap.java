@@ -20,7 +20,8 @@ import org.slf4j.LoggerFactory;
  * from the owner PAP). Information like hostname, port, protocol and path are used to build the
  * endpoint of a remote pap. A pap can also be private or public. When a PAP requests policies to
  * another PAP, the policies that are actually sent are all the public policies belonging to a
- * public pap.
+ * public pap. Finally a pap can be enabled or disabled. If it's enabled then its policies are sent
+ * to PDPs, otherwise they are not. By default a pap is not enabled.
  * 
  * @see PapManager
  * @see PapContainer
@@ -52,6 +53,7 @@ public class Pap {
     private String protocol = null;
     private boolean local = true;
     private boolean visibilityPublic = false;
+    private boolean enabled = false;
 
     /**
      * Constructor with no parameters. Needed for JavaBean compatibility and used by Axis
@@ -259,6 +261,10 @@ public class Pap {
         return "remote";
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
     public boolean isLocal() {
         return local;
     }
@@ -277,6 +283,10 @@ public class Pap {
 
     public void setDn(String dn) {
         this.dn = dn;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public void setHostname(String hostname) {

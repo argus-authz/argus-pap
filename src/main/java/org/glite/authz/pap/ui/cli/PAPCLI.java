@@ -16,6 +16,8 @@ import org.glite.authz.pap.ui.cli.authzmanagement.AddACE;
 import org.glite.authz.pap.ui.cli.authzmanagement.ListACL;
 import org.glite.authz.pap.ui.cli.authzmanagement.RemoveACE;
 import org.glite.authz.pap.ui.cli.papmanagement.AddPap;
+import org.glite.authz.pap.ui.cli.papmanagement.DisablePap;
+import org.glite.authz.pap.ui.cli.papmanagement.EnablePap;
 import org.glite.authz.pap.ui.cli.papmanagement.GetOrder;
 import org.glite.authz.pap.ui.cli.papmanagement.GetPollingInterval;
 import org.glite.authz.pap.ui.cli.papmanagement.ListPaps;
@@ -199,6 +201,8 @@ public class PAPCLI {
         papMgmtCommandList.add(new RemovePap());
         papMgmtCommandList.add(new UpdatePap());
         papMgmtCommandList.add(new ListPaps());
+        papMgmtCommandList.add(new EnablePap());
+        papMgmtCommandList.add(new DisablePap());
         papMgmtCommandList.add(new RefreshCache());
         papMgmtCommandList.add(new GetOrder());
         papMgmtCommandList.add(new SetOrder());

@@ -9,6 +9,7 @@ import org.glite.authz.pap.authz.operations.papmanagement.GetPollingIntervalOper
 import org.glite.authz.pap.authz.operations.papmanagement.ListPapsOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.RefreshPolicyCacheOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.RemovePapOperation;
+import org.glite.authz.pap.authz.operations.papmanagement.SetEnabledOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.SetOrderOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.PapExistsOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.SetPollingIntervalOperation;
@@ -120,6 +121,18 @@ public class PAPManagementService implements PAPManagement {
         try {
 
             return RemovePapOperation.instance(papAlias).execute();
+
+        } catch (RuntimeException e) {
+            ServiceClassExceptionManager.log(log, e);
+            throw e;
+        }
+    }
+    
+    public void setEnabled(String alias, boolean enabled) throws RemoteException {
+        log.info("setEnabled(" + alias + ", " + enabled + ");");
+        try {
+
+            SetEnabledOperation.instance(alias, enabled).execute();
 
         } catch (RuntimeException e) {
             ServiceClassExceptionManager.log(log, e);
