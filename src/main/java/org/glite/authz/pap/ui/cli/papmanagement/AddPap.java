@@ -110,7 +110,13 @@ public class AddPap extends PAPManagementCLI {
         papMgmtClient.addPap(pap);
 
         if (verboseMode) {
-            System.out.println("Success: new pap has been added.");
+            System.out.print("Retrieving policies... ");
+        }
+        
+        papMgmtClient.refreshCache(pap.getAlias());
+        
+        if (verboseMode) {
+            System.out.println("ok.");
         }
 
         return ExitStatus.SUCCESS.ordinal();

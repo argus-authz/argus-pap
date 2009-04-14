@@ -292,6 +292,7 @@ public class FileSystemPapDAO implements PapDAO {
     private void clearPapProperties(String papAlias) {
         iniConfiguration.clearProperty(dnKey(papAlias));
         iniConfiguration.clearProperty(hostnameKey(papAlias));
+        iniConfiguration.clearProperty(enabledKey(papAlias));
         iniConfiguration.clearProperty(portKey(papAlias));
         iniConfiguration.clearProperty(pathKey(papAlias));
         iniConfiguration.clearProperty(protocolKey(papAlias));

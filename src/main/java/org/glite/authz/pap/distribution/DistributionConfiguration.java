@@ -252,9 +252,9 @@ public class DistributionConfiguration {
      */
     public void removePap(String papAlias) {
 
-        clearPapProperties(papAlias);
-
         String[] oldPapOrdering = getPapOrdering();
+
+        clearPapProperties(papAlias);
 
         int newArraySize = oldPapOrdering.length - 1;
 
@@ -365,6 +365,7 @@ public class DistributionConfiguration {
     private void clearPapProperties(String papAlias) {
         papConfiguration.clearDistributionProperty(dnKey(papAlias));
         papConfiguration.clearDistributionProperty(hostnameKey(papAlias));
+        papConfiguration.clearDistributionProperty(enabledKey(papAlias));
         papConfiguration.clearDistributionProperty(portKey(papAlias));
         papConfiguration.clearDistributionProperty(pathKey(papAlias));
         papConfiguration.clearDistributionProperty(protocolKey(papAlias));
