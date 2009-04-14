@@ -139,7 +139,11 @@ public class Pap {
      * @return the default pap (alias={@value #DEFAULT_PAP_ALIAS}, local and public)).
      */
     public static Pap makeDefaultPAP() {
-        return new Pap(DEFAULT_PAP_ALIAS, true, null, null, null, null, null, true);
+        
+        Pap defaultPap = new Pap(DEFAULT_PAP_ALIAS, true, null, null, null, null, null, true);
+        defaultPap.setEnabled(true);
+        
+        return defaultPap;
     }
 
     /**
@@ -356,6 +360,7 @@ public class Pap {
         String aliasString = String.format("%salias=%s\n", indentString, alias);
         String typeString = String.format("%sisLocal=%b\n", paddingString, local);
         String visibilityString = String.format("%svisibility=%s\n", paddingString, visibility);
+        String enabledString = String.format("%senabled=%b\n", paddingString, enabled);
 
         String dnString = String.format("%sdn=%s\n", paddingString, dn);
         String endpointString = String.format("%sendpoint=%s\n", paddingString, getEndpoint());
@@ -371,7 +376,7 @@ public class Pap {
             }
         }
 
-        return aliasString + typeString + visibilityString + dnString + endpointString;
+        return aliasString + typeString + visibilityString + enabledString + dnString + endpointString;
     }
 
     /*
@@ -388,10 +393,11 @@ public class Pap {
         } else {
             visibility = "private";
         }
-        return String.format("alias=\"%s\" isLocal=\"%b\" visibility=\"%s\" dn=\"%s\" endpoint=\"%s\" id=\"%s\"",
+        return String.format("alias=\"%s\" isLocal=\"%b\" visibility=\"%s\" enabled=\"%b\" dn=\"%s\" endpoint=\"%s\" id=\"%s\"",
                              alias,
                              local,
                              visibility,
+                             enabled,
                              dn,
                              getEndpoint(),
                              id);

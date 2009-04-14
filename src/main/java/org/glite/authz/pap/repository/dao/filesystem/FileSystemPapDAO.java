@@ -91,6 +91,16 @@ public class FileSystemPapDAO implements PapDAO {
     private static String dnKey(String papAlias) {
         return aliasKey(papAlias) + "." + "dn";
     }
+    
+    /**
+     * Returns the key (INI configuration) holding the <code>enabled</code> value of a pap.
+     * 
+     * @param papAlias alias of the pap.
+     * @return the key.
+     */
+    private static String enabledKey(String papAlias) {
+        return aliasKey(papAlias) + "." + "enabled";
+    }
 
     /**
      * Returns the key (INI configuration) holding the <code>hostname</code> value of a pap.
@@ -317,9 +327,11 @@ public class FileSystemPapDAO implements PapDAO {
         String path = iniConfiguration.getString(pathKey(papAlias));
         String id = iniConfiguration.getString(idKey(papAlias));
         boolean visibilityPublic = iniConfiguration.getBoolean(visibilityPublicKey(papAlias));
+        boolean enabled = iniConfiguration.getBoolean(enabledKey(papAlias), false);
 
         Pap pap = new Pap(papAlias, Pap.isLocal(type), dn, host, port, path, protocol, visibilityPublic);
         pap.setId(id);
+        pap.setEnabled(enabled);
 
         long policyLastModificationTime;
         try {
@@ -390,6 +402,7 @@ public class FileSystemPapDAO implements PapDAO {
         iniConfiguration.setProperty(protocolKey(papAlias), pap.getProtocol());
         iniConfiguration.setProperty(idKey(papAlias), pap.getId());
         iniConfiguration.setProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
+        iniConfiguration.setProperty(enabledKey(papAlias), pap.isEnabled());
         iniConfiguration.setProperty(policyLastModificationTimeKey(papAlias),
                                      pap.getPolicyLastModificationTimeInSecondsString());
     }

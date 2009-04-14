@@ -62,6 +62,16 @@ public class DistributionConfiguration {
     private static String dnKey(String papAlias) {
         return aliasKey(papAlias) + "." + "dn";
     }
+    
+    /**
+     * Returns the <i>enabled</i> key of a pap.
+     * 
+     * @param papAlias alias if the pap.
+     * @return the <i>enabled</i> key.
+     */
+    private static String enabledKey(String papAlias) {
+        return aliasKey(papAlias) + "." + "enabled";
+    }
 
     /**
      * Returns the <i>hostname</i> key of a pap.
@@ -393,8 +403,12 @@ public class DistributionConfiguration {
         String path = papConfiguration.getString(pathKey(papAlias));
         String protocol = papConfiguration.getString(protocolKey(papAlias));
         boolean visibilityPublic = papConfiguration.getBoolean(visibilityPublicKey(papAlias));
+        boolean enabled = papConfiguration.getBoolean(enabledKey(papAlias), false);
 
-        return new Pap(papAlias, isLocal, dn, hostname, port, path, protocol, visibilityPublic);
+        Pap pap = new Pap(papAlias, isLocal, dn, hostname, port, path, protocol, visibilityPublic);
+        pap.setEnabled(enabled);
+        
+        return pap; 
     }
 
     /**
@@ -407,6 +421,7 @@ public class DistributionConfiguration {
         String papAlias = pap.getAlias();
 
         papConfiguration.setDistributionProperty(typeKey(papAlias), pap.getTypeAsString());
+        papConfiguration.setDistributionProperty(enabledKey(papAlias), pap.isEnabled());
         papConfiguration.setDistributionProperty(dnKey(papAlias), pap.getDn());
         papConfiguration.setDistributionProperty(hostnameKey(papAlias), pap.getHostname());
         papConfiguration.setDistributionProperty(portKey(papAlias), pap.getPort());

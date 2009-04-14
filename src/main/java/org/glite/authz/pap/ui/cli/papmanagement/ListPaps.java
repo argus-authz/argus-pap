@@ -57,10 +57,18 @@ public class ListPaps extends PAPManagementCLI {
                     visibility = "private";
                 }
                 
-                if (pap.isLocal()) {
-                    System.out.println(String.format("alias = %s (%s, %s)", pap.getAlias(), pap.getTypeAsString(), visibility));
+                String enabledString;
+                
+                if (pap.isEnabled()) {
+                    enabledString = "enabled";
                 } else {
-                    System.out.println(String.format("alias = %s (%s, %s, %s)", pap.getAlias(), pap.getTypeAsString(), visibility, pap.getEndpoint()));
+                    enabledString = "disabled";
+                }
+                
+                if (pap.isLocal()) {
+                    System.out.println(String.format("alias = %s (%s, %s, %s)", pap.getAlias(), pap.getTypeAsString(), enabledString, visibility));
+                } else {
+                    System.out.println(String.format("alias = %s (%s, %s, %s, %s)", pap.getAlias(), pap.getTypeAsString(), enabledString, visibility, pap.getEndpoint()));
                 }
             }
         }
