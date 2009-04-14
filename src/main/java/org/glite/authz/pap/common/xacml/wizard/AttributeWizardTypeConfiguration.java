@@ -11,15 +11,21 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeEx
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Reads the supported {@link AttributeWizardType} from configuration.
+ * <p>
+ * Call the {@link AttributeWizardTypeConfiguration#bootstrap()} method before anything else.
+ */
 public class AttributeWizardTypeConfiguration {
 
-    private static AttributeWizardType actionPolicyAttributeWizard = null;
+    private static final Logger log = LoggerFactory.getLogger(AttributeWizardTypeConfiguration.class);
 
-    public static final String UNRECOGNIZED_ATTRIBUTE_ID = "unrecognized-id";
+    private static AttributeWizardType actionPolicyAttributeWizard = null;
+    private static AttributeWizardType resourcePolicySetAttributeWizard = null;
+    private static final String UNRECOGNIZED_ATTRIBUTE_ID = "unrecognized-id";
+
     private static AttributeWizardTypeConfiguration instance = null;
     private static List<AttributeWizardType> list = null;
-    private static final Logger log = LoggerFactory.getLogger(AttributeWizardTypeConfiguration.class);
-    private static AttributeWizardType resourcePolicySetAttributeWizard = null;
 
     private static String baseKey(String id) {
         return id;
@@ -183,10 +189,25 @@ public class AttributeWizardTypeConfiguration {
         return baseKey(id) + ".xacml-target-element";
     }
 
+    /**
+     * Return the attribute used for the actions of the simplified policy language.
+     * 
+     * @return the attribute used for the actions of the simplified policy language.
+     */
     public AttributeWizardType getActionAttributeWizard() {
         return actionPolicyAttributeWizard;
     }
 
+    /**
+     * Return the <code>AtributeWizardType</code> identified by the given id of the simplified
+     * policy language.
+     * 
+     * @param id attribute id of the simplified policy language.
+     * @return the <code>AtributeWizardType</code> identified by the given id of the simplified
+     *         policy language.
+     * 
+     * @throws UnsupportedAttributeException if the given id is not supported.
+     */
     public AttributeWizardType getById(String id) {
 
         for (AttributeWizardType attributeWizardType : list) {
@@ -198,6 +219,14 @@ public class AttributeWizardTypeConfiguration {
         throw new UnsupportedAttributeException("id=" + id);
     }
 
+    /**
+     * Return the <code>AtributeWizardType</code> identified by the given XACML id.
+     * 
+     * @param id XACML attribute id.
+     * @return the <code>AtributeWizardType</code> identified by the given XACML id.
+     * 
+     * @throws UnsupportedAttributeException if the given id is not supported.
+     */
     public AttributeWizardType getByXACMLId(String xacmlId) {
 
         for (AttributeWizardType attributeWizardType : list) {
@@ -209,22 +238,57 @@ public class AttributeWizardTypeConfiguration {
         throw new UnsupportedAttributeException("xacmlId=" + xacmlId);
     }
 
+    /**
+     * Return the attribute used for the resources of the simplified policy language.
+     * 
+     * @return the attribute used for the resources of the simplified policy language.
+     */
     public AttributeWizardType getResourceAttributeWizard() {
         return resourcePolicySetAttributeWizard;
     }
     
+    /**
+     * Return the <code>AttributeWizardType</code> identifying an unrecognized XACML attribute.
+     * 
+     * @param xacmlId XACML id.
+     * @param dataType data type of the attribute.
+     * @return the <code>AttributeWizardType</code> identifying an unrecognized XACML attribute.
+     */
     public AttributeWizardType getUnrecognizedAttributeWizard(String xacmlId, String dataType) {
         return new AttributeWizardType(UNRECOGNIZED_ATTRIBUTE_ID, xacmlId, dataType, null, null);
     }
 
+    /**
+     * Checks whether the given id (of the simplified policy language) is supported or not.
+     * 
+     * @param id the id to check.
+     * @return <code>true</code> if the given id (of the simplified policy language) is supported,
+     *         <code>false</code> otherwise.
+     */
     public boolean idExist(String id) {
         return checkIdExist(id);
     }
 
+    /**
+     * Checks whether the given XACML id is supported or not.
+     * 
+     * @param id the XACML id to check.
+     * @return <code>true</code> if the given XACML id is supported, <code>false</code> otherwise.
+     */
     public boolean xacmlIdExist(String xacmlId) {
         return checkXacmlIdExist(xacmlId);
     }
 
+    /**
+     * Checks whether the given XACML id is of the same type of the given <code>TargetElement</code>
+     * (e.g. a subject, resource, action or environment attribute).
+     * 
+     * @param xacmlId the XACML id to check.
+     * @param targetElement the target element type to check against.
+     * @return <code>true</code> is the given XACML id is of the same type of the given
+     *         <code>TargetElement</code>, <code>false</code> otherwise (even in the case that the
+     *         given XACML is not supported, i.e. not found in the configuration).
+     */
     public boolean xacmlIdMatchesTargetElement(String xacmlId, TargetElement targetElement) {
         try {
 

@@ -1,6 +1,7 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -18,12 +19,14 @@ import org.glite.authz.pap.common.xacml.utils.SubjectMatchHelper;
 import org.glite.authz.pap.common.xacml.utils.SubjectsHelper;
 import org.glite.authz.pap.common.xacml.utils.TargetHelper;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.TargetWizardException;
-import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedPolicyException;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
+import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedTargetException;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.policy.ActionMatchType;
 import org.opensaml.xacml.policy.ActionType;
 import org.opensaml.xacml.policy.ActionsType;
 import org.opensaml.xacml.policy.EnvironmentMatchType;
+import org.opensaml.xacml.policy.EnvironmentType;
 import org.opensaml.xacml.policy.EnvironmentsType;
 import org.opensaml.xacml.policy.ResourceMatchType;
 import org.opensaml.xacml.policy.ResourceType;
@@ -35,6 +38,11 @@ import org.opensaml.xacml.policy.TargetType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * This class renders a list of {@link AttributeWizard} into an XACML Target and vice versa.
+ * Supported targets are the ones with single SubjectType, ResourceType, ActionType and
+ * EnvironmentType elements.
+ */
 public class TargetWizard {
 
     private static final Logger log = LoggerFactory.getLogger(TargetWizard.class);
@@ -42,23 +50,56 @@ public class TargetWizard {
     private TargetType target = null;
     private final List<AttributeWizard> targetAttributeWizardList;
 
+    /**
+     * Constructor.
+     * 
+     * @param attributeWizard the attribute wizard to build the Target with.
+     */
     public TargetWizard(AttributeWizard attributeWizard) {
-        targetAttributeWizardList = new ArrayList<AttributeWizard>(1);
-        targetAttributeWizardList.add(attributeWizard);
+        targetAttributeWizardList = Arrays.asList(attributeWizard);
     }
 
+    /**
+     * Constructor.
+     * <p>
+     * Attributes of the same category (resource, action, subject, environment) are
+     * <i>Category</i>Match elements of the generated target. For example if the given list of
+     * attributes as two subject attributes the generated Target contains two <i>SubjectMatch</i>
+     * elements.
+     * 
+     * @param targetAttributeWizardList the list of attribute wizard to build the Target with.
+     */
     public TargetWizard(List<AttributeWizard> targetAttributeWizardList) {
         if (targetAttributeWizardList == null) {
-            targetAttributeWizardList = new ArrayList<AttributeWizard>(0);
+            this.targetAttributeWizardList = Collections.emptyList();
+        } else {
+            this.targetAttributeWizardList = targetAttributeWizardList;
         }
-        this.targetAttributeWizardList = targetAttributeWizardList;
     }
 
+    /**
+     * Constructor.
+     * 
+     * @param target the XACML target.
+     */
     public TargetWizard(TargetType target) {
         this.target = target;
         this.targetAttributeWizardList = buildAttributeWizardList(target);
     }
 
+    /**
+     * Build a list of attribute wizard from the given XACML Target.
+     * <p>
+     * Supported targets are the ones with single SubjectType, ResourceType, ActionType and
+     * EnvironmentType elements.
+     * 
+     * @param target the XACML Target.
+     * @return a list of attribute wizard from the given XACML Target.
+     * 
+     * @throws UnsupportedTargetException if the given XACML Target is not recognized.
+     * @throws UnsupportedAttributeException if the given XACML Target have some attributes that are
+     *             not recognized.
+     */
     private static List<AttributeWizard> buildAttributeWizardList(TargetType target) {
 
         List<AttributeWizard> attributeWizardList = new LinkedList<AttributeWizard>();
@@ -73,7 +114,7 @@ public class TargetWizard {
             if (!subjectList.isEmpty()) {
 
                 if (subjectList.size() > 1) {
-                    throw new UnsupportedPolicyException("Only one SubjectType is allowed");
+                    throw new UnsupportedTargetException("Only one SubjectType is allowed");
                 }
 
                 attributeList.addAll(SubjectMatchHelper.getAttributeList(subjectList.get(0).getSubjectMatches()));
@@ -89,7 +130,7 @@ public class TargetWizard {
             if (!resourceList.isEmpty()) {
 
                 if (resourceList.size() > 1) {
-                    throw new UnsupportedPolicyException("Only one ResourceSubjectType is allowed");
+                    throw new UnsupportedTargetException("Only one ResourceType is allowed");
                 }
 
                 attributeList.addAll(ResourceMatchHelper.getAttributeList(resourceList.get(0).getResourceMatches()));
@@ -105,10 +146,26 @@ public class TargetWizard {
             if (!actionList.isEmpty()) {
 
                 if (actionList.size() > 1) {
-                    throw new UnsupportedPolicyException("Only one ActionSubjectType is allowed");
+                    throw new UnsupportedTargetException("Only one ActionType is allowed");
                 }
 
                 attributeList.addAll(ActionMatchHelper.getAttributeList(actionList.get(0).getActionMatches()));
+            }
+        }
+
+        // get environments
+        EnvironmentsType environments = target.getEnvironments();
+
+        if (environments != null) {
+            List<EnvironmentType> environmentList = environments.getEnvrionments();
+
+            if (!environmentList.isEmpty()) {
+
+                if (environmentList.size() > 1) {
+                    throw new UnsupportedTargetException("Only one EnvironmentType is allowed");
+                }
+
+                attributeList.addAll(EnvironmentMatchHelper.getAttributeList(environmentList.get(0).getEnvrionmentMatches()));
             }
         }
 
@@ -120,15 +177,33 @@ public class TargetWizard {
         return attributeWizardList;
     }
 
+    /**
+     * Return the list of attributes (as <code>AttributeWizard</code> objects) of this Target.
+     * 
+     * @return the list of attributes (as <code>AttributeWizard</code> objects) of this Target.
+     */
     public List<AttributeWizard> getAttributeWizardList() {
         return targetAttributeWizardList;
     }
 
+    /**
+     * Return the <code>TargetType</code> object.
+     * @return the <code>TargetType</code> object.
+     */
     public TargetType getXACML() {
         initTargetTypeIfNotSet();
         return target;
     }
 
+    /**
+     * Check if this target is equivalent to the given one.
+     * <p>
+     * Two Targets are considered to be equivalent if they have the same list of attributes.
+     * 
+     * @param target the <code>TargetType</code> to compare this target against.
+     * @return <code>true</code> if this Target and the given one are equivalent, <code>false</code>
+     *         otherwise.
+     */
     public boolean isEquivalent(TargetType target) {
 
         if (target == null) {
@@ -146,6 +221,15 @@ public class TargetWizard {
         return isEquivalent(targetWizard);
     }
 
+    /**
+     * Check if this target is equivalent to the given one.
+     * <p>
+     * Two Targets are considered to be equivalent if they have the same list of attributes.
+     * 
+     * @param targetWizard the <code>TargetWizard</code> to compare this target against.
+     * @return <code>true</code> if this Target and the given one are equivalent, <code>false</code>
+     *         otherwise.
+     */
     public boolean isEquivalent(TargetWizard targetWizard) {
 
         List<AttributeWizard> attributeWizardList = targetWizard.getAttributeWizardList();
@@ -172,12 +256,18 @@ public class TargetWizard {
         return true;
     }
 
+    /**
+     * Release children DOM of the internal <code>TargetType</code> object.
+     */
     public void releaseChildrenDOM() {
         if (target != null) {
             target.releaseChildrenDOM(true);
         }
     }
 
+    /**
+     * Release DOM of the internal <code>TargetType</code> object.
+     */
     public void releaseDOM() {
         if (target != null) {
             target.releaseDOM();
@@ -185,12 +275,18 @@ public class TargetWizard {
         }
     }
 
+    /**
+     * Build the <code>TargetType</code> object if it doesn't exist.
+     */
     private void initTargetTypeIfNotSet() {
         if (target == null) {
             setTargetType();
         }
     }
 
+    /**
+     * Build the <code>TargetType</code> object replacing the existing one (if any).
+     */
     private void setTargetType() {
 
         releaseDOM();

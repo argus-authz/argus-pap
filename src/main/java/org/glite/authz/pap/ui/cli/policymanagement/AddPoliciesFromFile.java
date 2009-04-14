@@ -116,6 +116,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             for (int i = 0; i < size; i++) {
                 PolicyWizard policyWizard = policySetWizard.getPolicyWizardList().get(i);
                 policyArray[i] = policyWizard.getXACML();
+                TypeStringUtils.releaseUnneededMemory(policyArray[i]);
                 idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
                 tagAndValueArray[i] = policyWizard.getTagAndValue();
                 TypeStringUtils.releaseUnneededMemory(policyWizard);
@@ -189,6 +190,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
         for (int i = 0; i < size; i++) {
             PolicyWizard policyWizard = policyWizardList.get(i);
             policyArray[i] = policyWizard.getXACML();
+            TypeStringUtils.releaseUnneededMemory(policyArray[i]);
             idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
             tagAndValueArray[i] = policyWizard.getTagAndValue();
             TypeStringUtils.releaseUnneededMemory(policyWizard);
