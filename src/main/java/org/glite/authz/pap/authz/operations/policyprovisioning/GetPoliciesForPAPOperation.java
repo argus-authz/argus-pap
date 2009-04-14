@@ -10,6 +10,7 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
+import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.ServicesUtils;
@@ -89,11 +90,25 @@ public class GetPoliciesForPAPOperation extends BasePAPOperation<List<XACMLObjec
 
         List<PolicySetType> resultPolicySetList = new LinkedList<PolicySetType>();
 
-        for (PolicySetType policySet : papContainer.getAllPolicySets()) {
+        List<PolicySetType> policySetList;
+        List<PolicyType> policyList;
+
+        if (papContainer.getPap().isLocal()) {
+            synchronized (ServicesUtils.highLevelOperationLock) {
+                policySetList = papContainer.getAllPolicySets();
+                policyList = papContainer.getAllPolicies();
+            }
+        } else {
+            synchronized (DistributionModule.storePoliciesLock) {
+                policySetList = papContainer.getAllPolicySets();
+                policyList = papContainer.getAllPolicies();
+            }
+        }
+
+        for (PolicySetType policySet : policySetList) {
             resultPolicySetList.add(policySet);
         }
 
-        List<PolicyType> policyList = papContainer.getAllPolicies();
         List<PolicyType> resultPolicyList = new LinkedList<PolicyType>();
 
         boolean removedAtLeastOnePrivatePolicy = false;

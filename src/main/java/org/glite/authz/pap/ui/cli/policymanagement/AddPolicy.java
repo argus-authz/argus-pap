@@ -14,6 +14,11 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeEx
 
 public class AddPolicy extends PolicyManagementCLI {
 
+    private static String OPT_ACTIONID_LONG = "action-id";
+    private static String OPT_ACTIONID_DESCRIPTION = "Specify an action-id";
+    private static String OPT_RULEID_LONG = "pap";
+    private static String OPT_RULEID_DESCRIPTION = "Specify a rule-id";
+
     private static final String OPT_BOTTOM_LONG = "bottom";
     private static final String OPT_BOTTOM_DESCRIPTION = "Add the policy at the end of the list of rules of the given action.";
     private static String[] COMMAND_NAME_VALUES = { "add-policy", "ap" };
@@ -24,7 +29,7 @@ public class AddPolicy extends PolicyManagementCLI {
             + "<action-id>    the policy is inserted into the action with id=<action-id>\n"
             + "[rule-id]      if specified the policy is added before \"rule-id\" (after if --"
             + OPT_MOVEAFTER_LONG + " is set).";
-    private static String USAGE = "[options] <permit|deny> <id=value>... <action-id> [rule-id]";
+    private static String USAGE = "[options] <permit|deny> <id=value>...";
     private String alias = null;
 
     public AddPolicy() {
@@ -47,6 +52,22 @@ public class AddPolicy extends PolicyManagementCLI {
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
                                        .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_ACTIONID_DESCRIPTION)
+                                       .withLongOpt(OPT_ACTIONID_LONG)
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_RULEID_DESCRIPTION)
+                                       .withLongOpt(OPT_RULEID_LONG)
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_ACTION_DESCRIPTION)
+                                       .withLongOpt(OPT_ACTION_LONG)
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_RESOURCE_DESCRIPTION)
+                                       .withLongOpt(OPT_RESOURCE_LONG)
+                                       .create());
         return options;
     }
 
@@ -55,7 +76,7 @@ public class AddPolicy extends PolicyManagementCLI {
 
         String[] args = commandLine.getArgs();
 
-        if (args.length < 4) {
+        if (args.length < 3) {
             throw new ParseException("Wrong number of arguments. Usage: " + USAGE);
         }
 
@@ -82,35 +103,54 @@ public class AddPolicy extends PolicyManagementCLI {
                 break;
             }
         }
-        
+
         if (attributeList.size() == 0) {
             throw new ParseException("Wrong number of arguments. Specify at least one attribute <id=value>");
         }
 
-        int actionIdIndex = attributeList.size() + 2;
-
-        if (actionIdIndex >= args.length) {
-            throw new ParseException("Wrong number of arguments. Usage: " + USAGE);
-        }
-
-        String actionId = args[actionIdIndex];
-
-        int ruleIdIndex = actionIdIndex + 1;
+        String actionId = null;
         String ruleId = null;
-
-        if (ruleIdIndex < args.length) {
-            ruleId = args[ruleIdIndex++];
+        String actionValue = null;
+        String resourceValue = null;
+        
+        if (commandLine.hasOption(OPT_ACTIONID_LONG)) {
+            actionId = commandLine.getOptionValue(OPT_ACTIONID_LONG);
         }
-
-        if (ruleIdIndex != args.length) {
-            throw new ParseException("Wrong number of arguments. Usage: " + USAGE);
+        
+        if (commandLine.hasOption(OPT_RULEID_LONG)) {
+            ruleId = commandLine.getOptionValue(OPT_RULEID_LONG);
         }
-
+        
+        if (commandLine.hasOption(OPT_ACTION_LONG)) {
+            actionValue = commandLine.getOptionValue(OPT_ACTION_LONG);
+        }
+        
+        if (commandLine.hasOption(OPT_RESOURCE_LONG)) {
+            resourceValue = commandLine.getOptionValue(OPT_RESOURCE_LONG);
+        }
+        
+        if (actionId == null) {
+            if ((actionValue == null)) {
+                throw new ParseException("Specify option --" + OPT_ACTIONID_LONG + " or --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG);
+            }
+            if ((resourceValue == null)) {
+                throw new ParseException("Specify option --" + OPT_ACTIONID_LONG + " or --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG);
+            }
+            if (ruleId != null) {
+                throw new ParseException("Options --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG + " are set. Do not specify option --" + OPT_RULEID_LONG);
+            }
+        } else {
+            if ((actionValue != null) || (resourceValue != null)) {
+                throw new ParseException("Specify option --" + OPT_ACTIONID_LONG + " or --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG);
+            }
+        }
+        
         boolean after = false;
 
         if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
             if (ruleId == null) {
-                throw new ParseException("Wrong number of arguments. --" + OPT_MOVEAFTER_LONG + " option needs the \"rule-id\" to be specified.");
+                throw new ParseException("Wrong number of arguments. --" + OPT_MOVEAFTER_LONG
+                        + " option needs the \"rule-id\" to be specified.");
             }
             after = true;
         }
@@ -118,17 +158,18 @@ public class AddPolicy extends PolicyManagementCLI {
         if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
             alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
-        
+
         boolean bottom = false;
-        
+
         if (commandLine.hasOption(OPT_BOTTOM_LONG)) {
             bottom = true;
         }
-        
+
         if (bottom && (ruleId != null)) {
-            throw new ParseException("Specify one of --" + OPT_BOTTOM_LONG + " option or \"rule-id\", not both at the same time.");
+            throw new ParseException("Specify one of --" + OPT_BOTTOM_LONG
+                    + " option or \"rule-id\", not both at the same time.");
         }
-        
+
         if (bottom) {
             after = true;
         }
@@ -136,22 +177,27 @@ public class AddPolicy extends PolicyManagementCLI {
         if (verboseMode) {
             System.out.print("Adding policy... ");
         }
-        
+
         String policyId = null;
 
         policyId = highlevelPolicyMgmtClient.addRule(alias,
                                                      isPermit,
                                                      attributeList.toArray(new String[attributeList.size()]),
+                                                     actionValue, 
+                                                     resourceValue,
                                                      actionId,
                                                      ruleId,
                                                      after);
-
         if (policyId == null) {
+            
             printOutputMessage(String.format("error."));
+            
         } else {
+            
             if (verboseMode) {
                 System.out.println("ok");
             }
+            
         }
         return ExitStatus.SUCCESS.ordinal();
     }

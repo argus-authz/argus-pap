@@ -23,8 +23,8 @@ import org.slf4j.LoggerFactory;
 public class PolicySetWizard extends XACMLWizard {
 
     private static final Logger log = LoggerFactory.getLogger(PolicySetWizard.class);
-    protected final AttributeWizardType attributeWizardType = AttributeWizardTypeConfiguration.getInstance()
-                                                                                              .getResourceAttributeWizard();
+    protected static final AttributeWizardType attributeWizardType = AttributeWizardTypeConfiguration.getInstance()
+                                                                                                     .getResourceAttributeWizard();
     protected String description = null;
     protected final List<ObligationWizard> obligationWizardList = new LinkedList<ObligationWizard>();
     protected PolicySetType policySet = null;
@@ -132,6 +132,19 @@ public class PolicySetWizard extends XACMLWizard {
         }
     }
 
+    public static String getResourceValue(PolicySetType policySet) {
+
+        TargetWizard targetWizard = new TargetWizard(policySet.getTarget());
+
+        try {
+            validateTargetAttributewizardList(targetWizard.getAttributeWizardList());
+        } catch (UnsupportedPolicySetWizardException e) {
+            return null;
+        }
+        
+        return targetWizard.getAttributeWizardList().get(0).getValue();
+    }
+
     public static void increaseVersion(PolicySetType policySet) {
         int version;
 
@@ -145,6 +158,24 @@ public class PolicySetWizard extends XACMLWizard {
         }
 
         policySet.setVersion(Integer.toString(version));
+    }
+
+    /**
+     * @param targetAttributeWizardList
+     * 
+     * @throws UnsupportedPolicySetWizardException
+     */
+    private static void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
+
+        if (targetAttributeWizardList.size() != 1) {
+            throw new UnsupportedPolicySetWizardException("Wrong number of attributes, only one is supported");
+        }
+
+        AttributeWizard aw = targetAttributeWizardList.get(0);
+
+        if (aw.getAttributeWizardType() != attributeWizardType) {
+            throw new UnsupportedPolicySetWizardException("Only resource attributes are supported");
+        }
     }
 
     public void addObligation(ObligationWizard obligationWizard) {
@@ -390,19 +421,6 @@ public class PolicySetWizard extends XACMLWizard {
             for (PolicyWizard policyWizard : policyWizardList) {
                 PolicySetHelper.addPolicyReference(policySet, policyWizard.getPolicyId());
             }
-        }
-    }
-
-    private void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
-
-        if (targetAttributeWizardList.size() != 1) {
-            throw new UnsupportedPolicySetWizardException("Wrong number of attributes, only one is supported");
-        }
-
-        AttributeWizard aw = targetAttributeWizardList.get(0);
-
-        if (aw.getAttributeWizardType() != attributeWizardType) {
-            throw new UnsupportedPolicySetWizardException("Only resource attributes are supported");
         }
     }
 }

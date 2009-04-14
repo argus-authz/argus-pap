@@ -28,6 +28,8 @@
 		<wsdl:part name="alias" type="xsd:string"></wsdl:part>
 		<wsdl:part name="isPermit" type="xsd:boolean"></wsdl:part>
 		<wsdl:part name="attributeList" type="tns:StringList"></wsdl:part>
+		<wsdl:part name="actionValue" type="xsd:string"></wsdl:part>
+		<wsdl:part name="resourceValue" type="xsd:string"></wsdl:part>
 		<wsdl:part name="actionIdentifier" type="xsd:string"></wsdl:part>
 		<wsdl:part name="ruleIdentifier" type="xsd:string"></wsdl:part>
 		<wsdl:part name="moveAfter" type="xsd:boolean"></wsdl:part>

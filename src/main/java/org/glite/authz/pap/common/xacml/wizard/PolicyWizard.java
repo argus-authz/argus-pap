@@ -49,7 +49,7 @@ public class PolicyWizard extends XACMLWizard {
     protected final String actionValue;
     
     /** The action attribute on which this policy is based */
-    protected final AttributeWizardType attributeWizardType = AttributeWizardTypeConfiguration.getInstance()
+    protected static final AttributeWizardType attributeWizardType = AttributeWizardTypeConfiguration.getInstance()
                                                                                               .getActionAttributeWizard();
     protected final List<ObligationWizard> obligationWizardList = new LinkedList<ObligationWizard>();
     protected final List<RuleWizard> ruleWizardList = new LinkedList<RuleWizard>();
@@ -130,6 +130,23 @@ public class PolicyWizard extends XACMLWizard {
         }
 
         this.policy = (PolicyTypeString) policy;
+    }
+    
+    /**
+     * Return the action value of the given policy.
+     * 
+     * @param policy
+     * @return the action value of the given policy.
+     * 
+     * @throws UnsupportedPolicyException if the given policy is not an action policy.
+     */
+    public static String getActionValue(PolicyType policy) {
+        TargetWizard targetWizard = new TargetWizard(policy.getTarget());
+
+        List<AttributeWizard> targetAttributeWizardList = targetWizard.getAttributeWizardList();
+        validateTargetAttributewizardList(targetAttributeWizardList);
+
+        return targetAttributeWizardList.get(0).getValue();
     }
 
     /**
@@ -569,7 +586,7 @@ public class PolicyWizard extends XACMLWizard {
      * 
      * @throws UnsupportedPolicyException if the validation fails.
      */
-    private void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
+    private static void validateTargetAttributewizardList(List<AttributeWizard> targetAttributeWizardList) {
 
         if (targetAttributeWizardList == null) {
             throw new UnsupportedPolicySetWizardException("targetAttributeWizardList is null");

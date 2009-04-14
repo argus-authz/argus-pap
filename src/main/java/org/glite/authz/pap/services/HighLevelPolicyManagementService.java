@@ -20,8 +20,8 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
 
     private static final Logger log = LoggerFactory.getLogger(HighLevelPolicyManagementService.class);
 
-    public String addRule(String alias, boolean isPermit, String[] attributeList, String actionId,
-            String ruleId, boolean moveAfter) throws RemoteException {
+    public String addRule(String alias, boolean isPermit, String[] attributeList, String actionValue,
+            String resourceValue, String actionId, String ruleId, boolean moveAfter) throws RemoteException {
         log.info(String.format("Received addRule(isPermit=%b, ..., actionId=\"%s\", ruleId=\"%s\", moveAfter=%b);",
                                isPermit,
                                actionId,
@@ -30,14 +30,16 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
         try {
             synchronized (ServicesUtils.highLevelOperationLock) {
                 List<AttributeWizard> attributeWizardList = new ArrayList<AttributeWizard>(attributeList.length);
-                
+
                 for (String attribute : attributeList) {
                     attributeWizardList.add(new AttributeWizard(attribute));
                 }
-                
+
                 return AddRuleOperation.instance(alias,
                                                  isPermit,
                                                  attributeWizardList,
+                                                 actionValue, 
+                                                 resourceValue,
                                                  actionId,
                                                  ruleId,
                                                  moveAfter).execute();

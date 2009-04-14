@@ -48,19 +48,26 @@ public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObjec
 
         // Add references to the remote PAPs
         for (PapContainer papContainer : papContainerList) {
-            
+
             if (!papContainer.getPap().isEnabled()) {
                 continue;
             }
-            
+
             log.info("Adding PAP: " + papContainer.getPap().getAlias());
 
             try {
                 PolicySetType papPolicySetNoReferences;
 
-                synchronized (DistributionModule.storePoliciesLock) {
-                    papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
-                                                                        papContainer.getRootPolicySetId());
+                if (papContainer.getPap().isLocal()) {
+                    synchronized (ServicesUtils.highLevelOperationLock) {
+                        papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
+                                                                            papContainer.getRootPolicySetId());
+                    }
+                } else {
+                    synchronized (DistributionModule.storePoliciesLock) {
+                        papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
+                                                                            papContainer.getRootPolicySetId());
+                    }
                 }
 
                 PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
