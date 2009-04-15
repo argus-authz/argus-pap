@@ -22,7 +22,8 @@ import org.slf4j.LoggerFactory;
 public class ListPolicies extends PolicyManagementCLI {
 
     private static final String[] commandNameValues = { "list-policies", "lp" };
-    private static final String DESCRIPTION = "List policies. If no options are specified then the policies of the default pap are listed.";
+    private static final String DESCRIPTION = "List policies. By default the policies of the default pap are listed unless option --"
+        + OPT_PAPALIAS_LONG + " is specified.";
     private static final Logger log = LoggerFactory.getLogger(ListPolicies.class);
     private static final String USAGE = "[options]";
 

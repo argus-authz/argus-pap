@@ -101,7 +101,7 @@ public class PAPManagementService implements PAPManagement {
 
     public String ping() throws RemoteException {
         log.info("Requested ping()");
-        return "PAP v."+PAPVersion.instance().getVersion();
+        return "PAP version: " + PAPVersion.instance().getVersion();
     }
 
     public boolean refreshCache(String papAlias) throws RemoteException {
@@ -127,7 +127,7 @@ public class PAPManagementService implements PAPManagement {
             throw e;
         }
     }
-    
+
     public void setEnabled(String alias, boolean enabled) throws RemoteException {
         log.info("setEnabled(" + alias + ", " + enabled + ");");
         try {
@@ -152,7 +152,7 @@ public class PAPManagementService implements PAPManagement {
     }
 
     public void setPollingInterval(float seconds) throws RemoteException {
-        log.info("setPollingInterval("+ seconds + ");");
+        log.info("setPollingInterval(" + seconds + ");");
         try {
 
             SetPollingIntervalOperation.instance((long) seconds).execute();
@@ -168,7 +168,8 @@ public class PAPManagementService implements PAPManagement {
         try {
 
             if (Pap.DEFAULT_PAP_ALIAS.equals(pap.getAlias())) {
-                throw new PapManagerException(String.format("Invalid request. \"%s\" cannot be updated", Pap.DEFAULT_PAP_ALIAS));
+                throw new PapManagerException(String.format("Invalid request. \"%s\" cannot be updated",
+                                                            Pap.DEFAULT_PAP_ALIAS));
             }
 
             return UpdatePapOperation.instance(pap).execute();

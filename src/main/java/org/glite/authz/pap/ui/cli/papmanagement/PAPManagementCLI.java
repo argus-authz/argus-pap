@@ -18,7 +18,8 @@ public abstract class PAPManagementCLI extends ServiceCLI {
     protected static String OPT_REMOTEL_LONG = "remote";
     protected static String OPT_REMOTE_DESCRIPTION = "Set the pap as remote";
     protected PAPManagement papMgmtClient;
-    
+    protected ServiceClient serviceClient;
+
     public PAPManagementCLI(String[] commandNameValues, String usage, String description,
             String longDescription) {
         super(commandNameValues, usage, description, longDescription);
@@ -31,10 +32,11 @@ public abstract class PAPManagementCLI extends ServiceCLI {
         papMgmtClient = serviceClient.getPAPManagementService(serviceClient.getTargetEndpoint()
                 + serviceClient.getPAPManagementServiceName());
 
+        this.serviceClient = serviceClient;
+
         return executeCommand(commandLine);
     }
 
-    protected abstract int executeCommand(CommandLine commandLine) throws CLIException,
-            ParseException, RemoteException;
-
+    protected abstract int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+            RemoteException;
 }

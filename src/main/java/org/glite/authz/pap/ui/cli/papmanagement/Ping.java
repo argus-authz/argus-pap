@@ -35,12 +35,13 @@ public class Ping extends PAPManagementCLI {
 
         if (args.length > 1)
             throw new ParseException("Wrong number of arguments");
+        
+        System.out.print("Contacting PAP at \"" + serviceClient.getTargetEndpoint() + "\"... ");
 
         String papVersion = papMgmtClient.ping();
 
-        System.out.println("PAP successfully contacted: version=" + papVersion);
+        System.out.println("ok (" + papVersion + ")");
 
         return ExitStatus.SUCCESS.ordinal();
     }
-
 }
