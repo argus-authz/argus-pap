@@ -481,6 +481,9 @@ public class PolicyWizard extends XACMLWizard {
         }
 
         for (RuleWizard ruleWizard : ruleWizardList) {
+            if (printRuleIds) {
+                sb.append('\n');
+            }
             sb.append(ruleWizard.toFormattedString(baseIndentation + internalIndentation, internalIndentation, printRuleIds));
             sb.append('\n');
         }
