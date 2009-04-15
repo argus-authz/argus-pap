@@ -15,25 +15,39 @@ import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeEx
 public class AddPolicy extends PolicyManagementCLI {
 
     private static String OPT_ACTIONID_LONG = "action-id";
-    private static String OPT_ACTIONID_DESCRIPTION = "Specify an action-id";
-    private static String OPT_RULEID_LONG = "pap";
-    private static String OPT_RULEID_DESCRIPTION = "Specify a rule-id";
+    private static String OPT_ACTIONID_DESCRIPTION = "Specify an action-id.";
+    private static String OPT_RULEID_LONG = "rule-id";
+    private static String OPT_RULEID_DESCRIPTION = "Specify a rule-id (needs option --" + OPT_ACTIONID_LONG
+            + ").";
 
     private static final String OPT_BOTTOM_LONG = "bottom";
     private static final String OPT_BOTTOM_DESCRIPTION = "Add the policy at the end of the list of rules of the given action.";
-    private static String[] COMMAND_NAME_VALUES = { "add-policy", "ap" };
-    private static String DESCRIPTION = "Add a permit/deny policy.\n"
+    private static final String[] COMMAND_NAME_VALUES = { "add-policy", "ap" };
+    private static final String DESCRIPTION = "Add a permit/deny policy.\n"
             + "<permit|deny>  \"permit\" or \"deny\" to add a, respectively, permit/deny policy.\n"
-            + "<id=value>     a string in the form \"<id>=<value>\", where <id> is any of the attribute ids that can be specified"
-            + "in the simplified policy language and <value> the value to be assigned (e.g. fqan=/vo/group).\n"
-            + "<action-id>    the policy is inserted into the action with id=<action-id>\n"
-            + "[rule-id]      if specified the policy is added before \"rule-id\" (after if --"
-            + OPT_MOVEAFTER_LONG + " is set).";
-    private static String USAGE = "[options] <permit|deny> <id=value>...";
+            + "<id=value>     a string in the form \"<id>=<value>\", where <id> is any of the attribute ids that can be specified "
+            + "in the simplified policy language and <value> the value to be assigned (e.g. fqan=/vo/group).";
+    private static final String LONG_DESCRIPTION = "This command allows to add a rule into an action by specifying "
+            + "an action-id (in this case the action must already exist) or a resource/action value (use option --"
+            + OPT_ACTIONID_LONG
+            + " to specify an action-id or the options --"
+            + OPT_RESOURCE_LONG
+            + " and --"
+            + OPT_ACTION_LONG
+            + " to specify resource/action values). "
+            + "In the latter case a new resource and/or action are created if they don't already exist. "
+            + "By default the rule is inserted on the top of an action unless the --"
+            + OPT_BOTTOM_LONG
+            + " option is given. If the --"
+            + OPT_RULEID_LONG
+            + " is set the rule is inserted before the given rule-id or after if the --"
+            + OPT_MOVEAFTER_LONG
+            + " option is given.";
+    private static final String USAGE = "[options] <permit|deny> <id=value>...";
     private String alias = null;
 
     public AddPolicy() {
-        super(COMMAND_NAME_VALUES, USAGE, DESCRIPTION, null);
+        super(COMMAND_NAME_VALUES, USAGE, DESCRIPTION, LONG_DESCRIPTION);
     }
 
     @SuppressWarnings("static-access")
@@ -112,44 +126,58 @@ public class AddPolicy extends PolicyManagementCLI {
         String ruleId = null;
         String actionValue = null;
         String resourceValue = null;
-        
+
         if (commandLine.hasOption(OPT_ACTIONID_LONG)) {
             actionId = commandLine.getOptionValue(OPT_ACTIONID_LONG);
         }
-        
+
         if (commandLine.hasOption(OPT_RULEID_LONG)) {
             ruleId = commandLine.getOptionValue(OPT_RULEID_LONG);
         }
-        
+
         if (commandLine.hasOption(OPT_ACTION_LONG)) {
             actionValue = commandLine.getOptionValue(OPT_ACTION_LONG);
         }
-        
+
         if (commandLine.hasOption(OPT_RESOURCE_LONG)) {
             resourceValue = commandLine.getOptionValue(OPT_RESOURCE_LONG);
         }
-        
+
         if (actionId == null) {
-            if ((actionValue == null)) {
-                throw new ParseException("Specify option --" + OPT_ACTIONID_LONG + " or --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG);
+            if ((resourceValue == null) && (actionValue == null) && (ruleId != null)) {
+                throw new ParseException(String.format("Option --%s needs option --%s.",
+                                                       OPT_RULEID_LONG,
+                                                       OPT_ACTIONID_LONG));
             }
-            if ((resourceValue == null)) {
-                throw new ParseException("Specify option --" + OPT_ACTIONID_LONG + " or --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG);
+            if ((resourceValue == null) && (actionValue == null)) {
+                throw new ParseException(String.format("Specify an action-id or a resource/action value."));
+            }
+            if ((resourceValue == null) || (actionValue == null)) {
+                throw new ParseException(String.format("--%s and --%s must be both present.",
+                                                       OPT_RESOURCE_LONG,
+                                                       OPT_ACTION_LONG));
             }
             if (ruleId != null) {
-                throw new ParseException("Options --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG + " are set. Do not specify option --" + OPT_RULEID_LONG);
+                throw new ParseException(String.format("Option --%s needs option --%s and cannot be used with options --%s and --%s.",
+                                                       OPT_RULEID_LONG,
+                                                       OPT_ACTIONID_LONG,
+                                                       OPT_RESOURCE_LONG,
+                                                       OPT_ACTION_LONG));
             }
         } else {
             if ((actionValue != null) || (resourceValue != null)) {
-                throw new ParseException("Specify option --" + OPT_ACTIONID_LONG + " or --" + OPT_ACTION_LONG + " and --" + OPT_RESOURCE_LONG);
+                throw new ParseException(String.format("Option --%s cannot be used with options --%s and --%s.",
+                                                       OPT_ACTIONID_LONG,
+                                                       OPT_RESOURCE_LONG,
+                                                       OPT_ACTION_LONG));
             }
         }
-        
+
         boolean after = false;
 
         if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
             if (ruleId == null) {
-                throw new ParseException("Wrong number of arguments. --" + OPT_MOVEAFTER_LONG
+                throw new ParseException("The --" + OPT_MOVEAFTER_LONG
                         + " option needs the \"rule-id\" to be specified.");
             }
             after = true;
@@ -183,21 +211,21 @@ public class AddPolicy extends PolicyManagementCLI {
         policyId = highlevelPolicyMgmtClient.addRule(alias,
                                                      isPermit,
                                                      attributeList.toArray(new String[attributeList.size()]),
-                                                     actionValue, 
+                                                     actionValue,
                                                      resourceValue,
                                                      actionId,
                                                      ruleId,
                                                      after);
         if (policyId == null) {
-            
+
             printOutputMessage(String.format("error."));
-            
+
         } else {
-            
+
             if (verboseMode) {
                 System.out.println("ok");
             }
-            
+
         }
         return ExitStatus.SUCCESS.ordinal();
     }
