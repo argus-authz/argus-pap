@@ -42,7 +42,8 @@ public abstract class ServiceCLI {
     private static final String OPT_CERT_LONG = "cert";
 
     private static final String OPT_HOST_DESCRIPTION = "Specifies the target PAP hostname (default is localhost). "
-            + "This option defines the PAP endpoint to be contacted as follows: https://arg:port" + Pap.DEFAULT_SERVICES_ROOT_PATH;
+            + "This option defines the PAP endpoint to be contacted as follows: https://arg:port"
+            + Pap.DEFAULT_SERVICES_ROOT_PATH;
     private static final String OPT_HOST_LONG = "host";
 
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
@@ -266,10 +267,12 @@ public abstract class ServiceCLI {
                                                                Pap.DEFAULT_HOST,
                                                                Pap.DEFAULT_PORT,
                                                                Pap.DEFAULT_SERVICES_ROOT_PATH) + ").")
+                                       .withArgName("url")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_HOST_LONG)
                                        .withDescription(OPT_HOST_DESCRIPTION)
+                                       .withArgName("hostname")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_PORT_LONG)
@@ -278,14 +281,17 @@ public abstract class ServiceCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_PROXY_LONG)
                                        .withDescription(OPT_PROXY_DESCRIPTION)
+                                       .withArgName("file")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_CERT_LONG)
                                        .withDescription(OPT_CERT_DESCRIPTION)
+                                       .withArgName("file")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_KEY_LONG)
                                        .withDescription(OPT_KEY_DESCRIPTION)
+                                       .withArgName("file")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withLongOpt(OPT_PASSWORD_LONG)

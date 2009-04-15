@@ -229,7 +229,7 @@ public class DistributionConfiguration {
 
         long pollIntervalInSecs = papConfiguration.getLong(pollIntervallKey());
 
-        log.info("Polling interval for remote PAPs is set to: " + pollIntervalInSecs + " seconds");
+        log.info("Polling interval for remote paps is set to: " + pollIntervalInSecs + " seconds");
 
         return pollIntervalInSecs;
     }
@@ -386,7 +386,7 @@ public class DistributionConfiguration {
 
         String type = papConfiguration.getString(typeKey(papAlias));
         if (type == null) {
-            throw new DistributionConfigurationException("\"type\" is not set for remote PAP \"" + papAlias
+            throw new DistributionConfigurationException("\"type\" is not set for remote pap \"" + papAlias
                     + "\"");
         }
 
@@ -396,7 +396,7 @@ public class DistributionConfiguration {
         String hostname = papConfiguration.getString(hostnameKey(papAlias));
 
         if ((hostname == null) && (!isLocal)) {
-            throw new DistributionConfigurationException("\"hostname\" is not set for remote PAP \""
+            throw new DistributionConfigurationException("\"hostname\" is not set for remote pap \""
                     + papAlias + "\"");
         }
 
@@ -448,14 +448,14 @@ public class DistributionConfiguration {
         for (String alias : aliasArray) {
 
             if (aliasSet.contains(alias)) {
-                throw new DistributionConfigurationException(String.format("Error in remote PAPs order: alias \"%s\" appears more than one time",
+                throw new DistributionConfigurationException(String.format("Error in remote paps order: alias \"%s\" appears more than one time",
                                                                            alias));
             }
 
             aliasSet.add(alias);
 
             if (!aliasExists(alias)) {
-                throw new DistributionConfigurationException(String.format("Error in remote PAPs order: unknown alias \"%s\"",
+                throw new DistributionConfigurationException(String.format("Error in remote paps order: unknown alias \"%s\"",
                                                                            alias));
             }
         }

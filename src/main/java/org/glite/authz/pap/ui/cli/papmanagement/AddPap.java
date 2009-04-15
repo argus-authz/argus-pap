@@ -14,9 +14,15 @@ public class AddPap extends PAPManagementCLI {
     private static final String DESCRIPTION = "Add a remote or local pap.\n"
             + "<alias> is a friendly name (it has to be unique) used to identify the pap\n"
             + "<endpoint> endpoint of the PAP in the following format: [<protocol>://]<host>:[<port>/[path]]\n";
-    private static final String LONG_DESCRIPTION = "Default protocol is: " + Pap.DEFAULT_PROTOCOL + "\n"
-            + "Default port is: " + Pap.DEFAULT_PORT + "\n" + "Default path is: "
-            + Pap.DEFAULT_SERVICES_ROOT_PATH + "\n" + "Example:\n" + "\t pap-admin " + commandNameValues[0]
+    private static final String LONG_DESCRIPTION = "A new added pap is disabled by default (i.e. its policies are not "
+            + "sent to the PDP). Use the command \"enable-pap\" to enable a pap.\nDefault protocol is: "
+            + Pap.DEFAULT_PROTOCOL
+            + "\nDefault port is: "
+            + Pap.DEFAULT_PORT
+            + "\nDefault path is: "
+            + Pap.DEFAULT_SERVICES_ROOT_PATH
+            + "\nExample:\n\t pap-admin "
+            + commandNameValues[0]
             + " cnaf_pap test.cnaf.infn.it \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\"";
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";

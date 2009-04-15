@@ -11,8 +11,8 @@ import org.glite.authz.pap.common.Pap;
 public class UpdatePap extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "update-pap", "upap" };
-    private static final String DESCRIPTION = "Update pap information. The input is the same as for the \"add-pap\" command, " +
-    		"the effect is to update old information with the new one.\n";
+    private static final String DESCRIPTION = "Update pap information. The input is the same as for the \"add-pap\" command, "
+            + "the effect is to update old information with the new one.\n";
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";
     private static final String USAGE = "[options] <alias> [<endpoint> <dn>]";
@@ -86,7 +86,7 @@ public class UpdatePap extends PAPManagementCLI {
             port = AddPap.getPort(args[2]);
             path = AddPap.getPath(args[2]);
         }
-        
+
         Pap pap = new Pap(alias, isLocal, dn, host, port, path, protocol, isPublic);
 
         String msg = "Updating PAP: ";
@@ -102,8 +102,16 @@ public class UpdatePap extends PAPManagementCLI {
 
         papMgmtClient.updatePap(pap);
 
-        if (verboseMode) {
-            System.out.println("Success: pap has been updated.");
+        if (pap.isRemote()) {
+            if (verboseMode) {
+                System.out.print("Retrieving policies... ");
+            }
+
+            papMgmtClient.refreshCache(pap.getAlias());
+
+            if (verboseMode) {
+                System.out.println("ok.");
+            }
         }
 
         return ExitStatus.SUCCESS.ordinal();

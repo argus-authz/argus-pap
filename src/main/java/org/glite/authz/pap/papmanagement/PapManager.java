@@ -143,6 +143,9 @@ public class PapManager {
 
         distributionConfiguration.removePap(papAlias);
         papDAO.delete(papAlias);
+
+        // pap ordering could be modified.
+        configurationPapOrdering = distributionConfiguration.getPapOrdering();
     }
 
     /**
