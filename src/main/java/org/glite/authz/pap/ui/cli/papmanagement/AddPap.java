@@ -15,9 +15,8 @@ public class AddPap extends PAPManagementCLI {
             + "<alias> is a friendly name (it has to be unique) used to identify the pap\n"
             + "<endpoint> endpoint of the PAP in the following format: [<protocol>://]<host>:[<port>/[path]]\n";
     private static final String LONG_DESCRIPTION = "Default protocol is: " + Pap.DEFAULT_PROTOCOL + "\n"
-            + "Default port is: " + Pap.DEFAULT_PORT + "\n"
-            + "Default path is: " + Pap.DEFAULT_SERVICES_ROOT_PATH + "\n"
-    		+ "Example:\n" + "\t pap-admin " + commandNameValues[0]
+            + "Default port is: " + Pap.DEFAULT_PORT + "\n" + "Default path is: "
+            + Pap.DEFAULT_SERVICES_ROOT_PATH + "\n" + "Example:\n" + "\t pap-admin " + commandNameValues[0]
             + " cnaf_pap test.cnaf.infn.it \"/C=IT/O=INFN/OU=Host/L=CNAF/CN=test.cnaf.infn.it\"";
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";
@@ -93,7 +92,7 @@ public class AddPap extends PAPManagementCLI {
             path = getPath(args[2]);
             dn = args[3];
         }
-        
+
         Pap pap = new Pap(alias, isLocal, dn, host, port, path, protocol, isPublic);
 
         String msg = "Adding pap: ";
@@ -109,14 +108,16 @@ public class AddPap extends PAPManagementCLI {
 
         papMgmtClient.addPap(pap);
 
-        if (verboseMode) {
-            System.out.print("Retrieving policies... ");
-        }
-        
-        papMgmtClient.refreshCache(pap.getAlias());
-        
-        if (verboseMode) {
-            System.out.println("ok.");
+        if (pap.isRemote()) {
+            if (verboseMode) {
+                System.out.print("Retrieving policies... ");
+            }
+
+            papMgmtClient.refreshCache(pap.getAlias());
+
+            if (verboseMode) {
+                System.out.println("ok.");
+            }
         }
 
         return ExitStatus.SUCCESS.ordinal();
@@ -125,67 +126,66 @@ public class AddPap extends PAPManagementCLI {
     protected static String getHostname(String endpoint) {
 
         int start = endpoint.indexOf("://");
-        
+
         if (start == -1) {
             start = 0;
         } else {
-            start +=3;
+            start += 3;
         }
-        
+
         int end = endpoint.indexOf(':', start);
-        
+
         if (end == -1) {
             end = endpoint.length();
         }
 
         return endpoint.substring(start, end);
     }
-    
+
     protected static String getPath(String endpoint) {
         int start = endpoint.indexOf("://");
-        
+
         if (start == -1) {
             start = 0;
         } else {
-            start +=3;
+            start += 3;
         }
-        
+
         start = endpoint.indexOf('/', start);
-        
-        
+
         if (start == -1) {
             return null;
         }
-        
+
         int end = endpoint.length();
-        
+
         return endpoint.substring(start, end);
     }
-    
+
     protected static String getPort(String endpoint) {
         int start = endpoint.indexOf("://");
-        
+
         if (start == -1) {
             start = 0;
         } else {
-            start +=3;
+            start += 3;
         }
-        
+
         start = endpoint.indexOf(':', start);
-        
+
         int end = endpoint.indexOf('/', start);
-        
+
         if (start == -1) {
             return null;
         }
-        
+
         if (end == -1) {
             end = endpoint.length();
         }
-        
+
         return endpoint.substring(start, end);
     }
-    
+
     protected static String getProtocol(String endpoint) {
 
         int index = endpoint.indexOf("://");
