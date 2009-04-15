@@ -23,9 +23,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
 
     private static final String[] commandNameValues = { "update-policy-from-file", "up" };
     private static final String DESCRIPTION = "Update the resource/action identified by <id> with the new resource/action "
-            + "defined in <file>. In the case of update of a resource all the actions defined inside the new resource (the one inside <file>) "
-            + "are ignored. This means that for a resource only obligations and the description can be updated. To remove, add, and "
-            + "change the order of actions inside a resource use the appropriate commands.";
+            + "defined in <file>.";
     private static final String USAGE = "[options] <id> <file>";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
 
