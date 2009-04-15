@@ -25,17 +25,21 @@ import org.slf4j.LoggerFactory;
 public class AddPoliciesFromFile extends PolicyManagementCLI {
 
     private static final Logger log = LoggerFactory.getLogger(AddPoliciesFromFile.class);
-    private static String OPT_PIVOT_LONG = "pivot";
-    private static String OPT_PIVOT_DESCRIPTION = "insert before <id> (option --" + OPT_MOVEAFTER_LONG + " modifies this behavior in: insert afer<id>)";
+    private static final String OPT_PIVOT_LONG = "pivot";
+    private static final String OPT_PIVOT_DESCRIPTION = "insert before <id> (option --" + OPT_MOVEAFTER_LONG
+            + " modifies this behavior in: insert after <id>)";
+    private static final String OPT_MOVEAFTER_DESCRIPTION = "insert after the id specified with --" + OPT_PIVOT_LONG;
 
     private static final String[] commandNameValues = { "add-policies-from-file", "apf" };
     private static final String DESCRIPTION = "Add policies defined in the given file.\n"
-            + "[resourceId]   resource id in which insert actions.\n"
-            + "<file>       define a set of resource elements or a set of action elements.\n";
+            + "[resourceId] resource id where insert actions into.\n"
+            + "<file>       test file defining a set of resource elements or a set of action elements.\n";
     private static final String LONG_DESCRIPTION = "If <file> defines a set of resource elements \"resourceId\" must not "
             + "be provided, otherwise if only action elements are defined \"resourceId\" indentifies the resource element "
-            + "in which insert the given action elements. If option --" + OPT_PIVOT_LONG + " is not specified all the "
-            + "elements are inserted in the last available position, otherwise they are inserted before \"pivotId\" "
+            + "where insert the given action elements. If option --"
+            + OPT_PIVOT_LONG
+            + " is not specified all the "
+            + "elements are inserted at the bottom, otherwise they are inserted before \"pivotId\" "
             + "(or after \"pivotId\" if option --" + OPT_MOVEAFTER_LONG + " is set).";
     private static final String USAGE = "[options] <file> [resourceId]";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
@@ -105,7 +109,9 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             }
 
             if (verboseMode) {
-                System.out.println(String.format("Added policy set: %s (id=%s)", policySetWizard.getTagAndValue(), policySetId));
+                System.out.println(String.format("Added policy set: %s (id=%s)",
+                                                 policySetWizard.getTagAndValue(),
+                                                 policySetId));
             }
 
             int size = policySetWizard.getPolicyWizardList().size();
@@ -122,7 +128,11 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
                 TypeStringUtils.releaseUnneededMemory(policyWizard);
             }
 
-            String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias, 0, policySetId, idPrefixArray, policyArray);
+            String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias,
+                                                                       0,
+                                                                       policySetId,
+                                                                       idPrefixArray,
+                                                                       policyArray);
 
             for (int i = 0; i < size; i++) {
                 String policyId = policyIdArray[i];
@@ -172,7 +182,8 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             position = PolicySetHelper.getPolicyIdReferenceIndex(targetolicySet, pivotId);
             TypeStringUtils.releaseUnneededMemory(targetolicySet);
             if (position == -1) {
-                System.out.println("Pivot id \"" + pivotId + "\" not found inside resource id \"" + resourceId + "\".");
+                System.out.println("Pivot id \"" + pivotId + "\" not found inside resource id \""
+                        + resourceId + "\".");
                 return false;
             }
             if (moveAfter) {
@@ -199,7 +210,11 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
 
         log.debug("Inserting actions into position: " + position);
 
-        String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias, position, resourceId, idPrefixArray, policyArray);
+        String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias,
+                                                                   position,
+                                                                   resourceId,
+                                                                   idPrefixArray,
+                                                                   policyArray);
 
         for (int i = 0; i < size; i++) {
             String policyId = policyIdArray[i];
@@ -233,16 +248,19 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PIVOT_DESCRIPTION)
                                        .withLongOpt(OPT_PIVOT_LONG)
+                                       .withArgName("id")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
+                                       .withArgName("alias")
                                        .create());
         return options;
     }
 
     @Override
-    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+            RemoteException {
         String[] args = commandLine.getArgs();
 
         if ((args.length < 2) || (args.length > 3)) {

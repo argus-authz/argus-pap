@@ -36,7 +36,7 @@ public class AddPolicy extends PolicyManagementCLI {
             + OPT_ACTION_LONG
             + " to specify resource/action values). "
             + "In the latter case a new resource and/or action are created if they don't already exist. "
-            + "By default the rule is inserted on the top of an action unless the --"
+            + "By default the rule is inserted at the top of an action unless the --"
             + OPT_BOTTOM_LONG
             + " option is given. If the --"
             + OPT_RULEID_LONG

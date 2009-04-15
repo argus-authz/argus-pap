@@ -14,10 +14,10 @@ import org.glite.authz.pap.ui.cli.ServiceCLI;
 public abstract class PolicyManagementCLI extends ServiceCLI {
 
     protected static String OPT_PAPALIAS_LONG = "pap";
-    protected static String OPT_PAPALIAS_DESCRIPTION = "Select <arg> as PAP";
+    protected static String OPT_PAPALIAS_DESCRIPTION = "Select <arg> as pap";
     protected static String OPT_ALLPAPS = "all";
     protected static String OPT_ALLPAPS_LONG = "all-paps";
-    protected static String OPT_ALLPAPS_DESCRIPTION = "Select all PAPs";
+    protected static String OPT_ALLPAPS_DESCRIPTION = "Select all paps";
     protected static String OPT_MOVEAFTER_LONG = "after";
     protected static String OPT_MOVEAFTER_DESCRIPTION = "move <id> after <pivotId> (by default <id> is moved before <pivotId>)";
     protected static String OPT_ACTION = "a";

@@ -11,7 +11,7 @@ public class BanAttribute extends PolicyManagementCLI {
 
     private static String[] COMMAND_NAME_VALUES = { "ban"};
     private static String DESCRIPTION = "Ban an attribute. <id> is any of the attribute ids that can be specified in the "
-            + "simplified policy language. By default the attribute is bannen for resource and action both with value \".*\". "
+            + "simplified policy language. By default the attribute is banned for resource and action both with value \".*\". "
             + "Different values for resource and action can be set using options --" + OPT_RESOURCE_LONG + " and --"
             + OPT_ACTION_LONG + ".";
     private static String USAGE = "[options] <id> <value>";

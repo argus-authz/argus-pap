@@ -98,7 +98,7 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
         }
 
         if (targetPolicy == null) {
-            throw new NotFoundException("RuleId not found: " + id);
+            throw new NotFoundException("Id not found: " + id);
         }
 
         if (targetPolicy.getRules().size() == 0) {

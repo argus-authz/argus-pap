@@ -13,7 +13,7 @@ public class UnBanAttribute extends PolicyManagementCLI {
 
     private static String[] COMMAND_NAME_VALUES = { "un-ban", "uban" };
     private static String DESCRIPTION = "Un-ban a previously banned attribute. <id> is any of the attribute ids that can be specified in the "
-            + "simplified policy language. By default the attribute is un-bannen for resource and action both with value \"*\". "
+            + "simplified policy language. By default the attribute is un-bannen for resource and action both with value \".*\". "
             + "Different values for resource and action can be set using options --"
             + OPT_RESOURCE_LONG
             + " and --"
