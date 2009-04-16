@@ -10,7 +10,8 @@ import org.apache.commons.cli.ParseException;
 public class RemoveAllPolicies extends PolicyManagementCLI {
 
     private static final String[] commandNameValues = { "remove-all-policies", "rap" };
-    private static final String DESCRIPTION = "Delete all policies of all the paps or only for pap specified by --" + OPT_PAPALIAS_LONG + ".";
+    private static final String DESCRIPTION = "Delete all policies of a pap. Use option --" + OPT_PAPALIAS_LONG + " to specify a pap different " +
+    		"than the default one.";
     private static final String USAGE = "[options]";
     
     private String alias = null;
