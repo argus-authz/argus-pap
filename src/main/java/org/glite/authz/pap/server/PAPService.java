@@ -38,26 +38,33 @@ public final class PAPService {
         PapManager papManager = PapManager.getInstance();
 
         // Property: number of local policies
-        int numberOfLocalPolicies = papManager.getPapContainer(Pap.DEFAULT_PAP_ALIAS).getNumberOfPolicies();
-        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME,
-                numberOfLocalPolicies);
+        int numberOfLocalPolicies = 0;
+        for (PapContainer papContainer : PapContainer.getContainers(papManager.getLocalPaps())) {
+            numberOfLocalPolicies += papContainer.getNumberOfPolicies();
+        }
+        PAPConfiguration.instance()
+                        .setMonitoringProperty(MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME,
+                                               numberOfLocalPolicies);
 
         // Property: number of remote policies
         int numOfRemotePolicies = 0;
         for (PapContainer papContainer : PapContainer.getContainers(papManager.getRemotePaps())) {
             numOfRemotePolicies += papContainer.getNumberOfPolicies();
         }
-        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME,
-                numOfRemotePolicies);
+        PAPConfiguration.instance()
+                        .setMonitoringProperty(MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME,
+                                               numOfRemotePolicies);
 
         // Property: number of policies
         PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_POLICIES_PROP_NAME,
-                numberOfLocalPolicies + numOfRemotePolicies);
+                                                          numberOfLocalPolicies + numOfRemotePolicies);
 
         // Property: policy last modification time
-        String policyLastModificationTimeString = papManager.getPap(Pap.DEFAULT_PAP_ALIAS).getPolicyLastModificationTimeInSecondsString();
-        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                policyLastModificationTimeString);
+        String policyLastModificationTimeString = papManager.getPap(Pap.DEFAULT_PAP_ALIAS)
+                                                            .getPolicyLastModificationTimeInSecondsString();
+        PAPConfiguration.instance()
+                        .setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+                                               policyLastModificationTimeString);
     }
 
     public static void start(ServletContext context) {
@@ -66,7 +73,7 @@ public final class PAPService {
 
         // Initialize configuaration
         PAPConfiguration conf = PAPConfiguration.initialize(context);
-        
+
         // Start autorization service
         logger.info("Starting authorization engine...");
 
@@ -83,51 +90,52 @@ public final class PAPService {
             logger.error("Error configuring OpenSAML:" + e.getMessage());
             throw new PAPConfigurationException("Error configuring OpenSAML:" + e.getMessage(), e);
         }
-        
+
         // Boostrap wizard attributes
         AttributeWizardTypeConfiguration.bootstrap();
 
         // Start repository manager
         logger.info("Starting repository manager...");
         RepositoryManager.bootstrap();
-        
+
         PapManager.initialize();
-        
+
         boolean performRepositoryValidationCheck;
 
         try {
-            
-            performRepositoryValidationCheck = PAPConfiguration.instance().getBoolean("repository.consistency_check");
-            
+
+            performRepositoryValidationCheck = PAPConfiguration.instance()
+                                                               .getBoolean("repository.consistency_check");
+
         } catch (NoSuchElementException e) {
-            
+
             performRepositoryValidationCheck = false;
             logger.info("Skipping repository validation check");
-            
+
         }
 
         if (performRepositoryValidationCheck) {
-            
+
             boolean repair;
-            
+
             try {
-            
+
                 repair = PAPConfiguration.instance().getBoolean("repository.consistency_check.repair");
-            
+
             } catch (NoSuchElementException e) {
-            
+
                 repair = false;
             }
-            
+
             logger.info("Starting repository validation. repair=" + repair);
-            
+
             if (RepositoryUtils.performAllChecks(repair) == false) {
-            
+
                 throw new RepositoryException("Repository validation check failed");
-                
+
             }
         }
-        
+
         setStartupMonitoringProperties();
 
         logger.info("Starting pap distribution module...");
