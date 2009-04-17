@@ -12,6 +12,11 @@ if [ -z $PAP_HOME ]; then
 	exit 1
 fi
 
+if [ ! -r $PAP_HOME/conf/pap_configuration.ini ]; then
+	echo "File $PAP_HOME/conf/pap_configuration.ini doesn't exist or is not readable!"
+	exit 1
+fi 
+	
 PAP_RUN_FILE=$PAP_HOME/.pap-standalone.pid
 
 . $PAP_HOME/bin/pap-env.sh
