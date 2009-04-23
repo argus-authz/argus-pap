@@ -53,16 +53,14 @@ public class CurrentAdmin {
 
         log.debug( "Fectching FQANs out of the security context");
         
-        if ( validator == null ) {
-            log
-                    .warn( "VOMS validator not initialized, authorization checks will ignore VOMS fqans even if "
-                            + "present." );
-            return;
-        }
-
         SecurityContext theContext = SecurityContext.getCurrentContext();
-
-        validator.setClientChain( theContext.getClientCertChain() );
+        
+        if ( validator == null ) {
+            log.debug("Initializing VOMS validator object...");
+            validator = new VOMSValidator(theContext.getClientCertChain());
+            
+        }else
+            validator.setClientChain( theContext.getClientCertChain() );
         
         try {
 
