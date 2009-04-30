@@ -209,7 +209,8 @@ public abstract class ServiceCLI {
             verboseMode = true;
         }
 
-        // ask for certificate password if needed
+        // Ask for certificate password if needed. The default private key (getClientPrivateKey() == null)
+        // is a host certificate key which doesn't need the password
         if (serviceClient.getClientPrivateKey() != null) {
             try {
 
