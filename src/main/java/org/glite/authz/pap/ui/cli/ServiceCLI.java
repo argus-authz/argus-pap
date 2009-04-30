@@ -1,6 +1,10 @@
 package org.glite.authz.pap.ui.cli;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
@@ -12,6 +16,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import org.bouncycastle.openssl.PEMReader;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.Pap;
@@ -48,9 +53,6 @@ public abstract class ServiceCLI {
 
     private static final String OPT_KEY_DESCRIPTION = "Specifies non-standard user private key.";
     private static final String OPT_KEY_LONG = "key";
-
-    private static final String OPT_PASSWORD_DESCRIPTION = "Specifies the password used to decrypt the user's private key.";
-    private static final String OPT_PASSWORD_LONG = "password";
 
     private static final String OPT_PORT = "p";
     private static final String OPT_PORT_DESCRIPTION = "Specifies the port on which the target PAP is listening "
@@ -191,23 +193,51 @@ public abstract class ServiceCLI {
             }
         }
 
-        if (commandLine.hasOption(OPT_PROXY_LONG))
+        if (commandLine.hasOption(OPT_PROXY_LONG)) {
             serviceClient.setClientProxy(commandLine.getOptionValue(OPT_PROXY_LONG));
+        }
 
-        if (commandLine.hasOption(OPT_CERT_LONG))
+        if (commandLine.hasOption(OPT_CERT_LONG)) {
             serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT_LONG));
+        }
 
-        if (commandLine.hasOption(OPT_KEY_LONG))
+        if (commandLine.hasOption(OPT_KEY_LONG)) {
             serviceClient.setClientPrivateKey(commandLine.getOptionValue(OPT_KEY_LONG));
+        }
 
-        if (commandLine.hasOption(OPT_PASSWORD_LONG))
-            serviceClient.setClientPrivateKeyPassword(commandLine.getOptionValue(OPT_PASSWORD_LONG));
-
-        if (commandLine.hasOption(OPT_VERBOSE))
+        if (commandLine.hasOption(OPT_VERBOSE)) {
             verboseMode = true;
+        }
+
+        // ask for certificate password if needed
+        if (serviceClient.getClientPrivateKey() != null) {
+            try {
+
+                Reader reader = new FileReader(serviceClient.getClientPrivateKey());
+
+                PEMReader pm = new PEMReader(reader, new PasswordFinderImpl());
+
+                char[] password = null;
+
+                try {
+                    pm.readObject();
+                } catch (IOException e) {
+                    // doesn't matter certificate stuff is managed later.
+                    // the purpose of this is just to set the password (if needed).
+                }
+
+                password = PasswordFinderImpl.getTypedPassword();
+
+                if (password != null) {
+                    serviceClient.setClientPrivateKeyPassword(new String(password));
+                }
+
+            } catch (FileNotFoundException e) {
+                throw new CLIException(e);
+            }
+        }
 
         return executeCommandService(commandLine, serviceClient);
-
     }
 
     public String[] getCommandNameValues() {
@@ -292,10 +322,6 @@ public abstract class ServiceCLI {
                                        .withLongOpt(OPT_KEY_LONG)
                                        .withDescription(OPT_KEY_DESCRIPTION)
                                        .withArgName("file")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withLongOpt(OPT_PASSWORD_LONG)
-                                       .withDescription(OPT_PASSWORD_DESCRIPTION)
                                        .create());
         options.addOption(OptionBuilder.hasArg(false)
                                        .withLongOpt(OPT_VERBOSE_LONG)
