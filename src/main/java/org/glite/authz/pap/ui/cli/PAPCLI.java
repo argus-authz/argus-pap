@@ -126,7 +126,7 @@ public class PAPCLI {
             log.error("Remote exception", e);
             
             if (e.getCause() instanceof java.security.cert.CertificateException) {
-                System.out.println("Error: bad password or bad certificate.");
+                System.out.println("Error: bad password or bad key (" + serviceCLI.getServiceClient().getClientPrivateKey() + ").");
                 System.out.println(e.getMessage());
             } else {
                 System.out.println("Error: " + e.getMessage());
