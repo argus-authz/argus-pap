@@ -58,7 +58,10 @@ public class PAPCLI {
 
         for (ServiceCLI.ExitStatus es : ServiceCLI.ExitStatus.values()) {
             if (es.ordinal() == exitStatus) {
-                log.info(String.format("Exit status (%s): %s %d", cli.getCommandName(), es.toString(), exitStatus));
+                log.info(String.format("Exit status (%s): %s %d",
+                                       cli.getCommandName(),
+                                       es.toString(),
+                                       exitStatus));
             }
         }
 
@@ -121,7 +124,14 @@ public class PAPCLI {
 
         } catch (RemoteException e) {
             log.error("Remote exception", e);
-            System.out.println("Error: " + e.getMessage());
+            
+            if (e.getCause() instanceof java.security.cert.CertificateException) {
+                System.out.println("Error: bad password or bad certificate.");
+                System.out.println(e.getMessage());
+            } else {
+                System.out.println("Error: " + e.getMessage());
+            }
+            
             return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
 
         } catch (Exception e) {
@@ -144,14 +154,14 @@ public class PAPCLI {
         }
 
         String command;
-        
+
         try {
-        	command = getCommand(commandLine);
+            command = getCommand(commandLine);
         } catch (ParseException e) {
-        	if (printGeneralHelpMessage) {
-        		return;
-        	}
-        	throw e;
+            if (printGeneralHelpMessage) {
+                return;
+            }
+            throw e;
         }
 
         boolean commandFound = false;
@@ -211,7 +221,7 @@ public class PAPCLI {
         authzMgmtCommandList.add(new ListACL());
         authzMgmtCommandList.add(new AddACE());
         authzMgmtCommandList.add(new RemoveACE());
-        
+
         // Test
         testCommandList.add(new SAMLClient());
 
@@ -223,7 +233,7 @@ public class PAPCLI {
     }
 
     private void defineOptions() {
-    	options = ServiceCLI.getGlobalOptions();
+        options = ServiceCLI.getGlobalOptions();
         options.addOption("h", "help", false, "Print this message");
     }
 
@@ -262,40 +272,55 @@ public class PAPCLI {
         PrintWriter pw = new PrintWriter(System.out);
 
         pw.println();
-        helpFormatter.printUsage(pw, helpFormatter.getWidth(), "pap-admin [global-options] <command> [options] [args]");
+        helpFormatter.printUsage(pw,
+                                 helpFormatter.getWidth(),
+                                 "pap-admin [global-options] <command> [options] [args]");
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "PAP command-line client.");
-        helpFormatter.printWrapped(pw, helpFormatter.getWidth(),
-                "Type 'pap-admin <subcommand> -h' for help on a specific subcommand.");
+        helpFormatter.printWrapped(pw,
+                                   helpFormatter.getWidth(),
+                                   "Type 'pap-admin <subcommand> -h' for help on a specific subcommand.");
         pw.println();
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Global options:");
-        helpFormatter.printOptions(pw, helpFormatter.getWidth(), options, helpFormatter.getLeftPadding(), helpFormatter
-                .getDescPadding());
+        helpFormatter.printOptions(pw,
+                                   helpFormatter.getWidth(),
+                                   options,
+                                   helpFormatter.getLeftPadding(),
+                                   helpFormatter.getDescPadding());
         pw.println();
-        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "List of available subcommands grouped by " + "category.");
+        helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "List of available subcommands grouped by "
+                + "category.");
         pw.println();
 
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Policy management:");
         for (ServiceCLI serviceCLI : policyMgmtCommandList) {
-            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
+            helpFormatter.printWrapped(pw,
+                                       hfWidth,
+                                       getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
         }
         pw.println();
 
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Distribution management:");
         for (ServiceCLI serviceCLI : papMgmtCommandList) {
-            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
+            helpFormatter.printWrapped(pw,
+                                       hfWidth,
+                                       getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
         }
         pw.println();
 
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Authorization management:");
         for (ServiceCLI serviceCLI : authzMgmtCommandList) {
-            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
+            helpFormatter.printWrapped(pw,
+                                       hfWidth,
+                                       getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
         }
         pw.println();
-        
+
         helpFormatter.printWrapped(pw, helpFormatter.getWidth(), "Test utils:");
         for (ServiceCLI serviceCLI : testCommandList) {
-            helpFormatter.printWrapped(pw, hfWidth, getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
+            helpFormatter.printWrapped(pw,
+                                       hfWidth,
+                                       getCommandStringHelpMessage(serviceCLI.getCommandNameValues()));
         }
 
         pw.println();
@@ -322,18 +347,18 @@ public class PAPCLI {
     }
 
     protected String getCommand(CommandLine commandLine) throws ParseException {
-    	
-    	String[] args = commandLine.getArgs();
-    	
-    	if (args.length == 0) {
-    		throw new ParseException("Missing command");
-    	}
-    	
+
+        String[] args = commandLine.getArgs();
+
+        if (args.length == 0) {
+            throw new ParseException("Missing command");
+        }
+
         return args[0];
     }
 
-    protected int profileCommandExecution(ServiceCLI serviceCLI, String[] args) throws HelpMessageException, RemoteException,
-            ParseException {
+    protected int profileCommandExecution(ServiceCLI serviceCLI, String[] args) throws HelpMessageException,
+            RemoteException, ParseException {
 
         int status = ServiceCLI.ExitStatus.FAILURE.ordinal();
         int numSamples = 10;
@@ -346,8 +371,10 @@ public class PAPCLI {
             samples[i] = System.currentTimeMillis() - cmdFoundTime;
         }
 
-        log.debug("Avg '" + serviceCLI.getClass().getSimpleName() + "'cmd execution time: " + computeAvg(samples) + " msecs.");
-        log.debug("Fist '" + serviceCLI.getClass().getSimpleName() + "' execution (bootstrap) time: " + samples[0] + " msecs.");
+        log.debug("Avg '" + serviceCLI.getClass().getSimpleName() + "'cmd execution time: "
+                + computeAvg(samples) + " msecs.");
+        log.debug("Fist '" + serviceCLI.getClass().getSimpleName() + "' execution (bootstrap) time: "
+                + samples[0] + " msecs.");
 
         return status;
 

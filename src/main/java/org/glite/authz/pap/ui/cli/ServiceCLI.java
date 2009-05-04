@@ -137,8 +137,9 @@ public abstract class ServiceCLI {
 
         CommandLine commandLine = parser.parse(options, args);
 
-        if (commandLine.hasOption(OPT_HELP))
+        if (commandLine.hasOption(OPT_HELP)) {
             throw new HelpMessageException();
+        }
 
         if (commandLine.hasOption(OPT_URL_LONG)) {
 
@@ -149,11 +150,22 @@ public abstract class ServiceCLI {
             String host = Pap.DEFAULT_HOST;
             String port = Pap.DEFAULT_PORT;
 
-            if (commandLine.hasOption(OPT_HOST_LONG))
+            if (commandLine.hasOption(OPT_HOST_LONG)) {
                 host = commandLine.getOptionValue(OPT_HOST_LONG);
+            }
 
-            if (commandLine.hasOption(OPT_PORT))
+            if (commandLine.hasOption(OPT_PORT)) {
                 port = commandLine.getOptionValue(OPT_PORT);
+
+                try {
+                    Integer.valueOf(port);
+                } catch (NumberFormatException e) {
+                    throw new ParseException(String.format("Invalid port number \"%s\" (option -%s, --%s)",
+                                                           port,
+                                                           OPT_PORT,
+                                                           OPT_PORT_LONG));
+                }
+            }
 
             serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL,
                                                           host,
@@ -209,7 +221,8 @@ public abstract class ServiceCLI {
             verboseMode = true;
         }
 
-        // Ask for certificate password if needed. The default private key (getClientPrivateKey() == null)
+        // Ask for certificate password if needed. The default private key (getClientPrivateKey() ==
+        // null)
         // is a host certificate key which doesn't need the password
         if (serviceClient.getClientPrivateKey() != null) {
             try {
