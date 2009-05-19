@@ -61,6 +61,9 @@ PAP_CLIENT_CP="$PAP_DEPS$PAP_JAR:$PAP_HOME/conf/logging/client"
 # Classpath for the pap standalone service
 PAP_STANDALONE_CP="$TM_DEPS$CONFIG_DEPS$JETTY_DEPS$LOGGING_DEPS$PAP_JAR:$PAP_HOME/conf/logging/standalone"
 
+# Test classpath for the pap standalone service
+TEST_PAP_STANDALONE_CP="$PAP_DEPS:$PAP_HOME/conf/logging/standalone"
+
 # Environment for the pap client application
 PAP_CLIENT_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS"
 
@@ -71,7 +74,7 @@ PAP_STANDALONE_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS
 PAP_CLIENT_CMD="java $PAP_CLIENT_ENV -DconfigureLog4j=false -DeffectiveUserId=$EUID -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
 
 # Command used to start the pap standalone service
-PAP_STANDALONE_CMD="java -Xmx$PAP_STANDALONE_MEM_SIZE $PAP_STANDALONE_VM_OPTIONS $PAP_STANDALONE_ENV -cp $PAP_STANDALONE_CP $PAP_STANDALONE_CLASS --conf-dir $PAP_HOME/conf"
+PAP_STANDALONE_CMD="java -Xmx$PAP_STANDALONE_MEM_SIZE $PAP_STANDALONE_VM_OPTIONS $PAP_STANDALONE_ENV -cp $TEST_PAP_STANDALONE_CP $PAP_STANDALONE_CLASS --conf-dir $PAP_HOME/conf"
 
 # The hostname property as appears in the pap configuration file
 PAP_HOST=`grep 'hostname =' $PAP_CONF_FILE | awk '{print $3}'`
