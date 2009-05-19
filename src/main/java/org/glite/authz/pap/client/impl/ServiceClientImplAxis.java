@@ -2,12 +2,14 @@ package org.glite.authz.pap.client.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.Security;
 import java.util.Properties;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.encoding.TypeMapping;
 
 import org.apache.axis.AxisProperties;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;

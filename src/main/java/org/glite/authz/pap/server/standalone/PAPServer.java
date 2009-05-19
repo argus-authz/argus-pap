@@ -210,7 +210,7 @@ public final class PAPServer {
 
         papServer.setThreadPool( threadPool );
 
-        TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
+        TrustManagerSelectChannelConnector connector = new TrustManagerSelectChannelConnector(
                 buildTrustmanagerConfiguration() );
 
         connector.setPort( port );
@@ -236,6 +236,7 @@ public final class PAPServer {
 
         webappContext.setContextPath( "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT );
         webappContext.setWar( DEFAULT_WAR_LOCATION );
+        webappContext.setParentLoaderPriority(true);
 
         HandlerCollection handlers = new HandlerCollection();
         handlers.setHandlers( new Handler[] { webappContext,

@@ -3,6 +3,7 @@ package org.glite.authz.pap.server.standalone;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
+import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.Properties;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.security.trustmanager.ContextWrapper;
 import org.mortbay.io.nio.SelectChannelEndPoint;
 import org.mortbay.io.nio.SelectorManager.SelectSet;
@@ -28,6 +30,11 @@ import org.slf4j.LoggerFactory;
 public class TrustManagerSelectChannelConnector extends
         SslSelectChannelConnector {
 
+	static{
+		
+		Security.addProvider(new BouncyCastleProvider());
+		
+	}
     private static final Logger log = LoggerFactory
             .getLogger( TrustManagerSelectChannelConnector.class );
 

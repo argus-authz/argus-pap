@@ -1,19 +1,11 @@
 package org.glite.authz.pap.authz;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.cert.CRLException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
+import java.security.Security;
 
-import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
-import org.glite.voms.PKIStore;
-import org.glite.voms.PKIVerifier;
-import org.glite.voms.VOMSValidator;
-import org.glite.voms.ac.ACValidator;
-import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +15,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class AuthorizationEngine {
+	
     
     public static final Logger logger = LoggerFactory.getLogger( AuthorizationEngine.class );
 
