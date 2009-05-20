@@ -303,6 +303,7 @@ public class PapManager {
         // id (and alias) cannot change
         newPap.setId(oldPap.getId());
 
+        distributionConfiguration.savePap(newPap);
         papDAO.update(newPap);
     }
 

@@ -289,7 +289,7 @@ public class DistributionConfiguration {
         setPapProperties(pap);
         papConfiguration.saveStartupConfiguration();
     }
-
+    
     /**
      * Save the given paps ordering into configuration.
      * <p>
