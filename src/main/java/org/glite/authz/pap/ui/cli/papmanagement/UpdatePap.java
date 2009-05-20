@@ -85,6 +85,7 @@ public class UpdatePap extends PAPManagementCLI {
             host = AddPap.getHostname(args[2]);
             port = AddPap.getPort(args[2]);
             path = AddPap.getPath(args[2]);
+            dn = args[3];
         }
 
         Pap pap = new Pap(alias, isLocal, dn, host, port, path, protocol, isPublic);
