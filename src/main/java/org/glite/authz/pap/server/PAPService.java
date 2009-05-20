@@ -92,7 +92,8 @@ public final class PAPService {
         }
 
         // Boostrap wizard attributes
-        AttributeWizardTypeConfiguration.bootstrap();
+        String configFileName = PAPConfiguration.instance().getPAPConfigurationDir() + "/attribute-mappings.ini";
+        AttributeWizardTypeConfiguration.bootstrap(configFileName);
 
         // Start repository manager
         logger.info("Starting repository manager...");

@@ -1,5 +1,6 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -31,11 +32,11 @@ public class AttributeWizardTypeConfiguration {
         return id;
     }
 
-    public static void bootstrap() {
+    public static void bootstrap(String attributeMappingsFileName) {
 
         list = new LinkedList<AttributeWizardType>();
 
-        initListFromFile();
+        initListFromFile(attributeMappingsFileName);
 
         initResourcePolicySetAttributeWizard();
         initActionPolicyAttributeWizard();
@@ -85,17 +86,21 @@ public class AttributeWizardTypeConfiguration {
         throw new AttributeWizardTypeConfigurationException("Cannot find id \"action\"");
     }
     
-    private static void initListFromFile() {
+    private static void initListFromFile(String fileName) {
 
-        String attributeMappingsFile = "/configuration/attribute-mappings.ini";
+        File attributeMappingsFile = new File (fileName);
+        
+        if (!attributeMappingsFile.exists()) {
+            throw new AttributeWizardTypeConfigurationException("Configuration file not found: " + attributeMappingsFile.getAbsolutePath());
+        }
 
         PropertiesConfiguration configuration;
 
         try {
-            configuration = new PropertiesConfiguration(Object.class.getResource(attributeMappingsFile));
+            configuration = new PropertiesConfiguration(attributeMappingsFile);
         } catch (ConfigurationException e) {
-            throw new AttributeWizardTypeConfigurationException("Error reading configuration from resource: "
-                    + attributeMappingsFile);
+            throw new AttributeWizardTypeConfigurationException("Error reading configuration: "
+                    + attributeMappingsFile.getAbsolutePath());
         }
 
         String[] idArray = configuration.getStringArray(idKey());
@@ -103,37 +108,37 @@ public class AttributeWizardTypeConfiguration {
         for (String id : idArray) {
 
             if (checkIdExist(id)) {
-                throw new AttributeWizardTypeConfigurationException("Error: duplicated id \"" + id + "\" (resource: "
-                        + attributeMappingsFile + ")");
+                throw new AttributeWizardTypeConfigurationException("Error: duplicated id \"" + id + "\" ("
+                        + attributeMappingsFile.getAbsolutePath() + ")");
             }
 
             String xacmlId = configuration.getString(xacmlIdKey(id));
             if (xacmlId == null) {
-                throw new AttributeWizardTypeConfigurationException("Error: undefined xacml-id for id \"" + id + "\" (resource: "
-                        + attributeMappingsFile + ")");
+                throw new AttributeWizardTypeConfigurationException("Error: undefined xacml-id for id \"" + id + "\" ("
+                        + attributeMappingsFile.getAbsolutePath() + ")");
             }
 
             String xacmlDataType = configuration.getString(xacmlDataTypeKey(id));
             if (xacmlDataType == null) {
                 throw new AttributeWizardTypeConfigurationException("Error: undefined xacml-data-type for id \"" + id
-                        + "\" (resource: " + attributeMappingsFile + ")");
+                        + "\" (" + attributeMappingsFile.getAbsolutePath() + ")");
             }
 
             String xacmlMatchFunction = configuration.getString(xacmlMatchFunctionKey(id));
             if (xacmlMatchFunction == null) {
                 throw new AttributeWizardTypeConfigurationException("Error: undefined xacml-match-function for id \"" + id
-                        + "\" (resource: " + attributeMappingsFile + ")");
+                        + "\" (" + attributeMappingsFile.getAbsolutePath() + ")");
             }
 
             String xacmlTargetElement = configuration.getString(xacmlTargetElementKey(id));
             if (xacmlTargetElement == null) {
                 throw new AttributeWizardTypeConfigurationException("Error: undefined xacml-target-element for id \"" + id
-                        + "\" (resource: " + attributeMappingsFile + ")");
+                        + "\" (" + attributeMappingsFile.getAbsolutePath() + ")");
             }
 
             if (checkXacmlIdExist(xacmlId)) {
-                throw new AttributeWizardTypeConfigurationException("Error: duplicated xacml-id \"" + xacmlId + "\" (resource: "
-                        + attributeMappingsFile + ")");
+                throw new AttributeWizardTypeConfigurationException("Error: duplicated xacml-id \"" + xacmlId + "\" ("
+                        + attributeMappingsFile.getAbsolutePath() + ")");
             }
 
             log.info(String.format("Adding new AttributeWizardType: id=%s, xacml-id=%s, xacml-data-type=%s, xacml-target-element=%s, xacml-mach-function=%s",

@@ -9,7 +9,6 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
-import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
 
 public class AddPolicy extends PolicyManagementCLI {
@@ -104,7 +103,7 @@ public class AddPolicy extends PolicyManagementCLI {
             throw new ParseException("First argument must be \"permit\" or \"deny\" (found: " + args[1] + ")");
         }
 
-        AttributeWizardTypeConfiguration.bootstrap();
+        XACMLPolicyCLIUtils.initAttributeWizard();
 
         List<String> attributeList = new LinkedList<String>();
 
