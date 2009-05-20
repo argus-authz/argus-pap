@@ -16,7 +16,7 @@ public class AddPolicy extends PolicyManagementCLI {
     private static String OPT_ACTIONID_LONG = "action-id";
     private static String OPT_ACTIONID_DESCRIPTION = "Specify an action-id.";
     private static String OPT_RULEID_LONG = "rule-id";
-    private static String OPT_RULEID_DESCRIPTION = "Specify a rule-id (needs option --" + OPT_ACTIONID_LONG
+    private static String OPT_RULEID_DESCRIPTION = "Specify a rule-id to be used as a pivot (needs option --" + OPT_ACTIONID_LONG
             + ").";
 
     private static final String OPT_BOTTOM_LONG = "bottom";
