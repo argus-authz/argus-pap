@@ -25,15 +25,23 @@ public class SetPollingInterval extends PAPManagementCLI {
     protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
 
         String[] args = commandLine.getArgs();
-        
+
         if (args.length != 2) {
             throw new ParseException("Wrong number of arguments: specify the new polling interval in seconds");
         }
-        
-        float pollingInterval = Float.valueOf(args[1]);
 
-        papMgmtClient.setPollingInterval(pollingInterval);
-        
+        try {
+
+            float pollingInterval = Float.valueOf(args[1]);
+
+            papMgmtClient.setPollingInterval(pollingInterval);
+
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid number: \"" + args[1]
+                    + "\". Specify the new polling interval (integer number) in seconds.");
+            return ExitStatus.PARSE_ERROR.ordinal();
+        }
+
         return ExitStatus.SUCCESS.ordinal();
     }
 }
