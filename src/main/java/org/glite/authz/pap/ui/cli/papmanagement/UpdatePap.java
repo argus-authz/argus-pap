@@ -41,6 +41,10 @@ public class UpdatePap extends PAPManagementCLI {
                                        .withDescription(OPT_REMOTE_DESCRIPTION)
                                        .withLongOpt(OPT_REMOTEL_LONG)
                                        .create(OPT_REMOTE));
+        options.addOption(OptionBuilder.hasArg(false)
+                                       .withDescription(OPT_NO_POLICIES_DESCRIPTION)
+                                       .withLongOpt(OPT_NO_POLICIES_LONG)
+                                       .create());
         return options;
     }
 
@@ -104,14 +108,23 @@ public class UpdatePap extends PAPManagementCLI {
         papMgmtClient.updatePap(pap);
 
         if (pap.isRemote()) {
-            if (verboseMode) {
-                System.out.print("Retrieving policies... ");
-            }
 
-            papMgmtClient.refreshCache(pap.getAlias());
+            if (!commandLine.hasOption(OPT_NO_POLICIES_LONG)) {
 
-            if (verboseMode) {
-                System.out.println("ok.");
+                if (verboseMode) {
+                    System.out.print("Retrieving policies... ");
+                }
+
+                try {
+                    papMgmtClient.refreshCache(pap.getAlias());
+                } catch (RemoteException e) {
+                    System.out.println("Error: pap information successfully updated but cannot retrieve policies.");
+                    throw e;
+                }
+
+                if (verboseMode) {
+                    System.out.println("ok.");
+                }
             }
         }
 

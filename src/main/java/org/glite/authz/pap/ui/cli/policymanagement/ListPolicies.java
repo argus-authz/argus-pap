@@ -115,8 +115,8 @@ public class ListPolicies extends PolicyManagementCLI {
                                        .create(OPT_SHOW_ALL_IDS));
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_ALLPAPS_DESCRIPTION)
-                                       .withLongOpt(OPT_ALLPAPS_LONG)
-                                       .create(OPT_ALLPAPS));
+                                       .withLongOpt(OPT_ALL_LONG)
+                                       .create());
         options.addOption(OptionBuilder.hasArgs()
                                        .withDescription(OPT_PAPALIAS_DESCRIPTION)
                                        .withLongOpt(OPT_PAPALIAS_LONG)
@@ -146,7 +146,7 @@ public class ListPolicies extends PolicyManagementCLI {
         String[] papAliasArray = null;
         String[] papInfoArray = null;
 
-        if (commandLine.hasOption(OPT_ALLPAPS)) {
+        if (commandLine.hasOption(OPT_ALL_LONG)) {
             
             Pap[] papArray = papMgmtClient.getAllPaps();
             papAliasArray = new String[papArray.length];
