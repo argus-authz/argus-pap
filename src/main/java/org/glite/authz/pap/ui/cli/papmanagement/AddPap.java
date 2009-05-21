@@ -15,7 +15,10 @@ public class AddPap extends PAPManagementCLI {
             + "<alias> is a friendly name (it has to be unique) used to identify the pap\n"
             + "<endpoint> endpoint of the PAP in the following format: [<protocol>://]<host>:[<port>/[path]]\n";
     private static final String LONG_DESCRIPTION = "A new added pap is disabled by default (i.e. its policies are not "
-            + "sent to the PDP). Use the command \"enable-pap\" to enable a pap.\nDefault protocol is: "
+            + "sent to the PDP). Use the command \"enable-pap\" to enable a pap. Policies are fetched "
+            + "immediately unless option --"
+            + OPT_NO_POLICIES_LONG
+            + " is given. \nDefault protocol is: "
             + Pap.DEFAULT_PROTOCOL
             + "\nDefault port is: "
             + Pap.DEFAULT_PORT
