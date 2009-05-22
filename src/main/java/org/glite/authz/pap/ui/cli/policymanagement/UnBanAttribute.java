@@ -17,7 +17,9 @@ public class UnBanAttribute extends PolicyManagementCLI {
             + "Different values for resource and action can be set using options --"
             + OPT_RESOURCE_LONG
             + " and --"
-            + OPT_ACTION_LONG + ".";
+            + OPT_ACTION_LONG
+            + ".\nExample:\npap-admin uban subject \"/C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Alberto Forti\"\n"
+            + "pap-admin uban fqan /dteam/test";
     private static String USAGE = "[options] <id> <value>";
     private String alias = null;
 
@@ -45,7 +47,8 @@ public class UnBanAttribute extends PolicyManagementCLI {
     }
 
     @Override
-    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException, RemoteException {
+    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
+            RemoteException {
 
         String[] args = commandLine.getArgs();
 
@@ -55,7 +58,7 @@ public class UnBanAttribute extends PolicyManagementCLI {
 
         String id = args[1];
         String value = args[2];
-        
+
         if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
             alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
