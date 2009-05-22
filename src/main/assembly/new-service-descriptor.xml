@@ -88,6 +88,13 @@
     <file>
       <source>${basedir}/src/main/bash/pap-env.sh</source>
       <outputDirectory>bin</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/bash/pap-client-env.sh</source>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0644</fileMode>
     </file>
     
     <file>

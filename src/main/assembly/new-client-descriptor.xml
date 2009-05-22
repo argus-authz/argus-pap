@@ -1,0 +1,74 @@
+<assembly xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd">
+    
+  <id>client</id>
+  <formats>
+    <format>tar.gz</format>
+  </formats>
+  
+  <includeBaseDirectory>true</includeBaseDirectory>
+  
+  <fileSets>
+        <fileSet>
+            <directory>src/main/config</directory>
+            <outputDirectory>conf</outputDirectory>
+            <includes>
+              <include>logging/client/*</include>
+              <include>attribute-mappings.ini</include>
+            </includes>
+            <fileMode>0644</fileMode>
+        </fileSet>
+        <fileSet>
+          <directory>doc</directory>
+          <outputDirectory>doc</outputDirectory>
+        </fileSet>
+  </fileSets>
+   
+  <files>
+    
+    <file>
+      <source>target/${project.build.finalName}.jar</source>
+      <outputDirectory>lib</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+        
+    <file>
+      <source>${basedir}/src/main/bash/pap-client-env.sh</source>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    
+    <file>
+      <source>${basedir}/src/main/bash/pap-admin.sh</source>
+      <destName>pap-admin</destName>
+      <outputDirectory>bin</outputDirectory>
+      <fileMode>0755</fileMode>
+    </file>
+    
+  </files>
+  
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>lib</outputDirectory>
+      <excludes>
+        <exclude>javax.servlet:servlet-api</exclude>
+        <exclude>org.apache.xerces:xml-apis</exclude>
+        <exclude>org.apache.xerces:xercesImpl</exclude>
+        <exclude>org.apache.xerces:serializer</exclude>
+        <exclude>org.apache.xerces:resolver</exclude>
+        <exclude>*:war</exclude>
+      </excludes>
+    </dependencySet>
+    
+    <dependencySet>
+      <outputDirectory>lib/endorsed</outputDirectory>
+      <includes>
+        <include>org.apache.xerces:xml-apis</include>
+        <include>org.apache.xerces:xercesImpl</include>
+        <include>org.apache.xerces:serializer</include>
+        <include>org.apache.xerces:resolver</include>
+      </includes>
+    </dependencySet>
+  </dependencySets>
+</assembly>

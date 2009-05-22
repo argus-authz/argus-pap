@@ -5,7 +5,7 @@
   <artifactId>org.glite.authz.pap</artifactId>
   <packaging>war</packaging>
   <name>pap</name>
-  <version>1.0.0rc1</version>
+  <version>1.0.0rc2</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
@@ -107,7 +107,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin
-				</artifactId>
+        </artifactId>
         <version>2.0</version>
       </plugin>
       <plugin>
@@ -132,7 +132,9 @@
                 <nsExclude>
                   urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol
                 </nsExclude>
-                <nsExclude>http://org.glite.authz/wsdl/pap/services/pap_management/pap</nsExclude>
+                <nsExclude>
+                  http://org.glite.authz/wsdl/pap/services/pap_management/pap
+                </nsExclude>
               </nsExcludes>
 
               <!-- *********** Mappings ********** -->
@@ -153,7 +155,8 @@
                   </targetPackage>
                 </mapping>
                 <mapping>
-                  <namespace> ${pap-services-namespace}/xacml_policy_management
+                  <namespace>
+                    ${pap-services-namespace}/xacml_policy_management
                   </namespace>
                   <targetPackage>
                     org.glite.authz.pap.services.xacml_policy_management.axis_skeletons
@@ -174,8 +177,11 @@
                   </targetPackage>
                 </mapping>
                 <mapping>
-                  <namespace>http://org.glite.authz/wsdl/pap/services/pap_management/pap</namespace>
-                  <targetPackage>org.glite.authz.pap.common</targetPackage>
+                  <namespace>
+                    http://org.glite.authz/wsdl/pap/services/pap_management/pap
+                  </namespace>
+                  <targetPackage>org.glite.authz.pap.common
+                  </targetPackage>
                 </mapping>
                 <mapping>
                   <namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os
@@ -214,11 +220,18 @@
           <descriptors>
             <descriptor>src/main/assembly/new-service-descriptor.xml
             </descriptor>
-            <!--
-              <descriptor>src/main/assembly/client-descriptor.xml </descriptor>
-            -->
+            <descriptor>src/main/assembly/new-client-descriptor.xml
+            </descriptor>
           </descriptors>
         </configuration>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>assembly</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
@@ -283,27 +296,25 @@
       </exclusions>
     </dependency>
 
-	
+
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-voms-java-api
       </artifactId>
       <version>1.9.8</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15</artifactId>
       <version>1.40</version>
     </dependency>
 
-	<!-- 
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15</artifactId>
-      <version>1.40</version>
-    </dependency>
-     -->
+    <!--
+      <dependency> <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15</artifactId> <version>1.40</version>
+      </dependency>
+    -->
     <dependency>
       <groupId>axis</groupId>
       <artifactId>axis</artifactId>
@@ -341,7 +352,7 @@
     <dependency>
       <groupId>org.glite</groupId>
       <artifactId>glite-security-util-java
-			</artifactId>
+      </artifactId>
       <version>2.0.1-1</version>
       <!-- <version>1.4.0</version>  -->
     </dependency>
@@ -449,9 +460,12 @@
           <aggregate>true</aggregate>
           <author>false</author>
           <version>true</version>
-          <doctitle>${project.name} ${project.version} Java API.</doctitle>
-          <windowtitle>${project.name} ${project.version} Java API.</windowtitle>
-          <overview>src/main/java/overview.html</overview>
+          <doctitle>${project.name} ${project.version} Java
+            API.</doctitle>
+          <windowtitle>${project.name} ${project.version} Java
+            API.</windowtitle>
+          <overview>src/main/java/overview.html
+          </overview>
         </configuration>
       </plugin>
     </plugins>

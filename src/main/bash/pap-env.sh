@@ -11,14 +11,15 @@
 
 set -e
 
-# PAP configuration file location
-PAP_CONF_FILE="$PAP_HOME/conf/pap_configuration.ini"
 
 # Location of the PAP jars
 PAP_LIBS=$PAP_HOME/lib
 
 # Location of the PAP endorsed jars
 PAP_ENDORSED_LIBS=$PAP_LIBS/endorsed
+
+# PAP configuration file location
+PAP_CONF_FILE="$PAP_HOME/conf/pap_configuration.ini"
 
 # Sets the heap size for the JVM  
 if [ -z $PAP_STANDALONE_MEM_SIZE ]; then
@@ -27,9 +28,6 @@ fi
 
 # The name of the class that implements the PAP standalone server
 PAP_STANDALONE_CLASS="org.glite.authz.pap.server.standalone.PAPServer"
-
-# The name of the class that implements the PAP client
-PAP_CLIENT_CLASS="org.glite.authz.pap.ui.cli.PAPCLI"
 
 # The name of the class the implements the PAP shutdown helper
 PAP_URL_TOUCHER_CLASS="org.glite.authz.pap.common.utils.URLToucher"
@@ -49,26 +47,14 @@ JETTY_DEPS=`ls -x $PAP_LIBS/jetty-*.jar $PAP_LIBS/servlet-api-*.jar | tr '\n' ':
 # ':' separated list of standalone PAP dependencies, used to build the classpath
 PAP_DEPS=`ls -x $PAP_LIBS/*.jar | tr '\n' ':'`
 
-# ':' separated list of client PAP dependencies, used to build the classpath
-PAP_CLIENT_DEPS=`ls -x $PAP_LIBS/*.jar | grep -v 'glite-security-voms-java-api' | tr '\n' ':'`
-
 # Location of the PAP jar file
 PAP_JAR="$PAP_HOME/lib/pap.jar"
-
-# Classpath for the pap client application
-PAP_CLIENT_CP="$PAP_DEPS$PAP_JAR:$PAP_HOME/conf/logging/client"
 
 # Classpath for the pap standalone service w
 PAP_STANDALONE_CP="$PAP_DEPS:$PAP_HOME/conf/logging/standalone"
 
-# Environment for the pap client application
-PAP_CLIENT_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS"
-
 # Environment for the pap standalone service
 PAP_STANDALONE_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS -Djava.net.preferIPv4Stack=true"
-
-# Command used to start the pap client application
-PAP_CLIENT_CMD="java $PAP_CLIENT_ENV -DconfigureLog4j=false -DeffectiveUserId=$EUID -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
 
 # Command used to start the pap standalone service
 PAP_STANDALONE_CMD="java -Xmx$PAP_STANDALONE_MEM_SIZE $PAP_STANDALONE_VM_OPTIONS $PAP_STANDALONE_ENV -cp $PAP_STANDALONE_CP $PAP_STANDALONE_CLASS --conf-dir $PAP_HOME/conf"
@@ -124,6 +110,3 @@ check_certificates(){
 	fi  
 
 }
-
-
-
