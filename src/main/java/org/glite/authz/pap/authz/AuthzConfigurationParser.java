@@ -190,7 +190,8 @@ public final class AuthzConfigurationParser {
                 } catch ( VOMSSyntaxException e ) {
                     throw new PAPAuthzConfigurationException(
                             "Unsupported principal name: '" + principalName
-                                    + "'." );
+                                    + "'. Very probably there is a syntax error in the dn or fqan that was being parsed, check the syntax" +
+                                    		" of your configuration file." );
                 }
 
             }
