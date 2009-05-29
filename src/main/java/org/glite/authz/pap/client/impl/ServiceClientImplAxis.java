@@ -2,14 +2,12 @@ package org.glite.authz.pap.client.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.Security;
 import java.util.Properties;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.encoding.TypeMapping;
 
 import org.apache.axis.AxisProperties;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
@@ -36,7 +34,6 @@ public class ServiceClientImplAxis implements ServiceClient {
     private String clientPrivateKeyPassword = null;
     private String clientProxy = null;
     private String serviceURL = null;
-    
 
     public ServiceClientImplAxis() {}
 
@@ -67,13 +64,15 @@ public class ServiceClientImplAxis implements ServiceClient {
         HighLevelPolicyManagementServiceLocator loc = new HighLevelPolicyManagementServiceLocator();
 
         try {
-            return loc.getHighLevelPolicyManagementService( new URL(url) );
+            return loc.getHighLevelPolicyManagementService(new URL(url));
 
         } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting Highlevel Policy management service: " + e.getMessage(), e);
+            throw new PAPException("Error contacting Highlevel Policy management service: " + e.getMessage(),
+                                   e);
 
         } catch (ServiceException e) {
-            throw new PAPException("Error contacting HighLevel Policy management service: " + e.getMessage(), e);
+            throw new PAPException("Error contacting HighLevel Policy management service: " + e.getMessage(),
+                                   e);
 
         }
     }
@@ -91,10 +90,12 @@ public class ServiceClientImplAxis implements ServiceClient {
             return loc.getPAPAuthorizationManagement(new URL(url));
 
         } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting PAP Authorization management service: " + e.getMessage(), e);
+            throw new PAPException("Error contacting PAP Authorization management service: " + e.getMessage(),
+                                   e);
 
         } catch (ServiceException e) {
-            throw new PAPException("Error contacting PAP Authorization management service: " + e.getMessage(), e);
+            throw new PAPException("Error contacting PAP Authorization management service: " + e.getMessage(),
+                                   e);
 
         }
     }
@@ -109,7 +110,7 @@ public class ServiceClientImplAxis implements ServiceClient {
         PAPManagementServiceLocator loc = new PAPManagementServiceLocator();
 
         try {
-            return loc.getPAPManagementService( new URL(url) );
+            return loc.getPAPManagementService(new URL(url));
 
         } catch (MalformedURLException e) {
             throw new PAPException("Error contacting PAP Management service: " + e.getMessage(), e);
@@ -119,7 +120,7 @@ public class ServiceClientImplAxis implements ServiceClient {
 
         }
     }
-    
+
     public String getPAPManagementServiceName() {
         return "PAPManagementService";
     }
@@ -127,29 +128,31 @@ public class ServiceClientImplAxis implements ServiceClient {
     public Provisioning getProvisioningService(String url) {
 
         initializeAxisProperties();
-        
+
         ProvisioningServiceLocator loc = new ProvisioningServiceLocator();
-        
+
         TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
-        
+
         typeMapping.register(org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.class,
-                org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
-                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
+                             org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
+                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                             new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
 
         typeMapping.register(org.opensaml.saml2.core.Response.class,
-                org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
-                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
+                             org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
+                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                             new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
 
         try {
-            return loc.getProvisioningService( new URL(url) );
+            return loc.getProvisioningService(new URL(url));
 
         } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
+            throw new PAPException("Error contacting Provisioning Policy management service: "
+                    + e.getMessage(), e);
 
         } catch (ServiceException e) {
-            throw new PAPException("Error contacting Provisioning Policy management service: " + e.getMessage(), e);
+            throw new PAPException("Error contacting Provisioning Policy management service: "
+                    + e.getMessage(), e);
 
         }
     }
@@ -167,19 +170,19 @@ public class ServiceClientImplAxis implements ServiceClient {
         initializeAxisProperties();
         XACMLPolicyManagementServiceLocator loc = new XACMLPolicyManagementServiceLocator();
         TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
-        
+
         typeMapping.register(org.opensaml.xacml.policy.PolicyType.class,
-                org.opensaml.xacml.policy.PolicyType.SCHEMA_TYPE_NAME,
-                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                new org.glite.authz.pap.common.opensamlserializer.PolicyTypeDeserializerFactory());
-        
+                             org.opensaml.xacml.policy.PolicyType.SCHEMA_TYPE_NAME,
+                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                             new org.glite.authz.pap.common.opensamlserializer.PolicyTypeDeserializerFactory());
+
         typeMapping.register(org.opensaml.xacml.policy.PolicySetType.class,
-                org.opensaml.xacml.policy.PolicySetType.SCHEMA_TYPE_NAME,
-                new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                new org.glite.authz.pap.common.opensamlserializer.PolicySetTypeDeserializerFactory());
+                             org.opensaml.xacml.policy.PolicySetType.SCHEMA_TYPE_NAME,
+                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+                             new org.glite.authz.pap.common.opensamlserializer.PolicySetTypeDeserializerFactory());
 
         try {
-            return loc.getXACMLPolicyManagementService( new URL(url) );
+            return loc.getXACMLPolicyManagementService(new URL(url));
 
         } catch (MalformedURLException e) {
             throw new PAPException("Error contacting XACML Policy management service: " + e.getMessage(), e);
@@ -198,7 +201,7 @@ public class ServiceClientImplAxis implements ServiceClient {
         log.debug("clientCertificate=" + certFile);
         clientCertificate = certFile;
     }
-    
+
     public void setClientPrivateKey(String keyFile) {
         log.debug("clientPrivateKey=" + keyFile);
         clientPrivateKey = keyFile;
@@ -208,10 +211,10 @@ public class ServiceClientImplAxis implements ServiceClient {
         clientPrivateKeyPassword = privateKeyPassword;
     }
 
-    public void setClientProxy( String clientProxy ) {
+    public void setClientProxy(String clientProxy) {
 
         this.clientProxy = clientProxy;
-        
+
     }
 
     public void setTargetEndpoint(String endpointURL) {
@@ -220,7 +223,8 @@ public class ServiceClientImplAxis implements ServiceClient {
 
     protected void initializeAxisProperties() {
 
-        AxisProperties.setProperty("axis.socketSecureFactory", "org.glite.security.trustmanager.axis.AXISSocketFactory");
+        AxisProperties.setProperty("axis.socketSecureFactory",
+                                   "org.glite.security.trustmanager.axis.AXISSocketFactory");
 
         System.setProperty("crlUpdateInterval", "0s");
 
@@ -229,28 +233,31 @@ public class ServiceClientImplAxis implements ServiceClient {
 
         // TODO will get cert and key from the configuration, with those as
         // default
-        
-        if (clientProxy != null)
-            properties.setProperty( "gridProxyFile", clientProxy );
-        else{
 
-            if (clientCertificate == null)
+        if (clientProxy != null) {
+            
+            properties.setProperty("gridProxyFile", clientProxy);
+            
+        } else {
+
+            if (clientCertificate == null) {
                 properties.setProperty("sslCertFile", DEFAULT_SSL_CERT_FILE);
-            else
+            } else {
                 properties.setProperty("sslCertFile", clientCertificate);
+            }
 
-            if (clientPrivateKey == null)
+            if (clientPrivateKey == null) {
                 properties.setProperty("sslKey", DEFAULT_SSL_KEY);
-            else
+            } else {
                 properties.setProperty("sslKey", clientPrivateKey);
+            }
 
-            if (clientPrivateKeyPassword != null)
+            if (clientPrivateKeyPassword != null) {
                 properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
+            }
         }
 
         AXISSocketFactory.setCurrentProperties(properties);
         System.setProperties(properties);
-
     }
-
 }

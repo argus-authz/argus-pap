@@ -189,19 +189,18 @@ public abstract class ServiceCLI {
 
                         String x509UserProxy = System.getenv("X509_USER_PROXY");
 
-                        if (x509UserProxy == null || "".equals(x509UserProxy))
+                        if (x509UserProxy == null || "".equals(x509UserProxy)) {
                             throw new PAPException("Cannot enstabilish user's effective user id, please use the --proxy option "
                                     + "to specify which proxy pap-admin should use for authentication.");
-                        else
+                        } else {
                             serviceClient.setClientProxy(x509UserProxy);
-                    }
-
-                    else
+                        }
+                    } else {
                         serviceClient.setClientProxy("/tmp/x509up_u" + euidProperty);
-
-                } else
+                    }
+                } else {
                     serviceClient.setClientProxy("/tmp/x509up_u" + euid);
-
+                }
             }
         }
 
