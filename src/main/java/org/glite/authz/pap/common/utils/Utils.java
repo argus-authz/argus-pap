@@ -102,10 +102,11 @@ public class Utils {
     }
 
     /**
-     * Checks if a string is not null or empty.
+     * Checks if a string is not null or not empty.
      * 
      * @param s the string to check.
-     * @return <code>true</code> the string is not <code>null</code> or <code>empty</code>.
+     * @return <code>true</code> if the string is not <code>null</code> or not <code>empty</code>,
+     *         <code>false</code> otherwise.
      */
     public static boolean isDefined(String s) {
 

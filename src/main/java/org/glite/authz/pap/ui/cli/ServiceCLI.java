@@ -1,5 +1,6 @@
 package org.glite.authz.pap.ui.cli;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,6 +22,9 @@ import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.exceptions.PAPException;
+import org.glite.authz.pap.common.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class ServiceCLI {
 
@@ -35,10 +39,9 @@ public abstract class ServiceCLI {
         // value = 5
     }
 
-    private static final HelpFormatter helpFormatter = new HelpFormatter();
+    private static final Logger log = LoggerFactory.getLogger(ServiceCLI.class);
 
-    private static final String OPT_USE_PROXY_DESCRIPTION = "Forces the pap-admin to use a proxy found in the standard location.";
-    private static final String OPT_USE_PROXY_LONG = "use_proxy";
+    private static final HelpFormatter helpFormatter = new HelpFormatter();
 
     private static final String OPT_PROXY_DESCRIPTION = "Specifies a user proxy to be used for authentication.";
     private static final String OPT_PROXY_LONG = "proxy";
@@ -125,6 +128,53 @@ public abstract class ServiceCLI {
         return globalOptions;
     }
 
+    @SuppressWarnings("static-access")
+    private static Options defineGlobalOptions() {
+
+        Options options = new Options();
+
+        // TODO: OPT_URL and (OPT_HOST, OPT_PORT) are mutually exclusive
+        // options. Use OptionGroup.
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withLongOpt(OPT_URL_LONG)
+                                       .withDescription("Specifies the target PAP endpoint (default: "
+                                               + String.format(DEFAULT_SERVICE_URL,
+                                                               Pap.DEFAULT_HOST,
+                                                               Pap.DEFAULT_PORT,
+                                                               Pap.DEFAULT_SERVICES_ROOT_PATH) + ").")
+                                       .withArgName("url")
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withLongOpt(OPT_HOST_LONG)
+                                       .withDescription(OPT_HOST_DESCRIPTION)
+                                       .withArgName("hostname")
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withLongOpt(OPT_PORT_LONG)
+                                       .withDescription(OPT_PORT_DESCRIPTION)
+                                       .create(OPT_PORT));
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withLongOpt(OPT_PROXY_LONG)
+                                       .withDescription(OPT_PROXY_DESCRIPTION)
+                                       .withArgName("file")
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withLongOpt(OPT_CERT_LONG)
+                                       .withDescription(OPT_CERT_DESCRIPTION)
+                                       .withArgName("file")
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withLongOpt(OPT_KEY_LONG)
+                                       .withDescription(OPT_KEY_DESCRIPTION)
+                                       .withArgName("file")
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(false)
+                                       .withLongOpt(OPT_VERBOSE_LONG)
+                                       .withDescription(OPT_VERBOSE_DESCRIPTION)
+                                       .create(OPT_VERBOSE));
+        return options;
+    }
+
     public boolean commandMatch(String command) {
         for (String value : commandNameValues) {
             if (value.equals(command))
@@ -139,6 +189,10 @@ public abstract class ServiceCLI {
 
         if (commandLine.hasOption(OPT_HELP)) {
             throw new HelpMessageException();
+        }
+
+        if (commandLine.hasOption(OPT_VERBOSE)) {
+            verboseMode = true;
         }
 
         if (commandLine.hasOption(OPT_URL_LONG)) {
@@ -174,50 +228,107 @@ public abstract class ServiceCLI {
 
         }
 
-        if (commandLine.hasOption(OPT_USE_PROXY_LONG)) {
-
-            // If the --proxy option is specified, we get the proxy from there
-
-            if (!commandLine.hasOption(OPT_PROXY_LONG)) {
-
-                String euid = System.getenv("EUID");
-
-                if (euid == null || "".equals(euid)) {
-                    String euidProperty = System.getProperty("effectiveUserId");
-
-                    if ((euidProperty == null || "".equals(euidProperty))) {
-
-                        String x509UserProxy = System.getenv("X509_USER_PROXY");
-
-                        if (x509UserProxy == null || "".equals(x509UserProxy)) {
-                            throw new PAPException("Cannot enstabilish user's effective user id, please use the --proxy option "
-                                    + "to specify which proxy pap-admin should use for authentication.");
-                        } else {
-                            serviceClient.setClientProxy(x509UserProxy);
-                        }
-                    } else {
-                        serviceClient.setClientProxy("/tmp/x509up_u" + euidProperty);
-                    }
-                } else {
-                    serviceClient.setClientProxy("/tmp/x509up_u" + euid);
-                }
-            }
-        }
+        boolean credentialsNotRetrieved = true;
 
         if (commandLine.hasOption(OPT_PROXY_LONG)) {
             serviceClient.setClientProxy(commandLine.getOptionValue(OPT_PROXY_LONG));
+            credentialsNotRetrieved = false;
         }
 
         if (commandLine.hasOption(OPT_CERT_LONG)) {
-            serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT_LONG));
+            if (commandLine.hasOption(OPT_PROXY_LONG)) {
+                throw new ParseException(String.format("Conflicting options --%s and --%s.",
+                                                       OPT_PROXY_LONG,
+                                                       OPT_CERT_LONG));
+            } else {
+                serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT_LONG));
+                credentialsNotRetrieved = false;
+            }
         }
 
         if (commandLine.hasOption(OPT_KEY_LONG)) {
-            serviceClient.setClientPrivateKey(commandLine.getOptionValue(OPT_KEY_LONG));
+            if (commandLine.hasOption(OPT_PROXY_LONG)) {
+                throw new ParseException(String.format("Conflicting options --%s and --%s.",
+                                                       OPT_PROXY_LONG,
+                                                       OPT_KEY_LONG));
+            } else {
+                serviceClient.setClientPrivateKey(commandLine.getOptionValue(OPT_KEY_LONG));
+                credentialsNotRetrieved = false;
+            }
         }
 
-        if (commandLine.hasOption(OPT_VERBOSE)) {
-            verboseMode = true;
+        if (credentialsNotRetrieved) {
+
+            // 1. if running as root take the cert /etc/grid-security/hostcert.pem
+            // 2. check the env variable X509_USER_PROXY
+            // 3. check the env variable X509_USER_CERT (and X509_USER_KEY)
+            // 4. check the proxy /tmp/x509up_u<id_utente>
+            // 5. check the cert $HOME/.globus/usercert.pem and key $HOME/.globus/userkey.pem
+
+            String euid = getEUID();
+
+            if (euid == null) {
+
+                log.error("Cannot enstabilish user's effective user id.");
+
+                throw new PAPException(String.format("Cannot enstabilish user's effective user id, please use the --%s or --%s, --%s options.",
+                                                     OPT_PROXY_LONG,
+                                                     OPT_CERT_LONG,
+                                                     OPT_KEY_LONG));
+            }
+
+            String messageString = null;
+
+            if ("0".equals(euid)) {
+                // user: root
+                serviceClient.setClientCertificate("/etc/grid-security/hostcert.pem");
+                serviceClient.setClientPrivateKey("/etc/grid-security/hostkey.pem");
+
+                messageString = String.format("Connecting to %s using %s and %s",
+                                              serviceClient.getTargetEndpoint(),
+                                              serviceClient.getClientCertificate(),
+                                              serviceClient.getClientPrivateKey());
+            } else {
+
+                if (setProxyFromEnvironment()) {
+
+                    messageString = String.format("Connecting to %s using proxy (from environment X509_USER_PROXY)  %s",
+                                                  serviceClient.getTargetEndpoint(),
+                                                  serviceClient.getClientProxy());
+
+                } else if (setCertFromEnvironment()) {
+
+                    messageString = String.format("Connecting to %s using %s and %s (from environment X509_USER_CERT and X509_USER_KEY)",
+                                                  serviceClient.getTargetEndpoint(),
+                                                  serviceClient.getClientCertificate(),
+                                                  serviceClient.getClientPrivateKey());
+
+                } else if (setProxyFromStandardLocation(euid)) {
+                    messageString = String.format("Connecting to %s using proxy %s",
+                                                  serviceClient.getTargetEndpoint(),
+                                                  serviceClient.getClientProxy());
+
+                } else if (setCertFromHomeDir()) {
+
+                    messageString = String.format("Connecting to %s using %s and %s",
+                                                  serviceClient.getTargetEndpoint(),
+                                                  serviceClient.getClientCertificate(),
+                                                  serviceClient.getClientPrivateKey());
+
+                } else {
+                    throw new ParseException(String.format("Unable to find a certificate or a proxy, please specify a proxy file with option --%s or certificate and key with options --%s and --%s",
+                                                           OPT_PROXY_LONG,
+                                                           OPT_CERT_LONG,
+                                                           OPT_KEY_LONG));
+                }
+
+            }
+
+            log.info(messageString);
+
+            if (verboseMode) {
+                System.out.println(messageString);
+            }
         }
 
         // Ask for certificate password if needed. The default private key (getClientPrivateKey() ==
@@ -296,57 +407,6 @@ public abstract class ServiceCLI {
                                    helpFormatter.getDescPadding());
     }
 
-    @SuppressWarnings("static-access")
-    private static Options defineGlobalOptions() {
-
-        Options options = new Options();
-
-        // TODO: OPT_URL and (OPT_HOST, OPT_PORT) are mutually exclusive
-        // options. Use OptionGroup.
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withLongOpt(OPT_URL_LONG)
-                                       .withDescription("Specifies the target PAP endpoint (default: "
-                                               + String.format(DEFAULT_SERVICE_URL,
-                                                               Pap.DEFAULT_HOST,
-                                                               Pap.DEFAULT_PORT,
-                                                               Pap.DEFAULT_SERVICES_ROOT_PATH) + ").")
-                                       .withArgName("url")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withLongOpt(OPT_HOST_LONG)
-                                       .withDescription(OPT_HOST_DESCRIPTION)
-                                       .withArgName("hostname")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withLongOpt(OPT_PORT_LONG)
-                                       .withDescription(OPT_PORT_DESCRIPTION)
-                                       .create(OPT_PORT));
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withLongOpt(OPT_PROXY_LONG)
-                                       .withDescription(OPT_PROXY_DESCRIPTION)
-                                       .withArgName("file")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withLongOpt(OPT_CERT_LONG)
-                                       .withDescription(OPT_CERT_DESCRIPTION)
-                                       .withArgName("file")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withLongOpt(OPT_KEY_LONG)
-                                       .withDescription(OPT_KEY_DESCRIPTION)
-                                       .withArgName("file")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withLongOpt(OPT_VERBOSE_LONG)
-                                       .withDescription(OPT_VERBOSE_DESCRIPTION)
-                                       .create(OPT_VERBOSE));
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withLongOpt(OPT_USE_PROXY_LONG)
-                                       .withDescription(OPT_USE_PROXY_DESCRIPTION)
-                                       .create());
-        return options;
-    }
-
     protected abstract Options defineCommandOptions();
 
     protected abstract int executeCommandService(CommandLine commandLine, ServiceClient serviceClient)
@@ -365,4 +425,128 @@ public abstract class ServiceCLI {
             System.out.println(msg);
     }
 
+    /**
+     * Return the effective user ID.
+     * 
+     * @return the effective user ID or <code>null</code> if the effective user ID couldn't be
+     *         established.
+     */
+    private String getEUID() {
+
+        String euid = System.getenv("EUID");
+
+        if (!Utils.isDefined(euid)) {
+            String euidProperty = System.getProperty("effectiveUserId");
+
+            if (Utils.isDefined(euidProperty)) {
+                euid = euidProperty;
+            } else {
+                euid = null;
+            }
+        }
+
+        return euid;
+    }
+
+    /**
+     * Set the certificate and the key in {@link ServiceCLI#serviceClient} using
+     * ~/.globus/user{cert,key}.pem.
+     * 
+     * @return <code>true</code> if cert and key were found, <code>false</code> otherwise.
+     * 
+     */
+    private boolean setCertFromHomeDir() throws ParseException {
+
+        String baseDir = System.getProperty("user.home") + File.separator + ".globus" + File.separator;
+
+        String cert = baseDir + "usercert.pem";
+        String key = baseDir + "userkey.pem";
+
+        File file = new File(cert);
+
+        if (!file.exists()) {
+            return false;
+        }
+
+        file = new File(key);
+
+        if (!file.exists()) {
+            return false;
+        }
+
+        serviceClient.setClientCertificate(cert);
+        serviceClient.setClientPrivateKey(key);
+
+        return true;
+    }
+
+    /**
+     * Set the certificate the the key in {@link ServiceCLI#serviceClient} using the envirinment
+     * variables X509_USER_CERT and X509_USER_KEY.
+     * 
+     * @return <code>true</code> if the env variables are set, <code>false</code> otherwise.
+     * @throws ParseException if only one of X509_USER_CERT or X509_USER_KEY is set.
+     * 
+     */
+    private boolean setCertFromEnvironment() throws ParseException {
+        String x509UserCert = System.getenv("X509_USER_CERT");
+        String x509UserKey = System.getenv("X509_USER_KEY");
+
+        if (!Utils.isDefined(x509UserCert) && (!Utils.isDefined(x509UserKey))) {
+            return false;
+        }
+
+        if (!(Utils.isDefined(x509UserCert) && Utils.isDefined(x509UserKey))) {
+            if (Utils.isDefined(x509UserCert)) {
+                throw new ParseException("Trying to use environment variable X509_USER_CERT for certificate but environment variable X509_USER_KEY is not set.");
+            }
+            throw new ParseException("Trying to use environment variable X509_USER_KEY for private key but environment variable X509_USER_CERT is not set.");
+        }
+
+        serviceClient.setClientCertificate(x509UserCert);
+        serviceClient.setClientPrivateKey(x509UserKey);
+
+        return true;
+    }
+
+    /**
+     * Set the proxy in {@link ServiceCLI#serviceClient} using the location defined in the
+     * environment variable X509_USER_PROXY.
+     * 
+     * @return <code>true</code> if the env variable is set, <code>false</code> otherwise.
+     */
+    private boolean setProxyFromEnvironment() {
+
+        String x509UserProxy = System.getenv("X509_USER_PROXY");
+
+        if (Utils.isDefined(x509UserProxy)) {
+            
+            serviceClient.setClientProxy(x509UserProxy);
+            return true;
+            
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Set the proxy in {@link ServiceCLI#serviceClient} using the standard location (i.e. /tmp).
+     * 
+     * @param euid the effective user ID to build the proxy file name.
+     * @return <code>true</code> the proxy was found, <code>false</code> otherwise.
+     */
+    private boolean setProxyFromStandardLocation(String euid) {
+
+        String proxy = "/tmp/x509up_u" + euid;
+
+        File file = new File(proxy);
+
+        if (!file.exists()) {
+            return false;
+        }
+
+        serviceClient.setClientProxy(proxy);
+
+        return true;
+    }
 }
