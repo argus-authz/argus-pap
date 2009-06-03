@@ -281,13 +281,24 @@ public abstract class ServiceCLI {
 
             if ("0".equals(euid)) {
                 // user: root
-                serviceClient.setClientCertificate("/etc/grid-security/hostcert.pem");
-                serviceClient.setClientPrivateKey("/etc/grid-security/hostkey.pem");
 
-                messageString = String.format("Connecting to %s using %s and %s",
-                                              serviceClient.getTargetEndpoint(),
-                                              serviceClient.getClientCertificate(),
-                                              serviceClient.getClientPrivateKey());
+                if (setCertFromEnvironment()) {
+
+                    messageString = String.format("Connecting to %s using %s and %s (from environment X509_USER_CERT and X509_USER_KEY)",
+                                                  serviceClient.getTargetEndpoint(),
+                                                  serviceClient.getClientCertificate(),
+                                                  serviceClient.getClientPrivateKey());
+
+                } else {
+
+                    serviceClient.setClientCertificate("/etc/grid-security/hostcert.pem");
+                    serviceClient.setClientPrivateKey("/etc/grid-security/hostkey.pem");
+
+                    messageString = String.format("Connecting to %s using %s and %s",
+                                                  serviceClient.getTargetEndpoint(),
+                                                  serviceClient.getClientCertificate(),
+                                                  serviceClient.getClientPrivateKey());
+                }
             } else {
 
                 if (setProxyFromEnvironment()) {
@@ -520,10 +531,10 @@ public abstract class ServiceCLI {
         String x509UserProxy = System.getenv("X509_USER_PROXY");
 
         if (Utils.isDefined(x509UserProxy)) {
-            
+
             serviceClient.setClientProxy(x509UserProxy);
             return true;
-            
+
         } else {
             return false;
         }
