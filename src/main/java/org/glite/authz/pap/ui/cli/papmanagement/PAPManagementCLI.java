@@ -14,7 +14,6 @@ public abstract class PAPManagementCLI extends ServiceCLI {
     protected static String OPT_LOCAL = "l";
     protected static String OPT_LOCAL_LONG = "local";
     protected static String OPT_LOCAL_DESCRIPTION = "Set the pap as local.";
-    protected static String OPT_REMOTE = "r";
     protected static String OPT_REMOTEL_LONG = "remote";
     protected static String OPT_REMOTE_DESCRIPTION = "Set the pap as remote.";
     protected static String OPT_NO_POLICIES_LONG = "no-policies";

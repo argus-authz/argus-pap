@@ -12,7 +12,10 @@ public class UpdatePap extends PAPManagementCLI {
 
     private static final String[] commandNameValues = { "update-pap", "upap" };
     private static final String DESCRIPTION = "Update pap information. The input is the same as for the \"add-pap\" command, "
-            + "the effect is to update old information with the new one.\n";
+            + "the effect is to update old information with the new one.\n"
+            + "<alias> is a friendly name (it has to be unique) used to identify the pap\n"
+            + "<endpoint> endpoint of the PAP in the following format: [<protocol>://]<host>[:<port>[/path]]\n"
+            + "<dn> DN of the endpoint machine";
     private static final String LOPT_PRIVATE = "private";
     private static final String LOPT_PUBLIC = "public";
     private static final String USAGE = "[options] <alias> [<endpoint> <dn>]";
@@ -40,7 +43,7 @@ public class UpdatePap extends PAPManagementCLI {
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_REMOTE_DESCRIPTION)
                                        .withLongOpt(OPT_REMOTEL_LONG)
-                                       .create(OPT_REMOTE));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_NO_POLICIES_DESCRIPTION)
                                        .withLongOpt(OPT_NO_POLICIES_LONG)
@@ -69,7 +72,7 @@ public class UpdatePap extends PAPManagementCLI {
             isLocal = true;
         }
 
-        if (commandLine.hasOption(OPT_REMOTE)) {
+        if (commandLine.hasOption(OPT_REMOTEL_LONG)) {
             isLocal = true;
         }
 
@@ -88,6 +91,9 @@ public class UpdatePap extends PAPManagementCLI {
             protocol = AddPap.getProtocol(args[2]);
             host = AddPap.getHostname(args[2]);
             port = AddPap.getPort(args[2]);
+            
+            AddPap.validatePort(port);
+            
             path = AddPap.getPath(args[2]);
             dn = args[3];
         }

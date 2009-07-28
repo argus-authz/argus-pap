@@ -13,7 +13,8 @@ public class AddPap extends PAPManagementCLI {
     private static final String[] commandNameValues = { "add-pap", "apap" };
     private static final String DESCRIPTION = "Add a remote or local pap.\n"
             + "<alias> is a friendly name (it has to be unique) used to identify the pap\n"
-            + "<endpoint> endpoint of the PAP in the following format: [<protocol>://]<host>:[<port>/[path]]\n";
+            + "<endpoint> endpoint of the PAP in the following format: [<protocol>://]<host>[:<port>[/path]]\n"
+            + "<dn> DN of the endpoint machine";
     private static final String LONG_DESCRIPTION = "A new added pap is disabled by default (i.e. its policies are not "
             + "sent to the PDP). Use the command \"enable-pap\" to enable a pap. Policies are fetched "
             + "immediately unless option --"
@@ -54,7 +55,7 @@ public class AddPap extends PAPManagementCLI {
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_REMOTE_DESCRIPTION)
                                        .withLongOpt(OPT_REMOTEL_LONG)
-                                       .create(OPT_REMOTE));
+                                       .create());
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_NO_POLICIES_DESCRIPTION)
                                        .withLongOpt(OPT_NO_POLICIES_LONG)
@@ -83,7 +84,7 @@ public class AddPap extends PAPManagementCLI {
             isLocal = true;
         }
 
-        if (commandLine.hasOption(OPT_REMOTE)) {
+        if (commandLine.hasOption(OPT_REMOTEL_LONG)) {
             isLocal = false;
         }
 
@@ -102,6 +103,9 @@ public class AddPap extends PAPManagementCLI {
             protocol = getProtocol(args[2]);
             host = getHostname(args[2]);
             port = getPort(args[2]);
+
+            validatePort(port);
+            
             path = getPath(args[2]);
             dn = args[3];
         }
@@ -161,7 +165,12 @@ public class AddPap extends PAPManagementCLI {
             end = endpoint.length();
         }
 
-        return endpoint.substring(start, end);
+        String hostname = endpoint.substring(start, end);
+        
+        if (hostname.length() == 0) {
+            return null;
+        }
+        return hostname;
     }
 
     protected static String getPath(String endpoint) {
@@ -201,6 +210,8 @@ public class AddPap extends PAPManagementCLI {
             return null;
         }
 
+        start++; // skip the ':'
+
         if (end == -1) {
             end = endpoint.length();
         }
@@ -215,6 +226,31 @@ public class AddPap extends PAPManagementCLI {
         if (index == -1) {
             return null;
         }
-        return endpoint.substring(0, index);
+        String protocol = endpoint.substring(0, index);
+        
+        if (protocol.length() == 0) {
+            return null;
+        }
+        return protocol;
+    }
+    
+    protected static void validatePort(String port) throws ParseException {
+        
+        if (port != null) {
+            
+            int portNum;
+            
+            try {
+                
+                portNum = Integer.parseInt(port);
+                
+            } catch (NumberFormatException e) {
+                throw new ParseException("Invalid port number: " + port);
+            }
+            
+            if (portNum > 65535) {
+                throw new ParseException("Invalid port number: " + port);
+            }
+        }
     }
 }
