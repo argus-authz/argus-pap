@@ -66,14 +66,21 @@ public class RefreshCache extends PAPManagementCLI {
             System.out.print("Refreshing cache for pap \"" + alias + "\"...");
 
             try {
-                papMgmtClient.refreshCache(alias);
-                success = true;
+                boolean papExists = papMgmtClient.refreshCache(alias);
+                
+                if (papExists) {
+                    System.out.println(" ok.");
+                    success = true;
+                } else {
+                    System.out.println(" error: pap doesn't exist");
+                    failure = true;
+                }
+                
             } catch (RemoteException e) {
                 System.out.println("error: " + e.getMessage());
                 failure = true;
                 continue;
             }
-            System.out.println(" ok.");
         }
 
         if (success && failure) {
