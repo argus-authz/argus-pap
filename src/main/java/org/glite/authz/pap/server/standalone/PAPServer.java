@@ -132,6 +132,11 @@ public final class PAPServer {
             
             log.error( e.getMessage() );
             
+            // Also print error message to standard error 
+            
+            System.err.println("PAP encountered an error that could not be dealt with, shutting down!");
+            System.err.println("Error: "+e.getMessage());
+            e.printStackTrace(System.err);
             
             if (log.isDebugEnabled()) 
                 log.error( e.getMessage(), e);

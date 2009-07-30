@@ -127,7 +127,7 @@ alive_and_kicking(){
 
 start(){
 
-	echo -n "Starting $prog: "
+	# echo -n "Starting $prog: "
 		
 	pre_checks || failure 
 	
@@ -138,7 +138,7 @@ start(){
 	if [ $? -eq 0 ]; then
 		echo "$!" > $PAP_RUN_FILE;
 		status || failure "PAP not running after being just started!"
-	 	success "Ok."
+	 	success 
 	else
 		failure "failed!"
 	fi
@@ -147,12 +147,12 @@ start(){
 
 restart(){
 	
-	echo -n "Restarting $prog: "
+	# echo -n "Restarting $prog: "
 	kill_pap_proc && (rm -f $PAP_RUN_FILE; sleep 5; start) || failure "Error restarting pap process!"
 
 }
 stop(){
-	echo -n "Stopping $prog: "
+	# echo -n "Stopping $prog: "
 	kill_pap_proc && (rm -f $PAP_RUN_FILE; success "Ok.") || failure "Error killing PAP process!"
 }
 
