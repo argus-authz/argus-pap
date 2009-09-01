@@ -360,7 +360,7 @@ public abstract class ServiceCLI {
 
                 Reader reader = new FileReader(serviceClient.getClientPrivateKey());
 
-                String prompt = "Please enter the passphrase for the private key file" + serviceClient.getClientPrivateKey()
+                String prompt = "Please enter the passphrase for the private key file " + serviceClient.getClientPrivateKey()
                         + ": ";
                 PasswordFinderImpl passwordFinder = new PasswordFinderImpl(prompt);
 
