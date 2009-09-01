@@ -241,6 +241,11 @@ public abstract class ServiceCLI {
                                                        OPT_PROXY_LONG,
                                                        OPT_CERT_LONG));
             } else {
+                if (!commandLine.hasOption(OPT_KEY_LONG)) {
+                    throw new ParseException(String.format("Option --%s requires also option --%s.",
+                                                           OPT_CERT_LONG,
+                                                           OPT_KEY_LONG));
+                }
                 serviceClient.setClientCertificate(commandLine.getOptionValue(OPT_CERT_LONG));
                 credentialsNotRetrieved = false;
             }
@@ -252,6 +257,11 @@ public abstract class ServiceCLI {
                                                        OPT_PROXY_LONG,
                                                        OPT_KEY_LONG));
             } else {
+                if (!commandLine.hasOption(OPT_CERT_LONG)) {
+                    throw new ParseException(String.format("Option --%s requires also option --%s.",
+                                                           OPT_KEY_LONG,
+                                                           OPT_CERT_LONG));
+                }
                 serviceClient.setClientPrivateKey(commandLine.getOptionValue(OPT_KEY_LONG));
                 credentialsNotRetrieved = false;
             }
@@ -350,7 +360,11 @@ public abstract class ServiceCLI {
 
                 Reader reader = new FileReader(serviceClient.getClientPrivateKey());
 
-                PEMReader pm = new PEMReader(reader, new PasswordFinderImpl());
+                String prompt = "Please enter the passphrase for " + serviceClient.getClientPrivateKey()
+                        + ": ";
+                PasswordFinderImpl passwordFinder = new PasswordFinderImpl(prompt);
+
+                PEMReader pm = new PEMReader(reader, passwordFinder);
 
                 char[] password = null;
 
@@ -361,7 +375,7 @@ public abstract class ServiceCLI {
                     // the purpose of this is just to set the password (if needed).
                 }
 
-                password = PasswordFinderImpl.getTypedPassword();
+                password = passwordFinder.getTypedPassword();
 
                 if (password != null) {
                     serviceClient.setClientPrivateKeyPassword(new String(password));
@@ -439,8 +453,7 @@ public abstract class ServiceCLI {
     /**
      * Return the effective user ID.
      * 
-     * @return the effective user ID or <code>null</code> if the effective user ID couldn't be
-     *         established.
+     * @return the effective user ID or <code>null</code> if the effective user ID couldn't be established.
      */
     private String getEUID() {
 
@@ -460,8 +473,7 @@ public abstract class ServiceCLI {
     }
 
     /**
-     * Set the certificate and the key in {@link ServiceCLI#serviceClient} using
-     * ~/.globus/user{cert,key}.pem.
+     * Set the certificate and the key in {@link ServiceCLI#serviceClient} using ~/.globus/user{cert,key}.pem.
      * 
      * @return <code>true</code> if cert and key were found, <code>false</code> otherwise.
      * 
@@ -492,8 +504,8 @@ public abstract class ServiceCLI {
     }
 
     /**
-     * Set the certificate the the key in {@link ServiceCLI#serviceClient} using the envirinment
-     * variables X509_USER_CERT and X509_USER_KEY.
+     * Set the certificate the the key in {@link ServiceCLI#serviceClient} using the envirinment variables
+     * X509_USER_CERT and X509_USER_KEY.
      * 
      * @return <code>true</code> if the env variables are set, <code>false</code> otherwise.
      * @throws ParseException if only one of X509_USER_CERT or X509_USER_KEY is set.
@@ -521,8 +533,8 @@ public abstract class ServiceCLI {
     }
 
     /**
-     * Set the proxy in {@link ServiceCLI#serviceClient} using the location defined in the
-     * environment variable X509_USER_PROXY.
+     * Set the proxy in {@link ServiceCLI#serviceClient} using the location defined in the environment
+     * variable X509_USER_PROXY.
      * 
      * @return <code>true</code> if the env variable is set, <code>false</code> otherwise.
      */
