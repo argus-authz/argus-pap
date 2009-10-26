@@ -33,7 +33,7 @@ PAP_STANDALONE_CLASS="org.glite.authz.pap.server.standalone.PAPServer"
 PAP_URL_TOUCHER_CLASS="org.glite.authz.pap.common.utils.URLToucher"
 
 # The trustmanager jar files
-TM_DEPS=`ls -x $PAP_LIBS/glite-security-trustmanager-*.jar $PAP_LIBS/glite-security-util-java-*.jar $PAP_LIBS/bcprov-*.jar   | tr '\n' ':'`
+TM_DEPS=`ls -x $PAP_LIBS/trustmanager-*.jar $PAP_LIBS/util-java-*.jar $PAP_LIBS/bcprov-*.jar   | tr '\n' ':'`
 
 # Commons configuration jar files and dependencies 
 CONFIG_DEPS=`ls -x $PAP_LIBS/commons-configuration-*.jar $PAP_LIBS/commons-collections-*.jar $PAP_LIBS/commons-lang-*.jar $PAP_LIBS/commons-lang-*.jar $PAP_LIBS/commons-logging-*.jar  | tr '\n' ':'`

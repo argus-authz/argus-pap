@@ -14,7 +14,7 @@ PAP_ENDORSED_LIBS=$PAP_LIBS/endorsed
 PAP_CLIENT_CLASS="org.glite.authz.pap.ui.cli.PAPCLI"
 
 # ':' separated list of client PAP dependencies, used to build the classpath
-PAP_CLIENT_DEPS=`ls -x $PAP_LIBS/*.jar | grep -v 'glite-security-voms-java-api' | tr '\n' ':'`
+PAP_CLIENT_DEPS=`ls -x $PAP_LIBS/*.jar | grep -v 'voms-api-java' | tr '\n' ':'`
 
 # Location of the PAP jar file
 PAP_JAR="$PAP_HOME/lib/pap.jar"
