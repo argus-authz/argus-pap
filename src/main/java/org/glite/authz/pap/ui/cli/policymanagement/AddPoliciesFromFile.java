@@ -25,22 +25,20 @@ import org.slf4j.LoggerFactory;
 public class AddPoliciesFromFile extends PolicyManagementCLI {
 
     private static final Logger log = LoggerFactory.getLogger(AddPoliciesFromFile.class);
-    private static final String OPT_PIVOT_LONG = "pivot";
-    private static final String OPT_PIVOT_DESCRIPTION = "insert before <id> (option --" + OPT_MOVEAFTER_LONG
-            + " modifies this behavior in: insert after <id>)";
-    private static final String OPT_MOVEAFTER_DESCRIPTION = "insert after the id specified with --" + OPT_PIVOT_LONG;
 
     private static final String[] commandNameValues = { "add-policies-from-file", "apf" };
-    private static final String DESCRIPTION = "Add policies defined in the given file.\n"
-            + "[resourceId] resource id where insert actions into.\n"
-            + "<file>       test file defining a set of resource elements or a set of action elements.\n";
+    private static final String DESCRIPTION = "Add policies defined in the given file.\nParameters:\n"
+            + "<file>       policy file defining a set of resource elements or a set of action elements.\n"
+            + "[resourceId] resource id where insert actions into.\n";
+
     private static final String LONG_DESCRIPTION = "If <file> defines a set of resource elements \"resourceId\" must not "
             + "be provided, otherwise if only action elements are defined \"resourceId\" indentifies the resource element "
-            + "where insert the given action elements. If option --"
-            + OPT_PIVOT_LONG
-            + " is not specified all the "
-            + "elements are inserted at the bottom, otherwise they are inserted before \"pivotId\" "
-            + "(or after \"pivotId\" if option --" + OPT_MOVEAFTER_LONG + " is set).";
+            + "in which inserting the given action elements into. By default elements are inserted at the bottom."
+            + " To change this behaviour two options can be used: \"--"
+            + OPT_BEFORE_ID_LONG
+            + " <id>\" to insert before the given <id>, and \"--"
+            + OPT_AFTER_ID_LONG
+            + " <id>\" to insert after the given <id>.";
     private static final String USAGE = "[options] <file> [resourceId]";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
     private List<XACMLWizard> xacmlWizardList;
@@ -74,7 +72,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             PolicySetType rootPolicySet = xacmlPolicyMgmtClient.getRootPolicySet(null);
             position = PolicySetHelper.getPolicySetIdReferenceIndex(rootPolicySet, pivotId);
             if (position == -1) {
-                System.out.println("Pivot id \"" + pivotId + "\" not found (or not a resource id).");
+                System.out.println("id \"" + pivotId + "\" not found (or it's not a resource id).");
                 return false;
             }
             if (moveAfter) {
@@ -182,8 +180,8 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             position = PolicySetHelper.getPolicyIdReferenceIndex(targetolicySet, pivotId);
             TypeStringUtils.releaseUnneededMemory(targetolicySet);
             if (position == -1) {
-                System.out.println("Pivot id \"" + pivotId + "\" not found inside resource id \""
-                        + resourceId + "\".");
+                System.out.println("id \"" + pivotId
+                        + "\" not found inside resource the given resource (id = \"" + resourceId + "\").");
                 return false;
             }
             if (moveAfter) {
@@ -215,7 +213,6 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
                                                                    resourceId,
                                                                    idPrefixArray,
                                                                    policyArray);
-
         for (int i = 0; i < size; i++) {
             String policyId = policyIdArray[i];
             String tagAndValue = tagAndValueArray[i];
@@ -241,13 +238,14 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
     @Override
     protected Options defineCommandOptions() {
         Options options = new Options();
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription(OPT_MOVEAFTER_DESCRIPTION)
-                                       .withLongOpt(OPT_MOVEAFTER_LONG)
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_AFTER_ID_DESCRIPTION)
+                                       .withLongOpt(OPT_AFTER_ID_LONG)
+                                       .withArgName("id")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
-                                       .withDescription(OPT_PIVOT_DESCRIPTION)
-                                       .withLongOpt(OPT_PIVOT_LONG)
+                                       .withDescription(OPT_BEFORE_ID_DESCRIPTION)
+                                       .withLongOpt(OPT_BEFORE_ID_LONG)
                                        .withArgName("id")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
@@ -271,22 +269,24 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
         }
 
-        if (commandLine.hasOption(OPT_PIVOT_LONG)) {
-            pivotId = commandLine.getOptionValue(OPT_PIVOT_LONG);
-        }
-
         if ((args.length == 3)) {
             resourceId = args[2];
         }
 
-        if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
+        if (commandLine.hasOption(OPT_BEFORE_ID_LONG)) {
+            pivotId = commandLine.getOptionValue(OPT_BEFORE_ID_LONG);
+            moveAfter = false;
+        }
+
+        if (commandLine.hasOption(OPT_AFTER_ID_LONG)) {
+            pivotId = commandLine.getOptionValue(OPT_AFTER_ID_LONG);
             moveAfter = true;
         }
 
-        log.debug("args.lengh=" + args.length);
-        log.debug("resourceId=" + resourceId);
-        log.debug("pivotId=" + pivotId);
-        log.debug("moveAfter=" + moveAfter);
+        log.trace("args.lengh=" + args.length);
+        log.trace("resourceId=" + resourceId);
+        log.trace("pivotId=" + pivotId);
+        log.trace("moveAfter=" + moveAfter);
 
         File file = new File(args[1]);
 

@@ -15,33 +15,28 @@ public class AddPolicy extends PolicyManagementCLI {
 
     private static String OPT_ACTIONID_LONG = "action-id";
     private static String OPT_ACTIONID_DESCRIPTION = "Specify an action-id.";
-    private static String OPT_RULEID_LONG = "rule-id";
-    private static String OPT_RULEID_DESCRIPTION = "Specify a rule-id to be used as a pivot (needs option --" + OPT_ACTIONID_LONG
-            + ").";
+    private static String OPT_AFTER_RULEID_LONG = "after-rule-id";
+    private static String OPT_AFTER_RULEID_DESCRIPTION = "Insert after the given rule-id (needs option --"
+            + OPT_ACTIONID_LONG + ").";
+    private static String OPT_BEFORE_RULEID_LONG = "before-rule-id";
+    private static String OPT_BEFORE_RULEID_DESCRIPTION = "Insert before the given rule-id (needs option --"
+            + OPT_ACTIONID_LONG + ").";
 
     private static final String OPT_BOTTOM_LONG = "bottom";
     private static final String OPT_BOTTOM_DESCRIPTION = "Add the policy at the end of the list of rules of the given action.";
     private static final String[] COMMAND_NAME_VALUES = { "add-policy", "ap" };
-    private static final String DESCRIPTION = "Add a permit/deny policy.\n"
+    private static final String DESCRIPTION = "Add a permit/deny policy.\nParameters:\n"
             + "<permit|deny>  \"permit\" or \"deny\" to add a, respectively, permit/deny policy.\n"
             + "<id=value>     a string in the form \"<id>=<value>\", where <id> is any of the attribute ids that can be specified "
             + "in the simplified policy language and <value> the value to be assigned (e.g. fqan=/vo/group).";
     private static final String LONG_DESCRIPTION = "This command allows to add a rule into an action by specifying "
-            + "an action-id (in this case the action must already exist) or a resource/action value (use option --"
-            + OPT_ACTIONID_LONG
-            + " to specify an action-id or the options --"
+            + "an action-id of an existing action (option --" + OPT_ACTIONID_LONG + ") or a resource/action value (options --"
             + OPT_RESOURCE_LONG
             + " and --"
             + OPT_ACTION_LONG
-            + " to specify resource/action values). "
-            + "In the latter case a new resource and/or action are created if they don't already exist. "
-            + "By default the rule is inserted at the top of an action unless the --"
-            + OPT_BOTTOM_LONG
-            + " option is given. If the --"
-            + OPT_RULEID_LONG
-            + " is set the rule is inserted before the given rule-id or after if the --"
-            + OPT_MOVEAFTER_LONG
-            + " option is given.";
+            + "). In the latter case a new resource and/or action are created if they don't already exist. "
+            + "\nBy default the rule is inserted at the top of an action. To change this behaviour use one of the following options: --"
+            + OPT_BOTTOM_LONG + ", --" + OPT_AFTER_RULEID_LONG + ", --" + OPT_BEFORE_RULEID_LONG + ".";
     private static final String USAGE = "[options] <permit|deny> <id=value>...";
     private String alias = null;
 
@@ -53,9 +48,15 @@ public class AddPolicy extends PolicyManagementCLI {
     @Override
     protected Options defineCommandOptions() {
         Options options = new Options();
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription(OPT_MOVEAFTER_DESCRIPTION)
-                                       .withLongOpt(OPT_MOVEAFTER_LONG)
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_AFTER_RULEID_DESCRIPTION)
+                                       .withLongOpt(OPT_AFTER_RULEID_LONG)
+                                       .withArgName("rule-id")
+                                       .create());
+        options.addOption(OptionBuilder.hasArg(true)
+                                       .withDescription(OPT_BEFORE_RULEID_DESCRIPTION)
+                                       .withLongOpt(OPT_BEFORE_RULEID_LONG)
+                                       .withArgName("rule-id")
                                        .create());
         options.addOption(OptionBuilder.hasArg(false)
                                        .withDescription(OPT_BOTTOM_DESCRIPTION)
@@ -68,10 +69,7 @@ public class AddPolicy extends PolicyManagementCLI {
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_ACTIONID_DESCRIPTION)
                                        .withLongOpt(OPT_ACTIONID_LONG)
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withDescription(OPT_RULEID_DESCRIPTION)
-                                       .withLongOpt(OPT_RULEID_LONG)
+                                       .withArgName("action-id")
                                        .create());
         options.addOption(OptionBuilder.hasArg(true)
                                        .withDescription(OPT_ACTION_DESCRIPTION)
@@ -125,13 +123,20 @@ public class AddPolicy extends PolicyManagementCLI {
         String ruleId = null;
         String actionValue = null;
         String resourceValue = null;
+        boolean afterRule = false;
 
         if (commandLine.hasOption(OPT_ACTIONID_LONG)) {
             actionId = commandLine.getOptionValue(OPT_ACTIONID_LONG);
         }
 
-        if (commandLine.hasOption(OPT_RULEID_LONG)) {
-            ruleId = commandLine.getOptionValue(OPT_RULEID_LONG);
+        if (commandLine.hasOption(OPT_AFTER_RULEID_LONG)) {
+            ruleId = commandLine.getOptionValue(OPT_AFTER_RULEID_LONG);
+            afterRule = true;
+        }
+
+        if (commandLine.hasOption(OPT_BEFORE_RULEID_LONG)) {
+            ruleId = commandLine.getOptionValue(OPT_BEFORE_RULEID_LONG);
+            afterRule = false;
         }
 
         if (commandLine.hasOption(OPT_ACTION_LONG)) {
@@ -144,8 +149,9 @@ public class AddPolicy extends PolicyManagementCLI {
 
         if (actionId == null) {
             if ((resourceValue == null) && (actionValue == null) && (ruleId != null)) {
-                throw new ParseException(String.format("Option --%s needs option --%s.",
-                                                       OPT_RULEID_LONG,
+                throw new ParseException(String.format("Options --%s and --%s need option --%s.",
+                                                       OPT_BEFORE_RULEID_LONG,
+                                                       OPT_AFTER_RULEID_LONG,
                                                        OPT_ACTIONID_LONG));
             }
             if ((resourceValue == null) && (actionValue == null)) {
@@ -157,8 +163,9 @@ public class AddPolicy extends PolicyManagementCLI {
                                                        OPT_ACTION_LONG));
             }
             if (ruleId != null) {
-                throw new ParseException(String.format("Option --%s needs option --%s and cannot be used with options --%s and --%s.",
-                                                       OPT_RULEID_LONG,
+                throw new ParseException(String.format("Options --%s and --%s need option --%s and cannot be used with options --%s and --%s.",
+                                                       OPT_BEFORE_RULEID_LONG,
+                                                       OPT_AFTER_RULEID_LONG,
                                                        OPT_ACTIONID_LONG,
                                                        OPT_RESOURCE_LONG,
                                                        OPT_ACTION_LONG));
@@ -170,16 +177,6 @@ public class AddPolicy extends PolicyManagementCLI {
                                                        OPT_RESOURCE_LONG,
                                                        OPT_ACTION_LONG));
             }
-        }
-
-        boolean after = false;
-
-        if (commandLine.hasOption(OPT_MOVEAFTER_LONG)) {
-            if (ruleId == null) {
-                throw new ParseException("The --" + OPT_MOVEAFTER_LONG
-                        + " option needs the \"rule-id\" to be specified.");
-            }
-            after = true;
         }
 
         if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
@@ -198,7 +195,7 @@ public class AddPolicy extends PolicyManagementCLI {
         }
 
         if (bottom) {
-            after = true;
+            afterRule = true;
         }
 
         if (verboseMode) {
@@ -214,7 +211,7 @@ public class AddPolicy extends PolicyManagementCLI {
                                                      resourceValue,
                                                      actionId,
                                                      ruleId,
-                                                     after);
+                                                     afterRule);
         if (policyId == null) {
 
             printOutputMessage(String.format("error."));

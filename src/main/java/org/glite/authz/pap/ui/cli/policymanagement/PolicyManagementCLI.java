@@ -17,8 +17,12 @@ public abstract class PolicyManagementCLI extends ServiceCLI {
     protected static String OPT_PAPALIAS_DESCRIPTION = "Select <arg> as pap";
     protected static String OPT_ALL_LONG = "all";
     protected static String OPT_ALLPAPS_DESCRIPTION = "Select all paps";
-    protected static String OPT_MOVEAFTER_LONG = "after";
-    protected static String OPT_MOVEAFTER_DESCRIPTION = "move <id> after <pivotId> (by default <id> is moved before <pivotId>)";
+    
+    protected static String OPT_AFTER_ID_LONG = "after";
+    protected static String OPT_AFTER_ID_DESCRIPTION = "place element after the given <id>";
+    protected static String OPT_BEFORE_ID_LONG = "before";
+    protected static String OPT_BEFORE_ID_DESCRIPTION = "place element before the given <id>";
+    
     protected static String OPT_ACTION = "a";
     protected static String OPT_ACTION_DESCRIPTION = "Specify an action value.";
     protected static String OPT_ACTION_LONG = "action";
