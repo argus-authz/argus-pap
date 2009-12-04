@@ -1,6 +1,6 @@
 package org.glite.authz.pap.repository.dao;
 
-import org.glite.authz.pap.repository.dao.filesystem.FileSystemDAOFactory;
+import org.glite.authz.pap.repository.dao.hibernate.DAOFactoryHibernate;
 
 /**
  * This class conforms to the Abstract Factory pattern to produce a number of DAOs needed by the
@@ -14,7 +14,8 @@ public abstract class DAOFactory {
      * @return the DAO factory implementation class.
      */
     public static DAOFactory getDAOFactory() {
-        return FileSystemDAOFactory.getInstance();
+//        return FileSystemDAOFactory.getInstance();
+        return DAOFactoryHibernate.getInstance();
     }
 
     /**

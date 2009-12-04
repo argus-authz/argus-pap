@@ -1,22 +1,8 @@
 package org.glite.authz.pap.repository;
 
-import java.io.File;
-import java.util.List;
-import java.util.NoSuchElementException;
-
-import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.Pap;
-import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
-import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
-import org.glite.authz.pap.common.xacml.wizard.XACMLWizard;
-import org.glite.authz.pap.encoder.EncodingException;
-import org.glite.authz.pap.encoder.PolicyFileEncoder;
-import org.glite.authz.pap.papmanagement.PapContainer;
-import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager;
 import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
-import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,6 +29,8 @@ public abstract class RepositoryManager {
     public static void bootstrap() {
 
         FileSystemRepositoryManager.getInstance().initialize();
+        
+        PersistenceManager.getInstance().initialize();
 
         checkVersion();
 

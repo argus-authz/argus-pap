@@ -6,9 +6,9 @@ import java.util.NoSuchElementException;
 import javax.servlet.ServletContext;
 
 import org.glite.authz.pap.authz.AuthorizationEngine;
-import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.PAPVersion;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
 import org.glite.authz.pap.distribution.DistributionModule;

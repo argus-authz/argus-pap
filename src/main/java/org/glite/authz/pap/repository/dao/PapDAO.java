@@ -15,11 +15,10 @@ public interface PapDAO {
     /**
      * Delete a Pap.
      * <p>
-     * The Pap identified by the alias is deleted and all the policies it contains are also deleted.
+     * The pap identified by the alias is deleted together with all the policies and policy sets it contains.
      * 
      * @param alias identifier of the pap.
-     * 
-     * @throws NotFoundException if the given <code>alias</code> were not found.
+     * @throws NotFoundException if the given <code>alias</code> was not found.
      */
     public void delete(String alias);
 

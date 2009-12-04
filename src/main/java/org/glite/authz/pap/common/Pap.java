@@ -1,5 +1,10 @@
 package org.glite.authz.pap.common;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.papmanagement.PapContainer;
@@ -27,6 +32,9 @@ import org.slf4j.LoggerFactory;
  * @see PapContainer
  * 
  */
+
+@Entity
+@Table(name = "pap")
 public class Pap {
 
     /** Default host: {@value} */
@@ -43,16 +51,39 @@ public class Pap {
 
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(Pap.class);
-    private String alias = null;
-    private String dn = null;
-    private String hostname = null;
+    
+    @Id
+    @Column(name = "id")
     private String id = null;
+    
+    @Column(name = "alias", unique = true)
+    private String alias = null;
+    
+    @Column(name = "dn")
+    private String dn = null;
+    
+    @Column(name = "hostname")
+    private String hostname = null;
+    
+    @Column(name = "path")
     private String path = null;
+    
+    @Column(name = "policy_last_modification_at")
     private long policyLastModificationTimeInMillis = 0;
+    
+    @Column(name = "port")
     private String port = null;
+    
+    @Column(name = "protocol")
     private String protocol = null;
+    
+    @Column(name = "is_local")
     private boolean local = true;
+    
+    @Column(name = "is_public")
     private boolean visibilityPublic = false;
+    
+    @Column(name = "is_enabled")
     private boolean enabled = false;
 
     /**
@@ -283,6 +314,18 @@ public class Pap {
 
     public void setAlias(String alias) {
         this.alias = alias;
+    }
+    
+    public void setAll(Pap pap) {
+        alias = pap.getAlias();
+        dn = pap.getDn();
+        hostname = pap.getHostname();
+        path = pap.getPath();
+        port = pap.getPort();
+        protocol = pap.getProtocol();
+        enabled = pap.isEnabled();
+        local = pap.isLocal();
+        visibilityPublic = pap.isVisibilityPublic();
     }
 
     public void setDn(String dn) {

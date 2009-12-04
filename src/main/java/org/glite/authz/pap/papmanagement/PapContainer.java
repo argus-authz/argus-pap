@@ -11,7 +11,6 @@ import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PapDAO;
@@ -120,7 +119,6 @@ public class PapContainer {
         }
 
         String oldVersion = policySet.getVersion();
-        PolicySetWizard.increaseVersion(policySet);
 
         try {
             policySetDAO.update(papId, oldVersion, policySet);
@@ -165,7 +163,6 @@ public class PapContainer {
         }
 
         String oldVersion = rootPolicySet.getVersion();
-        PolicySetWizard.increaseVersion(rootPolicySet);
 
         try {
             policySetDAO.update(papId, oldVersion, rootPolicySet);
@@ -508,7 +505,6 @@ public class PapContainer {
                 } else {
 
                     String oldVersion = policySet.getVersion();
-                    PolicySetWizard.increaseVersion(policySet);
 
                     policySetDAO.update(papId, oldVersion, policySet);
                 }
@@ -553,7 +549,6 @@ public class PapContainer {
         if (PolicySetHelper.deletePolicySetReference(rootPolicySet, policySetId)) {
 
             String oldVersion = rootPolicySet.getVersion();
-            PolicySetWizard.increaseVersion(rootPolicySet);
 
             policySetDAO.update(papId, oldVersion, rootPolicySet);
 

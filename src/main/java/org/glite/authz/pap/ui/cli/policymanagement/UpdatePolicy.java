@@ -76,7 +76,6 @@ public class UpdatePolicy extends PolicyManagementCLI {
 
         policySet.setPolicySetId(id);
         policySet.setVersion(repositoryVersion);
-        PolicySetWizard.increaseVersion(policySet);
 
         xacmlPolicyMgmtClient.updatePolicySet(alias, repositoryVersion, policySet);
         

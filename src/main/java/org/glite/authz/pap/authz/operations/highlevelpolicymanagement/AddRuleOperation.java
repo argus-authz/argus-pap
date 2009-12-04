@@ -113,8 +113,6 @@ public class AddRuleOperation extends BasePAPOperation<String> {
 
         String version = policy.getVersion();
 
-        PolicyWizard.increaseVersion(policy);
-
         TypeStringUtils.releaseUnneededMemory(policy);
 
         papContainer.updatePolicy(version, policy);
@@ -220,7 +218,6 @@ public class AddRuleOperation extends BasePAPOperation<String> {
         PolicySetHelper.addPolicySetReference(rootPolicySet, index, resourceId);
 
         String version = rootPolicySet.getVersion();
-        PolicySetWizard.increaseVersion(rootPolicySet);
 
         papContainer.updatePolicySet(version, rootPolicySet);
 
@@ -256,7 +253,6 @@ public class AddRuleOperation extends BasePAPOperation<String> {
         PolicySetHelper.addPolicyReference(resource, index, actionId);
         
         String version = resource.getVersion();
-        PolicySetWizard.increaseVersion(resource);
         
         papContainer.updatePolicySet(version, resource);
         

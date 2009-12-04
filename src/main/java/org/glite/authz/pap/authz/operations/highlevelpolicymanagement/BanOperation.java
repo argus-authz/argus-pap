@@ -97,7 +97,6 @@ public class BanOperation extends BasePAPOperation<String> {
         if (policySetNeedToBeSaved) {
             if (updateOperationForPolicySet) {
                 String oldVersion = targetPolicySet.getVersion();
-                PolicySetWizard.increaseVersion(targetPolicySet);
                 papContainer.updatePolicySet(oldVersion, targetPolicySet);
             } else {
                 papContainer.addPolicySet(0, targetPolicySet);
@@ -108,7 +107,6 @@ public class BanOperation extends BasePAPOperation<String> {
 
         if (updateOperationForPolicy) {
             String oldVersion = targetPolicyWizard.getVersionString();
-            targetPolicyWizard.increaseVersion();
             papContainer.updatePolicy(oldVersion, targetPolicyWizard.getXACML());
         } else {
             papContainer.storePolicy(targetPolicyWizard.getXACML());

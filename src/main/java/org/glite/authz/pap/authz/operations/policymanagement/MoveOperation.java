@@ -6,8 +6,6 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
-import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
@@ -103,8 +101,6 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
         String version = rootPAPPolicySet.getVersion();
 
-        PolicySetWizard.increaseVersion(rootPAPPolicySet);
-
         papContainer.updatePolicySet(version, rootPAPPolicySet);
     }
 
@@ -143,8 +139,6 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
         String version = targetPolicySet.getVersion();
 
-        PolicySetWizard.increaseVersion(targetPolicySet);
-
         papContainer.updatePolicySet(version, targetPolicySet);
     }
 
@@ -180,8 +174,6 @@ public class MoveOperation extends BasePAPOperation<Object> {
         PolicyHelper.addRule(targetPolicy, pivotIndex, rule);
 
         String version = targetPolicy.getVersion();
-
-        PolicyWizard.increaseVersion(targetPolicy);
 
         papContainer.updatePolicy(version, targetPolicy);
     }

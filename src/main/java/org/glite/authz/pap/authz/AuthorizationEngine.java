@@ -1,9 +1,7 @@
 package org.glite.authz.pap.authz;
 
 import java.io.File;
-import java.security.Security;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.slf4j.Logger;

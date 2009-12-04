@@ -1,22 +1,12 @@
 package org.glite.authz.pap.encoder;
-import java.io.InputStream;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.File;
-import java.lang.String;
-
-import org.glite.authz.pap.common.xacml.wizard.*;
-import org.opensaml.xacml.policy.PolicySetType;
-import org.opensaml.xacml.policy.PolicyType;
+import java.io.InputStream;
 import java.util.List;
-import org.opensaml.xacml.XACMLObject;
-import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
-import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.opensaml.DefaultBootstrap;
-import org.opensaml.xml.XMLConfigurator;
-import org.opensaml.xml.Configuration;
-import org.opensaml.xml.ConfigurationException;
+
+import org.glite.authz.pap.common.xacml.wizard.XACMLWizard;
 import org.glite.authz.pap.encoder.parser.BWParser;
 import org.glite.authz.pap.encoder.parser.ParseException;
 

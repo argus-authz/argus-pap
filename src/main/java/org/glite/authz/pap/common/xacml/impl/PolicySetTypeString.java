@@ -3,6 +3,11 @@ package org.glite.authz.pap.common.xacml.impl;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.namespace.QName;
 
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
@@ -40,12 +45,32 @@ import org.w3c.dom.Element;
  * utility method {@link TypeStringUtils#releaseUnneededMemory(Object)}.
  * 
  */
+@Entity
+@Table(name = "policyset")
 public class PolicySetTypeString implements PolicySetType {
 
+    @Transient
     private static final Logger log = LoggerFactory.getLogger(PolicySetTypeString.class);
+    
+    @Transient
     private PolicySetType policySet = null;
+    
+    @Id
+    @Column(name = "id")
     private String policySetId = null;
+    
+    @Column(name = "policyset_string")
     private String policySetString = null;
+    
+    @Column(name = "pap_id")
+    private String papId = null;
+
+    
+    /**
+     * Constructor used by persistence. 
+     */
+    PolicySetTypeString() {
+    }
 
     public PolicySetTypeString(PolicySetType policySet) {
         this.policySet = policySet;
@@ -126,6 +151,10 @@ public class PolicySetTypeString implements PolicySetType {
         initPolicySetTypeIfNotSet();
         invalidatePolicySetString();
         return policySet.getOrderedChildren();
+    }
+
+    public String getPapId() {
+        return papId;
     }
 
     public XMLObject getParent() {
@@ -304,6 +333,10 @@ public class PolicySetTypeString implements PolicySetType {
         policySet.setObligations(arg0);
     }
 
+    public void setPapId(String papId) {
+        this.papId = papId;
+    }
+
     public void setParent(XMLObject arg0) {
         initPolicySetTypeIfNotSet();
         invalidatePolicySetString();
@@ -338,7 +371,6 @@ public class PolicySetTypeString implements PolicySetType {
     public void setPolicySetString(String policySetId, String policySetString) {
         this.policySetString = policySetString;
         this.policySetId = policySetId;
-        invalidatePolicySetId();
         releaseDOM();
     }
 

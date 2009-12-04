@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
@@ -126,7 +125,6 @@ public class RepositoryUtils {
                         log.info("Automatic repair is set. Action: " + action);
                         PolicySetHelper.deletePolicySetReference(rootPS, policySetId);
                         String version = rootPS.getVersion();
-                        PolicySetWizard.increaseVersion(rootPS);
                         papContainer.updatePolicySet(version, rootPS);
                         papContainer.deletePolicySet(policySetId);
                         log.info("Automatic repair successfully completed (deleted policy set " + policySetId
@@ -153,7 +151,6 @@ public class RepositoryUtils {
                             log.info("Automatic repair is set. Action: " + action);
                             PolicySetHelper.deletePolicyReference(policySet, policyId);
                             String version = policySet.getVersion();
-                            PolicySetWizard.increaseVersion(policySet);
                             papContainer.updatePolicySet(version, policySet);
                             papContainer.deletePolicy(policyId);
                             log.info("Automatic repair successfully completed (deleted policy " + policyId
@@ -254,7 +251,6 @@ public class RepositoryUtils {
                     log.info("Automatic repair is set. Action: " + action);
                     PolicySetHelper.deletePolicySetReference(policySet, id);
                     String version = policySet.getVersion();
-                    PolicySetWizard.increaseVersion(policySet);
                     papContainer.updatePolicySet(version, policySet);
                     log.info("Automatic repair successfully completed for policy set " + policySetId);
                 } else {

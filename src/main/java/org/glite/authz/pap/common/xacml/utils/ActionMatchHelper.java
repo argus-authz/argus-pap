@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.opensaml.xacml.ctx.AttributeType;
+import org.opensaml.xacml.policy.ActionMatchType;
 import org.opensaml.xacml.policy.AttributeDesignatorType;
 import org.opensaml.xacml.policy.AttributeValueType;
-import org.opensaml.xacml.policy.ActionMatchType;
 
 public class ActionMatchHelper extends XMLObjectHelper<ActionMatchType> {
 

@@ -298,13 +298,12 @@ public class PapManager {
             return;
         }
 
-        Pap oldPap = papDAO.get(alias);
+        Pap pap = papDAO.get(alias);
 
-        // id (and alias) cannot change
-        newPap.setId(oldPap.getId());
+        pap.setAll(newPap);
 
-        distributionConfiguration.savePap(newPap);
-        papDAO.update(newPap);
+        distributionConfiguration.savePap(pap);
+        papDAO.update(pap);
     }
 
     /**
@@ -483,10 +482,10 @@ public class PapManager {
             throw new RepositoryException("Invalid alias for default pap. Cannot perform updateDefaultPap request.");
         }
 
-        Pap oldDefaultPap = getPap(Pap.DEFAULT_PAP_ALIAS);
+        Pap defaultPap = getPap(Pap.DEFAULT_PAP_ALIAS);
 
-        newDefaultPap.setId(oldDefaultPap.getId());
+        defaultPap.setAll(newDefaultPap);
 
-        papDAO.update(newDefaultPap);
+        papDAO.update(defaultPap);
     }
 }

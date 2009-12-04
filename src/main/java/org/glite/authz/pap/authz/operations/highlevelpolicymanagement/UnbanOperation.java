@@ -100,7 +100,6 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
             } else {
 
                 String oldVersion = policyWizard.getVersionString();
-                policyWizard.increaseVersion();
                 papContainer.updatePolicy(oldVersion, policyWizard.getXACML());
             }
 

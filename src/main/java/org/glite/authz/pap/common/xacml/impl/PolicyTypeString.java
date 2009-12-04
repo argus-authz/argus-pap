@@ -3,6 +3,11 @@ package org.glite.authz.pap.common.xacml.impl;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.xml.namespace.QName;
 
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
@@ -36,12 +41,31 @@ import org.w3c.dom.Element;
  * utility method {@link TypeStringUtils#releaseUnneededMemory(Object)}.
  * 
  */
+@Entity
+@Table(name = "policy")
 public class PolicyTypeString implements PolicyType {
 
+    @Transient
     private static final Logger log = LoggerFactory.getLogger(PolicyTypeString.class);
+    
+    @Transient
     private PolicyType policy = null;
+    
+    @Id
+    @Column(name = "id")
     private String policyId = null;
+    
+    @Column(name = "policy_string")
     private String policyString = null;
+    
+    @Column(name = "pap_id")
+    private String papId;
+    
+    /**
+     * Constructor used by persistence. 
+     */
+    PolicyTypeString() {
+    }
 
     public PolicyTypeString(PolicyType policy) {
         this.policy = policy;
@@ -123,6 +147,10 @@ public class PolicyTypeString implements PolicyType {
         initPolicyTypeIfNotSet();
         invalidatePolicyString();
         return policy.getOrderedChildren();
+    }
+
+    public String getPapId() {
+        return papId;
     }
 
     public XMLObject getParent() {
@@ -278,6 +306,10 @@ public class PolicyTypeString implements PolicyType {
         initPolicyTypeIfNotSet();
         policy.setObligations(arg0);
         invalidatePolicyString();
+    }
+
+    public void setPapId(String papId) {
+        this.papId = papId;
     }
 
     public void setParent(XMLObject arg0) {
