@@ -1,42 +1,41 @@
 package org.glite.authz.pap.repository.dao.hibernate;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-
 import org.glite.authz.pap.repository.PersistenceManager;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 public abstract class GenericDAOJpa {
 
-    protected EntityManager entityManager = null;
+    protected Session session = null;
 
     public void clear() {
-        getEntityManager().clear();
+        getSession().clear();
     }
 
     public void flush() {
-        getEntityManager().flush();
+        getSession().flush();
     }
 
-    public void setEntityManager(EntityManager em) {
-        entityManager = em;
+    public void setEntityManager(Session session) {
+        this.session = session;
     }
 
-    protected void commitManagedTransaction(EntityTransaction tx) {
+    protected void commitManagedTransaction(Transaction tx) {
         if (tx == null) {
             return;
         }
         tx.commit();
     }
 
-    protected EntityManager getEntityManager() {
-        if (entityManager == null) {
-            entityManager = PersistenceManager.getInstance().createEntityManager();
+    protected Session getSession() {
+        if (session == null) {
+            session = PersistenceManager.getInstance().getCurrentSession();
         }
-        return entityManager;
+        return session;
     }
     
-    protected EntityTransaction manageTransaction() {
-        EntityTransaction tx = getEntityManager().getTransaction();
+    protected Transaction manageTransaction() {
+        Transaction tx = getSession().getTransaction();
         if (tx.isActive()) {
             return null;
         } else {
@@ -45,7 +44,7 @@ public abstract class GenericDAOJpa {
         }
     }
     
-    protected void rollbakManagedTransaction(EntityTransaction tx) {
+    protected void rollbakManagedTransaction(Transaction tx) {
         if (tx != null) {
             tx.rollback();
         }

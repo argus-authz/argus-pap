@@ -2,8 +2,6 @@ package org.glite.authz.pap.repository.dao.hibernate;
 
 import java.util.List;
 
-import javax.persistence.EntityTransaction;
-
 import org.glite.authz.pap.common.xacml.impl.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
@@ -12,6 +10,7 @@ import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
+import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
      */
     public void delete(String papId, String policySetId) {
 
-        EntityTransaction tx = manageTransaction();
+        Transaction tx = manageTransaction();
 
         PolicySetType policySet = getById(papId, policySetId);
 
@@ -58,7 +57,7 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
             throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
         }
 
-        getEntityManager().remove(policySet);
+        getSession().delete(policySet);
 
         commitManagedTransaction(tx);
     }
@@ -68,12 +67,12 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
      */
     public void deleteAll(String papId) {
 
-        EntityTransaction tx = manageTransaction();
+        Transaction tx = manageTransaction();
 
         List<PolicySetType> policySetList = getAll(papId);
 
         for (PolicySetType policySet : policySetList) {
-            getEntityManager().remove(policySet);
+            getSession().delete(policySet);
         }
 
         commitManagedTransaction(tx);
@@ -86,7 +85,7 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         // TODO: remove papId input parameter
 
-        PolicySetTypeString policySet = getEntityManager().find(PolicySetTypeString.class, policySetId);
+        PolicySetTypeString policySet = (PolicySetTypeString) getSession().get(PolicySetTypeString.class, policySetId);
 
         return !(policySet == null);
     }
@@ -99,9 +98,9 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         // TODO: change the name in getByPapId
 
-        List<PolicySetType> policySetList = getEntityManager().createQuery("select p from PolicySetTypeString p where p.papId = :papId")
+        List<PolicySetType> policySetList = getSession().createQuery("select p from PolicySetTypeString p where p.papId = :papId")
                                                               .setParameter("papId", papId)
-                                                              .getResultList();
+                                                              .list();
         return policySetList;
     }
 
@@ -112,7 +111,7 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         // TODO: remove papId input parameter
 
-        PolicySetTypeString policySet = getEntityManager().find(PolicySetTypeString.class, policySetId);
+        PolicySetTypeString policySet = (PolicySetTypeString) getSession().load(PolicySetTypeString.class, policySetId);
 
         if (policySet == null) {
             throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
@@ -133,11 +132,11 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         String policySetId = policySetTypeString.getPolicySetId();
 
-        EntityTransaction tx = manageTransaction();
+        Transaction tx = manageTransaction();
 
         try {
 
-            getEntityManager().persist(policySetTypeString);
+            getSession().persist(policySetTypeString);
 
         } catch (ConstraintViolationException e) {
             rollbakManagedTransaction(tx);
@@ -170,7 +169,7 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
         
         TypeStringUtils.releaseUnneededMemory(newPolicySetTypeString);
 
-        EntityTransaction tx = manageTransaction();
+        Transaction tx = manageTransaction();
 
         PolicySetTypeString repoPolicySet = (PolicySetTypeString) getById(papId, policySetId);
 
@@ -192,10 +191,8 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
             repoPolicySet.setPolicySetString(newPolicySetTypeString.getPolicySetId(), newPolicySetTypeString.getPolicySetString());
         }
         
-        getEntityManager().persist(repoPolicySet);
+        getSession().persist(repoPolicySet);
         
         commitManagedTransaction(tx);
-        
-//        getEntityManager().createNamedQuery("SHUTDOWN COMPACT");
     }
 }

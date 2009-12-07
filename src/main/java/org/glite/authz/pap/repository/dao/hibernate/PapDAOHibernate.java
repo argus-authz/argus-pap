@@ -3,8 +3,6 @@ package org.glite.authz.pap.repository.dao.hibernate;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.EntityTransaction;
-
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.repository.dao.PapDAO;
@@ -40,22 +38,13 @@ public class PapDAOHibernate extends GenericDAOJpa implements PapDAO {
      */
     public void delete(String papAlias) {
 
-        EntityTransaction tx = manageTransaction();
+        Pap pap = get(papAlias);
 
-        try {
-            Pap pap = get(papAlias);
+        PapContainer papContainer = new PapContainer(get(papAlias));
+        papContainer.deleteAllPolicies();
+        papContainer.deleteAllPolicySets();
 
-            PapContainer papContainer = new PapContainer(get(papAlias));
-            papContainer.deleteAllPolicies();
-            papContainer.deleteAllPolicySets();
-
-            getEntityManager().remove(pap);
-
-            commitManagedTransaction(tx);
-
-        } catch (NotFoundException e) {
-            rollbakManagedTransaction(tx);
-        }
+        getSession().delete(pap);
     }
 
     /**
@@ -79,10 +68,10 @@ public class PapDAOHibernate extends GenericDAOJpa implements PapDAO {
         Pap pap = null;
 
         try {
-            pap = (Pap) getEntityManager().createQuery("select p from Pap p where p.alias = :alias")
-                                          .setParameter("alias", papAlias)
-                                          .setMaxResults(1)
-                                          .getSingleResult();
+            pap = (Pap) getSession().createQuery("select p from Pap p where p.alias = :alias")
+                                    .setParameter("alias", papAlias)
+                                    .setMaxResults(1)
+                                    .uniqueResult();
         } catch (javax.persistence.NoResultException e) {
             // do nothing. Use case for the following if, pap is null.
         }
@@ -113,7 +102,7 @@ public class PapDAOHibernate extends GenericDAOJpa implements PapDAO {
     @SuppressWarnings("unchecked")
     public List<Pap> getAll() {
 
-        List<Pap> papList = (List<Pap>) getEntityManager().createQuery("select p from Pap p").getResultList();
+        List<Pap> papList = (List<Pap>) getSession().createQuery("select p from Pap p").list();
         return papList;
     }
 
@@ -130,16 +119,13 @@ public class PapDAOHibernate extends GenericDAOJpa implements PapDAO {
      */
     public void store(Pap pap) {
 
-        EntityTransaction tx = manageTransaction();
-
         try {
-            getEntityManager().persist(pap);
+
+            getSession().persist(pap);
+
         } catch (ConstraintViolationException e) {
-            rollbakManagedTransaction(tx);
             throw new AlreadyExistsException(String.format("Already exists: papAlias=%s", pap.getAlias()));
         }
-
-        commitManagedTransaction(tx);
     }
 
     /**
@@ -147,19 +133,10 @@ public class PapDAOHibernate extends GenericDAOJpa implements PapDAO {
      */
     public void update(Pap pap) {
 
-        EntityTransaction tx = manageTransaction();
+        Pap persistedPap = get(pap.getAlias());
 
-        try {
-            Pap persistedPap = get(pap.getAlias());
+        persistedPap.setAll(pap);
 
-            persistedPap.setAll(pap);
-
-            getEntityManager().persist(persistedPap);
-
-            commitManagedTransaction(tx);
-
-        } catch (NotFoundException e) {
-            rollbakManagedTransaction(tx);
-        }
+        getSession().persist(persistedPap);
     }
 }

@@ -17,6 +17,7 @@ import org.glite.authz.pap.authz.operations.papmanagement.UpdatePapOperation;
 import org.glite.authz.pap.common.PAPVersion;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManagerException;
+import org.glite.authz.pap.repository.PersistenceManager;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,15 +26,29 @@ public class PAPManagementService implements PAPManagement {
 
     private static final Logger log = LoggerFactory.getLogger(PAPManagementService.class);
 
+    private void beginTransaction() {
+        PersistenceManager.getInstance().getCurrentSession().beginTransaction();
+    }
+    
+    private void commitTransaction() {
+        PersistenceManager.getInstance().getCurrentSession().getTransaction().commit();
+    }
+    
     public boolean addPap(Pap pap) throws RemoteException {
         log.info("addTrustedPAP();");
 
         try {
-
-            return AddPapOperation.instance(pap).execute();
+            
+            beginTransaction();
+            
+            boolean result = AddPapOperation.instance(pap).execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -42,11 +57,13 @@ public class PAPManagementService implements PAPManagement {
         log.info("exists(" + papAlias + ");");
 
         try {
-
-            return PapExistsOperation.instance(papAlias).execute();
+            beginTransaction();
+            boolean result = PapExistsOperation.instance(papAlias).execute();
+            commitTransaction();
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
 
@@ -56,10 +73,16 @@ public class PAPManagementService implements PAPManagement {
         log.info("listTrustedPAPs();");
         try {
 
-            return ListPapsOperation.instance().execute();
+            beginTransaction();
+            
+            Pap[] papArray = ListPapsOperation.instance().execute();
+            
+            commitTransaction();
+            
+            return papArray;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -67,10 +90,16 @@ public class PAPManagementService implements PAPManagement {
     public String[] getOrder() throws RemoteException {
         try {
 
-            return GetOrderOperation.instance().execute();
+            beginTransaction();
+            
+            String[] result = GetOrderOperation.instance().execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -79,10 +108,16 @@ public class PAPManagementService implements PAPManagement {
         log.info("getTrustedPAP(" + papAlias + ");");
         try {
 
-            return GetPapOperation.instance(papAlias).execute();
+            beginTransaction();
+            
+            Pap result = GetPapOperation.instance(papAlias).execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -91,10 +126,16 @@ public class PAPManagementService implements PAPManagement {
         log.info("getPollingInterval();");
         try {
 
-            return GetPollingIntervalOperation.instance().execute();
+            beginTransaction();
+            
+            float result = GetPollingIntervalOperation.instance().execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -108,10 +149,16 @@ public class PAPManagementService implements PAPManagement {
         log.info("refreshCache(" + papAlias + ");");
         try {
 
-            return RefreshPolicyCacheOperation.instance(papAlias).execute();
+            beginTransaction();
+            
+            boolean result = RefreshPolicyCacheOperation.instance(papAlias).execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -120,10 +167,16 @@ public class PAPManagementService implements PAPManagement {
         log.info("removeTrustedPAP(" + papAlias + ");");
         try {
 
-            return RemovePapOperation.instance(papAlias).execute();
+            beginTransaction();
+            
+            boolean result = RemovePapOperation.instance(papAlias).execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -132,10 +185,14 @@ public class PAPManagementService implements PAPManagement {
         log.info("setEnabled(" + alias + ", " + enabled + ");");
         try {
 
+            beginTransaction();
+            
             SetEnabledOperation.instance(alias, enabled).execute();
+            
+            commitTransaction();
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -143,10 +200,16 @@ public class PAPManagementService implements PAPManagement {
     public boolean setOrder(String[] aliasArray) throws RemoteException {
         try {
 
-            return SetOrderOperation.instance(aliasArray).execute();
+            beginTransaction();
+            
+            boolean result = SetOrderOperation.instance(aliasArray).execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -172,10 +235,16 @@ public class PAPManagementService implements PAPManagement {
                                                             Pap.DEFAULT_PAP_ALIAS));
             }
 
-            return UpdatePapOperation.instance(pap).execute();
+            beginTransaction();
+            
+            boolean result = UpdatePapOperation.instance(pap).execute();
+            
+            commitTransaction();
+            
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServiceClassExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }

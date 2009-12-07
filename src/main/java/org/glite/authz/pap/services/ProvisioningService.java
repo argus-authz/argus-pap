@@ -28,6 +28,7 @@ import org.apache.axis.transport.http.HTTPConstants;
 import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPAPOperation;
 import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
+import org.glite.authz.pap.repository.PersistenceManager;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
 import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
@@ -46,29 +47,40 @@ public class ProvisioningService implements Provisioning {
 
     public Response XACMLPolicyQuery(XACMLPolicyQueryType query) throws java.rmi.RemoteException {
 
-        HttpServletRequest httpServletRequest = 
-            (HttpServletRequest) MessageContext.getCurrentContext().getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
-        
+        HttpServletRequest httpServletRequest = (HttpServletRequest) MessageContext.getCurrentContext()
+                                                                                   .getProperty(HTTPConstants.MC_HTTP_SERVLETREQUEST);
+
         // lock need to keep memory usage low, it's not possible to re-use opensaml objects so they have to
         // be cloned for every request.
         synchronized (lock) {
 
             try {
+
+                PersistenceManager.getInstance().getCurrentSession().beginTransaction();
+
                 // log the received query
                 log.trace("Received XACLMPolicyQuery " + XMLObjectHelper.toString(query));
 
                 /* check a few things about the query */
                 try {
+
                     ServicesUtils.checkQuery(query);
+
                 } catch (VersionMismatchException e) {
-                    log.error(e.getMessage(), e);
+
+                    ServiceClassExceptionManager.logAndRollback(log, e);
                     return ServicesUtils.createResponse(query, e);
+
                 } catch (MissingIssuerException e) {
-                    log.error(e.getMessage(), e);
+
+                    ServiceClassExceptionManager.logAndRollback(log, e);
                     return ServicesUtils.createResponse(query, e);
+
                 } catch (WrongFormatIssuerException e) {
-                    log.error(e.getMessage(), e);
+
+                    ServiceClassExceptionManager.logAndRollback(log, e);
                     return ServicesUtils.createResponse(query, e);
+
                 }
 
                 /* get local policies */
@@ -76,8 +88,8 @@ public class ProvisioningService implements Provisioning {
                 List<XACMLObject> resultList = null;
 
                 /*
-                 * TODO discrimination between a PAP and a PDP is done after the presence of the Extensions
-                 * element, too simplistic
+                 * TODO discrimination between a PAP and a PDP is done after the presence of the Extensions element, too
+                 * simplistic
                  */
 
                 Extensions extensions = query.getExtensions();
@@ -94,12 +106,14 @@ public class ProvisioningService implements Provisioning {
 
                 Response response = ServicesUtils.createResponse(query, resultList, httpServletRequest);
 
+                PersistenceManager.getInstance().getCurrentSession().getTransaction().commit();
+
                 log.trace("Sending Response : " + XMLObjectHelper.toString(query));
 
                 return response;
 
             } catch (RuntimeException e) {
-                ServiceClassExceptionManager.log(log, e);
+                ServiceClassExceptionManager.logAndRollback(log, e);
                 throw e;
             }
         }

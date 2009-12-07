@@ -14,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class has methods to read distribution information from configuration and to write back
- * these information to the configuration file. The reason for having both read and write facilities
- * is that these information can be modified through the command line.
+ * This class has methods to read distribution information from configuration and to write back these information to the
+ * configuration file. The reason for having both read and write facilities is that these information can be modified
+ * through the command line.
  * 
  * @see PapManager
  * @see Pap
@@ -42,12 +42,11 @@ public class DistributionConfiguration {
     }
 
     /**
-     * Returns the <code>alias</code> key part (INI configuration) of a pap. This is the first part
-     * common to all the keys associated to a pap.
+     * Returns the <code>alias</code> key part (INI configuration) of a pap. This is the first part common to all the
+     * keys associated to a pap.
      * 
      * @param papAlias alias of the pap.
-     * @return the key build as {@link DistributionConfiguration#PAPS_STANZA} + "." +
-     *         <i>papAlias</i>
+     * @return the key build as {@link DistributionConfiguration#PAPS_STANZA} + "." + <i>papAlias</i>
      */
     private static String aliasKey(String papAlias) {
         return PAPS_STANZA + "." + papAlias;
@@ -62,7 +61,7 @@ public class DistributionConfiguration {
     private static String dnKey(String papAlias) {
         return aliasKey(papAlias) + "." + "dn";
     }
-    
+
     /**
      * Returns the <i>enabled</i> key of a pap.
      * 
@@ -173,13 +172,12 @@ public class DistributionConfiguration {
     }
 
     /**
-     * Reads the list of defined paps from configuration. Paps are read following without a specific
-     * order, there the returned list does <b>not</b> follow the paps ordering.
+     * Reads the list of defined paps from configuration. Paps are read following without a specific order, there the
+     * returned list does <b>not</b> follow the paps ordering.
      * 
      * @return list of paps defined in the configuration (not ordered).
-     * 
-     * @throws DistributionConfigurationException if a configuration error was found (the reason in
-     *             the exception message).
+     * @throws DistributionConfigurationException if a configuration error was found (the reason in the exception
+     *             message).
      */
     @SuppressWarnings("unchecked")
     public List<Pap> getPapList() {
@@ -203,9 +201,8 @@ public class DistributionConfiguration {
      * Reads the pap ordering (list of aliases) from the configuration.
      * 
      * @return an array of aliases (can be empty, i.e. no ordering defined).
-     * 
-     * @throws DistributionConfigurationException if the ordering contains an undefined alias and/or
-     *             duplicated aliases (the reason is in the exception message).
+     * @throws DistributionConfigurationException if the ordering contains an undefined alias and/or duplicated aliases
+     *             (the reason is in the exception message).
      */
     public String[] getPapOrdering() {
 
@@ -233,7 +230,7 @@ public class DistributionConfiguration {
 
         return pollIntervalInSecs;
     }
-    
+
     /**
      * Set the polling interval into configuration.
      * 
@@ -289,18 +286,16 @@ public class DistributionConfiguration {
         setPapProperties(pap);
         papConfiguration.saveStartupConfiguration();
     }
-    
+
     /**
      * Save the given paps ordering into configuration.
      * <p>
-     * If the given array is <code>null</code> or <code>empty</code> the previous ordering (if any)
-     * is cleared (i.e. no ordering defined).
+     * If the given array is <code>null</code> or <code>empty</code> the previous ordering (if any) is cleared (i.e. no
+     * ordering defined).
      * 
-     * @param aliasArray the array of aliases identifying the new ordering (can be <code>null</code>
-     *            or <code>empty</code>).
-     * 
-     * @throws DistributionConfigurationException if the new ordering contains duplicated or unknown
-     *             aliases.
+     * @param aliasArray the array of aliases identifying the new ordering (can be <code>null</code> or
+     *            <code>empty</code>).
+     * @throws DistributionConfigurationException if the new ordering contains duplicated or unknown aliases.
      */
     public void savePapOrdering(String[] aliasArray) {
 
@@ -335,8 +330,7 @@ public class DistributionConfiguration {
      * Checks for the existence of an alias in the configuration.
      * 
      * @param alias the alias to check.
-     * @return <code>true</code> if the alias exists in the configuration, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if the alias exists in the configuration, <code>false</code> otherwise.
      */
     private boolean aliasExists(String alias) {
 
@@ -378,9 +372,8 @@ public class DistributionConfiguration {
      * 
      * @param papAlias alias of the pap to get.
      * @return the retrieved <code>Pap</code>.
-     * 
-     * @throws DistributionConfigurationException if there is some configuration error like missing
-     *             required information (specific reason is put in the exception message).
+     * @throws DistributionConfigurationException if there is some configuration error like missing required information
+     *             (specific reason is put in the exception message).
      */
     private Pap getPapFromProperties(String papAlias) {
 
@@ -408,8 +401,8 @@ public class DistributionConfiguration {
 
         Pap pap = new Pap(papAlias, isLocal, dn, hostname, port, path, protocol, visibilityPublic);
         pap.setEnabled(enabled);
-        
-        return pap; 
+
+        return pap;
     }
 
     /**
@@ -432,9 +425,10 @@ public class DistributionConfiguration {
     }
 
     /**
-     * checks if the given alias array is a valid pap ordering.
-     * @param aliasArray array of aliases to be validated.
+     * Checks whether the given array of pap alias is a valid pap ordering or not. A pap ordering is valid if each alias
+     * is known and appears once.
      * 
+     * @param aliasArray array of aliases to be validated.
      * @throws DistributionConfigurationException if there are unknown or duplicated aliases.
      */
     private void validatePapOrdering(String[] aliasArray) {

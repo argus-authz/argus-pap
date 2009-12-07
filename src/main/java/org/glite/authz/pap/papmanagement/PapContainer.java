@@ -40,8 +40,8 @@ import org.slf4j.LoggerFactory;
 public class PapContainer {
 
     private static final Logger log = LoggerFactory.getLogger(PapContainer.class);
-
     private static final Object notificationLock = new Object();
+    
     private final Pap pap;
     private final String papId;
     private final PolicyDAO policyDAO;

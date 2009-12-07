@@ -177,6 +177,7 @@ public class RepositoryUtils {
      */
     public static boolean performAllChecks(boolean repair) {
 
+        PersistenceManager.getInstance().getCurrentSession().beginTransaction();
         boolean success = true;
 
         if (checkXMLValidation() == false) {
@@ -194,6 +195,8 @@ public class RepositoryUtils {
             purgeUnreferencedPolicySets();
             purgeUnreferencedPolicies();
         }
+        
+        PersistenceManager.getInstance().getCurrentSession().getTransaction().commit();
 
         return success;
     }
