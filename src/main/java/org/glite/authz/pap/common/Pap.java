@@ -15,22 +15,19 @@ import org.slf4j.LoggerFactory;
 /**
  * The <code>Pap</code> class is a JavaBean describing the information associated to a pap.
  * <p>
- * The PAP service (PAP uppercase) is organized in units and each unit is called pap (pap
- * lowercase). Basically a pap is a container for policies. This class models the information
- * associated to a pap and not its content (for managing the policies of a pap see
- * {@link PapContainer}.
+ * The PAP service (PAP uppercase) is organized in units and each unit is called pap (pap lowercase). Basically a pap is
+ * a container for policies. This class models the information associated to a pap and not its content (for managing the
+ * policies of a pap see {@link PapContainer}.
  * <p>
- * A pap can be local or remote. The policies of a local pap are written by the administrator of the
- * PAP service, on the other side the policies of a remote pap are retrieved remotely (downloaded
- * from the owner PAP). Information like hostname, port, protocol and path are used to build the
- * endpoint of a remote pap. A pap can also be private or public. When a PAP requests policies to
- * another PAP, the policies that are actually sent are all the public policies belonging to a
- * public pap. Finally a pap can be enabled or disabled. If it's enabled then its policies are sent
- * to PDPs, otherwise they are not. By default a pap is not enabled.
+ * A pap can be local or remote. The policies of a local pap are written by the administrator of the PAP service, on the
+ * other side the policies of a remote pap are retrieved remotely (downloaded from the owner PAP). Information like
+ * hostname, port, protocol and path are used to build the endpoint of a remote pap. A pap can also be private or
+ * public. When a PAP requests policies to another PAP, the policies that are actually sent are all the public policies
+ * belonging to a public pap. Finally a pap can be enabled or disabled. If it's enabled then its policies are sent to
+ * PDPs, otherwise they are not. By default a pap is not enabled.
  * 
  * @see PapManager
  * @see PapContainer
- * 
  */
 
 @Entity
@@ -51,64 +48,92 @@ public class Pap {
 
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(Pap.class);
-    
+
+    /**
+     * Return <code>true</code> if the given string equals "local" (not case sentitive).<br>
+     * Convenience method used for reading the type from configuration file.
+     * 
+     * @param type a <code>String</code> to be compared with the <code>Strinf</code> "local".
+     * @return <code>true</code> if <code>type</code> is equal to "local" (not case sensitive), <code>false</code>
+     *         otherwise.
+     */
+    public static boolean isLocal(String type) {
+        if ("local".equals(type.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Constructor for the <i>default</i> pap.
+     * <p>
+     * The default pap alias is defined by {@link Pap#DEFAULT_PAP_ALIAS}.
+     * 
+     * @return the default pap (alias={@value #DEFAULT_PAP_ALIAS}, local and public)).
+     */
+    public static Pap makeDefaultPAP() {
+
+        Pap defaultPap = new Pap(DEFAULT_PAP_ALIAS, true, null, null, null, null, null, true);
+        defaultPap.setEnabled(true);
+
+        return defaultPap;
+    }
+
     @Id
     @Column(name = "id")
     private String id = null;
-    
+
     @Column(name = "alias", unique = true)
     private String alias = null;
-    
+
     @Column(name = "dn")
     private String dn = null;
-    
+
     @Column(name = "hostname")
     private String hostname = null;
-    
+
     @Column(name = "path")
     private String path = null;
-    
+
     @Column(name = "policy_last_modification_at")
     private long policyLastModificationTimeInMillis = 0;
-    
+
     @Column(name = "port")
     private String port = null;
-    
+
     @Column(name = "protocol")
     private String protocol = null;
-    
+
     @Column(name = "is_local")
     private boolean local = true;
-    
+
     @Column(name = "is_public")
     private boolean visibilityPublic = false;
-    
+
     @Column(name = "is_enabled")
     private boolean enabled = false;
 
     /**
-     * Constructor with no parameters. Needed for JavaBean compatibility and used by Axis
-     * serialization methods.
+     * Constructor with no parameters. Needed for JavaBean compatibility and used by Axis serialization methods.
      */
-    public Pap() {}
+    public Pap() {
+    }
 
     /**
      * Constructor.
      * 
      * @param alias alias of the pap (it must be a unique name).
-     * @param isLocal if <code>true</code> the pap is local, if <code>false</code> the pap is
-     *            remote.
+     * @param isLocal if <code>true</code> the pap is local, if <code>false</code> the pap is remote.
      * @param dn DN of the pap (remote pap). Can be <code>null</code>.
-     * @param hostname hostname of the pap (remote pap). If <code>null</code> or empty the default
-     *            value is {@link #DEFAULT_HOST}.
-     * @param port port port of the pap (remote pap). If <code>null</code> or empty the default
-     *            value is {@link #DEFAULT_PORT}.
-     * @param servicesRootPath service path of the pap (remote pap). If <code>null</code> or empty
-     *            the default value is {@link #DEFAULT_SERVICES_ROOT_PATH}.
-     * @param protocol protocol of the pap (remote pap). If <code>null</code> or empty the default
-     *            value is {@link #DEFAULT_PROTOCOL}.
-     * @param visibilityPublic if <code>true</code> the pap is public, if <code>false</code> the pap
-     *            is private.
+     * @param hostname hostname of the pap (remote pap). If <code>null</code> or empty the default value is
+     *            {@link #DEFAULT_HOST}.
+     * @param port port port of the pap (remote pap). If <code>null</code> or empty the default value is
+     *            {@link #DEFAULT_PORT}.
+     * @param servicesRootPath service path of the pap (remote pap). If <code>null</code> or empty the default value is
+     *            {@link #DEFAULT_SERVICES_ROOT_PATH}.
+     * @param protocol protocol of the pap (remote pap). If <code>null</code> or empty the default value is
+     *            {@link #DEFAULT_PROTOCOL}.
+     * @param visibilityPublic if <code>true</code> the pap is public, if <code>false</code> the pap is private.
      */
     public Pap(String alias, boolean isLocal, String dn, String hostname, String port,
             String servicesRootPath, String protocol, boolean visibilityPublic) {
@@ -148,39 +173,9 @@ public class Pap {
     }
 
     /**
-     * Return <code>true</code> if the given string equals "local" (not case sentitive).<br>
-     * Convenience method used for reading the type from configuration file.
-     * 
-     * @param type a <code>String</code> to be compared with the <code>Strinf</code> "local".
-     * @return <code>true</code> if <code>type</code> is equal to "local" (not case sensitive),
-     *         <code>false</code> otherwise.
-     */
-    public static boolean isLocal(String type) {
-        if ("local".equals(type.toLowerCase())) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Constructor for the <i>default</i> pap.
-     * <p>
-     * The default pap alias is defined by {@link Pap#DEFAULT_PAP_ALIAS}.
-     * 
-     * @return the default pap (alias={@value #DEFAULT_PAP_ALIAS}, local and public)).
-     */
-    public static Pap makeDefaultPAP() {
-        
-        Pap defaultPap = new Pap(DEFAULT_PAP_ALIAS, true, null, null, null, null, null, true);
-        defaultPap.setEnabled(true);
-        
-        return defaultPap;
-    }
-
-    /**
-     * Compares this <code>Pap</code> to the specified object. The result is <code>true</code> if
-     * and only if the argument is not <code>null</code> and is a <code>Pap</code> object whose
-     * members value is the same as this object.
+     * Compares this <code>Pap</code> to the specified object. The result is <code>true</code> if and only if the
+     * argument is not <code>null</code> and is a <code>Pap</code> object whose members value is the same as this
+     * object.
      * 
      * @param pap
      * @return
@@ -257,9 +252,9 @@ public class Pap {
     /**
      * Returns the endpoint of the pap in the form: protocol://hostname:port/path.
      * 
-     * @return a <code>String</code> representing the endpoint. No check is performed on protocol,
-     *         hostname, port and path. If some of them are <code>null</code> then the corresponding
-     *         part of the endpoint string reports a "null" string.
+     * @return a <code>String</code> representing the endpoint. No check is performed on protocol, hostname, port and
+     *         path. If some of them are <code>null</code> then the corresponding part of the endpoint string reports a
+     *         "null" string.
      */
     public String getEndpoint() {
         return protocol + "://" + hostname + ":" + port + path;
@@ -296,6 +291,13 @@ public class Pap {
         return "remote";
     }
 
+    public boolean isDefaultPap() {
+        if (DEFAULT_PAP_ALIAS.equals(alias)) {
+            return true;
+        }
+        return false;
+    }
+
     public boolean isEnabled() {
         return enabled;
     }
@@ -315,7 +317,7 @@ public class Pap {
     public void setAlias(String alias) {
         this.alias = alias;
     }
-    
+
     public void setAll(Pap pap) {
         alias = pap.getAlias();
         dn = pap.getDn();
@@ -381,8 +383,8 @@ public class Pap {
     }
 
     /**
-     * Returns a formatted <code>String</code> version of this <code>Pap</code>. Multiple lines are
-     * used and indentation.
+     * Returns a formatted <code>String</code> version of this <code>Pap</code>. Multiple lines are used and
+     * indentation.
      * 
      * @param indent the indentation to be used.
      * @param padding the padding to be used.
@@ -424,7 +426,6 @@ public class Pap {
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Object#toString()
      */
     @Override

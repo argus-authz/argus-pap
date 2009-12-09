@@ -43,8 +43,9 @@ public class UpdatePolicy extends PolicyManagementCLI {
         PolicyType oldPolicy = xacmlPolicyMgmtClient.getPolicy(alias, id);
 
         policyWizard.setPolicyId(id);
-        policyWizard.increaseVersion();
+        policyWizard.setVersion(oldPolicy.getVersion());
 
+        // TODO: passing the version is no more needed, change the interface.
         boolean success = xacmlPolicyMgmtClient.updatePolicy(alias, oldPolicy.getVersion(), policyWizard.getXACML());
 
         if (!success) {
@@ -77,6 +78,7 @@ public class UpdatePolicy extends PolicyManagementCLI {
         policySet.setPolicySetId(id);
         policySet.setVersion(repositoryVersion);
 
+        // TODO: remove the repositoryVersion parameter from the interface, it's not needed anymore.
         xacmlPolicyMgmtClient.updatePolicySet(alias, repositoryVersion, policySet);
         
         TypeStringUtils.releaseUnneededMemory(policySetWizard);

@@ -41,20 +41,24 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
     public String[] addPolicies(String alias, int index, String policySetId, String[] policyIdPrefixArray,
             PolicyType[] policyArray) throws RemoteException {
+
         log.info(String.format("addPolicy(policySetId=\"%s\"\");", policySetId));
 
         try {
-            synchronized (ServicesUtils.highLevelOperationLock) {
 
-                return AddPoliciesOperation.instance(alias,
-                                                     index,
-                                                     policySetId,
-                                                     policyIdPrefixArray,
-                                                     policyArray).execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            String[] result = AddPoliciesOperation.instance(alias,
+                                                            index,
+                                                            policySetId,
+                                                            policyIdPrefixArray,
+                                                            policyArray).execute();
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -67,13 +71,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                                policyIdPrefix));
         try {
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                return AddPolicyOperation.instance(alias, index, policySetId, policyIdPrefix, policy)
-                                         .execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            String result = AddPolicyOperation.instance(alias, index, policySetId, policyIdPrefix, policy)
+                                              .execute();
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -83,11 +90,17 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         log.info(String.format("addPolicySet(policySetId=\"%s\");", policySet.getPolicySetId()));
 
         try {
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                return AddPolicySetOperation.instance(alias, index, policySet).execute();
-            }
+
+            ServicesUtils.beginTransaction();
+
+            String result = AddPolicySetOperation.instance(alias, index, policySet).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
+
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -101,16 +114,24 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
+            ServicesUtils.beginTransaction();
+
             Pap ps = PapManager.getInstance().getPap(alias);
 
+            PolicySetType result;
+
             if (ps.isLocal()) {
-                return GetLocalRootPolicySetOperation.instance(ps).execute();
+                result = GetLocalRootPolicySetOperation.instance(ps).execute();
             } else {
-                return GetRemoteRootPolicySetOperation.instance(ps).execute();
+                result = GetRemoteRootPolicySetOperation.instance(ps).execute();
             }
 
+            ServicesUtils.commitTransaction();
+
+            return result;
+
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -124,6 +145,8 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
+            ServicesUtils.beginTransaction();
+
             Pap ps = PapManager.getInstance().getPap(alias);
 
             PolicyType policy;
@@ -134,10 +157,12 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 policy = GetRemotePolicyOperation.instance(ps, policyId).execute();
             }
 
+            ServicesUtils.commitTransaction();
+
             return policy;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -151,6 +176,8 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
+            ServicesUtils.beginTransaction();
+
             Pap ps = PapManager.getInstance().getPap(alias);
 
             PolicySetType policySet;
@@ -160,10 +187,13 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
             } else {
                 policySet = GetRemotePolicySetOperation.instance(ps, policySetId).execute();
             }
+
+            ServicesUtils.commitTransaction();
+
             return policySet;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -176,18 +206,24 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
+            ServicesUtils.beginTransaction();
+
             Pap ps = PapManager.getInstance().getPap(alias);
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                if (ps.isLocal()) {
-                    return HasLocalPolicyOperation.instance(ps, policyId).execute();
-                } else {
-                    return HasRemotePolicyOperation.instance(ps, policyId).execute();
-                }
+            boolean result;
+
+            if (ps.isLocal()) {
+                result = HasLocalPolicyOperation.instance(ps, policyId).execute();
+            } else {
+                result = HasRemotePolicyOperation.instance(ps, policyId).execute();
             }
 
+            ServicesUtils.commitTransaction();
+
+            return result;
+
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -200,18 +236,24 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
+            ServicesUtils.beginTransaction();
+
             Pap ps = PapManager.getInstance().getPap(alias);
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                if (ps.isLocal()) {
-                    return HasLocalPolicySetOperation.instance(ps, policySetId).execute();
-                } else {
-                    return HasRemotePolicySetOperation.instance(ps, policySetId).execute();
-                }
+            boolean result;
+
+            if (ps.isLocal()) {
+                result = HasLocalPolicySetOperation.instance(ps, policySetId).execute();
+            } else {
+                result = HasRemotePolicySetOperation.instance(ps, policySetId).execute();
             }
 
+            ServicesUtils.commitTransaction();
+
+            return result;
+
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -225,18 +267,25 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
+            ServicesUtils.beginTransaction();
+
             Pap ps = PapManager.getInstance().getPap(alias);
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                if (ps.isLocal()) {
-                    return ListLocalPoliciesOperation.instance(ps).execute();
-                } else {
-                    return ListRemotePoliciesOperation.instance(ps).execute();
-                }
+            PolicyType[] result;
+
+            if (ps.isLocal()) {
+                result = ListLocalPoliciesOperation.instance(ps).execute();
+            } else {
+
+                result = ListRemotePoliciesOperation.instance(ps).execute();
             }
 
+            ServicesUtils.commitTransaction();
+
+            return result;
+
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -250,18 +299,24 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
                 alias = Pap.DEFAULT_PAP_ALIAS;
             }
 
+            ServicesUtils.beginTransaction();
+
             Pap ps = PapManager.getInstance().getPap(alias);
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                if (ps.isLocal()) {
-                    return ListLocalPolicySetOperation.instance(ps).execute();
-                } else {
-                    return ListRemotePolicySetOperation.instance(ps).execute();
-                }
+            PolicySetType[] result;
+
+            if (ps.isLocal()) {
+                result = ListLocalPolicySetOperation.instance(ps).execute();
+            } else {
+                result = ListRemotePolicySetOperation.instance(ps).execute();
             }
 
+            ServicesUtils.commitTransaction();
+
+            return result;
+
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -271,12 +326,14 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                MoveOperation.instance(alias, id, pivotId, moveAfter).execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            MoveOperation.instance(alias, id, pivotId, moveAfter).execute();
+
+            ServicesUtils.commitTransaction();
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -286,12 +343,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                return RemoveObjectByIdAndReferencesOperation.instance(alias, id).execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            boolean result = RemoveObjectByIdAndReferencesOperation.instance(alias, id).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -300,12 +361,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         log.info(String.format("removePolicy(\"%s\");", policyId));
         try {
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                return RemovePolicyOperation.instance(alias, policyId).execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            boolean result = RemovePolicyOperation.instance(alias, policyId).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -315,12 +380,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                return RemovePolicySetOperation.instance(alias, policySetId).execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            boolean result = RemovePolicySetOperation.instance(alias, policySetId).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -330,10 +399,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            return StorePolicyOperation.instance(alias, idPrefix, policy).execute();
+            ServicesUtils.beginTransaction();
+
+            String result = StorePolicyOperation.instance(alias, idPrefix, policy).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -344,10 +419,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            return StorePolicySetOperation.instance(alias, idPrefix, policySet).execute();
+            ServicesUtils.beginTransaction();
+
+            String result = StorePolicySetOperation.instance(alias, idPrefix, policySet).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -357,12 +438,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                return UpdatePolicyOperation.instance(alias, version, policy).execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            boolean result = UpdatePolicyOperation.instance(alias, version, policy).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }
@@ -375,12 +460,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
 
         try {
 
-            synchronized (ServicesUtils.highLevelOperationLock) {
-                return UpdatePolicySetOperation.instance(alias, version, policySet).execute();
-            }
+            ServicesUtils.beginTransaction();
+
+            boolean result = UpdatePolicySetOperation.instance(alias, version, policySet).execute();
+
+            ServicesUtils.commitTransaction();
+
+            return result;
 
         } catch (RuntimeException e) {
-            ServiceClassExceptionManager.log(log, e);
+            ServicesExceptionManager.logAndRollback(log, e);
             throw e;
         }
     }

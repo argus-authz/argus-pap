@@ -29,10 +29,11 @@ import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.papmanagement.PapManager;
+import org.glite.authz.pap.repository.PersistenceManager;
 import org.glite.authz.pap.repository.RepositoryManager;
-import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
-import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
-import org.glite.authz.pap.services.provisioning.exceptions.WrongFormatIssuerException;
+import org.glite.authz.pap.services.exceptions.MissingIssuerException;
+import org.glite.authz.pap.services.exceptions.VersionMismatchException;
+import org.glite.authz.pap.services.exceptions.WrongFormatIssuerException;
 import org.joda.time.DateTime;
 import org.opensaml.Configuration;
 import org.opensaml.common.SAMLVersion;
@@ -68,8 +69,15 @@ public class ServicesUtils {
 
     @SuppressWarnings("unused")
     private static Logger logger = LoggerFactory.getLogger(ServicesUtils.class);
-    public static final Object highLevelOperationLock = new Object();
 
+    public static void beginTransaction() {
+        PersistenceManager.getInstance().getCurrentSession().beginTransaction();
+    }
+    
+    public static void commitTransaction() {
+        PersistenceManager.getInstance().getCurrentSession().getTransaction().commit();
+    }
+    
     public static void checkQuery(XACMLPolicyQueryType query) throws VersionMismatchException,
             MissingIssuerException, WrongFormatIssuerException {
 

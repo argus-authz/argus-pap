@@ -8,7 +8,6 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
-import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
@@ -19,7 +18,6 @@ import org.opensaml.xacml.policy.PolicyType;
 
 /**
  * Authorized operation to fetch policies out of this pap when the caller is a PDP.
- * 
  */
 public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObject>> {
 
@@ -59,15 +57,15 @@ public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObjec
                 PolicySetType papPolicySetNoReferences;
 
                 if (papContainer.getPap().isLocal()) {
-                    synchronized (ServicesUtils.highLevelOperationLock) {
-                        papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
-                                                                            papContainer.getRootPolicySetId());
-                    }
+
+                    papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
+                                                                        papContainer.getRootPolicySetId());
+
                 } else {
-                    synchronized (DistributionModule.storePoliciesLock) {
-                        papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
-                                                                            papContainer.getRootPolicySetId());
-                    }
+
+                    papPolicySetNoReferences = getPolicySetNoReferences(papContainer,
+                                                                        papContainer.getRootPolicySetId());
+
                 }
 
                 PolicySetHelper.addPolicySet(rootPolicySet, papPolicySetNoReferences);
@@ -131,8 +129,7 @@ public class GetPoliciesForPDPOperation extends BasePAPOperation<List<XACMLObjec
 
     @Override
     /*
-     * * The required permission for this operation is:
-     * <code>POLICY_READ_LOCAL|POLICY_READ_REMOTE</code>
+     * * The required permission for this operation is: <code>POLICY_READ_LOCAL|POLICY_READ_REMOTE</code>
      */
     protected void setupPermissions() {
         addRequiredPermission(PAPPermission.of(PermissionFlags.POLICY_READ_LOCAL,

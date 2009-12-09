@@ -7,7 +7,7 @@ import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.XACMLPolicyManagementServiceException;
 
 public class RemovePolicySetOperation extends BasePAPOperation<Boolean> {
 

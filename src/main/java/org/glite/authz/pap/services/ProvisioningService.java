@@ -29,10 +29,10 @@ import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPAP
 import org.glite.authz.pap.authz.operations.policyprovisioning.GetPoliciesForPDPOperation;
 import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.repository.PersistenceManager;
+import org.glite.authz.pap.services.exceptions.MissingIssuerException;
+import org.glite.authz.pap.services.exceptions.VersionMismatchException;
+import org.glite.authz.pap.services.exceptions.WrongFormatIssuerException;
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
-import org.glite.authz.pap.services.provisioning.exceptions.MissingIssuerException;
-import org.glite.authz.pap.services.provisioning.exceptions.VersionMismatchException;
-import org.glite.authz.pap.services.provisioning.exceptions.WrongFormatIssuerException;
 import org.opensaml.saml2.common.Extensions;
 import org.opensaml.saml2.core.Response;
 import org.opensaml.xacml.XACMLObject;
@@ -68,17 +68,17 @@ public class ProvisioningService implements Provisioning {
 
                 } catch (VersionMismatchException e) {
 
-                    ServiceClassExceptionManager.logAndRollback(log, e);
+                    ServicesExceptionManager.logAndRollback(log, e);
                     return ServicesUtils.createResponse(query, e);
 
                 } catch (MissingIssuerException e) {
 
-                    ServiceClassExceptionManager.logAndRollback(log, e);
+                    ServicesExceptionManager.logAndRollback(log, e);
                     return ServicesUtils.createResponse(query, e);
 
                 } catch (WrongFormatIssuerException e) {
 
-                    ServiceClassExceptionManager.logAndRollback(log, e);
+                    ServicesExceptionManager.logAndRollback(log, e);
                     return ServicesUtils.createResponse(query, e);
 
                 }
@@ -113,7 +113,7 @@ public class ProvisioningService implements Provisioning {
                 return response;
 
             } catch (RuntimeException e) {
-                ServiceClassExceptionManager.logAndRollback(log, e);
+                ServicesExceptionManager.logAndRollback(log, e);
                 throw e;
             }
         }

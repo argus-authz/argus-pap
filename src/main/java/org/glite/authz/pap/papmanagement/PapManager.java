@@ -15,7 +15,6 @@ import org.glite.authz.pap.repository.dao.DAOFactory;
 import org.glite.authz.pap.repository.dao.PapDAO;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.glite.authz.pap.repository.exceptions.RepositoryException;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -263,10 +262,12 @@ public class PapManager {
      * @return <code>true</code> if a pap with the given alias exists, <code>false</code> otherwise.
      */
     public boolean exists(String papAlias) {
+        
         Transaction tx = persistenceManager.manageTransaction();
+        
         boolean exists = papDAO.exists(papAlias);
+        
         persistenceManager.commitManagedTransaction(tx);
-
         return exists;
     }
 
@@ -277,10 +278,12 @@ public class PapManager {
      * @return an <i>ordered</i> <code>List</code> of all the defined paps.
      */
     public List<Pap> getAllPaps() {
+        
         Transaction tx = persistenceManager.manageTransaction();
+        
         List<Pap> papList = getPapList();
+        
         persistenceManager.commitManagedTransaction(tx);
-
         return papList;
     }
 
@@ -314,10 +317,12 @@ public class PapManager {
      * @throws NotFoundException if a pap with the given alias was not found.
      */
     public Pap getPap(String papAlias) {
+        
         Transaction tx = persistenceManager.manageTransaction();
+        
         Pap pap = papDAO.get(papAlias);
+        
         persistenceManager.commitManagedTransaction(tx);
-
         return pap;
     }
 
@@ -360,7 +365,6 @@ public class PapManager {
         }
 
         persistenceManager.commitManagedTransaction(tx);
-
         return resultList;
     }
 
@@ -383,7 +387,6 @@ public class PapManager {
         }
 
         persistenceManager.commitManagedTransaction(tx);
-        
         return remotePapList;
     }
 
@@ -405,30 +408,24 @@ public class PapManager {
     /**
      * Update the information associated to a pap.
      * 
-     * @param newPap update the information of the pap with the same alias of the given one.
+     * @param pap update the information of the pap with the same alias of the given one.
      * @throws NotFoundException if a pap with the same alias of the given one was not found.
      * @throws PapManagerException if the given pap is <code>null</code>.
      */
-    public void updatePap(Pap newPap) {
+    public void updatePap(Pap pap) {
 
-        if (newPap == null) {
+        if (pap == null) {
             throw new PapManagerException("pap cannot be null");
         }
 
-        String alias = newPap.getAlias();
-        
         Transaction tx = persistenceManager.manageTransaction();
 
-        if (Pap.DEFAULT_PAP_ALIAS.equals(alias)) {
-            updateDefaultPap(newPap);
-            return;
+        if (pap.isDefaultPap()) {
+            // do not update distribution configuration
+        } else {
+            distributionConfiguration.savePap(pap);
         }
 
-        Pap pap = papDAO.get(alias);
-
-        pap.setAll(newPap);
-
-        distributionConfiguration.savePap(pap);
         papDAO.update(pap);
         
         persistenceManager.commitManagedTransaction(tx);
@@ -498,23 +495,5 @@ public class PapManager {
             papList.add(papDAO.get(alias));
         }
         return papList;
-    }
-
-    /**
-     * Updates the <i>default</i> pap.
-     * 
-     * @param newDefaultPap
-     */
-    private void updateDefaultPap(Pap newDefaultPap) {
-
-        if (!Pap.DEFAULT_PAP_ALIAS.equals(newDefaultPap.getAlias())) {
-            throw new RepositoryException("Invalid alias for default pap. Cannot perform updateDefaultPap request.");
-        }
-
-        Pap defaultPap = getPap(Pap.DEFAULT_PAP_ALIAS);
-
-        defaultPap.setAll(newDefaultPap);
-
-        papDAO.update(defaultPap);
     }
 }

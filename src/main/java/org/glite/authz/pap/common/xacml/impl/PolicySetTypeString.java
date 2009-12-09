@@ -59,10 +59,10 @@ public class PolicySetTypeString implements PolicySetType {
     @Column(name = "id")
     private String policySetId = null;
     
-    @Column(name = "policyset_string")
+    @Column(name = "policyset_string", nullable = false)
     private String policySetString = null;
     
-    @Column(name = "pap_id")
+    @Column(name = "pap_id", nullable = false)
     private String papId = null;
 
     

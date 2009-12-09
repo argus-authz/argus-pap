@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.glite.authz.pap.common.xacml.impl.PolicySetTypeString;
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.utils.XMLObjectHelper;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.repository.dao.PolicySetDAO;
 import org.glite.authz.pap.repository.dao.filesystem.FileSystemRepositoryManager;
 import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
-import org.hibernate.Transaction;
 import org.hibernate.exception.ConstraintViolationException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.slf4j.Logger;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * The value for <i>prefix</i> is: {@link FileSystemRepositoryManager#POLICYSET_FILENAME_PREFIX}.<br>
  * The value for <i>extension</i> is: {@link FileSystemRepositoryManager#XACML_FILENAME_EXTENSION}. <br>
  */
-public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO {
+public class PolicySetDAOHibernate extends GenericDAOHibernate implements PolicySetDAO {
 
     private static final Logger log = LoggerFactory.getLogger(PolicySetDAOHibernate.class);
 
@@ -49,33 +49,23 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
      */
     public void delete(String papId, String policySetId) {
 
-        Transaction tx = manageTransaction();
-
         PolicySetType policySet = getById(papId, policySetId);
 
-        if (policySet == null) {
-            throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
-        }
-
         getSession().delete(policySet);
-
-        commitManagedTransaction(tx);
     }
 
     /**
      * {@Inherited}
      */
     public void deleteAll(String papId) {
-
-        Transaction tx = manageTransaction();
+        
+        // TODO: change the name in deleteByPapId
 
         List<PolicySetType> policySetList = getAll(papId);
 
         for (PolicySetType policySet : policySetList) {
             getSession().delete(policySet);
         }
-
-        commitManagedTransaction(tx);
     }
 
     /**
@@ -85,7 +75,8 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         // TODO: remove papId input parameter
 
-        PolicySetTypeString policySet = (PolicySetTypeString) getSession().get(PolicySetTypeString.class, policySetId);
+        PolicySetTypeString policySet = (PolicySetTypeString) getSession().get(PolicySetTypeString.class,
+                                                                               policySetId);
 
         return !(policySet == null);
     }
@@ -99,8 +90,8 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
         // TODO: change the name in getByPapId
 
         List<PolicySetType> policySetList = getSession().createQuery("select p from PolicySetTypeString p where p.papId = :papId")
-                                                              .setParameter("papId", papId)
-                                                              .list();
+                                                        .setParameter("papId", papId)
+                                                        .list();
         return policySetList;
     }
 
@@ -111,7 +102,8 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         // TODO: remove papId input parameter
 
-        PolicySetTypeString policySet = (PolicySetTypeString) getSession().load(PolicySetTypeString.class, policySetId);
+        PolicySetTypeString policySet = (PolicySetTypeString) getSession().get(PolicySetTypeString.class,
+                                                                               policySetId);
 
         if (policySet == null) {
             throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
@@ -132,51 +124,32 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         String policySetId = policySetTypeString.getPolicySetId();
 
-        Transaction tx = manageTransaction();
-
         try {
 
-            getSession().persist(policySetTypeString);
+            getSession().save(policySetTypeString);
 
         } catch (ConstraintViolationException e) {
-            rollbakManagedTransaction(tx);
             throw new AlreadyExistsException("Already exists: policySetId=" + policySetId);
         }
-
-        commitManagedTransaction(tx);
 
         log.debug("Stored policy set: " + policySetId);
     }
 
-    public void update(String papId, String policySetVersion, PolicySetType newPolicySet) {
+    public void update(String papId, String version, PolicySetType policySet) {
 
-        PolicySetTypeString newPolicySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(newPolicySet);
-        TypeStringUtils.releaseUnneededMemory(newPolicySet);
-        
-        String policySetId = newPolicySetTypeString.getPolicySetId();
-        String newPolicySetVersion = newPolicySetTypeString.getVersion();
+        // TODO: remove version in punt parameter
 
+        PolicySetTypeString policySetTypeString = TypeStringUtils.cloneAsPolicySetTypeString(policySet);
+        TypeStringUtils.releaseUnneededMemory(policySet);
 
-        if (!policySetVersion.equals(newPolicySetVersion)) {
-            throw new InvalidVersionException(String.format("Invalide version of the policy set to be updated. PolicySetId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
-                                                            policySetId,
-                                                            policySetVersion,
-                                                            newPolicySetVersion));
-        }
-        
-        PolicySetWizard.increaseVersion(newPolicySetTypeString);
-        newPolicySetTypeString.setPapId(papId);
-        
-        TypeStringUtils.releaseUnneededMemory(newPolicySetTypeString);
+        String policySetId = policySetTypeString.getPolicySetId();
+        String policySetVersion = policySetTypeString.getVersion();
 
-        Transaction tx = manageTransaction();
+        PolicySetWizard.increaseVersion(policySetTypeString);
+
+        TypeStringUtils.releaseUnneededMemory(policySetTypeString);
 
         PolicySetTypeString repoPolicySet = (PolicySetTypeString) getById(papId, policySetId);
-
-        if (repoPolicySet == null) {
-            rollbakManagedTransaction(tx);
-            throw new NotFoundException(policySetNotFoundExceptionMsg(policySetId));
-        }
 
         if (!(repoPolicySet.getVersion().equals(policySetVersion))) {
             throw new InvalidVersionException(String.format("Attempting to update the wrong version of PolicySetId=\"%s\" (requestedVersion=\"%s\", repositoryVersion=\"%s\")",
@@ -187,12 +160,16 @@ public class PolicySetDAOHibernate extends GenericDAOJpa implements PolicySetDAO
 
         TypeStringUtils.releaseUnneededMemory(repoPolicySet);
 
-        if (repoPolicySet != newPolicySetTypeString) {
-            repoPolicySet.setPolicySetString(newPolicySetTypeString.getPolicySetId(), newPolicySetTypeString.getPolicySetString());
+        if (repoPolicySet != policySetTypeString) {
+            repoPolicySet.setPolicySetString(policySetTypeString.getPolicySetId(),
+                                             policySetTypeString.getPolicySetString());
         }
         
-        getSession().persist(repoPolicySet);
+        if (log.isTraceEnabled()) {
+            log.trace("Updating policy set with:\n" + XMLObjectHelper.toString(repoPolicySet));
+            TypeStringUtils.releaseUnneededMemory(repoPolicySet);
+        }
         
-        commitManagedTransaction(tx);
+        getSession().save(repoPolicySet);
     }
 }

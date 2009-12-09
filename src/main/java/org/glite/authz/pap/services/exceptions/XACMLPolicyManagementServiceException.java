@@ -1,4 +1,4 @@
-package org.glite.authz.pap.services;
+package org.glite.authz.pap.services.exceptions;
 
 public class XACMLPolicyManagementServiceException extends RuntimeException {
 

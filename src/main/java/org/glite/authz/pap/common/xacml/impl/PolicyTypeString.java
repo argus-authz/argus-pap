@@ -55,10 +55,10 @@ public class PolicyTypeString implements PolicyType {
     @Column(name = "id")
     private String policyId = null;
     
-    @Column(name = "policy_string")
+    @Column(name = "policy_string", nullable = false)
     private String policyString = null;
     
-    @Column(name = "pap_id")
+    @Column(name = "pap_id", nullable = false)
     private String papId;
     
     /**
@@ -239,7 +239,7 @@ public class PolicyTypeString implements PolicyType {
     public boolean isDOMLoaded() {
         return (policy != null);
     }
-
+    
     @SuppressWarnings("unchecked")
     public void registerValidator(Validator arg0) {
         initPolicyTypeIfNotSet();

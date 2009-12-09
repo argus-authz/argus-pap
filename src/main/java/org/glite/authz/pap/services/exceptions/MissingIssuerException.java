@@ -20,7 +20,7 @@
 
  **************************************************************************/
 
-package org.glite.authz.pap.services.provisioning.exceptions;
+package org.glite.authz.pap.services.exceptions;
 
 public class MissingIssuerException extends Exception {
 

@@ -6,7 +6,7 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.glite.authz.pap.services.HighLevelPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.HighLevelPolicyManagementServiceException;
 
 public class PurgeOperation extends BasePAPOperation<Object> {
 

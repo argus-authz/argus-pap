@@ -124,8 +124,7 @@ public class RepositoryUtils {
                     if (repair) {
                         log.info("Automatic repair is set. Action: " + action);
                         PolicySetHelper.deletePolicySetReference(rootPS, policySetId);
-                        String version = rootPS.getVersion();
-                        papContainer.updatePolicySet(version, rootPS);
+                        papContainer.updatePolicySet(rootPS);
                         papContainer.deletePolicySet(policySetId);
                         log.info("Automatic repair successfully completed (deleted policy set " + policySetId
                                 + ")");
@@ -150,8 +149,7 @@ public class RepositoryUtils {
                         if (repair) {
                             log.info("Automatic repair is set. Action: " + action);
                             PolicySetHelper.deletePolicyReference(policySet, policyId);
-                            String version = policySet.getVersion();
-                            papContainer.updatePolicySet(version, policySet);
+                            papContainer.updatePolicySet(policySet);
                             papContainer.deletePolicy(policyId);
                             log.info("Automatic repair successfully completed (deleted policy " + policyId
                                     + ")");
@@ -253,8 +251,7 @@ public class RepositoryUtils {
                 if (repair) {
                     log.info("Automatic repair is set. Action: " + action);
                     PolicySetHelper.deletePolicySetReference(policySet, id);
-                    String version = policySet.getVersion();
-                    papContainer.updatePolicySet(version, policySet);
+                    papContainer.updatePolicySet(policySet);
                     log.info("Automatic repair successfully completed for policy set " + policySetId);
                 } else {
                     result = false;

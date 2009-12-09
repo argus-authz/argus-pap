@@ -20,7 +20,7 @@
 
  **************************************************************************/
 
-package org.glite.authz.pap.services.provisioning.exceptions;
+package org.glite.authz.pap.services.exceptions;
 
 import org.opensaml.saml2.core.NameID;
 

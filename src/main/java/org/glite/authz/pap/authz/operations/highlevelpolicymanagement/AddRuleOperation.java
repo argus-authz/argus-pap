@@ -15,8 +15,8 @@ import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.RuleWizard;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.glite.authz.pap.services.HighLevelPolicyManagementServiceException;
-import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.HighLevelPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.EffectType;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -111,11 +111,9 @@ public class AddRuleOperation extends BasePAPOperation<String> {
 
         PolicyHelper.addRule(policy, index, ruleWizard.getXACML());
 
-        String version = policy.getVersion();
-
         TypeStringUtils.releaseUnneededMemory(policy);
 
-        papContainer.updatePolicy(version, policy);
+        papContainer.updatePolicy(policy);
 
         return ruleWizard.getRuleId();
     }
@@ -217,9 +215,7 @@ public class AddRuleOperation extends BasePAPOperation<String> {
 
         PolicySetHelper.addPolicySetReference(rootPolicySet, index, resourceId);
 
-        String version = rootPolicySet.getVersion();
-
-        papContainer.updatePolicySet(version, rootPolicySet);
+        papContainer.updatePolicySet(rootPolicySet);
 
         return resourceId;
     }
@@ -252,9 +248,7 @@ public class AddRuleOperation extends BasePAPOperation<String> {
         
         PolicySetHelper.addPolicyReference(resource, index, actionId);
         
-        String version = resource.getVersion();
-        
-        papContainer.updatePolicySet(version, resource);
+        papContainer.updatePolicySet(resource);
         
         return actionId;
     }

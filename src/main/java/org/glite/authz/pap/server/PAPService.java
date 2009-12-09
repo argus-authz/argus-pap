@@ -15,6 +15,7 @@ import org.glite.authz.pap.distribution.DistributionModule;
 import org.glite.authz.pap.monitoring.MonitoredProperties;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
+import org.glite.authz.pap.repository.PersistenceManager;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.RepositoryUtils;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
@@ -35,6 +36,8 @@ public final class PAPService {
                         .setMonitoringProperty(MonitoredProperties.SERVICE_STARTUP_TIME_PROP_NAME,
                                                ((new GregorianCalendar()).getTimeInMillis() / 1000));
 
+        PersistenceManager.getInstance().getCurrentSession().beginTransaction();
+        
         PapManager papManager = PapManager.getInstance();
 
         // Property: number of local policies
@@ -62,6 +65,9 @@ public final class PAPService {
         // Property: policy last modification time
         String policyLastModificationTimeString = papManager.getPap(Pap.DEFAULT_PAP_ALIAS)
                                                             .getPolicyLastModificationTimeInSecondsString();
+        
+        PersistenceManager.getInstance().getCurrentSession().getTransaction().commit();
+        
         PAPConfiguration.instance()
                         .setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
                                                policyLastModificationTimeString);

@@ -14,7 +14,7 @@ import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.TargetWizard;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.XACMLPolicyManagementServiceException;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.UnbanResult;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -99,8 +99,7 @@ public class UnbanOperation extends BasePAPOperation<UnbanResult> {
                 
             } else {
 
-                String oldVersion = policyWizard.getVersionString();
-                papContainer.updatePolicy(oldVersion, policyWizard.getXACML());
+                papContainer.updatePolicy(policyWizard.getXACML());
             }
 
             unbanResult.setStatusCode(0);

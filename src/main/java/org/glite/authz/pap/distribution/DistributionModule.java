@@ -10,6 +10,8 @@ import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
+import org.glite.authz.pap.repository.PersistenceManager;
+import org.glite.authz.pap.services.ServicesExceptionManager;
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -17,20 +19,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class implements the distribution module, that means running a thread which regularly polls
- * remote paps to fetch policies.
+ * This class implements the distribution module, that means running a thread which regularly polls remote paps to fetch
+ * policies.
  * <p>
- * Start the thread that polls remote paps by calling the
- * {@link DistributionModule#startDistributionModule()} method and stop it by calling the
- * {@link DistributionModule#stopDistributionModule()} method.
+ * Start the thread that polls remote paps by calling the {@link DistributionModule#startDistributionModule()} method
+ * and stop it by calling the {@link DistributionModule#stopDistributionModule()} method.
  * <p>
- * The {@link DistributionModule#refreshCache(Pap)} method can be used to force a refresh of the
- * remote paps cache asynchronously.
+ * The {@link DistributionModule#refreshCache(Pap)} method can be used to force a refresh of the remote paps cache
+ * asynchronously.
  */
 public class DistributionModule extends Thread {
-
-    /** lock used when the cache of a pap is refreshed. */
-    public static final Object storePoliciesLock = new Object();
 
     private static final Logger log = LoggerFactory.getLogger(DistributionModule.class);
     private static DistributionModule instance = null;
@@ -50,11 +48,10 @@ public class DistributionModule extends Thread {
     }
 
     /**
-     * Refreshes the policies of a pap, that means fetching the policies and storing them in the
-     * repository. If the given pap is not remote then nothing happens.
+     * Refreshes the policies of a pap, that means fetching the policies and storing them in the repository. If the
+     * given pap is not remote then nothing happens.
      * 
      * @param pap
-     * 
      * @throws RemoteException
      * @throws ServiceException
      */
@@ -65,16 +62,19 @@ public class DistributionModule extends Thread {
                                papPolicies.size(),
                                pap.getAlias(),
                                pap.getEndpoint()));
+        try {
         storePapPolicies(pap, papPolicies);
+        } catch (RuntimeException e) {
+            ServicesExceptionManager.logAndRollback(log, e);
+        }
     }
 
     /**
      * Fetches policies from a remote pap.
      * 
      * @param remotePap the remote pap to fetch policies from.
-     * @return the list of policy sets and policies of the pap. The first element is the root policy
-     *         set of the pap. Returns an empty list if the pap wasn't a remote pap.
-     * 
+     * @return the list of policy sets and policies of the pap. The first element is the root policy set of the pap.
+     *         Returns an empty list if the pap wasn't a remote pap.
      * @throws RemoteException
      * @throws ServiceException
      */
@@ -110,53 +110,49 @@ public class DistributionModule extends Thread {
         PapManager papManager = PapManager.getInstance();
         PapContainer papContainer = papManager.getPapContainer(pap.getAlias());
 
-        synchronized (storePoliciesLock) {
+        papContainer.deleteAllPolicies();
+        papContainer.deleteAllPolicySets();
 
-            papContainer.deleteAllPolicies();
-            papContainer.deleteAllPolicySets();
+        XACMLObject papRoot = papPolicies.get(0);
 
-            XACMLObject papRoot = papPolicies.get(0);
+        if (papRoot instanceof PolicySetType) {
 
-            if (papRoot instanceof PolicySetType) {
+            ((PolicySetType) papRoot).setPolicySetId(papContainer.getPap().getId());
 
-                ((PolicySetType) papRoot).setPolicySetId(papContainer.getPap().getId());
+            for (XACMLObject xacmlObject : papPolicies) {
 
-                for (XACMLObject xacmlObject : papPolicies) {
+                if (xacmlObject instanceof PolicySetType) {
+                    PolicySetType policySet = (PolicySetType) xacmlObject;
+                    papContainer.storePolicySet(policySet);
 
-                    if (xacmlObject instanceof PolicySetType) {
-                        PolicySetType policySet = (PolicySetType) xacmlObject;
-                        papContainer.storePolicySet(policySet);
+                    log.debug(String.format("Stored PolicySet \"%s\" into pap \"%s\"",
+                                            policySet.getPolicySetId(),
+                                            pap.getAlias()));
+                } else if (xacmlObject instanceof PolicyType) {
 
-                        log.debug(String.format("Stored PolicySet \"%s\" into pap \"%s\"",
-                                                policySet.getPolicySetId(),
-                                                pap.getAlias()));
-                    } else if (xacmlObject instanceof PolicyType) {
+                    PolicyType policy = (PolicyType) xacmlObject;
+                    papContainer.storePolicy(policy);
 
-                        PolicyType policy = (PolicyType) xacmlObject;
-                        papContainer.storePolicy(policy);
+                    log.debug(String.format("Stored Policy \"%s\" into pap \"%s\"",
+                                            policy.getPolicyId(),
+                                            pap.getAlias()));
+                } else {
 
-                        log.debug(String.format("Stored Policy \"%s\" into pap \"%s\"",
-                                                policy.getPolicyId(),
-                                                pap.getAlias()));
-                    } else {
-
-                        log.error(String.format("Invalid object (not a Policy or PolicySet) received from PAP %s (%s)",
-                                                pap.getAlias(),
-                                                pap.getEndpoint()));
-                    }
-                    TypeStringUtils.releaseUnneededMemory(xacmlObject);
+                    log.error(String.format("Invalid object (not a Policy or PolicySet) received from PAP %s (%s)",
+                                            pap.getAlias(),
+                                            pap.getEndpoint()));
                 }
-            } else {
-                log.error(String.format("The root of the policy tree is not a PolicySet (papAlias=%s, endpoint=%s)",
-                                        pap.getAlias(),
-                                        pap.getEndpoint()));
+                TypeStringUtils.releaseUnneededMemory(xacmlObject);
             }
+        } else {
+            log.error(String.format("The root of the policy tree is not a PolicySet (papAlias=%s, endpoint=%s)",
+                                    pap.getAlias(),
+                                    pap.getEndpoint()));
         }
     }
 
     /*
      * (non-Javadoc)
-     * 
      * @see java.lang.Thread#run()
      */
     public void run() {
@@ -173,17 +169,25 @@ public class DistributionModule extends Thread {
                             break;
 
                         try {
+                            
+                            PersistenceManager.getInstance().getCurrentSession().beginTransaction();
                             refreshCache(pap);
+                            PersistenceManager.getInstance().getCurrentSession().getTransaction().commit();
+                            
                         } catch (RemoteException e) {
+                            PersistenceManager.getInstance().getCurrentSession().getTransaction().rollback();
                             log.error(String.format("Error connecting to %s (%s): %s",
                                                     pap.getAlias(),
                                                     pap.getEndpoint(),
                                                     e.getMessage()));
                         } catch (ServiceException e) {
+                            PersistenceManager.getInstance().getCurrentSession().getTransaction().rollback();
                             log.error(String.format("Cannot connect to: %s (%s)",
                                                     pap.getAlias(),
                                                     pap.getEndpoint(),
                                                     e.getMessage()));
+                        } catch (RuntimeException e) {
+                            ServicesExceptionManager.logAndRollback(log, e);
                         }
                     }
 
@@ -191,7 +195,8 @@ public class DistributionModule extends Thread {
 
                     sleep(sleepTime);
                 }
-            } catch (InterruptedException e) {}
+            } catch (InterruptedException e) {
+            }
         }
     }
 
@@ -207,7 +212,7 @@ public class DistributionModule extends Thread {
     public void stopDistributionModule() {
 
         stayRunning = false;
-        
+
         this.interrupt();
 
         while (this.isAlive());

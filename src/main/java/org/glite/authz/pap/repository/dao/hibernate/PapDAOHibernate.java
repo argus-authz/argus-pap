@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
  * This DAO stores information about the paps and the version of the repository. These information are written in an INI
  * file.
  */
-public class PapDAOHibernate extends GenericDAOJpa implements PapDAO {
+public class PapDAOHibernate extends GenericDAOHibernate implements PapDAO {
 
     @SuppressWarnings("unused")
     private static final Logger log = LoggerFactory.getLogger(PapDAOHibernate.class);
@@ -132,11 +132,6 @@ public class PapDAOHibernate extends GenericDAOJpa implements PapDAO {
      * {@inheritDoc}
      */
     public void update(Pap pap) {
-
-        Pap persistedPap = get(pap.getAlias());
-
-        persistedPap.setAll(pap);
-
-        getSession().persist(persistedPap);
+        getSession().update(pap);
     }
 }

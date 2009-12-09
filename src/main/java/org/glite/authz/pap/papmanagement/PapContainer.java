@@ -1,9 +1,9 @@
 package org.glite.authz.pap.papmanagement;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -28,10 +28,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This class manages the content (the policies) of a <code>Pap</code>.
  * <p>
- * A pap has a root policy set which <i>id</i> is the same as the <i>pap id</i> (retrieved with
- * {@link Pap#getId()}). This policy set is the root of the tree of policies of the pap. There are
- * specific methods to create and retrieve this policy set (
- * {@link PapContainer#createRootPolicySet(), {@link PapContainer#getRootPolicySet()}).
+ * A pap has a root policy set which <i>id</i> is the same as the <i>pap id</i> (retrieved with {@link Pap#getId()}).
+ * This policy set is the root of the tree of policies of the pap. There are specific methods to create and retrieve
+ * this policy set ( {@link PapContainer#createRootPolicySet(), {@link PapContainer#getRootPolicySet()}).
  * 
  * @see PapManager
  * @see Pap
@@ -41,7 +40,7 @@ public class PapContainer {
 
     private static final Logger log = LoggerFactory.getLogger(PapContainer.class);
     private static final Object notificationLock = new Object();
-    
+
     private final Pap pap;
     private final String papId;
     private final PolicyDAO policyDAO;
@@ -81,16 +80,13 @@ public class PapContainer {
     /**
      * Adds a policy into a policy set.
      * 
-     * @param index position of the policy to added inside the list of policies already present in
-     *            the policy set.
+     * @param index position of the policy to added inside the list of policies already present in the policy set.
      * @param policySetId the policy set id.
      * @param policy the policy to be added.
-     * 
      * @throws NotFoundException if the policy set id was not found.
      * @throws AlreadyExistsException if there's already a policy with the same id of the given one.
-     * @throws InvalidVersionException if there was a concurrent modification of the policy set.
-     *             Getting this exception means that no policy has been added and the repository
-     *             hasn't been modified nor corrupted.
+     * @throws InvalidVersionException if there was a concurrent modification of the policy set. Getting this exception
+     *             means that no policy has been added and the repository hasn't been modified nor corrupted.
      */
     public void addPolicy(int index, String policySetId, PolicyType policy) {
 
@@ -106,7 +102,7 @@ public class PapContainer {
 
         TypeStringUtils.releaseUnneededMemory(policy);
 
-        PolicySetType policySet = policySetDAO.getById(papId, policySetId);
+        PolicySetType policySet = getPolicySet(policySetId);
 
         if (PolicySetHelper.referenceIdExists(policySet, policyId)) {
             throw new AlreadyExistsException("Reference id \"" + policyId + "\" alredy exists");
@@ -118,16 +114,9 @@ public class PapContainer {
             PolicySetHelper.addPolicyReference(policySet, index, policyId);
         }
 
-        String oldVersion = policySet.getVersion();
-
-        try {
-            policySetDAO.update(papId, oldVersion, policySet);
-        } catch (RepositoryException e) {
-            policyDAO.delete(papId, policyId);
-            throw e;
-        }
-
         TypeStringUtils.releaseUnneededMemory(policySet);
+
+        updatePolicySet(policySet);
 
         updatePapPolicyLastModificationTime();
 
@@ -139,10 +128,8 @@ public class PapContainer {
      * 
      * @param index
      * @param policySet
-     * 
-     * @throws InvalidVersionException if there was a concurrent modification of the root policy
-     *             set. Getting this exception means that no policy has been added and the
-     *             repository hasn't been modified nor corrupted.
+     * @throws InvalidVersionException if there was a concurrent modification of the root policy set. Getting this
+     *             exception means that no policy has been added and the repository hasn't been modified nor corrupted.
      */
     public void addPolicySet(int index, PolicySetType policySet) {
 
@@ -150,7 +137,7 @@ public class PapContainer {
 
         policySetDAO.store(papId, policySet);
 
-        PolicySetType rootPolicySet = policySetDAO.getById(papId, rootPolicySetId);
+        PolicySetType rootPolicySet = getPolicySet(rootPolicySetId);
 
         if (PolicySetHelper.referenceIdExists(rootPolicySet, policySetId)) {
             throw new AlreadyExistsException("Reference id \"" + policySetId + "\" alredy exists");
@@ -162,16 +149,9 @@ public class PapContainer {
             PolicySetHelper.addPolicySetReference(rootPolicySet, index, policySetId);
         }
 
-        String oldVersion = rootPolicySet.getVersion();
-
-        try {
-            policySetDAO.update(papId, oldVersion, rootPolicySet);
-        } catch (RepositoryException e) {
-            policySetDAO.delete(papId, policySetId);
-            throw e;
-        }
-
         TypeStringUtils.releaseUnneededMemory(rootPolicySet);
+        
+        updatePolicySet(rootPolicySet);
 
         updatePapPolicyLastModificationTime();
     }
@@ -198,7 +178,7 @@ public class PapContainer {
      */
     public void deleteAllPolicies() {
         // get the number of rules
-        List<PolicyType> policyList = policyDAO.getAll(papId);
+        List<PolicyType> policyList = getAllPolicies();
         int numberOfRules = 0;
         for (PolicyType policy : policyList) {
             numberOfRules += policy.getRules().size();
@@ -214,15 +194,16 @@ public class PapContainer {
     /**
      * Delete all the policy sets of the pap.
      * <p>
-     * Important: references of the deleted policy sets in policy sets (i.e. the root policy set)
-     * are not deleted. See method {@link PapContainer#removePolicySetAndReferences(String)}.
+     * Important: references of the deleted policy sets in policy sets (i.e. the root policy set) are not deleted. See
+     * method {@link PapContainer#removePolicySetAndReferences(String)}.
      */
     public void deleteAllPolicySets() {
         policySetDAO.deleteAll(papId);
     }
 
     public void deletePolicy(String id) throws NotFoundException, RepositoryException {
-        PolicyType policy = policyDAO.getById(papId, id);
+        
+        PolicyType policy = getPolicy(id);
 
         int numberOfRules = policy.getRules().size();
 
@@ -239,7 +220,6 @@ public class PapContainer {
      * {@link PapContainer#removePolicyAndReferences(String)}.
      * 
      * @param id policy id of the policy to be deleted.
-     * 
      * @throws NotFoundException if the given policy id was not found.
      */
     public void deletePolicySet(String id) throws NotFoundException, RepositoryException {
@@ -250,36 +230,45 @@ public class PapContainer {
      * Returns a List of all the policies of the pap.
      * 
      * @return a List of all the policies of the pap.
-     * 
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy file).
      */
     public List<PolicyType> getAllPolicies() {
-        return policyDAO.getAll(papId);
+        
+        List<PolicyType> policyList = new LinkedList<PolicyType>(); 
+        List<PolicyType> repoPolicyList = policyDAO.getAll(papId);
+        
+        for (PolicyType repoPolicy : repoPolicyList) {
+            policyList.add(TypeStringUtils.cloneAsPolicyTypeString(repoPolicy));
+        }
+        
+        return policyList;
     }
 
     /**
-     * Return a list of all the policy sets of the pap. The root policy set is the first element of
-     * the list.
+     * Return a list of all the policy sets of the pap. The root policy set is the first element of the list.
      * 
-     * @return a list of all the policy sets of the pap where thr first element is the root policy
-     *         set.
-     * 
+     * @return a list of all the policy sets of the pap where the first element is the root policy set.
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy file).
      */
     public List<PolicySetType> getAllPolicySets() {
-        List<PolicySetType> policySetList = policySetDAO.getAll(papId);
+        List<PolicySetType> repoPolicySetList = policySetDAO.getAll(papId);
+        List<PolicySetType> policySetList = new LinkedList<PolicySetType>();
+        
+        // Book the first position for the root policy set
+        policySetList.add(null);
 
         // place the root policy set as the first element
-        for (PolicySetType policySet : policySetList) {
+        for (PolicySetType repoPolicySet : repoPolicySetList) {
 
-            if (policySet.getPolicySetId().equals(rootPolicySetId)) {
+            PolicySetType policySet = TypeStringUtils.cloneAsPolicySetTypeString(repoPolicySet);
+            
+            if (rootPolicySetId.equals(policySet.getPolicySetId())) {
 
-                int rootPolicySetIndex = policySetList.indexOf(policySet);
-
-                if (rootPolicySetIndex != 0) {
-                    Collections.swap(policySetList, 0, rootPolicySetIndex);
-                }
-                break;
+                policySetList.set(0, policySet);
+                
+            } else {
+                
+                policySetList.add(policySet);
             }
         }
         return policySetList;
@@ -292,7 +281,7 @@ public class PapContainer {
      */
     public int getNumberOfPolicies() {
 
-        List<PolicyType> policyList = policyDAO.getAll(papId);
+        List<PolicyType> policyList = getAllPolicies();
 
         int numberOfRules = 0;
 
@@ -319,7 +308,7 @@ public class PapContainer {
      * @return the root policy set of this pap.
      */
     public PolicySetType getRootPolicySet() {
-        return policySetDAO.getById(papId, rootPolicySetId);
+        return TypeStringUtils.cloneAsPolicySetTypeString(policySetDAO.getById(papId, rootPolicySetId));
     }
 
     /**
@@ -336,12 +325,11 @@ public class PapContainer {
      * 
      * @param id policy id to search for.
      * @return the policy with the given <i>id</i>.
-     * 
      * @throws NotFoundException if no policy with the given id was found.
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy file).
      */
     public PolicyType getPolicy(String id) {
-        return policyDAO.getById(papId, id);
+        return TypeStringUtils.cloneAsPolicyTypeString(policyDAO.getById(papId, id));
     }
 
     /**
@@ -349,20 +337,18 @@ public class PapContainer {
      * 
      * @param id policy set id to search for.
      * @return the policy set with the given <i>id</i>.
-     * 
      * @throws NotFoundException if no policy set with the given id was found.
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy set file).
      */
     public PolicySetType getPolicySet(String id) {
-        return policySetDAO.getById(papId, id);
+        return TypeStringUtils.cloneAsPolicySetTypeString(policySetDAO.getById(papId, id));
     }
 
     /**
      * Checks for the existence of a policy with the given id.
      * 
      * @param id policy id to search for.
-     * @return <code>true</code> if a policy with the given id was found, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if a policy with the given id was found, <code>false</code> otherwise.
      */
     public boolean hasPolicy(String id) {
         return policyDAO.exists(papId, id);
@@ -372,8 +358,7 @@ public class PapContainer {
      * Checks for the existence of a policy set with the given id.
      * 
      * @param id policy set id to search for.
-     * @return <code>true</code> if a policy set with the given id was found, <code>false</code>
-     *         otherwise.
+     * @return <code>true</code> if a policy set with the given id was found, <code>false</code> otherwise.
      */
     public boolean hasPolicySet(String id) {
         return policySetDAO.exists(papId, id);
@@ -385,7 +370,7 @@ public class PapContainer {
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy file).
      */
     public void purgePoliciesWithNoRules() {
-        List<PolicyType> policyList = policyDAO.getAll(papId);
+        List<PolicyType> policyList = getAllPolicies();
         for (PolicyType policy : policyList) {
             if (policy.getRules().size() == 0) {
                 removePolicyAndReferences(policy.getPolicyId());
@@ -399,7 +384,7 @@ public class PapContainer {
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy file).
      */
     public void purgePolicySetWithNoPolicies() {
-        List<PolicySetType> policySetList = policySetDAO.getAll(papId);
+        List<PolicySetType> policySetList = getAllPolicySets();
         for (PolicySetType policySet : policySetList) {
 
             String policySetId = policySet.getPolicySetId();
@@ -415,14 +400,13 @@ public class PapContainer {
     }
 
     /**
-     * Delete all the policy sets found to be unreferenced (obviously the root policy set is not
-     * deleted).
+     * Delete all the policy sets found to be unreferenced (obviously the root policy set is not deleted).
      */
     public void purgeUnreferencedPolicySets() {
 
         Set<String> idSet = new HashSet<String>();
 
-        PolicySetType rootPS = policySetDAO.getById(papId, rootPolicySetId);
+        PolicySetType rootPS = getRootPolicySet();
 
         idSet.add(rootPS.getPolicySetId());
 
@@ -450,7 +434,7 @@ public class PapContainer {
 
         Set<String> idSet = new HashSet<String>();
 
-        for (PolicySetType policySet : policySetDAO.getAll(papId)) {
+        for (PolicySetType policySet : getAllPolicySets()) {
 
             List<String> idList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
 
@@ -475,11 +459,9 @@ public class PapContainer {
      * Delete a policy and all its references.
      * 
      * @param policyId the policy id of the policy to remove.
-     * 
      * @throws NotFoundException if no policy with the given id was found.
-     * @throws InvalidVersionException if there was a concurrent modification of the policy set.
-     *             Getting this exception means that no policy has been added and the repository
-     *             hasn't been modified nor corrupted.
+     * @throws InvalidVersionException if there was a concurrent modification of the policy set. Getting this exception
+     *             means that no policy has been added and the repository hasn't been modified nor corrupted.
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy file).
      */
     public void removePolicyAndReferences(String policyId) {
@@ -489,19 +471,19 @@ public class PapContainer {
         }
 
         boolean policyAlreadyRemoved = false;
-        
-        List<PolicySetType> policySetList = policySetDAO.getAll(papId);
+
+        List<PolicySetType> policySetList = getAllPolicySets();
 
         for (PolicySetType policySet : policySetList) {
 
             if (PolicySetHelper.deletePolicyReference(policySet, policyId)) {
 
                 if (policySet.getPolicyIdReferences().size() == 0) {
-                    
+
                     removePolicySetAndReferences(policySet.getPolicySetId());
-                    
+
                     policyAlreadyRemoved = true;
-                    
+
                 } else {
 
                     String oldVersion = policySet.getVersion();
@@ -512,12 +494,12 @@ public class PapContainer {
                 TypeStringUtils.releaseUnneededMemory(policySet);
             }
         }
-        
+
         if (policyAlreadyRemoved) {
             return;
         }
 
-        PolicyType policy = policyDAO.getById(papId, policyId);
+        PolicyType policy = getPolicy(policyId);
 
         int numberOfRules = policy.getRules().size();
 
@@ -531,11 +513,9 @@ public class PapContainer {
      * Delete a policy set and all its references.
      * 
      * @param policySetId the policy set id of the policy set to remove.
-     * 
      * @throws NotFoundException if no policy set with the given id was found.
-     * @throws InvalidVersionException if there was a concurrent modification of the root policy
-     *             set. Getting this exception means that no policy has been added and the
-     *             repository hasn't been modified nor corrupted.
+     * @throws InvalidVersionException if there was a concurrent modification of the root policy set. Getting this
+     *             exception means that no policy has been added and the repository hasn't been modified nor corrupted.
      * @throws RepositoryException if an error occurred (e.g. a corrupted policy set file).
      */
     public void removePolicySetAndReferences(String policySetId) {
@@ -544,7 +524,7 @@ public class PapContainer {
             throw new NotFoundException("PolicySetId \"" + policySetId + "\" does not exists");
         }
 
-        PolicySetType rootPolicySet = policySetDAO.getById(papId, rootPolicySetId);
+        PolicySetType rootPolicySet = getRootPolicySet();
 
         if (PolicySetHelper.deletePolicySetReference(rootPolicySet, policySetId)) {
 
@@ -555,7 +535,7 @@ public class PapContainer {
             TypeStringUtils.releaseUnneededMemory(rootPolicySet);
         }
 
-        PolicySetType policySet = policySetDAO.getById(papId, policySetId);
+        PolicySetType policySet = getPolicySet(policySetId);
         policySetDAO.delete(papId, policySetId);
 
         List<String> idList = PolicySetHelper.getPolicyIdReferencesValues(policySet);
@@ -564,7 +544,7 @@ public class PapContainer {
 
         for (String policyId : idList) {
 
-            PolicyType policy = policyDAO.getById(papId, policyId);
+            PolicyType policy = getPolicy(policyId);
             int numberOfRules = policy.getRules().size();
             TypeStringUtils.releaseUnneededMemory(policy);
 
@@ -579,7 +559,6 @@ public class PapContainer {
      * Store a policy.
      * 
      * @param policy the policy to be stored.
-     * 
      * @throws AlreadyExistsException if a policy with the same id was found.
      */
     public void storePolicy(PolicyType policy) {
@@ -597,7 +576,6 @@ public class PapContainer {
      * Store a policy set.
      * 
      * @param policySet the policy set to be stored.
-     * 
      * @throws AlreadyExistsException if a policy set with the same id was found.
      */
     public void storePolicySet(PolicySetType policySet) {
@@ -605,20 +583,24 @@ public class PapContainer {
     }
 
     /**
-     * Update a policy.
+     * Update a policy. The version of the policy must be the same as the one of the corresponding policy in the
+     * repository. Before updating the version is increased.
      * 
      * @param version version of the policy in the repository to be updated.
      * @param policy new policy replacing the one with the same id.
-     * 
      * @throws NotFoundException if a policy with the same id was not found.
-     * @throws InvalidVersionException if there was a concurrent modification of the policy. Getting
-     *             this exception means that no policy has been updated and the repository hasn't
-     *             been modified nor corrupted.
+     * @throws InvalidVersionException if there was a concurrent modification of the policy. Getting this exception
+     *             means that no policy has been updated and the repository hasn't been modified nor corrupted.
      */
-    public void updatePolicy(String version, PolicyType policy) {
-        PolicyType oldPolicy = policyDAO.getById(papId, policy.getPolicyId());
-        int numberOfRemovedRules = oldPolicy.getRules().size();
-        TypeStringUtils.releaseUnneededMemory(oldPolicy);
+    public void updatePolicy(PolicyType policy) {
+
+        String version = policy.getVersion();
+        TypeStringUtils.releaseUnneededMemory(policy);
+
+        PolicyType repoPolicy = getPolicy(policy.getPolicyId());
+
+        int numberOfRemovedRules = repoPolicy.getRules().size();
+        TypeStringUtils.releaseUnneededMemory(repoPolicy);
 
         int numberOfAddedRules = policy.getRules().size();
 
@@ -630,18 +612,22 @@ public class PapContainer {
     }
 
     /**
-     * Update a policy set.
+     * Update a policy set. The version of the policy set must be the same as the one of the corresponding policy set in
+     * the repository. Before updating the version is increased.
      * 
      * @param version version of the policy set in the repository to be updated.
-     * @param newPolicySet new policy set replacing the one with the same id.
-     * 
+     * @param policySet new policy set replacing the one with the same id.
      * @throws NotFoundException if a policy set with the same id was not found.
-     * @throws InvalidVersionException if there was a concurrent modification of the policy set.
-     *             Getting this exception means that no policy set has been updated and the
-     *             repository hasn't been modified nor corrupted.
+     * @throws InvalidVersionException if there was a concurrent modification of the policy set. Getting this exception
+     *             means that no policy set has been updated and the repository hasn't been modified nor corrupted.
      */
-    public void updatePolicySet(String version, PolicySetType newPolicySet) {
-        policySetDAO.update(papId, version, newPolicySet);
+    public void updatePolicySet(PolicySetType policySet) {
+        
+        String version = policySet.getVersion();
+        TypeStringUtils.releaseUnneededMemory(policySet);
+        
+        policySetDAO.update(papId, version, policySet);
+        
         updatePapPolicyLastModificationTime();
     }
 

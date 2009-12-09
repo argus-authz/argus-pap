@@ -4,7 +4,7 @@ import org.glite.authz.pap.repository.PersistenceManager;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
-public abstract class GenericDAOJpa {
+public abstract class GenericDAOHibernate {
 
     protected Session session = null;
 

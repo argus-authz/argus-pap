@@ -6,7 +6,7 @@ import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicySetType;
 
 public class UpdatePolicySetOperation extends BasePAPOperation<Boolean> {
@@ -44,7 +44,7 @@ public class UpdatePolicySetOperation extends BasePAPOperation<Boolean> {
             return false;
         }
 
-        papContainer.updatePolicySet(version, policySet);
+        papContainer.updatePolicySet(policySet);
 
         return true;
     }

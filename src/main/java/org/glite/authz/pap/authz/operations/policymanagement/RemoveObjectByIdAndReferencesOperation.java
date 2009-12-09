@@ -10,7 +10,7 @@ import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
-import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.policy.RuleType;
 
@@ -105,9 +105,8 @@ public class RemoveObjectByIdAndReferencesOperation extends BasePAPOperation<Boo
             papContainer.removePolicyAndReferences(targetPolicy.getPolicyId());
             
         } else {
-            String version = targetPolicy.getVersion();
 
-            papContainer.updatePolicy(version, targetPolicy);
+            papContainer.updatePolicy(targetPolicy);
         }
     }
 }

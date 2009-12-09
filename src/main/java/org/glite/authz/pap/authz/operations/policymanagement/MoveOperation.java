@@ -9,7 +9,7 @@ import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
-import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
+import org.glite.authz.pap.services.exceptions.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.policy.RuleType;
@@ -99,9 +99,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
         PolicySetHelper.addPolicySetReference(rootPAPPolicySet, pivotIndex, id);
 
-        String version = rootPAPPolicySet.getVersion();
-
-        papContainer.updatePolicySet(version, rootPAPPolicySet);
+        papContainer.updatePolicySet(rootPAPPolicySet);
     }
 
     private void movePolicy(PapContainer papContainer) {
@@ -137,9 +135,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
         PolicySetHelper.addPolicyReference(targetPolicySet, pivotIndex, id);
 
-        String version = targetPolicySet.getVersion();
-
-        papContainer.updatePolicySet(version, targetPolicySet);
+        papContainer.updatePolicySet(targetPolicySet);
     }
 
     private void moveRule(PapContainer papContainer) {
@@ -173,9 +169,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
 
         PolicyHelper.addRule(targetPolicy, pivotIndex, rule);
 
-        String version = targetPolicy.getVersion();
-
-        papContainer.updatePolicy(version, targetPolicy);
+        papContainer.updatePolicy(targetPolicy);
     }
 
     @Override

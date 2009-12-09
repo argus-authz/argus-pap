@@ -4,7 +4,7 @@ import org.glite.authz.pap.repository.PersistenceManager;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 
-public class ServiceClassExceptionManager {
+public class ServicesExceptionManager {
 	
 	public static void logAndThrow(Logger log, RuntimeException e) {
 	
