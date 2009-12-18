@@ -34,7 +34,7 @@ public class PAPManagementService implements PAPManagement {
             
             boolean result = AddPapOperation.instance(pap).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -52,7 +52,7 @@ public class PAPManagementService implements PAPManagement {
             
             boolean result = PapExistsOperation.instance(papAlias).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -71,7 +71,7 @@ public class PAPManagementService implements PAPManagement {
             
             Pap[] papArray = ListPapsOperation.instance().execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return papArray;
 
@@ -88,7 +88,7 @@ public class PAPManagementService implements PAPManagement {
             
             String[] result = GetOrderOperation.instance().execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -106,7 +106,7 @@ public class PAPManagementService implements PAPManagement {
             
             Pap result = GetPapOperation.instance(papAlias).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -124,7 +124,7 @@ public class PAPManagementService implements PAPManagement {
             
             float result = GetPollingIntervalOperation.instance().execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -147,7 +147,7 @@ public class PAPManagementService implements PAPManagement {
             
             boolean result = RefreshPolicyCacheOperation.instance(papAlias).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -165,7 +165,7 @@ public class PAPManagementService implements PAPManagement {
             
             boolean result = RemovePapOperation.instance(papAlias).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -183,7 +183,7 @@ public class PAPManagementService implements PAPManagement {
             
             SetEnabledOperation.instance(alias, enabled).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
 
         } catch (RuntimeException e) {
             ServicesExceptionManager.logAndRollback(log, e);
@@ -198,7 +198,7 @@ public class PAPManagementService implements PAPManagement {
             
             boolean result = SetOrderOperation.instance(aliasArray).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
@@ -233,7 +233,7 @@ public class PAPManagementService implements PAPManagement {
             
             boolean result = UpdatePapOperation.instance(pap).execute();
             
-            ServicesUtils.beginTransaction();
+            ServicesUtils.commitTransaction();
             
             return result;
 
