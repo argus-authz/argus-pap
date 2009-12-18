@@ -400,11 +400,12 @@ public class PolicyWizard extends XACMLWizard {
 
             if (ruleWizard.deniesAttribute(attributeWizard)) {
 
-                ruleWizardList.remove(i);
-
                 if (policy != null) {
-                    policy.getRules().remove(i);
+                    PolicyHelper.removeRule(policy, ruleWizard.getRuleId());
                 }
+
+                ruleWizardList.remove(i);
+                
                 return true;
             }
         }
