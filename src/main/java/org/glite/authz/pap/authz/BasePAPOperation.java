@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
  * Base operation implementing all the authorization steps and checks needed for
  * authorized management operations on the PAP.
  * 
- * Subclasses should implement the operation behaviour in the {@link #doExecute()}
+ * Subclasses should implement the operation behavior in the {@link #doExecute()}
  * method, that is called after all authorization checks have been done.
  * 
  * Required permission for operations should be defined by overriding the abstract

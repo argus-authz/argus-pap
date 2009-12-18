@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script sets up the environment tu run the pap client application.
+# This script sets up the environment to run the pap client application.
 # 
 set -e
 

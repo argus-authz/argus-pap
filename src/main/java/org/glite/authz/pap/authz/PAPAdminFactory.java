@@ -31,7 +31,7 @@ public class PAPAdminFactory {
     }
 
     /**
-     * Creates a new {@link X509Principal} admin starting from a string enconded X509 distinguished name (DN).
+     * Creates a new {@link X509Principal} admin starting from a string encoded X509 distinguished name (DN).
      * @param dn, the X509 certificate distinguished name
      * 
      * @return the {@link X509Principal} principal for the given dn
