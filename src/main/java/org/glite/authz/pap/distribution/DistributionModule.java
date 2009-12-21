@@ -165,7 +165,7 @@ public class DistributionModule extends Thread {
             try {
                 while (!this.isInterrupted()) {
 
-                    log.info("Starting refreshing cache process...");
+                    log.info("Starting refresh cache thread...");
 
                     for (Pap pap : PapManager.getInstance().getRemotePaps()) {
 
@@ -187,7 +187,7 @@ public class DistributionModule extends Thread {
                         }
                     }
 
-                    log.info("Refreshing cache process has finished");
+                    log.info("Refresh cache thread done.");
 
                     sleep(sleepTime);
                 }

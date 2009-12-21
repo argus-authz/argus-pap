@@ -13,6 +13,7 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.security.trustmanager.ContextWrapper;
 import org.mortbay.io.nio.SelectChannelEndPoint;
 import org.mortbay.io.nio.SelectorManager.SelectSet;
@@ -133,10 +134,10 @@ public class TrustManagerSelectChannelConnector extends
 
         SSLEngine engine = createSSLEngine();
         engine.setUseClientMode( false );
-
+                
         return new SslHttpChannelEndPoint( this, channel, selectSet, key,
-                engine );
-
+        			engine );
+        	
     }
 
 }
