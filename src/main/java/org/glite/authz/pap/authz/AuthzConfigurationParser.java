@@ -45,7 +45,7 @@ public final class AuthzConfigurationParser {
     public static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
     
     /** The regexp string used for matching X509 DNs in rfc 2253 format **/
-    public static final String rfc2253DnRegex = "^\"(([^=,]+=([^,]|\\s)+),?)+\"\\s*";
+    public static final String rfc2253DnRegex = "^\"([^\"]+)\"\\s*";
 
     /** The pattern object for matching X509 DNs **/
     public static final Pattern dnPattern = Pattern.compile( dnRegex );

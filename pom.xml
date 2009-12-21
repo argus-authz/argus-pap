@@ -317,7 +317,7 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-ext-jdk15</artifactId>
-      <version>1.40</version>
+      <version>1.43</version>
     </dependency>
 
     <dependency>
