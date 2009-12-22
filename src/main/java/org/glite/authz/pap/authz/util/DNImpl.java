@@ -19,15 +19,20 @@ package org.glite.authz.pap.authz.util;
 
 import java.security.Principal;
 
-import org.apache.log4j.Logger;
 import org.bouncycastle.asn1.DERObjectIdentifier;
 import org.bouncycastle.asn1.x509.X509Name;
 import org.bouncycastle.jce.X509Principal;
 import org.glite.security.util.DN;
 import org.glite.security.util.DNHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * DNImpl.java
+ * A replacement for buggy DNImpl in glite.security.util-java which doesn't comply to RFC2253
+ * for DN string formatting.
+ * 
+ * As soon as util-java is fixed, this class will be removed in favour of the util-java
+ * one.
  * 
  * @author Joni Hahkala
  *  
@@ -45,7 +50,7 @@ public class DNImpl implements DN {
 	public static final int CANON = 2;
 
 	/** Logging facility. */
-	private static final Logger LOGGER = Logger.getLogger(DNImpl.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(DNImpl.class);
 
 	/**
 	 * The DN in RFC2253 format. A cache to avoid generating the string multiple

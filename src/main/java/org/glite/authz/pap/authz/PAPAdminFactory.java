@@ -1,9 +1,8 @@
 package org.glite.authz.pap.authz;
 
 import org.bouncycastle.voms.VOMSAttribute.FQAN;
+import org.glite.authz.pap.authz.util.DNImpl;
 import org.glite.security.util.DN;
-import org.glite.security.util.DNHandler;
-import org.glite.security.util.DNImpl;
 
 /**
  * Creates {@link PAPAdmin} objects currently supported 
