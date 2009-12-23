@@ -33,7 +33,6 @@ public class ShutdownServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 		
-		
 		String papShutdownCommand  = PAPConfiguration.instance().getString(PAPConfiguration.STANDALONE_SERVICE_STANZA+".shutdown_command");
 		
 		if (papShutdownCommand == null){
@@ -47,7 +46,7 @@ public class ShutdownServlet extends HttpServlet {
 			if (shutdownCommand != null && shutdownCommand.equals(papShutdownCommand))
 				shutdownCommandThread.start();
 			else
-				logger.warn("Shutdown attempted with invalid command!");	
+				logger.warn("Shutdown attempted with invalid command string!");	
 			
 		}
 	}
