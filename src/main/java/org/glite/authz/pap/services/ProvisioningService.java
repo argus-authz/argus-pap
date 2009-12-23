@@ -62,13 +62,13 @@ public class ProvisioningService implements Provisioning {
                     ServicesUtils.checkQuery(query);
                 } catch (VersionMismatchException e) {
                     log.error(e.getMessage(), e);
-                    return ServicesUtils.createResponse(query, e);
+                    return ServicesUtils.createErrorResponse(query, e);
                 } catch (MissingIssuerException e) {
                     log.error(e.getMessage(), e);
-                    return ServicesUtils.createResponse(query, e);
+                    return ServicesUtils.createErrorResponse(query, e);
                 } catch (WrongFormatIssuerException e) {
                     log.error(e.getMessage(), e);
-                    return ServicesUtils.createResponse(query, e);
+                    return ServicesUtils.createErrorResponse(query, e);
                 }
 
                 /* get local policies */

@@ -1,5 +1,6 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
+import org.glite.authz.pap.authz.util.DNImpl;
 import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -9,186 +10,216 @@ import org.slf4j.LoggerFactory;
 
 public class AttributeWizard {
 
-    private static final Logger log = LoggerFactory.getLogger(AttributeWizard.class);
+	private static final Logger log = LoggerFactory
+			.getLogger(AttributeWizard.class);
 
-    private AttributeWizardType attributeWizardType;
-    private AttributeWizardTypeConfiguration attributeWizardTypeConfiguration = AttributeWizardTypeConfiguration.getInstance();
+	private static final String X509_SUBJECT_DATA_TYPE = "urn:oasis:names:tc:xacml:1.0:data-type:x500Name";
 
-    private String value;
+	private AttributeWizardType attributeWizardType;
+	private AttributeWizardTypeConfiguration attributeWizardTypeConfiguration = AttributeWizardTypeConfiguration
+			.getInstance();
 
-    public AttributeWizard(AttributeAssignmentType attributeAssignment) {
-        String xacmlId = attributeAssignment.getAttributeId();
-        try {
-            attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
-        } catch (UnsupportedAttributeException e) {
-            attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard(xacmlId,
-                                                                                                  attributeAssignment.getDataType());
-        }
-        this.value = attributeAssignment.getValue();
-    }
+	private String value;
 
-    public AttributeWizard(AttributeType attribute) {
-        String xacmlId = attribute.getAttributeID();
-        try {
-            attributeWizardType = attributeWizardTypeConfiguration.getByXACMLId(xacmlId);
-        } catch (UnsupportedAttributeException e) {
-            attributeWizardType = attributeWizardTypeConfiguration.getUnrecognizedAttributeWizard(xacmlId,
-                                                                                                  attribute.getDataType());
-        }
-        this.value = CtxAttributeTypeHelper.getFirstValue(attribute);
-    }
+	public AttributeWizard(AttributeAssignmentType attributeAssignment) {
+		String xacmlId = attributeAssignment.getAttributeId();
+		try {
+			attributeWizardType = attributeWizardTypeConfiguration
+					.getByXACMLId(xacmlId);
+		} catch (UnsupportedAttributeException e) {
+			attributeWizardType = attributeWizardTypeConfiguration
+					.getUnrecognizedAttributeWizard(xacmlId,
+							attributeAssignment.getDataType());
+		}
+		this.value = attributeAssignment.getValue();
+	}
 
-    public AttributeWizard(AttributeWizardType attributeWizardType, String value) {
-        this.attributeWizardType = attributeWizardType;
-        this.value = value;
-    }
+	public AttributeWizard(AttributeType attribute) {
+		String xacmlId = attribute.getAttributeID();
+		try {
+			attributeWizardType = attributeWizardTypeConfiguration
+					.getByXACMLId(xacmlId);
+		} catch (UnsupportedAttributeException e) {
+			attributeWizardType = attributeWizardTypeConfiguration
+					.getUnrecognizedAttributeWizard(xacmlId, attribute
+							.getDataType());
+		}
+		this.value = CtxAttributeTypeHelper.getFirstValue(attribute);
+	}
 
-    /**
-     * Constructor.
-     * 
-     * @param idEqualValue a string in the form "id=value".
-     * 
-     * @throws UnsupportedAttributeException if the id is not supported or the given string is not
-     *             in the right form.
-     */
-    public AttributeWizard(String idEqualValue) {
-        int index = idEqualValue.indexOf('=');
+	public AttributeWizard(AttributeWizardType attributeWizardType, String value) {
+		this.attributeWizardType = attributeWizardType;
 
-        if (index == -1) {
-            throw new UnsupportedAttributeException("invalid \"id=value\" string: " + idEqualValue);
-        }
+		setValue(value);
+	}
 
-        String id = idEqualValue.substring(0, index);
-        String value = idEqualValue.substring(index + 1);
+	/**
+	 * Constructor.
+	 * 
+	 * @param idEqualValue
+	 *            a string in the form "id=value".
+	 * 
+	 * @throws UnsupportedAttributeException
+	 *             if the id is not supported or the given string is not in the
+	 *             right form.
+	 */
+	public AttributeWizard(String idEqualValue) {
+		int index = idEqualValue.indexOf('=');
 
-        attributeWizardType = attributeWizardTypeConfiguration.getById(id);
+		if (index == -1) {
+			throw new UnsupportedAttributeException(
+					"invalid \"id=value\" string: " + idEqualValue);
+		}
 
-        if (attributeWizardType == null) {
-            throw new UnsupportedAttributeException("id=" + id);
-        }
+		String id = idEqualValue.substring(0, index);
+		String value = idEqualValue.substring(index + 1);
 
-        this.value = value;
-    }
+		attributeWizardType = attributeWizardTypeConfiguration.getById(id);
 
-    public AttributeWizard(String identifier, String value) {
+		if (attributeWizardType == null) {
+			throw new UnsupportedAttributeException("id=" + id);
+		}
 
-        attributeWizardType = attributeWizardTypeConfiguration.getById(identifier);
+		setValue(value);
+	}
 
-        if (attributeWizardType == null) {
-            throw new UnsupportedAttributeException("id=" + identifier);
-        }
+	public AttributeWizard(String identifier, String value) {
 
-        this.value = value;
-    }
+		attributeWizardType = attributeWizardTypeConfiguration
+				.getById(identifier);
 
-    public static boolean isActionAttribute(AttributeType attribute) {
-        String xacmlId = attribute.getAttributeID();
-        return AttributeWizardTypeConfiguration.getInstance()
-                                               .xacmlIdMatchesTargetElement(xacmlId,
-                                                                            AttributeWizardType.TargetElement.ACTION);
-    }
+		if (attributeWizardType == null) {
+			throw new UnsupportedAttributeException("id=" + identifier);
+		}
 
-    public static boolean isEnvironmentAttribute(AttributeType attribute) {
-        String xacmlId = attribute.getAttributeID();
-        return AttributeWizardTypeConfiguration.getInstance()
-                                               .xacmlIdMatchesTargetElement(xacmlId,
-                                                                            AttributeWizardType.TargetElement.ENVIRONMENT);
-    }
+		setValue(value);
+	}
 
-    public static boolean isResouceAttribute(AttributeType attribute) {
-        String xacmlId = attribute.getAttributeID();
-        return AttributeWizardTypeConfiguration.getInstance()
-                                               .xacmlIdMatchesTargetElement(xacmlId,
-                                                                            AttributeWizardType.TargetElement.RESOURCE);
-    }
+	public static boolean isActionAttribute(AttributeType attribute) {
+		String xacmlId = attribute.getAttributeID();
+		return AttributeWizardTypeConfiguration.getInstance()
+				.xacmlIdMatchesTargetElement(xacmlId,
+						AttributeWizardType.TargetElement.ACTION);
+	}
 
-    public static boolean isSubjectAttribute(AttributeType attribute) {
-        String xacmlId = attribute.getAttributeID();
-        return AttributeWizardTypeConfiguration.getInstance()
-                                               .xacmlIdMatchesTargetElement(xacmlId,
-                                                                            AttributeWizardType.TargetElement.SUBJECT);
-    }
+	public static boolean isEnvironmentAttribute(AttributeType attribute) {
+		String xacmlId = attribute.getAttributeID();
+		return AttributeWizardTypeConfiguration.getInstance()
+				.xacmlIdMatchesTargetElement(xacmlId,
+						AttributeWizardType.TargetElement.ENVIRONMENT);
+	}
 
-    public boolean equals(Object object) {
+	public static boolean isResouceAttribute(AttributeType attribute) {
+		String xacmlId = attribute.getAttributeID();
+		return AttributeWizardTypeConfiguration.getInstance()
+				.xacmlIdMatchesTargetElement(xacmlId,
+						AttributeWizardType.TargetElement.RESOURCE);
+	}
 
-        if (!(object instanceof AttributeWizard)) {
-            log.trace("equals(): false. Not an AttributeWizard: " + object.getClass().getName());
-            return false;
-        }
+	public static boolean isSubjectAttribute(AttributeType attribute) {
+		String xacmlId = attribute.getAttributeID();
+		return AttributeWizardTypeConfiguration.getInstance()
+				.xacmlIdMatchesTargetElement(xacmlId,
+						AttributeWizardType.TargetElement.SUBJECT);
+	}
 
-        AttributeWizard attributeWizard = (AttributeWizard) object;
+	public boolean equals(Object object) {
 
-        if (!(this.attributeWizardType.equals(attributeWizard.getAttributeWizardType()))) {
-            return false;
-        }
+		if (!(object instanceof AttributeWizard)) {
+			log.trace("equals(): false. Not an AttributeWizard: "
+					+ object.getClass().getName());
+			return false;
+		}
 
-        if (!(this.value.equals(attributeWizard.getValue()))) {
-            log.trace("equals(): false. value1=" + this.value + " value2=" + attributeWizard.getValue());
-            return false;
-        }
+		AttributeWizard attributeWizard = (AttributeWizard) object;
 
-        return true;
-    }
+		if (!(this.attributeWizardType.equals(attributeWizard
+				.getAttributeWizardType()))) {
+			return false;
+		}
 
-    public AttributeWizardType getAttributeWizardType() {
-        return attributeWizardType;
-    }
+		if (!(this.value.equals(attributeWizard.getValue()))) {
+			log.trace("equals(): false. value1=" + this.value + " value2="
+					+ attributeWizard.getValue());
+			return false;
+		}
 
-    public String getDataType() {
-        return attributeWizardType.getDataType();
-    }
+		return true;
+	}
 
-    public String getId() {
-        return attributeWizardType.getId();
-    }
+	public AttributeWizardType getAttributeWizardType() {
+		return attributeWizardType;
+	}
 
-    public String getMatchfunction() {
-        return attributeWizardType.getMatchFunction();
-    }
+	public String getDataType() {
+		return attributeWizardType.getDataType();
+	}
 
-    public AttributeWizardType.TargetElement getTargetElementType() {
-        return attributeWizardType.getTargetElement();
-    }
+	public String getId() {
+		return attributeWizardType.getId();
+	}
 
-    public String getValue() {
-        return value;
-    }
+	public String getMatchfunction() {
+		return attributeWizardType.getMatchFunction();
+	}
 
-    public AttributeType getXACML() {
-        return CtxAttributeTypeHelper.build(attributeWizardType.getXacmlId(),
-                                            attributeWizardType.getDataType(),
-                                            value);
-    }
+	public AttributeWizardType.TargetElement getTargetElementType() {
+		return attributeWizardType.getTargetElement();
+	}
 
-    public String getXacmlId() {
-        return attributeWizardType.getXacmlId();
-    }
+	public String getValue() {
+		return value;
+	}
 
-    public boolean isActionAttribute() {
-        if (AttributeWizardType.TargetElement.ACTION.equals(attributeWizardType.getTargetElement()))
-            return true;
-        return false;
-    }
+	public AttributeType getXACML() {
+		return CtxAttributeTypeHelper.build(attributeWizardType.getXacmlId(),
+				attributeWizardType.getDataType(), value);
+	}
 
-    public boolean isEnvironmentAttribute() {
-        if (AttributeWizardType.TargetElement.ENVIRONMENT.equals(attributeWizardType.getTargetElement()))
-            return true;
-        return false;
-    }
+	public String getXacmlId() {
+		return attributeWizardType.getXacmlId();
+	}
 
-    public boolean isResourceAttribute() {
-        if (AttributeWizardType.TargetElement.RESOURCE.equals(attributeWizardType.getTargetElement()))
-            return true;
-        return false;
-    }
+	public boolean isActionAttribute() {
+		if (AttributeWizardType.TargetElement.ACTION.equals(attributeWizardType
+				.getTargetElement()))
+			return true;
+		return false;
+	}
 
-    public boolean isSubjectAttribute() {
-        if (AttributeWizardType.TargetElement.SUBJECT.equals(attributeWizardType.getTargetElement()))
-            return true;
-        return false;
-    }
+	public boolean isEnvironmentAttribute() {
+		if (AttributeWizardType.TargetElement.ENVIRONMENT
+				.equals(attributeWizardType.getTargetElement()))
+			return true;
+		return false;
+	}
 
-    public String toFormattedString() {
-        return attributeWizardType.getId() + "=\"" + value + "\"";
-    }
+	public boolean isResourceAttribute() {
+		if (AttributeWizardType.TargetElement.RESOURCE
+				.equals(attributeWizardType.getTargetElement()))
+			return true;
+		return false;
+	}
+
+	public boolean isSubjectAttribute() {
+		if (AttributeWizardType.TargetElement.SUBJECT
+				.equals(attributeWizardType.getTargetElement()))
+			return true;
+		return false;
+	}
+
+	public String toFormattedString() {
+		return attributeWizardType.getId() + "=\"" + value + "\"";
+	}
+
+	private void setValue(String value) {
+
+		if (attributeWizardType.getDataType().equals(X509_SUBJECT_DATA_TYPE)) {
+
+			value = new DNImpl(value).getRFC2253();
+
+		}
+
+		this.value = value;
+	}
 }
