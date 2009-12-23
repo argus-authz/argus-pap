@@ -16,15 +16,9 @@
 
 package org.glite.authz.pap.server.standalone;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
@@ -66,11 +60,7 @@ public class JettyShutdownService {
         Context servletContext = new Context(shutdownService, "/", false, false);
         servletContext.setDisplayName("Shutdown Controller");
 
-        ServletHolder shutdownServlet = new ServletHolder(new HttpServlet() {
-            protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-                shutdownCommandThread.start();
-            }
-        });
+        ServletHolder shutdownServlet = new ServletHolder(new ShutdownServlet(shutdownCommandThread));
         servletContext.addServlet(shutdownServlet, "/shutdown");
 
         JettyRunThread shutdownServiceRunThread = new JettyRunThread(shutdownService);

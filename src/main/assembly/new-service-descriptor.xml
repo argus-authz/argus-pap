@@ -16,7 +16,7 @@
             <excludes>
               <exclude>logging/war/**</exclude>
             </excludes>
-            <fileMode>0644</fileMode>
+            <fileMode>0640</fileMode>
         </fileSet>
         
         <fileSet>

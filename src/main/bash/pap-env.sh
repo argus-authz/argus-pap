@@ -30,7 +30,7 @@ fi
 PAP_STANDALONE_CLASS="org.glite.authz.pap.server.standalone.PAPServer"
 
 # The name of the class the implements the PAP shutdown helper
-PAP_URL_TOUCHER_CLASS="org.glite.authz.pap.common.utils.URLToucher"
+PAP_SHUTDOWN_CLIENT_CLASS="org.glite.authz.pap.server.standalone.ShutdownClient"
 
 # The trustmanager jar files
 TM_DEPS=`ls -x $PAP_LIBS/trustmanager-*.jar $PAP_LIBS/util-java-*.jar $PAP_LIBS/bcprov-*.jar   | tr '\n' ':'`
@@ -75,7 +75,7 @@ PAP_CERT=`grep 'certificate =' $PAP_CONF_FILE  | awk '{print $3}'`
 PAP_KEY=`grep 'private_key =' $PAP_CONF_FILE | awk '{print $3}'`
 
 # The command used to shutdown the pap service
-PAP_SHUTDOWN_CMD="java -cp $PAP_STANDALONE_CP $PAP_URL_TOUCHER_CLASS http://localhost:$PAP_SHUTDOWN_PORT/shutdown"
+PAP_SHUTDOWN_CMD="java -DPAP_HOME=$PAP_HOME -cp $PAP_STANDALONE_CP $PAP_SHUTDOWN_CLIENT_CLASS"
 
 # Checks that openssl is installed in the system
 check_openssl(){
