@@ -210,7 +210,7 @@ public class ServicesUtils {
         
         PAPConfiguration conf = PAPConfiguration.instance();
         
-        String issuerValue = conf.getString(PAPConfiguration.STANDALONE_SERVICE_STANZA+".entityId", defaultEntityId);
+        String issuerValue = conf.getString(PAPConfiguration.STANDALONE_SERVICE_STANZA+".entity_id", defaultEntityId);
 
         issuer.setValue(issuerValue);
 
