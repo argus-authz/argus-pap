@@ -6,15 +6,28 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
 import org.glite.authz.pap.common.PAPConfiguration;
-
+/**
+ * This class implement the client that request the shutdown of the local PAP service.
+ *  
+ * @author andrea
+ *
+ */
 public class ShutdownClient {
 
+	/**
+	 * Prints the message of the exception passed as argument and exits
+	 * 
+	 * @param e, the exception to be printed
+	 */
 	static void printErrorMessageAndExit(Exception e) {
 
 		System.err.println("PAP shutdown error: " + e.getMessage());
 		System.exit(1);
 	}
 
+	/**
+	 * Triggers the shutdown of the local PAP service.
+	 */
 	static void doShutdown() {
 
 		PAPConfiguration conf = PAPConfiguration.instance();
@@ -48,6 +61,7 @@ public class ShutdownClient {
 
 	}
 
+	
 	public static void main(String[] args) {
 
 		// Switch off log4j logging
