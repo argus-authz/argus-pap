@@ -6,7 +6,6 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
 import org.glite.authz.pap.common.exceptions.NullArgumentException;
-import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.security.SecurityContext;
 import org.glite.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;

@@ -8,6 +8,12 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.exceptions.PAPException;
+import org.glite.security.trustmanager.ContextWrapper;
+import org.glite.security.trustmanager.UpdatingKeyManager;
+import org.glite.security.util.CaseInsensitiveProperties;
+import org.glite.voms.PKIStore;
+import org.glite.voms.VOMSTrustManager;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
 import org.mortbay.jetty.Server;
@@ -23,326 +29,409 @@ import org.slf4j.LoggerFactory;
  */
 public final class PAPServer {
 
-    /**
-     * 
-     * Useful defaults for the standalone service
-     *
-     */
-    final class PAPStandaloneServiceDefaults {
-        
-        /**
-         * The service hostname  
-         */
-        static final String HOSTNAME = "127.0.0.1";
+	/**
+	 * 
+	 * Useful defaults for the standalone service
+	 * 
+	 */
+	final class PAPStandaloneServiceDefaults {
 
-        /**
-         * The service port on which the pap will listen to request
-         */
-        static final int PORT = 8150;
+		/**
+		 * The service hostname
+		 */
+		static final String HOSTNAME = "127.0.0.1";
 
-        /**
-         * The shutdown service port
-         */
-        static final int SHUTDOWN_PORT = 8151;
+		/**
+		 * The service port on which the pap will listen to request
+		 */
+		static final int PORT = 8150;
 
-        /**
-         * Max request queue size. -1 means unbounded queue is used.
-         */
-        static final int MAX_REQUEST_QUEUE_SIZE = -1;
+		/**
+		 * The shutdown service port
+		 */
+		static final int SHUTDOWN_PORT = 8151;
 
-        /**
-         * Max concurrent connections.
-         */
-        static final int MAX_CONNECTIONS = 64;
-        
-        /**
-         * Default certificate path for the service
-         */
-        static final String CERTIFICATE_PATH = "/etc/grid-security/hostcert.pem";
-        
-        /**
-         * Default private key path for the service
-         */
-        static final String PRIVATE_KEY_PATH = "/etc/grid-security/hostkey.pem";
-        
-        /**
-         * Default path for CA certificates
-         */
-        static final String CA_PATH = "/etc/grid-security/certificates";
-        
-        /**
-         * Should CRLs be checked by trustmanager?
-         */
-        static final boolean CRL_ENABLED = true;
-        
-    } 
+		/**
+		 * Max request queue size. -1 means unbounded queue is used.
+		 */
+		static final int MAX_REQUEST_QUEUE_SIZE = -1;
 
-    private static final String DEFAULT_WAR_LOCATION = System.getProperty( "PAP_HOME" )
-        + "/wars/pap-standalone.war";
-    
-    private static final Logger log = LoggerFactory.getLogger( PAPServer.class );
-    
-    /**
-     * The option name used by callers to specify where the pap server should look for the configuration
-     */
-    private static final String CONF_DIR_OPTION_NAME = "conf-dir";
+		/**
+		 * Max concurrent connections.
+		 */
+		static final int MAX_CONNECTIONS = 64;
 
-    /**
-     * The pap configuration directory 
-     */
-    protected String papConfigurationDir;
-    
-    /**
-     * The pap jetty http server 
-     */
-    protected Server papServer;
+		/**
+		 * Default certificate path for the service
+		 */
+		static final String CERTIFICATE_PATH = "/etc/grid-security/hostcert.pem";
 
-    /**
-     * The jetty webapp context in which the pap wep application is configured
-     */
-    private WebAppContext webappContext;
+		/**
+		 * Default private key path for the service
+		 */
+		static final String PRIVATE_KEY_PATH = "/etc/grid-security/hostkey.pem";
 
-    /**
-     * Constructor.
-     * Parses the configuration and starts the server.
-     * 
-     * @param args. the command line arguments as passed by the {@link #main(String[])} method
-     */
-    public PAPServer( String[] args ) {
+		/**
+		 * Default path for CA certificates
+		 */
+		static final String CA_PATH = "/etc/grid-security/certificates";
 
-        try {
+		/**
+		 * Should CRLs be checked by trustmanager?
+		 */
+		static final boolean CRL_ENABLED = true;
 
-            parseOptions( args );
+	}
 
-            PAPConfiguration.initialize( papConfigurationDir);
+	private static final String DEFAULT_WAR_LOCATION = System
+			.getProperty("PAP_HOME")
+			+ "/wars/pap-standalone.war";
 
-            configurePAPServer();
+	private static final Logger log = LoggerFactory.getLogger(PAPServer.class);
 
-            papServer.start();
+	/**
+	 * The option name used by callers to specify where the pap server should
+	 * look for the configuration
+	 */
+	private static final String CONF_DIR_OPTION_NAME = "conf-dir";
 
-            if ( webappContext.getUnavailableException() != null )
-                throw webappContext.getUnavailableException();
+	/**
+	 * The pap configuration directory
+	 */
+	protected String papConfigurationDir;
 
-            papServer.join();
+	/**
+	 * The pap jetty http server
+	 */
+	protected Server papServer;
 
-        } catch ( Throwable e ) {
+	/**
+	 * The jetty webapp context in which the pap wep application is configured
+	 */
+	private WebAppContext webappContext;
 
-            log
-                    .error( "PAP encountered an error that could not be dealt with, shutting down!" );
-            
-            log.error( e.getMessage() );
-            
-            // Also print error message to standard error 
-            
-            System.err.println("PAP encountered an error that could not be dealt with, shutting down!");
-            System.err.println("Error: "+e.getMessage());
-            e.printStackTrace(System.err);
-            
-            if (log.isDebugEnabled()) 
-                log.error( e.getMessage(), e);
-            
+	/**
+	 * Constructor. Parses the configuration and starts the server.
+	 * 
+	 * @param args
+	 *            . the command line arguments as passed by the
+	 *            {@link #main(String[])} method
+	 */
+	public PAPServer(String[] args) {
 
-            try {
-                papServer.stop();
+		try {
 
-            } catch ( Exception e1 ) {
-                // Just ignore this
-            }
+			parseOptions(args);
 
-            System.exit( 1 );
-        }
+			PAPConfiguration.initialize(papConfigurationDir);
 
-    }
+			configurePAPServer();
 
-    /**
-     * Utility method to map pap configuration property names to glite-security-trustmanager property names
-     * @return the trustmanager properties
-     */
-    private Properties buildTrustmanagerConfiguration(){
-        
-        Properties tmProps = new Properties();
-        
-        tmProps.setProperty( "sslCertFile", getStringFromSecurityConfiguration( "certificate", PAPStandaloneServiceDefaults.CERTIFICATE_PATH ));
-        tmProps.setProperty( "sslKey" ,  getStringFromSecurityConfiguration( "private_key", PAPStandaloneServiceDefaults.PRIVATE_KEY_PATH ));
-        tmProps.setProperty( "crlEnabled", getStringFromSecurityConfiguration( "crl_enabled", String.valueOf(PAPStandaloneServiceDefaults.CRL_ENABLED)));
-        
-        return tmProps;
-        
-    }
+			papServer.start();
 
-    /**
-     * Performs the jetty server configuration
-     */
-    private void configurePAPServer() {
+			if (webappContext.getUnavailableException() != null)
+				throw webappContext.getUnavailableException();
 
-        log.info("Configuring jetty PAP server...");
-        
-        int port = getIntFromStandaloneConfiguration( "port", PAPStandaloneServiceDefaults.PORT );
-        
-        
-        papServer = new Server();
-        
-        int maxRequestQueueSize = getIntFromStandaloneConfiguration( "max_request_queue_size",
-                PAPStandaloneServiceDefaults.MAX_REQUEST_QUEUE_SIZE );
-        
-        log.debug("maxRequestQueueSize = {}", maxRequestQueueSize);
+			papServer.join();
 
-        int maxConnections = getIntFromStandaloneConfiguration( "max_connections",
-                PAPStandaloneServiceDefaults.MAX_CONNECTIONS );
-        
-        if (maxConnections <= 0){
-            log.error("Please specify a positive value for the 'maxConnections' configuration parameter!");
-            log.error( "Will use the hardcoded default '{}' instead...", PAPStandaloneServiceDefaults.MAX_CONNECTIONS );
-            maxConnections = PAPStandaloneServiceDefaults.MAX_CONNECTIONS;
-        }
-            
-        log.info("maxConnections = {}", maxConnections);
+		} catch (Throwable e) {
 
-        papServer.setSendServerVersion( false );
-        papServer.setSendDateHeader( false );
+			log
+					.error("PAP encountered an error that could not be dealt with, shutting down!");
 
-        BlockingQueue <Runnable> requestQueue;
+			log.error(e.getMessage());
 
-        if ( maxRequestQueueSize < 1 ) {
-            requestQueue = new LinkedBlockingQueue <Runnable>();
-        } else {
-            requestQueue = new ArrayBlockingQueue <Runnable>(
-                    maxRequestQueueSize );
-        }
+			// Also print error message to standard error
 
-        ThreadPool threadPool = new ThreadPool( 5, maxConnections, 60,
-                TimeUnit.SECONDS, requestQueue );
+			System.err
+					.println("PAP encountered an error that could not be dealt with, shutting down!");
+			System.err.println("Error: " + e.getMessage());
+			e.printStackTrace(System.err);
 
-        papServer.setThreadPool( threadPool );
+			if (log.isDebugEnabled())
+				log.error(e.getMessage(), e);
 
-        TrustManagerSelectChannelConnector connector = new TrustManagerSelectChannelConnector(
-                buildTrustmanagerConfiguration() );
+			try {
+				papServer.stop();
 
-        connector.setPort( port );
-        String host = getStringFromStandaloneConfiguration( "hostname", PAPStandaloneServiceDefaults.HOSTNAME );
-        
-        if (! host.equals( PAPStandaloneServiceDefaults.HOSTNAME ))
-            connector.setHost( host );
-        else
-        	// Will listen on any IP on the local machine
-        	connector.setHost("0.0.0.0");        	
-                
-        log.info( "PAP service will listen on {}:{}", new Object[]{host,port} );
-        papServer.setConnectors( new Connector[] { connector } );
+			} catch (Exception e1) {
+				// Just ignore this
+			}
 
-        JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
-                papServer );
+			System.exit(1);
+		}
 
-        JettyShutdownService.startJettyShutdownService( 8151, Collections
-                .singletonList( (Runnable) papShutdownCommand ) );
-        
-        
-        webappContext = new WebAppContext();
+	}
 
-        webappContext.setContextPath( "/"+PAPConfiguration.DEFAULT_WEBAPP_CONTEXT );
-        webappContext.setWar( DEFAULT_WAR_LOCATION );
-        webappContext.setParentLoaderPriority(true);
+	/**
+	 * Utility method to map pap configuration property names to
+	 * glite-security-trustmanager property names
+	 * 
+	 * @return the trustmanager properties
+	 */
+	private Properties buildTrustmanagerConfiguration() {
 
-        HandlerCollection handlers = new HandlerCollection();
-        handlers.setHandlers( new Handler[] { webappContext,
-                new DefaultHandler() } );
+		Properties tmProps = new Properties();
 
-        papServer.setHandler( handlers );
-        
-    }
+		tmProps.setProperty("sslCertFile", getStringFromSecurityConfiguration(
+				"certificate", PAPStandaloneServiceDefaults.CERTIFICATE_PATH));
+		tmProps.setProperty("sslKey", getStringFromSecurityConfiguration(
+				"private_key", PAPStandaloneServiceDefaults.PRIVATE_KEY_PATH));
+		tmProps.setProperty("crlEnabled", getStringFromSecurityConfiguration(
+				"crl_enabled", String
+						.valueOf(PAPStandaloneServiceDefaults.CRL_ENABLED)));
 
-    /**
-     * Utility method to fetch an int configuration parameter out of the standalone-service configuration
-     * 
-     * @param key, the configuration parameter key
-     * @param defaultValue, a default value in case the parameter is not defined
-     * @return the configuration parameter value
-     */
-    private int getIntFromStandaloneConfiguration( String key, int defaultValue ) {
+		return tmProps;
 
-        PAPConfiguration conf = PAPConfiguration.instance();
-        return conf.getInt( PAPConfiguration.STANDALONE_SERVICE_STANZA + "." + key, defaultValue );
-    }
-    
+	}
 
-    /**
-     * Utility method to fetch a string configuration parameter out of the security configuration
-     * 
-     * @param key, the configuration parameter key
-     * @param defaultValue, a default value in case the parameter is not defined
-     * @return the configuration parameter value
-     * 
-     */
-    private String getStringFromSecurityConfiguration(String key, String defaultValue){
-        
-        PAPConfiguration conf = PAPConfiguration.instance();
-        return conf.getString( PAPConfiguration.SECURITY_STANZA+"."+key, defaultValue);
-    }
+	
+	private Connector configureVOMSJettyConnector(){
+		
+		int port = getIntFromStandaloneConfiguration("port",
+				PAPStandaloneServiceDefaults.PORT);
+		String host = getStringFromStandaloneConfiguration("hostname",
+				PAPStandaloneServiceDefaults.HOSTNAME);
+		
+		String cert = getStringFromSecurityConfiguration(
+				"certificate", PAPStandaloneServiceDefaults.CERTIFICATE_PATH);
+		
+		String privateKey = getStringFromSecurityConfiguration(
+				"private_key", PAPStandaloneServiceDefaults.CERTIFICATE_PATH);
+		try {
+			
+			PKIStore store = new PKIStore(PAPStandaloneServiceDefaults.CA_PATH, PKIStore.TYPE_CADIR);
+			
+			// Refresh every 10 minutes
+			store.rescheduleRefresh(1000*60*10);
+			
+			VOMSTrustManager trustManager = new VOMSTrustManager(store);
+			
+			CaseInsensitiveProperties keystoreProps = new CaseInsensitiveProperties();
+			
+			keystoreProps.setProperty(ContextWrapper.CREDENTIALS_CERT_FILE, cert);
+	        keystoreProps.setProperty(ContextWrapper.CREDENTIALS_KEY_FILE, privateKey);
 
-    /**
-     * Utility method to fetch a string configuration parameter out of the security configuration
-     * 
-     * @param key, the configuration parameter key
-     * @param defaultValue, a default value in case the parameter is not defined
-     * @return the configuration parameter value
-     */
-    private String getStringFromStandaloneConfiguration( String key, String defaultValue){
-        
-        PAPConfiguration conf = PAPConfiguration.instance();
-        return conf.getString( PAPConfiguration.STANDALONE_SERVICE_STANZA + "." + key, defaultValue );
-        
-    }
+			UpdatingKeyManager keyManager = new UpdatingKeyManager(keystoreProps, null);
+			
+			JettySslSelectChannelConnector connector = new JettySslSelectChannelConnector(keyManager, trustManager); 
+			connector.setPort(port);
+			connector.setHost(host);
+		
+			connector.setWantClientAuth(true);
+			connector.setNeedClientAuth(true);
+			
+			log.info("PAP service will listen on {}:{}",
+					new Object[] { host, port });
+			
+			return connector;
+			
+		} catch (Exception e) {
+			log.error("Error configuring VOMS trust store: "+e.getMessage());
+			throw new PAPException(e);
+		}
+		
+		
+	}
+	/**
+	 * Configures the jetty connector.
+	 * 
+	 * @return
+	 */
+	private Connector configureJettyConnector() {
 
-    /**
-     * Parses command line options
-     * 
-     * @param args, the command line options
-     */
-    protected void parseOptions( String[] args ) {
+		int port = getIntFromStandaloneConfiguration("port",
+				PAPStandaloneServiceDefaults.PORT);
+		String host = getStringFromStandaloneConfiguration("hostname",
+				PAPStandaloneServiceDefaults.HOSTNAME);
 
-        if ( args.length > 0 ) {
+		TrustManagerSelectChannelConnector connector = new TrustManagerSelectChannelConnector(buildTrustmanagerConfiguration());
+		
+//		TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
+//				buildTrustmanagerConfiguration());
 
-            int currentArg = 0;
+		connector.setPort(port);
+		connector.setHost(host);
 
-            while ( currentArg < args.length ) {
+		log.info("PAP service will listen on {}:{}",
+				new Object[] { host, port });
+		return connector;
 
-                if ( !args[currentArg].startsWith( "--" ) ) {
-                    usage();
-                } else if ( args[currentArg].equalsIgnoreCase( "--"
-                        + CONF_DIR_OPTION_NAME ) ) {
-                    papConfigurationDir = args[currentArg + 1];
-                    log.info( "Starting PAP with configuration dir: {}",
-                            papConfigurationDir );
-                    currentArg = currentArg + 2;
-                    
-                }else
-                    usage();
+	}
 
-            }
+	/**
+	 * Performs the jetty server configuration
+	 */
+	private void configurePAPServer() {
 
-        }
-    }
+		log.info("Configuring jetty PAP server...");
 
-    /**
-     * Prints a usage message and exits with status 1
-     */
-    private void usage() {
+		papServer = new Server();
 
-        String usage = "PAPServer [--" + CONF_DIR_OPTION_NAME
-                + " <confDir>]";
+		int maxRequestQueueSize = getIntFromStandaloneConfiguration(
+				"max_request_queue_size",
+				PAPStandaloneServiceDefaults.MAX_REQUEST_QUEUE_SIZE);
 
-        System.out.println( usage );
-        System.exit( 1 );
-    }
+		log.debug("maxRequestQueueSize = {}", maxRequestQueueSize);
 
-    /**
-     * Runs the service
-     * @param args, the command line arguments
-     */
-    public static void main( String[] args ) {
+		int maxConnections = getIntFromStandaloneConfiguration(
+				"max_connections", PAPStandaloneServiceDefaults.MAX_CONNECTIONS);
 
-        new PAPServer( args );
+		if (maxConnections <= 0) {
+			log
+					.error("Please specify a positive value for the 'maxConnections' configuration parameter!");
+			log.error("Will use the hardcoded default '{}' instead...",
+					PAPStandaloneServiceDefaults.MAX_CONNECTIONS);
+			maxConnections = PAPStandaloneServiceDefaults.MAX_CONNECTIONS;
+		}
 
-    }
+		log.info("maxConnections = {}", maxConnections);
+
+		papServer.setSendServerVersion(false);
+		papServer.setSendDateHeader(false);
+
+		BlockingQueue<Runnable> requestQueue;
+
+		if (maxRequestQueueSize < 1) {
+			requestQueue = new LinkedBlockingQueue<Runnable>();
+		} else {
+			requestQueue = new ArrayBlockingQueue<Runnable>(maxRequestQueueSize);
+		}
+
+		ThreadPool threadPool = new ThreadPool(5, maxConnections, 60,
+				TimeUnit.SECONDS, requestQueue);
+
+		papServer.setThreadPool(threadPool);
+		papServer.setConnectors(new Connector[] { configureJettyConnector() });
+
+		JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
+				papServer);
+
+		JettyShutdownService.startJettyShutdownService(8151, Collections
+				.singletonList((Runnable) papShutdownCommand));
+
+		webappContext = new WebAppContext();
+
+		webappContext.setContextPath("/"
+				+ PAPConfiguration.DEFAULT_WEBAPP_CONTEXT);
+		webappContext.setWar(DEFAULT_WAR_LOCATION);
+		webappContext.setParentLoaderPriority(true);
+
+		HandlerCollection handlers = new HandlerCollection();
+		handlers.setHandlers(new Handler[] { webappContext,
+				new DefaultHandler() });
+
+		papServer.setHandler(handlers);
+
+	}
+
+	/**
+	 * Utility method to fetch an int configuration parameter out of the
+	 * standalone-service configuration
+	 * 
+	 * @param key
+	 *            , the configuration parameter key
+	 * @param defaultValue
+	 *            , a default value in case the parameter is not defined
+	 * @return the configuration parameter value
+	 */
+	private int getIntFromStandaloneConfiguration(String key, int defaultValue) {
+
+		PAPConfiguration conf = PAPConfiguration.instance();
+		return conf.getInt(PAPConfiguration.STANDALONE_SERVICE_STANZA + "."
+				+ key, defaultValue);
+	}
+
+	/**
+	 * Utility method to fetch a string configuration parameter out of the
+	 * security configuration
+	 * 
+	 * @param key
+	 *            , the configuration parameter key
+	 * @param defaultValue
+	 *            , a default value in case the parameter is not defined
+	 * @return the configuration parameter value
+	 * 
+	 */
+	private String getStringFromSecurityConfiguration(String key,
+			String defaultValue) {
+
+		PAPConfiguration conf = PAPConfiguration.instance();
+		return conf.getString(PAPConfiguration.SECURITY_STANZA + "." + key,
+				defaultValue);
+	}
+
+	/**
+	 * Utility method to fetch a string configuration parameter out of the
+	 * security configuration
+	 * 
+	 * @param key
+	 *            , the configuration parameter key
+	 * @param defaultValue
+	 *            , a default value in case the parameter is not defined
+	 * @return the configuration parameter value
+	 */
+	private String getStringFromStandaloneConfiguration(String key,
+			String defaultValue) {
+
+		PAPConfiguration conf = PAPConfiguration.instance();
+		return conf.getString(PAPConfiguration.STANDALONE_SERVICE_STANZA + "."
+				+ key, defaultValue);
+
+	}
+
+	/**
+	 * Parses command line options
+	 * 
+	 * @param args
+	 *            , the command line options
+	 */
+	protected void parseOptions(String[] args) {
+
+		if (args.length > 0) {
+
+			int currentArg = 0;
+
+			while (currentArg < args.length) {
+
+				if (!args[currentArg].startsWith("--")) {
+					usage();
+				} else if (args[currentArg].equalsIgnoreCase("--"
+						+ CONF_DIR_OPTION_NAME)) {
+					papConfigurationDir = args[currentArg + 1];
+					log.info("Starting PAP with configuration dir: {}",
+							papConfigurationDir);
+					currentArg = currentArg + 2;
+
+				} else
+					usage();
+
+			}
+
+		}
+	}
+
+	/**
+	 * Prints a usage message and exits with status 1
+	 */
+	private void usage() {
+
+		String usage = "PAPServer [--" + CONF_DIR_OPTION_NAME + " <confDir>]";
+
+		System.out.println(usage);
+		System.exit(1);
+	}
+
+	/**
+	 * Runs the service
+	 * 
+	 * @param args
+	 *            , the command line arguments
+	 */
+	public static void main(String[] args) {
+
+		new PAPServer(args);
+
+	}
 
 }

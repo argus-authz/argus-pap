@@ -13,7 +13,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLEngine;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.security.trustmanager.ContextWrapper;
 import org.mortbay.io.nio.SelectChannelEndPoint;
 import org.mortbay.io.nio.SelectorManager.SelectSet;
@@ -69,10 +68,8 @@ public class TrustManagerSelectChannelConnector extends
      * @throws Exception, if something goes wrong
      */
     protected void initializeSSLContext() throws Exception {
-
-        log
-                .debug( "TrustManagerSelectChannelConnector.initializeSSLContext():" );
-
+    	
+    	
         // Override clientAuth settings for trustmanager
         // The PAP authz system always need clientAuth on!
         props.setProperty( "clientAuth", "yes" );
@@ -94,39 +91,6 @@ public class TrustManagerSelectChannelConnector extends
         return context;
     }
 
-    @Override
-    protected SSLEngine createSSLEngine() throws IOException {
-
-        SSLEngine engine = context.createSSLEngine();
-
-        if ( getWantClientAuth() )
-            engine.setWantClientAuth( getWantClientAuth() );
-        else {
-            engine.setNeedClientAuth( getNeedClientAuth() );
-        }
-
-        if ( getExcludeCipherSuites() != null
-                && getExcludeCipherSuites().length > 0 ) {
-            List <String> excludedCSList = Arrays
-                    .asList( getExcludeCipherSuites() );
-            String[] enabledCipherSuites = engine.getEnabledCipherSuites();
-            List <String> enabledCSList = new ArrayList <String>( Arrays
-                    .asList( enabledCipherSuites ) );
-
-            for ( String cipherName : excludedCSList ) {
-                if ( enabledCSList.contains( cipherName ) ) {
-                    enabledCSList.remove( cipherName );
-                }
-            }
-            enabledCipherSuites = enabledCSList
-                    .toArray( new String[enabledCSList.size()] );
-
-            engine.setEnabledCipherSuites( enabledCipherSuites );
-        }
-
-        return engine;
-
-    }
 
     @Override
     protected SelectChannelEndPoint newEndPoint( SocketChannel channel,
