@@ -1,6 +1,7 @@
 package org.glite.authz.pap.common.xacml.wizard;
 
 import org.glite.authz.pap.authz.util.DNImpl;
+import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
 import org.opensaml.xacml.ctx.AttributeType;
@@ -216,7 +217,14 @@ public class AttributeWizard {
 
 		if (attributeWizardType.getDataType().equals(X509_SUBJECT_DATA_TYPE)) {
 
-			value = new DNImpl(value).getRFC2253();
+			try{
+				value = new DNImpl(value).getRFC2253();
+			
+			}catch(IllegalArgumentException e){
+				
+				throw new PAPException("The string passed as argument is not a valid certificate subject!", e);
+				
+			}
 
 		}
 

@@ -6,7 +6,7 @@ if [ -z $PAP_HOME ]; then
 	PAP_HOME="$(cd "${0%/*}/.." && pwd)"
 fi
 
-ENV_INI_FILE="$PAP_HOME/bin/pap-client-env.sh"
+ENV_INI_FILE="$PAP_HOME/lib/pap-client-env.sh"
 
 if [ -r $ENV_INI_FILE ]; then
 	. $ENV_INI_FILE

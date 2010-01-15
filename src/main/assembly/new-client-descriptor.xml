@@ -13,6 +13,7 @@
         <fileSet>
             <directory>src/main/config</directory>
             <outputDirectory>conf</outputDirectory>
+            <directoryMode>750</directoryMode>
             <includes>
               <include>logging/client/*</include>
               <include>attribute-mappings.ini</include>
@@ -35,7 +36,7 @@
         
     <file>
       <source>${basedir}/src/main/bash/pap-client-env.sh</source>
-      <outputDirectory>bin</outputDirectory>
+      <outputDirectory>lib</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     

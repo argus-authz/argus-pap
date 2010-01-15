@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.mortbay.log.Log;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -50,6 +51,8 @@ public class ShutdownServlet extends HttpServlet {
 			throws ServletException, IOException {
 		
 		String papShutdownCommand  = PAPConfiguration.instance().getString(PAPConfiguration.STANDALONE_SERVICE_STANZA+".shutdown_command");
+		
+		Log.info("Shutdown request received from {}.", req.getRemoteAddr());
 		
 		if (papShutdownCommand == null){
 			
