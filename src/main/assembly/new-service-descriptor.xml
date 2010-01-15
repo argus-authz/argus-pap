@@ -16,7 +16,8 @@
             <excludes>
               <exclude>logging/war/**</exclude>
             </excludes>
-            <fileMode>0644</fileMode>
+            <fileMode>0640</fileMode>
+            <directoryMode>0750</directoryMode>
         </fileSet>
         
         <fileSet>
@@ -48,6 +49,7 @@
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
+          <directoryMode>0750</directoryMode>
         </fileSet>
         
         <fileSet>
@@ -56,6 +58,31 @@
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
+        </fileSet>
+        
+        <fileSet>
+        	<directory>src</directory>
+        	<outputDirectory>sbin</outputDirectory>
+        	<excludes>
+            	<exclude>**/*</exclude>
+          	</excludes>
+          	<directoryMode>0750</directoryMode>
+        </fileSet>
+        <fileSet>
+        	<directory>src</directory>
+        	<outputDirectory>conf</outputDirectory>
+        	<excludes>
+            	<exclude>**/*</exclude>
+          	</excludes>
+          	<directoryMode>0750</directoryMode>
+        </fileSet>
+        <fileSet>
+        	<directory>src</directory>
+        	<outputDirectory>bin</outputDirectory>
+        	<excludes>
+            	<exclude>**/*</exclude>
+          	</excludes>
+          	<directoryMode>0755</directoryMode>
         </fileSet>
   </fileSets>
    
@@ -80,28 +107,28 @@
     
     <file>
       <source>${basedir}/src/main/python/pap-deploy.py</source>
-      <outputDirectory>bin</outputDirectory>
+      <outputDirectory>sbin</outputDirectory>
       <destName>pap-deploy</destName>
       <fileMode>0755</fileMode>
     </file>
         
     <file>
       <source>${basedir}/src/main/bash/pap-env.sh</source>
-      <outputDirectory>bin</outputDirectory>
+      <outputDirectory>lib</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
       <source>${basedir}/src/main/bash/pap-client-env.sh</source>
-      <outputDirectory>bin</outputDirectory>
+      <outputDirectory>lib</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
       <source>${basedir}/src/main/bash/pap-standalone.sh</source>
       <destName>pap-standalone</destName>
-      <outputDirectory>bin</outputDirectory>
-      <fileMode>0755</fileMode>
+      <outputDirectory>sbin</outputDirectory>
+      <fileMode>0750</fileMode>
     </file>
     
     <file>

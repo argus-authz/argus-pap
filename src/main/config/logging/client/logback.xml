@@ -3,7 +3,7 @@
 <configuration>
 
   <appender name="FILE" class="ch.qos.logback.core.FileAppender"> 
-    <File>./PAP_CLI.log</File>
+    <File>/tmp/pap-admin_u${effectiveUserId}.log</File>
     <Append>true</Append> 
     <layout class="ch.qos.logback.classic.PatternLayout">
       <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>

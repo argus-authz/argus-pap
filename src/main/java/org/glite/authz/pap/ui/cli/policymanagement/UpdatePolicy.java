@@ -21,7 +21,7 @@ import org.opensaml.xacml.policy.PolicyType;
 
 public class UpdatePolicy extends PolicyManagementCLI {
 
-    private static final String[] commandNameValues = { "update-policy-from-file", "up" };
+    private static final String[] commandNameValues = { "update-policy-from-file", "upf" };
     private static final String DESCRIPTION = "Update the resource/action identified by <id> with the new resource/action "
             + "defined in <file>.";
     private static final String USAGE = "[options] <id> <file>";

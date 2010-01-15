@@ -18,7 +18,7 @@ fi
 	
 PAP_RUN_FILE=$PAP_HOME/.pap-standalone.pid
 
-. $PAP_HOME/bin/pap-env.sh
+. $PAP_HOME/lib/pap-env.sh
 
 pre_checks(){
 	check_openssl

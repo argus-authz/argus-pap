@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
 
 /**
@@ -268,4 +269,5 @@ public class PAPPermission {
 
         return papPerm;
     }
+    
 }

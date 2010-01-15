@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Reader;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -42,9 +43,15 @@ public final class AuthzConfigurationParser {
 
     /** The regexp string for matching X509 DNs **/
     public static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
+    
+    /** The regexp string used for matching X509 DNs in rfc 2253 format **/
+    public static final String rfc2253DnRegex = "^\"([^\"]+)\"\\s*";
 
     /** The pattern object for matching X509 DNs **/
     public static final Pattern dnPattern = Pattern.compile( dnRegex );
+    
+    /** The pattern object for matching X509 DNs in rfc2253 format **/
+    public static final Pattern rfc2253DnPattern = Pattern.compile( rfc2253DnRegex );
 
     /** The regexp string for matching empty lines **/
     public static final String emptyLineRegex = "\\s*$";
@@ -150,7 +157,13 @@ public final class AuthzConfigurationParser {
 
             PAPPermission perm = PAPPermission.fromString( permissions );
 
-            Matcher dnMatcher = dnPattern.matcher( principalName );
+            Matcher dnMatcher; 
+            
+            if (principalName.startsWith("\"/"))
+            	dnMatcher = dnPattern.matcher( principalName );
+            else
+            	dnMatcher = rfc2253DnPattern.matcher(principalName);
+            
             Matcher anyUserMatcher = anyUserPattern.matcher( principalName );
 
             if ( anyUserMatcher.matches() ) {
@@ -210,9 +223,29 @@ public final class AuthzConfigurationParser {
      */
     public ACL parse( File f ) {
 
-        try {
+    	try {
+    		
+    		return parse(new FileReader(f));
 
-            BufferedReader reader = new BufferedReader( new FileReader( f ) );
+        } catch ( IOException e ) {
+
+            throw new PAPAuthzConfigurationException( e );
+        }
+
+    }
+
+    /**
+     * Parses authorization configuration out of text input stream and produces the corresponding
+     * ACL
+     * 
+     * @param r, the textual input stream containing the configuration information
+     * @return the corresponding {@link ACL} object
+     */
+    public ACL parse(Reader r) {
+    	
+    	try {
+
+            BufferedReader reader = new BufferedReader( r );
 
             String line = null;
             lineCounter = 0;
@@ -232,10 +265,9 @@ public final class AuthzConfigurationParser {
         } catch ( IOException e ) {
 
             throw new PAPAuthzConfigurationException( e );
-        }
-
+        }	
     }
-
+    
     /**
      * Saves in-memory ACL entries to a file
      * 

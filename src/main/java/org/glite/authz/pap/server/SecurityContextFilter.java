@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SecurityContextFilter implements Filter {
 
+	/** The logging facility for this class **/
     protected Logger logger = LoggerFactory
 	    .getLogger(SecurityContextFilter.class);
 

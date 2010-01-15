@@ -46,7 +46,7 @@ public class PathNamingScheme {
     public static final Logger log = LoggerFactory
 	    .getLogger(PathNamingScheme.class);
 
-    public static final String containerSyntax = "^(/[\\w.-]+)+|((/[\\w.-]+)+/)?(Role=[\\w.-]+)|(Capability=[\\w\\s.-]+)$";
+    public static final String containerSyntax = "^(/[\\w.-]+)+|((/[\\w.-]+)+/)?(Role=[\\w.-]+)(/Capability=[\\w.-]+)?$";
 
     public static final String groupSyntax = "^(/[\\w.-]+)+$";
 
@@ -54,7 +54,7 @@ public class PathNamingScheme {
 
     public static final String qualifiedRoleSyntax = "^(/[\\w.-]+)+/Role=[\\w.-]+$";
 
-    public static final String capabilitySyntax = "^Capability=[\\w\\s.-]+$";
+    public static final String capabilitySyntax = "^Capability=[\\w.-]+$";
 
     public static final Pattern containerPattern = Pattern
 	    .compile(containerSyntax);

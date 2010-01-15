@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 public class PAPConfiguration {
     
     /** Default directory prefix under which the authorization service apps are expected to live **/ 
-    private static final String DEFAULT_AUTHZ_PATH_PREFIX = "/opt/authz";
+    private static final String DEFAULT_AUTHZ_PATH_PREFIX = "/opt/argus";
     
     /** Default name for PAP home directory **/
     private static final String DEFAULT_PAP_HOMEDIR_NAME = "pap";
@@ -181,7 +181,7 @@ public class PAPConfiguration {
      */
     private void loadStartupConfiguration() {
 
-        logger.info( "Loading pap startup configuration..." );
+//        logger.info( "Loading pap startup configuration..." );
         String papConfDir = configuration.getString( "papConfigurationDir" );
 
         File papConfFile = new File( papConfDir + "/"

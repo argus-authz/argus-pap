@@ -32,6 +32,7 @@ public class URLToucher {
             URL url = new URL(urlString);
             URLConnection conn = url.openConnection();
                        
+            
             InputStream is = conn.getInputStream();
             
             do{

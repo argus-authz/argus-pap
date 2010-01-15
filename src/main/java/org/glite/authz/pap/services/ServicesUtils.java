@@ -98,16 +98,13 @@ public class ServicesUtils {
 
     }
 
-    public static Response createResponse(XACMLPolicyQueryType inResponseTo, Exception e) {
+    public static Response createErrorResponse(XACMLPolicyQueryType inResponseTo, Exception e) {
 
         // get a builder factory
         XMLObjectBuilderFactory builderFactory = Configuration.getBuilderFactory();
 
         /* prepare the response */
 
-        // TODO part of the response creation are repeated in the two create,
-        // share
-        // build a response object
         ResponseBuilder responseBuilder = (ResponseBuilder) builderFactory.getBuilder(Response.DEFAULT_ELEMENT_NAME);
         Response response = responseBuilder.buildObject();
 
@@ -133,7 +130,7 @@ public class ServicesUtils {
 
             statusCode.setValue(StatusCode.VERSION_MISMATCH_URI);
 
-        } else if (e instanceof MissingIssuerException | e instanceof WrongFormatIssuerException) {
+        } else if (e instanceof MissingIssuerException || e instanceof WrongFormatIssuerException) {
 
             // set the status code
 
@@ -204,13 +201,18 @@ public class ServicesUtils {
         IssuerBuilder issuerBuilder = (IssuerBuilder) builderFactory.getBuilder(Issuer.DEFAULT_ELEMENT_NAME);
         Issuer issuer = issuerBuilder.buildObject();
 
-        String endpoint = String.format("%s://%s:%s/%s/services/ProvisioningService",
-                                        request.getScheme(),
-                                        request.getServerName(),
-                                        request.getServerPort(),
-                                        PAPConfiguration.DEFAULT_WEBAPP_CONTEXT);
+        
+        String defaultEntityId = String.format("%s://%s:%s/%s/services/ProvisioningService",
+                request.getScheme(),
+                request.getServerName(),
+                request.getServerPort(),
+                PAPConfiguration.DEFAULT_WEBAPP_CONTEXT); 
+        
+        PAPConfiguration conf = PAPConfiguration.instance();
+        
+        String issuerValue = conf.getString(PAPConfiguration.STANDALONE_SERVICE_STANZA+".entity_id", defaultEntityId);
 
-        issuer.setValue(endpoint);
+        issuer.setValue(issuerValue);
 
         assertion.setIssuer(issuer);
 
