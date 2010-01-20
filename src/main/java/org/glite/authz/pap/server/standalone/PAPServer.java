@@ -1,5 +1,6 @@
 package org.glite.authz.pap.server.standalone;
 
+import java.security.Security;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -7,9 +8,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.X509KeyManager;
+import javax.net.ssl.X509TrustManager;
+
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.security.trustmanager.ContextWrapper;
+import org.glite.security.trustmanager.OpensslTrustmanager;
 import org.glite.security.trustmanager.UpdatingKeyManager;
 import org.glite.security.util.CaseInsensitiveProperties;
 import org.glite.voms.PKIStore;
@@ -29,6 +35,12 @@ import org.slf4j.LoggerFactory;
  */
 public final class PAPServer {
 
+	static {
+        if (Security.getProvider("BC") == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
+	
 	/**
 	 * 
 	 * Useful defaults for the standalone service
@@ -80,6 +92,28 @@ public final class PAPServer {
 		 * Should CRLs be checked by trustmanager?
 		 */
 		static final boolean CRL_ENABLED = true;
+		
+		/**
+		 * How frequently the PAP should update CRLs, CAs and namespaces from the filesystem.
+		 * The interval is defined as a string with the following format:
+		 * <code>N{s,m,h,d}</code> 
+		 * 
+		 * where N in the number of either (s=seconds, m=minutes, h=hours, d=days).
+		 * 
+		 * Example: 30m 
+		 * 
+		 * which means 30 minutes.
+		 *  
+		 * The default is 30 minutes.
+		 */
+		static final String CRL_UPDATE_INTERVAL = "30m";
+		
+		
+		/**
+		 * The directory containing all the CA certificates, CRLs and namespace definitions.
+		 */
+		static final String TRUST_STORE_DIR = "/etc/grid-security/certificates";
+		
 
 	}
 
@@ -180,41 +214,31 @@ public final class PAPServer {
 		tmProps.setProperty("crlEnabled", getStringFromSecurityConfiguration(
 				"crl_enabled", String
 						.valueOf(PAPStandaloneServiceDefaults.CRL_ENABLED)));
-
+		
+		tmProps.setProperty("crlUpdateInterval", getStringFromSecurityConfiguration("crl_update_interval", PAPStandaloneServiceDefaults.CRL_UPDATE_INTERVAL));
+		
+		tmProps.setProperty("trustStoreDir", getStringFromSecurityConfiguration("trust_store_dir", String
+				.valueOf(PAPStandaloneServiceDefaults.TRUST_STORE_DIR)));
+		
 		return tmProps;
 
 	}
 
-	
-	private Connector configureVOMSJettyConnector(){
+	private Connector configureTMConnector(){
 		
 		int port = getIntFromStandaloneConfiguration("port",
 				PAPStandaloneServiceDefaults.PORT);
 		String host = getStringFromStandaloneConfiguration("hostname",
 				PAPStandaloneServiceDefaults.HOSTNAME);
 		
-		String cert = getStringFromSecurityConfiguration(
-				"certificate", PAPStandaloneServiceDefaults.CERTIFICATE_PATH);
+		CaseInsensitiveProperties props = new CaseInsensitiveProperties(buildTrustmanagerConfiguration());
 		
-		String privateKey = getStringFromSecurityConfiguration(
-				"private_key", PAPStandaloneServiceDefaults.CERTIFICATE_PATH);
 		try {
 			
-			PKIStore store = new PKIStore(PAPStandaloneServiceDefaults.CA_PATH, PKIStore.TYPE_CADIR);
+			ContextWrapper context = new ContextWrapper(props);
 			
-			// Refresh every 10 minutes
-			store.rescheduleRefresh(1000*60*10);
+			JettySslSelectChannelConnector connector = new JettySslSelectChannelConnector(context.getKeyManager(),context.m_trustmanager);
 			
-			VOMSTrustManager trustManager = new VOMSTrustManager(store);
-			
-			CaseInsensitiveProperties keystoreProps = new CaseInsensitiveProperties();
-			
-			keystoreProps.setProperty(ContextWrapper.CREDENTIALS_CERT_FILE, cert);
-	        keystoreProps.setProperty(ContextWrapper.CREDENTIALS_KEY_FILE, privateKey);
-
-			UpdatingKeyManager keyManager = new UpdatingKeyManager(keystoreProps, null);
-			
-			JettySslSelectChannelConnector connector = new JettySslSelectChannelConnector(keyManager, trustManager); 
 			connector.setPort(port);
 			connector.setHost(host);
 		
@@ -226,37 +250,17 @@ public final class PAPServer {
 			
 			return connector;
 			
+		
 		} catch (Exception e) {
-			log.error("Error configuring VOMS trust store: "+e.getMessage());
+			
+			log.error("Error initializing trustmanager connector: "+e.getMessage());
+			if (log.isDebugEnabled())
+				log.error("Error initializing trustmanager connector: "+e.getMessage(),e);
+			
 			throw new PAPException(e);
 		}
 		
 		
-	}
-	/**
-	 * Configures the jetty connector.
-	 * 
-	 * @return
-	 */
-	private Connector configureJettyConnector() {
-
-		int port = getIntFromStandaloneConfiguration("port",
-				PAPStandaloneServiceDefaults.PORT);
-		String host = getStringFromStandaloneConfiguration("hostname",
-				PAPStandaloneServiceDefaults.HOSTNAME);
-
-		TrustManagerSelectChannelConnector connector = new TrustManagerSelectChannelConnector(buildTrustmanagerConfiguration());
-		
-//		TrustManagerSocketConnector connector = new TrustManagerSocketConnector(
-//				buildTrustmanagerConfiguration());
-
-		connector.setPort(port);
-		connector.setHost(host);
-
-		log.info("PAP service will listen on {}:{}",
-				new Object[] { host, port });
-		return connector;
-
 	}
 
 	/**
@@ -302,7 +306,7 @@ public final class PAPServer {
 				TimeUnit.SECONDS, requestQueue);
 
 		papServer.setThreadPool(threadPool);
-		papServer.setConnectors(new Connector[] { configureJettyConnector() });
+		papServer.setConnectors(new Connector[] { configureTMConnector() });
 
 		JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
 				papServer);
