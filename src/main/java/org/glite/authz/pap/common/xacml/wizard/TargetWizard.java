@@ -295,7 +295,9 @@ public class TargetWizard {
         for (AttributeWizard attributeWizard : targetAttributeWizardList) {
             if (attributeWizard.isSubjectAttribute()) {
                 subjectMatchTypeList.add(SubjectMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
-                                                                                attributeWizard.getMatchfunction()));
+                                                                                attributeWizard.getMatchfunction(),
+                                                                                attributeWizard.getMatchFunctionDataType()
+                                                                            	));
             }
         }
 
@@ -303,7 +305,10 @@ public class TargetWizard {
         for (AttributeWizard attributeWizard : targetAttributeWizardList) {
             if (attributeWizard.isResourceAttribute()) {
                 resourceMatchTypeList.add(ResourceMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
-                                                                                  attributeWizard.getMatchfunction()));
+                                                                                  attributeWizard.getMatchfunction(),
+                                                                                  attributeWizard.getMatchFunctionDataType()
+                                                                                  
+                ));
             }
         }
 
@@ -311,7 +316,9 @@ public class TargetWizard {
         for (AttributeWizard attributeWizard : targetAttributeWizardList) {
             if (attributeWizard.isActionAttribute()) {
                 actionMatchTypeList.add(ActionMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
-                                                                              attributeWizard.getMatchfunction()));
+                                                                              attributeWizard.getMatchfunction(),
+                                                                              attributeWizard.getMatchFunctionDataType()
+                                                                              ));
             }
         }
 
@@ -319,7 +326,8 @@ public class TargetWizard {
         for (AttributeWizard attributeWizard : targetAttributeWizardList) {
             if (attributeWizard.isEnvironmentAttribute()) {
                 environmentMatchTypeList.add(EnvironmentMatchHelper.buildWithDesignator(attributeWizard.getXACML(),
-                                                                                        attributeWizard.getMatchfunction()));
+                                                                                        attributeWizard.getMatchfunction(),
+                                                                                        attributeWizard.getMatchFunctionDataType()));
             }
         }
 

@@ -20,7 +20,7 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
         return (ResourceMatchType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
-    public static ResourceMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
+    public static ResourceMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId, String matchFunctionDatatype) {
 
         if (attribute == null) {
             return null;
@@ -31,7 +31,9 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
                 AttributeDesignatorType.RESOURCE_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
 
-        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute.getDataType(),
+        String attributeDataType =  (matchFunctionDatatype == null ?attribute.getDataType() : matchFunctionDatatype);
+        
+        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attributeDataType,
                 CtxAttributeTypeHelper.getFirstValue(attribute));
 
         resourceMatch.setResourceAttributeDesignator(designator);
@@ -41,12 +43,12 @@ public class ResourceMatchHelper extends XMLObjectHelper<ResourceMatchType> {
         return resourceMatch;
     }
 
-    public static List<ResourceMatchType> buildWithDesignator(List<AttributeType> attributeList, String matchFunctionId) {
+    public static List<ResourceMatchType> buildWithDesignator(List<AttributeType> attributeList, String matchFunctionId, String matchFunctionDatatype) {
 
         List<ResourceMatchType> resultList = new ArrayList<ResourceMatchType>(attributeList.size());
 
         for (AttributeType attribute : attributeList) {
-            resultList.add(buildWithDesignator(attribute, matchFunctionId));
+            resultList.add(buildWithDesignator(attribute, matchFunctionId, matchFunctionDatatype));
         }
 
         return resultList;

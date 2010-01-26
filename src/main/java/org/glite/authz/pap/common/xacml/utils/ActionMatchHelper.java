@@ -20,7 +20,7 @@ public class ActionMatchHelper extends XMLObjectHelper<ActionMatchType> {
         return (ActionMatchType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
-    public static ActionMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
+    public static ActionMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId, String matchFunctionDatatype) {
         
         if (attribute == null) {
             return null;
@@ -31,8 +31,9 @@ public class ActionMatchHelper extends XMLObjectHelper<ActionMatchType> {
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
                 AttributeDesignatorType.ACTION_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
         
-        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute
-                .getDataType(), CtxAttributeTypeHelper.getFirstValue(attribute));
+        String attributeDataType =  (matchFunctionDatatype == null ?attribute.getDataType() : matchFunctionDatatype);
+        
+        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attributeDataType, CtxAttributeTypeHelper.getFirstValue(attribute));
         
         actionMatch.setActionAttributeDesignator(designator);
         actionMatch.setAttributeValue(policyAttributeValue);
@@ -42,12 +43,12 @@ public class ActionMatchHelper extends XMLObjectHelper<ActionMatchType> {
     }
     
     public static List<ActionMatchType> buildWithDesignator(List<AttributeType> attributeList,
-            String matchFunctionId) {
+            String matchFunctionId, String matchFunctionDatatype) {
         
         List<ActionMatchType> resultList = new ArrayList<ActionMatchType>(attributeList.size());
         
         for (AttributeType attribute : attributeList) {
-            resultList.add(buildWithDesignator(attribute, matchFunctionId));
+            resultList.add(buildWithDesignator(attribute, matchFunctionId, matchFunctionDatatype));
         }
         
         return resultList;

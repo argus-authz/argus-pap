@@ -24,17 +24,17 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
         return (SubjectMatchType) Configuration.getBuilderFactory().getBuilder(elementQName).buildObject(elementQName);
     }
 
-    public static List<SubjectMatchType> buildListWithDesignator(List<AttributeType> attributeList, String matchFunctionId) {
+    public static List<SubjectMatchType> buildListWithDesignator(List<AttributeType> attributeList, String matchFunctionId, String matchFunctionDatatype) {
 
         List<SubjectMatchType> resultList = new ArrayList<SubjectMatchType>(attributeList.size());
 
         for (AttributeType attribute : attributeList) {
-            resultList.add(buildWithDesignator(attribute, matchFunctionId));
+            resultList.add(buildWithDesignator(attribute, matchFunctionId, matchFunctionDatatype));
         }
         return resultList;
     }
 
-    public static SubjectMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
+    public static SubjectMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId, String matchFunctionDatatype) {
 
         if (attribute == null) {
             return null;
@@ -45,7 +45,9 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
                 AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
 
-        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute.getDataType(),
+        String attributeDataType =  (matchFunctionDatatype == null ?attribute.getDataType() : matchFunctionDatatype);
+        
+        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attributeDataType,
                 CtxAttributeTypeHelper.getFirstValue(attribute));
 
         subjectMatch.setSubjectAttributeDesignator(designator);

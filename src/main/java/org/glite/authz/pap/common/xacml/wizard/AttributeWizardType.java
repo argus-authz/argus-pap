@@ -16,13 +16,16 @@ public class AttributeWizardType {
     private TargetElement targetElement;
     private String xacmlId;
     private String matchFunction;
+    
+    private String matchFunctionDataType;
 
-    public AttributeWizardType(String id, String xacmlId, String dataType, TargetElement category, String matchFunction) {
+    public AttributeWizardType(String id, String xacmlId, String dataType, TargetElement category, String matchFunction, String matchFunctionDataType) {
         this.id = id;
         this.xacmlId = xacmlId;
         this.dataType = dataType;
         this.targetElement = category;
         this.matchFunction = matchFunction;
+        this.matchFunctionDataType = matchFunctionDataType;
     }
 
     public String getDataType() {
@@ -45,7 +48,13 @@ public class AttributeWizardType {
         return xacmlId;
     }
 
-    public boolean equals(Object object) {
+    
+    public String getMatchFunctionDataType() {
+		return matchFunctionDataType;
+	}
+
+
+	public boolean equals(Object object) {
 
         if (!(object instanceof AttributeWizardType)) {
             log.trace("equals(): false. Not an AttributeWizardType: " + object.getClass().getName());

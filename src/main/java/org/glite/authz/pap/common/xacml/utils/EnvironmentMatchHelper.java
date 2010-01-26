@@ -20,7 +20,7 @@ public class EnvironmentMatchHelper extends XMLObjectHelper<EnvironmentMatchType
         return (EnvironmentMatchType) builderFactory.getBuilder(elementQName).buildObject(elementQName);
     }
 
-    public static EnvironmentMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId) {
+    public static EnvironmentMatchType buildWithDesignator(AttributeType attribute, String matchFunctionId, String matchFunctionDatatype) {
         
         if (attribute == null) {
             return null;
@@ -31,8 +31,10 @@ public class EnvironmentMatchHelper extends XMLObjectHelper<EnvironmentMatchType
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
                 AttributeDesignatorType.ACTION_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
         
-        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attribute
-                .getDataType(), CtxAttributeTypeHelper.getFirstValue(attribute));
+        String attributeDataType =  (matchFunctionDatatype == null ?attribute.getDataType() : matchFunctionDatatype);
+        
+        AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attributeDataType, 
+        		CtxAttributeTypeHelper.getFirstValue(attribute));
         
         environmentMatch.setEnvironmentAttributeDesignator(designator);
         environmentMatch.setAttributeValue(policyAttributeValue);
@@ -42,12 +44,12 @@ public class EnvironmentMatchHelper extends XMLObjectHelper<EnvironmentMatchType
     }
     
     public static List<EnvironmentMatchType> buildWithDesignator(List<AttributeType> attributeList,
-            String matchFunctionId) {
+            String matchFunctionId, String matchFunctionDatatype) {
         
         List<EnvironmentMatchType> resultList = new ArrayList<EnvironmentMatchType>(attributeList.size());
         
         for (AttributeType attribute : attributeList) {
-            resultList.add(buildWithDesignator(attribute, matchFunctionId));
+            resultList.add(buildWithDesignator(attribute, matchFunctionId, matchFunctionDatatype));
         }
         
         return resultList;

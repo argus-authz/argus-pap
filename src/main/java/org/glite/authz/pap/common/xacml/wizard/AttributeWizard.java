@@ -163,6 +163,12 @@ public class AttributeWizard {
 	public String getMatchfunction() {
 		return attributeWizardType.getMatchFunction();
 	}
+	
+	
+
+	public String getMatchFunctionDataType() {
+		return attributeWizardType.getMatchFunctionDataType();
+	}
 
 	public AttributeWizardType.TargetElement getTargetElementType() {
 		return attributeWizardType.getTargetElement();

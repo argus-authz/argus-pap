@@ -140,13 +140,17 @@ public class AttributeWizardTypeConfiguration {
                 throw new AttributeWizardTypeConfigurationException("Error: duplicated xacml-id \"" + xacmlId + "\" ("
                         + attributeMappingsFile.getAbsolutePath() + ")");
             }
+            
+            String xacmlMatchFunctionDataType = configuration.getString(xacmlMatchFunctionDataTypeKey(id)); 
 
-            log.info(String.format("Adding new AttributeWizardType: id=%s, xacml-id=%s, xacml-data-type=%s, xacml-target-element=%s, xacml-mach-function=%s",
+            
+            log.info(String.format("Adding new AttributeWizardType: id=%s, xacml-id=%s, xacml-data-type=%s, xacml-target-element=%s, xacml-match-function=%s, xacml-match-function-data-type=%s",
                                    id,
                                    xacmlId,
                                    xacmlDataType,
                                    xacmlTargetElement,
-                                   xacmlMatchFunction));
+                                   xacmlMatchFunction,
+                                   xacmlMatchFunctionDataType));
 
             AttributeWizardType.TargetElement targetElement;
 
@@ -163,7 +167,7 @@ public class AttributeWizardTypeConfiguration {
                         + "\" not recognized " + "(allowed values are: subject, resource, action and environment");
             }
 
-            list.add(new AttributeWizardType(id, xacmlId, xacmlDataType, targetElement, xacmlMatchFunction));
+            list.add(new AttributeWizardType(id, xacmlId, xacmlDataType, targetElement, xacmlMatchFunction, xacmlMatchFunctionDataType));
         }
     }
 
@@ -190,6 +194,9 @@ public class AttributeWizardTypeConfiguration {
         return baseKey(id) + ".xacml-match-function";
     }
 
+    private static String xacmlMatchFunctionDataTypeKey(String id){
+    	return baseKey(id) + ".xacml-match-function-datatype";
+    }
     private static String xacmlTargetElementKey(String id) {
         return baseKey(id) + ".xacml-target-element";
     }
@@ -260,7 +267,7 @@ public class AttributeWizardTypeConfiguration {
      * @return the <code>AttributeWizardType</code> identifying an unrecognized XACML attribute.
      */
     public AttributeWizardType getUnrecognizedAttributeWizard(String xacmlId, String dataType) {
-        return new AttributeWizardType(UNRECOGNIZED_ATTRIBUTE_ID, xacmlId, dataType, null, null);
+        return new AttributeWizardType(UNRECOGNIZED_ATTRIBUTE_ID, xacmlId, dataType, null, null,null);
     }
 
     /**
