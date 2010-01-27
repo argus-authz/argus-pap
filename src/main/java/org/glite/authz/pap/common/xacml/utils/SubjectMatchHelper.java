@@ -45,6 +45,7 @@ public class SubjectMatchHelper extends XMLObjectHelper<SubjectMatchType> {
         AttributeDesignatorType designator = AttributeDesignatorHelper.build(
                 AttributeDesignatorType.SUBJECT_ATTRIBUTE_DESIGNATOR_ELEMENT_NAME, attribute);
 
+        
         String attributeDataType =  (matchFunctionDatatype == null ?attribute.getDataType() : matchFunctionDatatype);
         
         AttributeValueType policyAttributeValue = PolicyAttributeValueHelper.build(attributeDataType,
