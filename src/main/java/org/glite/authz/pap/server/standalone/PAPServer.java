@@ -1,7 +1,11 @@
 package org.glite.authz.pap.server.standalone;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.security.Security;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -51,7 +55,7 @@ public final class PAPServer {
 		/**
 		 * The service hostname
 		 */
-		static final String HOSTNAME = "127.0.0.1";
+		static final String HOSTNAME = "localhost";
 
 		/**
 		 * The service port on which the pap will listen to request
@@ -228,8 +232,20 @@ public final class PAPServer {
 		
 		int port = getIntFromStandaloneConfiguration("port",
 				PAPStandaloneServiceDefaults.PORT);
+		
 		String host = getStringFromStandaloneConfiguration("hostname",
 				PAPStandaloneServiceDefaults.HOSTNAME);
+		
+		if (host.equals(PAPStandaloneServiceDefaults.HOSTNAME)||host.equals("127.0.0.1")||host.equals("::1")){
+			// Resolve local host name
+			try {
+				host = InetAddress.getLocalHost().getHostName();
+				log.warn("Resolving localhost to '{}', will bind to that.", host);
+			
+			} catch (UnknownHostException e) {
+				host = PAPStandaloneServiceDefaults.HOSTNAME;
+			}
+		}
 		
 		CaseInsensitiveProperties props = new CaseInsensitiveProperties(buildTrustmanagerConfiguration());
 		

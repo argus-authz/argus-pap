@@ -54,7 +54,7 @@ PAP_JAR="$PAP_HOME/lib/pap.jar"
 PAP_STANDALONE_CP="$PAP_DEPS:$PAP_HOME/conf/logging/standalone"
 
 # Environment for the pap standalone service
-PAP_STANDALONE_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS -Djava.net.preferIPv4Stack=true"
+PAP_STANDALONE_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS"
 
 # Command used to start the pap standalone service
 PAP_STANDALONE_CMD="java -Xmx$PAP_STANDALONE_MEM_SIZE $PAP_STANDALONE_VM_OPTIONS $PAP_STANDALONE_ENV -cp $PAP_STANDALONE_CP $PAP_STANDALONE_CLASS --conf-dir $PAP_HOME/conf"
