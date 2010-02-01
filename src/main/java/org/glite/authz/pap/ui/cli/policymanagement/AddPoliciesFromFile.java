@@ -302,7 +302,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
         }
 
         if (xacmlWizardList.isEmpty()) {
-            System.out.println("No policies defined in the give file");
+            System.out.println("No policies defined in the given file");
             return ExitStatus.FAILURE.ordinal();
         }
 
