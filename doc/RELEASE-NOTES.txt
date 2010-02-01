@@ -1,0 +1,9 @@
+PAP version 1.1.0-1
+
+Fixes for the following bugs:
+
+https://savannah.cern.ch/bugs/?59915
+https://savannah.cern.ch/bugs/?60042
+https://savannah.cern.ch/bugs/?60043
+https://savannah.cern.ch/bugs/?61077
+https://savannah.cern.ch/bugs/?60671
