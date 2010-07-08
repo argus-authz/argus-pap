@@ -355,6 +355,8 @@ public class PolicySetWizard extends XACMLWizard {
         }
 
         for (PolicyWizard policyWizard : policyWizardList) {
+        	
+        	
             sb.append('\n');
             sb.append(policyWizard.toFormattedString(baseIndentation + internalIndentation,
                                                      internalIndentation,

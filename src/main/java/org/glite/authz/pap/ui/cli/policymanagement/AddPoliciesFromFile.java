@@ -189,13 +189,13 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
             return false;
         }
 
-        PolicySetType targetolicySet = xacmlPolicyMgmtClient.getPolicySet(alias, resourceId);
+        PolicySetType targetPolicySet = xacmlPolicyMgmtClient.getPolicySet(alias, resourceId);
 
         int position = -1;
 
         if (pivotId != null) {
-            position = PolicySetHelper.getPolicyIdReferenceIndex(targetolicySet, pivotId);
-            TypeStringUtils.releaseUnneededMemory(targetolicySet);
+            position = PolicySetHelper.getPolicyIdReferenceIndex(targetPolicySet, pivotId);
+            TypeStringUtils.releaseUnneededMemory(targetPolicySet);
             if (position == -1) {
                 System.out.println("id \"" + pivotId
                         + "\" not found inside resource the given resource (id = \"" + resourceId + "\").");
@@ -319,7 +319,7 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
         }
 
         if (xacmlWizardList.isEmpty()) {
-            System.out.println("No policies defined in the give file");
+            System.out.println("No policies defined in the given file");
             return ExitStatus.FAILURE.ordinal();
         }
 

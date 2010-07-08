@@ -1,3 +1,22 @@
+PAP version 1.2.0
+
+Fixes for the following bugs:
+
+https://savannah.cern.ch/bugs/?60044
+https://savannah.cern.ch/bugs/?63180
+https://savannah.cern.ch/bugs/?65802
+https://savannah.cern.ch/bugs/?66669
+https://savannah.cern.ch/bugs/?68595
+https://savannah.cern.ch/bugs/?68599
+
+New features:
+
+* The pap-admin CLI now implements the obligation management commands 'add-obligation' and 'remove-obligation'.
+  These commands can be used to add/remove obligations to/from existing policies.
+  
+* The pap-admin CLI add-policy command now supports the creation of policy containing obligations at resource or action scope. 
+
+
 PAP version 1.1.0-1
 
 Fixes for the following bugs:
@@ -7,3 +26,4 @@ https://savannah.cern.ch/bugs/?60042
 https://savannah.cern.ch/bugs/?60043
 https://savannah.cern.ch/bugs/?61077
 https://savannah.cern.ch/bugs/?60671
+

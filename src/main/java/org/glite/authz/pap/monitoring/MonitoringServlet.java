@@ -43,7 +43,7 @@ public class MonitoringServlet extends HttpServlet {
     
         MonitoredProperties props = MonitoredProperties.instance();
         resp.getWriter().print(props.toString());       
-        resp.setStatus( 200 );
+        resp.setStatus( HttpServletResponse.SC_OK );
     }
 
 }

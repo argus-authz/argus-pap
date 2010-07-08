@@ -17,22 +17,36 @@
 
 package test.authz;
 
-import org.glite.authz.pap.authz.util.DNImpl;
-
 import junit.framework.TestCase;
+
+import org.glite.security.util.DN;
+import org.glite.security.util.DNHandler;
 
 public class DnTest extends TestCase {
 
 	
 	public static final String OPENSSL_ENCODED_DN = "/C=IT/O=INFN/OU=Personal Certificate/L=CNAF/CN=Andrea Ceccanti";
 	public static final String RFC2253_ENCODED_DN = "CN=Andrea Ceccanti,L=CNAF,OU=Personal Certificate,O=INFN,C=IT";
+	public static final String DN_WITH_SLASHES = "CN=Andrea Ceccanti/user,L=CNAF,OU=Personal Certificate,O=INFN,C=IT";
 	
-	public void testDnHandler(){
+	
+	public void testDnParsing(){
 		
-		assertEquals(new DNImpl(OPENSSL_ENCODED_DN).getRFC2253(), RFC2253_ENCODED_DN);
-		assertEquals(new DNImpl(OPENSSL_ENCODED_DN).getX500(), OPENSSL_ENCODED_DN);
-		assertEquals(new DNImpl(RFC2253_ENCODED_DN).getX500(), OPENSSL_ENCODED_DN);
-		assertEquals(new DNImpl(RFC2253_ENCODED_DN).getRFC2253(), RFC2253_ENCODED_DN);
+		DN dn = DNHandler.getDNRFC2253(OPENSSL_ENCODED_DN);
+		
+		assertEquals(dn, DNHandler.getDNRFC2253(RFC2253_ENCODED_DN));
+		assertEquals(dn.getX500(), OPENSSL_ENCODED_DN);
+		assertEquals(dn.getRFCDN(), RFC2253_ENCODED_DN);
+		
+		
+		
+		
+	}
+	
+	public void testDnWithSlashesParsing(){
+		
+		DN dn = DNHandler.getDNRFC2253(DN_WITH_SLASHES);
+		assertEquals(dn.getRFCDN(), DN_WITH_SLASHES);
 	}
 	
 }

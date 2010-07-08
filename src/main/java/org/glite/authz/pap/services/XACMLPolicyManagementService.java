@@ -233,16 +233,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public PolicyType[] listPolicies(String alias) throws RemoteException {
+    public PolicyType[] listPolicies(String papAlias) throws RemoteException {
         log.info("listPolicies();");
 
         try {
 
-            if (alias == null) {
-                alias = Pap.DEFAULT_PAP_ALIAS;
+            if (papAlias == null) {
+                papAlias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            Pap ps = PapManager.getInstance().getPap(alias);
+            Pap ps = PapManager.getInstance().getPap(papAlias);
 
             synchronized (ServicesUtils.highLevelOperationLock) {
                 if (ps.isLocal()) {
@@ -258,16 +258,16 @@ public class XACMLPolicyManagementService implements XACMLPolicyManagement {
         }
     }
 
-    public PolicySetType[] listPolicySets(String alias) throws RemoteException {
+    public PolicySetType[] listPolicySets(String papAlias) throws RemoteException {
         log.info("listPolicySets();");
 
         try {
 
-            if (alias == null) {
-                alias = Pap.DEFAULT_PAP_ALIAS;
+            if (papAlias == null) {
+                papAlias = Pap.DEFAULT_PAP_ALIAS;
             }
 
-            Pap ps = PapManager.getInstance().getPap(alias);
+            Pap ps = PapManager.getInstance().getPap(papAlias);
 
             synchronized (ServicesUtils.highLevelOperationLock) {
                 if (ps.isLocal()) {

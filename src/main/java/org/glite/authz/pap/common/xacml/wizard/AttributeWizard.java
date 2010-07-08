@@ -17,10 +17,10 @@
 
 package org.glite.authz.pap.common.xacml.wizard;
 
-import org.glite.authz.pap.authz.util.DNImpl;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
+import org.glite.security.util.DNHandler;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.policy.AttributeAssignmentType;
 import org.slf4j.Logger;
@@ -241,7 +241,8 @@ public class AttributeWizard {
 		if (attributeWizardType.getDataType().equals(X509_SUBJECT_DATA_TYPE)) {
 
 			try{
-				value = new DNImpl(value).getRFC2253();
+				
+				value = DNHandler.getDNRFC2253(value).getRFCDN();
 			
 			}catch(IllegalArgumentException e){
 				

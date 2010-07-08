@@ -75,7 +75,6 @@ kill_pap_proc(){
 		pid=`head -1 $PAP_RUN_FILE`
 		
 		## Use shutdown service hook
-		## wget -q --spider http://localhost:8151/shutdown
 		$PAP_SHUTDOWN_CMD
 		
 		if [ $? -ne 0 ]; then
@@ -128,6 +127,7 @@ status(){
 		fi
 	fi
 }
+
 
 alive_and_kicking(){
 

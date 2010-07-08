@@ -38,198 +38,256 @@ import org.slf4j.LoggerFactory;
 
 public class ListPolicies extends PolicyManagementCLI {
 
-    private static final String[] commandNameValues = { "list-policies", "lp" };
-    private static final String DESCRIPTION = "List policies. By default the policies of the default pap are listed unless option --"
-        + OPT_PAPALIAS_LONG + " is specified.";
-    private static final Logger log = LoggerFactory.getLogger(ListPolicies.class);
-    private static final String USAGE = "[options]";
+	private static final String[] commandNameValues = { "list-policies", "lp" };
+	private static final String DESCRIPTION = "List policies. By default the policies of the default pap are listed unless option --"
+			+ OPT_PAPALIAS_LONG + " is specified.";
+	private static final Logger log = LoggerFactory
+			.getLogger(ListPolicies.class);
+	private static final String USAGE = "[options]";
 
-    public ListPolicies() {
-        super(commandNameValues, USAGE, DESCRIPTION, null);
-    }
+	private static final String OPT_ACTION_LONG = "action";
+	private static final String OPT_ACTION_LONG_DESCRIPTION = "filter by action <arg>";
 
-    protected boolean listPolicies(String papAlias, boolean showIds, boolean showRuleId, boolean xacmlOutput)
-            throws RemoteException {
+	private static final String OPT_RESOURCE_LONG = "resource";
+	private static final String OPT_RESOURCE_LONG_DESCRIPTION = "filter by resource <arg>";
 
-        boolean somethingHasBeenSelected = false;
+	public ListPolicies() {
+		super(commandNameValues, USAGE, DESCRIPTION, null);
+	}
 
-        PolicySetType[] policySetArray;
+	
+	private String actionFilter = null;
+	private String resourceFilter = null;
+	
+	protected boolean listPolicies(String papAlias, boolean showIds,
+			boolean showRuleId, boolean xacmlOutput) throws RemoteException {
 
-        policySetArray = xacmlPolicyMgmtClient.listPolicySets(papAlias);
+		boolean foundMatchingPolicies = false;
 
-        if (policySetArray.length == 0) {
-            throw new CLIException("Error: the repository seems to be corrupted, no policy sets have been found");
-        }
+		PolicySetType[] policySetArray;
 
-        PolicyType[] policyArray;
+		policySetArray = xacmlPolicyMgmtClient.listPolicySets(papAlias);
 
-        policyArray = xacmlPolicyMgmtClient.listPolicies(papAlias);
+		if (policySetArray.length == 0) {
+			throw new CLIException(
+					"Error: the repository seems to be corrupted, no policy sets have been found");
+		}
 
-        List<PolicyWizard> policyWizardList = new ArrayList<PolicyWizard>(policyArray.length);
+		PolicyType[] policyArray;
 
-        for (PolicyType policy : policyArray) {
-            PolicyWizard policyWizard = new PolicyWizard(policy);
-            policyWizardList.add(policyWizard);
-            policyWizard.releaseChildrenDOM();
-            policyWizard.releaseDOM();
-        }
+		policyArray = xacmlPolicyMgmtClient.listPolicies(papAlias);
 
-        policyArray = null;
+		List<PolicyWizard> policyWizardList = new ArrayList<PolicyWizard>(policyArray.length);
 
-        PolicySetType localRootPolicySet = policySetArray[0];
+		for (PolicyType policy : policyArray) {
+			
+			// Filtering by action
+			// TODO: how to handle wildcards? Should we use regexp match?
+			String actionValue = PolicyWizard.getActionValue(policy);
+			if (actionFilter != null && !actionValue.equals(actionFilter))
+				continue;
+			
+			PolicyWizard policyWizard = new PolicyWizard(policy);
+			policyWizardList.add(policyWizard);
+			policyWizard.releaseChildrenDOM();
+			policyWizard.releaseDOM();
+		}
 
-        for (String policySetId : PolicySetHelper.getPolicySetIdReferencesValues(localRootPolicySet)) {
+		policyArray = null;
 
-            PolicySetType policySet = null;
+		PolicySetType localRootPolicySet = policySetArray[0];
 
-            for (PolicySetType policySetElem : policySetArray) {
-                if (policySetId.equals(policySetElem.getPolicySetId())) {
-                    policySet = policySetElem;
-                    break;
-                }
-            }
+		for (String policySetId : PolicySetHelper
+				.getPolicySetIdReferencesValues(localRootPolicySet)) {
 
-            if (policySet == null) {
-                throw new CLIException("Error: the repository seems to be corrupted, policy set not found: " + policySetId);
-            }
+			PolicySetType policySet = null;
 
-            try {
-                PolicySetWizard policySetWizard = new PolicySetWizard(policySet, policyWizardList, null);
-                System.out.println();
+			for (PolicySetType policySetElem : policySetArray) {
+				if (policySetId.equals(policySetElem.getPolicySetId())) {
+					policySet = policySetElem;
+					break;
+				}
+			}
 
-                if (xacmlOutput) {
-                    System.out.println(policySetWizard.toXACMLString());
-                } else {
-                    System.out.println(policySetWizard.toFormattedString(showIds, showRuleId));
-                }
+			if (policySet == null) {
+				throw new CLIException(
+						"Error: the repository seems to be corrupted, policy set not found: "
+								+ policySetId);
+			}
 
-            } catch (UnsupportedPolicySetWizardException e) {
-                log.error("Unsupported Policy/PolicySet", e);
-                System.out.println("id=" + policySetId + ": " + GENERIC_XACML_ERROR_MESSAGE);
-            }
+			try {
+				
+				String targetResourceValue = PolicySetWizard.getResourceValue(policySet);
+				
+				// Filter by resource at the policy set level
+				// TODO: how to handle wildcards? Should we use regexp match?
+				if (resourceFilter!=null && !targetResourceValue.equals(resourceFilter)){
+					continue;
+				}
+				
+				
+				// If filtering by action ruled out policies for this resource proceed to the
+				// next policy set
+				if (policyWizardList.isEmpty()){
+					continue;
+				}
+				PolicySetWizard policySetWizard = new PolicySetWizard(
+						policySet, policyWizardList, null);
+				
+				System.out.println();
 
-            somethingHasBeenSelected = true;
-        }
+				if (xacmlOutput) {
+					
+					System.out.println(policySetWizard.toXACMLString());
+				
+				} else {
+					
+					System.out.println(policySetWizard.toFormattedString(
+							showIds, showRuleId));
+				}
 
-        return somethingHasBeenSelected;
-    }
+			} catch (UnsupportedPolicySetWizardException e) {
+				log.error("Unsupported Policy/PolicySet", e);
+				System.out.println("id=" + policySetId + ": "
+						+ GENERIC_XACML_ERROR_MESSAGE);
+			}
 
-    @SuppressWarnings("static-access")
-    @Override
-    protected Options defineCommandOptions() {
-        Options options = new Options();
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription(OPT_SHOW_XACML_DESCRIPTION)
-                                       .withLongOpt(OPT_SHOW_XACML_LONG)
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription(OPT_SHOW_RA_IDS_DESCRIPTION)
-                                       .withLongOpt(OPT_SHOW_IDS_LONG)
-                                       .create(OPT_SHOW_RA_IDS));
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription(OPT_SHOW_ALL_IDS_DESCRIPTION)
-                                       .withLongOpt(OPT_SHOW_ALL_IDS_LONG)
-                                       .create(OPT_SHOW_ALL_IDS));
-        options.addOption(OptionBuilder.hasArg(false)
-                                       .withDescription(OPT_ALLPAPS_DESCRIPTION)
-                                       .withLongOpt(OPT_ALL_LONG)
-                                       .create());
-        options.addOption(OptionBuilder.hasArgs()
-                                       .withDescription(OPT_PAPALIAS_DESCRIPTION)
-                                       .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .create());
-        return options;
-    }
+			foundMatchingPolicies = true;
+		}
 
-    @Override
-    protected int executeCommand(CommandLine commandLine) throws ParseException, RemoteException {
-        boolean xacmlOutput = false;
-        boolean showIds = false;
-        boolean showRulesId = false;
+		return foundMatchingPolicies;
+	}
 
-        if (commandLine.hasOption(OPT_SHOW_XACML_LONG)) {
-            xacmlOutput = true;
-        }
+	@SuppressWarnings("static-access")
+	@Override
+	protected Options defineCommandOptions() {
+		Options options = new Options();
+		options.addOption(OptionBuilder.hasArg(false).withDescription(
+				OPT_SHOW_XACML_DESCRIPTION).withLongOpt(OPT_SHOW_XACML_LONG)
+				.create());
+		options.addOption(OptionBuilder.hasArg(false).withDescription(
+				OPT_SHOW_RA_IDS_DESCRIPTION).withLongOpt(OPT_SHOW_IDS_LONG)
+				.create(OPT_SHOW_RA_IDS));
+		options.addOption(OptionBuilder.hasArg(false).withDescription(
+				OPT_SHOW_ALL_IDS_DESCRIPTION)
+				.withLongOpt(OPT_SHOW_ALL_IDS_LONG).create(OPT_SHOW_ALL_IDS));
+		options.addOption(OptionBuilder.hasArg(false).withDescription(
+				OPT_ALLPAPS_DESCRIPTION).withLongOpt(OPT_ALL_LONG).create());
+		options.addOption(OptionBuilder.hasArgs().withDescription(
+				OPT_PAPALIAS_DESCRIPTION).withLongOpt(OPT_PAPALIAS_LONG)
+				.create());
 
-        if (commandLine.hasOption(OPT_SHOW_RA_IDS)) {
-            showIds = true;
-        }
+		options.addOption(OptionBuilder.hasArg(true).withDescription(
+				OPT_ACTION_LONG_DESCRIPTION).withLongOpt(OPT_ACTION_LONG)
+				.create());
 
-        if (commandLine.hasOption(OPT_SHOW_ALL_IDS_LONG)) {
-            showRulesId = true;
-            showIds = true;
-        }
+		options.addOption(OptionBuilder.hasArg(true).withDescription(
+				OPT_RESOURCE_LONG_DESCRIPTION).withLongOpt(OPT_RESOURCE_LONG)
+				.create());
+		return options;
+	}
 
-        String[] papAliasArray = null;
-        String[] papInfoArray = null;
+	@Override
+	protected int executeCommand(CommandLine commandLine)
+			throws ParseException, RemoteException {
+		boolean xacmlOutput = false;
+		boolean showIds = false;
+		boolean showRulesId = false;
 
-        if (commandLine.hasOption(OPT_ALL_LONG)) {
-            
-            Pap[] papArray = papMgmtClient.getAllPaps();
-            papAliasArray = new String[papArray.length];
-            for (int i = 0; i < papArray.length; i++) {
-                papAliasArray[i] = papArray[i].getAlias();
-            }
-            papInfoArray = getPAPInfoArray(papAliasArray, papArray);
-            
-        } else if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
-            
-            papAliasArray = commandLine.getOptionValues(OPT_PAPALIAS_LONG);
-            papInfoArray = getPAPInfoArray(papAliasArray, null);
-            
-        } else {
-            
-            Pap pap = Pap.makeDefaultPAP();
+		if (commandLine.hasOption(OPT_SHOW_XACML_LONG)) {
+			xacmlOutput = true;
+		}
 
-            Pap[] papArray = new Pap[1];
-            papArray[0] = pap;
+		if (commandLine.hasOption(OPT_SHOW_RA_IDS)) {
+			showIds = true;
+		}
 
-            papAliasArray = new String[1];
-            papAliasArray[0] = pap.getAlias();
+		if (commandLine.hasOption(OPT_SHOW_ALL_IDS_LONG)) {
+			showRulesId = true;
+			showIds = true;
+		}
 
-            papInfoArray = getPAPInfoArray(papAliasArray, papArray);
-        }
+		if (commandLine.hasOption(OPT_ACTION_LONG)){
+			actionFilter = commandLine.getOptionValue(OPT_ACTION_LONG);
+		}
+		
+		if (commandLine.hasOption(OPT_RESOURCE_LONG)){
+			resourceFilter = commandLine.getOptionValue(OPT_RESOURCE_LONG);
+		}
+		
+		String[] papAliasArray = null;
+		String[] papInfoArray = null;
 
-        XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
+		if (commandLine.hasOption(OPT_ALL_LONG)) {
 
-        for (int i = 0; i < papAliasArray.length; i++) {
+			Pap[] papArray = papMgmtClient.getAllPaps();
+			papAliasArray = new String[papArray.length];
+			for (int i = 0; i < papArray.length; i++) {
+				papAliasArray[i] = papArray[i].getAlias();
+			}
+			papInfoArray = getPAPInfoArray(papAliasArray, papArray);
 
-            System.out.println();
-            System.out.println(papInfoArray[i]);
+		} else if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
 
-            boolean policiesFound = listPolicies(papAliasArray[i], showIds, showRulesId, xacmlOutput);
+			papAliasArray = commandLine.getOptionValues(OPT_PAPALIAS_LONG);
+			papInfoArray = getPAPInfoArray(papAliasArray, null);
 
-            if (!policiesFound) {
-                printOutputMessage("No policies has been found.");
-            }
-        }
+		} else {
 
-        return ExitStatus.SUCCESS.ordinal();
-    }
+			Pap pap = Pap.makeDefaultPAP();
 
-    private String[] getPAPInfoArray(String[] papAliasArray, Pap[] papArray) throws RemoteException {
+			Pap[] papArray = new Pap[1];
+			papArray[0] = pap;
 
-        int size = papAliasArray.length;
-        String[] papInfoArray = new String[size];
+			papAliasArray = new String[1];
+			papAliasArray[0] = pap.getAlias();
 
-        for (int i = 0; i < size; i++) {
+			papInfoArray = getPAPInfoArray(papAliasArray, papArray);
+		}
 
-            String alias = papAliasArray[i];
+		XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
 
-            Pap pap;
+		for (int i = 0; i < papAliasArray.length; i++) {
 
-            if (papArray != null) {
-                pap = papArray[i];
-            } else {
-                pap = papMgmtClient.getPap(alias);
-            }
+			System.out.println();
+			System.out.println(papInfoArray[i]);
 
-            if (pap.isLocal()) {
-                papInfoArray[i] = String.format("%s (local):", pap.getAlias());
-            } else {
-                papInfoArray[i] = String.format("%s (%s:%s):", pap.getAlias(), pap.getHostname(), pap.getPort());
-            }
-        }
-        return papInfoArray;
-    }
+			boolean policiesFound = listPolicies(papAliasArray[i], showIds,
+					showRulesId, xacmlOutput);
+
+			if (!policiesFound) {
+				printOutputMessage("No policies has been found.");
+			}
+		}
+
+		return ExitStatus.SUCCESS.ordinal();
+	}
+
+	private String[] getPAPInfoArray(String[] papAliasArray, Pap[] papArray)
+			throws RemoteException {
+
+		int size = papAliasArray.length;
+		String[] papInfoArray = new String[size];
+
+		for (int i = 0; i < size; i++) {
+
+			String alias = papAliasArray[i];
+
+			Pap pap;
+
+			if (papArray != null) {
+				pap = papArray[i];
+			} else {
+				pap = papMgmtClient.getPap(alias);
+			}
+
+			if (pap.isLocal()) {
+				papInfoArray[i] = String.format("%s (local):", pap.getAlias());
+			} else {
+				papInfoArray[i] = String.format("%s (%s:%s):", pap.getAlias(),
+						pap.getHostname(), pap.getPort());
+			}
+		}
+		return papInfoArray;
+	}
 }

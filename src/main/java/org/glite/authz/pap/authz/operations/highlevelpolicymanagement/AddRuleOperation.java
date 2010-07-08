@@ -24,9 +24,11 @@ import org.glite.authz.pap.authz.PAPPermission;
 import org.glite.authz.pap.authz.PAPPermission.PermissionFlags;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.xacml.impl.TypeStringUtils;
+import org.glite.authz.pap.common.xacml.utils.ObligationsHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicyHelper;
 import org.glite.authz.pap.common.xacml.utils.PolicySetHelper;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizard;
+import org.glite.authz.pap.common.xacml.wizard.ObligationWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicySetWizard;
 import org.glite.authz.pap.common.xacml.wizard.PolicyWizard;
 import org.glite.authz.pap.common.xacml.wizard.RuleWizard;
@@ -35,29 +37,45 @@ import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.services.HighLevelPolicyManagementServiceException;
 import org.glite.authz.pap.services.XACMLPolicyManagementServiceException;
 import org.opensaml.xacml.policy.EffectType;
+import org.opensaml.xacml.policy.ObligationsType;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 
 public class AddRuleOperation extends BasePAPOperation<String> {
+	
+	public enum ObligationScopeType{
+		action,
+		resource
+	};
 
     private String actionId;
     private String actionValue;
     private String resourceValue;
+    private String obligationValue;
+    private ObligationScopeType obligationScope;
+    
     private String alias;
     private List<AttributeWizard> attributeWizardList;
     private EffectType effect;
     private boolean after;
     private String ruleId;
+    
 
     protected AddRuleOperation(String alias, boolean isPermit, List<AttributeWizard> attributeWizardList,
-            String actionValue, String resourceValue, String actionId, String ruleId, boolean after) {
+            String actionValue, String resourceValue, String actionId, String ruleId, String obligationValue, 
+            String obligationScope, boolean after) {
 
         this.alias = alias;
         this.attributeWizardList = attributeWizardList;
         this.actionId = actionId;
         this.actionValue = actionValue;
         this.resourceValue = resourceValue;
+        this.obligationValue = obligationValue;
+        
+        this.obligationScope = ObligationScopeType.valueOf(obligationScope);
+        
         this.ruleId = ruleId;
+        
         this.after = after;
 
         if (isPermit) {
@@ -67,10 +85,34 @@ public class AddRuleOperation extends BasePAPOperation<String> {
         }
 
     }
+    
+    
+    protected PolicySetType findResourcePolicySet(PapContainer pc){
+    	
+    	List<PolicySetType> policySetList = pc.getAllPolicySets();
+
+        PolicySetType targetPolicySet = null;
+        
+        // Skipping the first policy set as it is the root policy set.
+        for (int i = 1; i < policySetList.size(); i++) {
+            PolicySetType policySet = policySetList.get(i);
+            if (resourceValue.equals(PolicySetWizard.getResourceValue(policySet))) {
+                if (targetPolicySet != null) {
+                    throw new HighLevelPolicyManagementServiceException("More than one resource policy sets match the given resource id!");
+                }
+                targetPolicySet = policySet;
+            }
+        }
+        
+        policySetList = null;
+    	
+    	return targetPolicySet;
+    	
+    }
 
     public static AddRuleOperation instance(String alias, boolean isPermit,
             List<AttributeWizard> attributeWizardList, String actionValue, String resourceValue,
-            String actionId, String ruleId, boolean after) {
+            String actionId, String ruleId, String obligationId, String obligationScope, boolean after) {
         return new AddRuleOperation(alias,
                                     isPermit,
                                     attributeWizardList,
@@ -78,6 +120,8 @@ public class AddRuleOperation extends BasePAPOperation<String> {
                                     resourceValue,
                                     actionId,
                                     ruleId,
+                                    obligationId,
+                                    obligationScope,
                                     after);
     }
 
@@ -90,7 +134,7 @@ public class AddRuleOperation extends BasePAPOperation<String> {
         Pap pap = PapManager.getInstance().getPap(alias);
 
         if (pap.isRemote()) {
-            throw new XACMLPolicyManagementServiceException("Forbidden operation for a remote PAP");
+            throw new XACMLPolicyManagementServiceException("You cannot add rules to a remote PAP!");
         }
         
         if ((actionId == null) && (actionValue == null)) {
@@ -105,13 +149,37 @@ public class AddRuleOperation extends BasePAPOperation<String> {
             actionId = getActionId(papContainer, actionValue, resourceValue, after);
         }
         
-        PolicyType policy = papContainer.getPolicy(actionId);
-
+        PolicyType actionPolicy = papContainer.getPolicy(actionId);
+        
+        
+        if (obligationValue!= null){
+        	if (ObligationScopeType.action.equals(obligationScope)){
+        		
+        		if (!PolicyHelper.hasObligationWithId(actionPolicy, obligationValue)){
+        			ObligationWizard owiz = new ObligationWizard(obligationValue);
+        			ObligationsType obligations = ObligationsHelper.build();
+        			obligations.getObligations().add(owiz.getXACML());
+        			actionPolicy.setObligations(obligations);
+        		}
+        		
+        	}else{
+        		
+        		PolicySetType resourcePolicySet = findResourcePolicySet(papContainer);
+        		if (!PolicySetHelper.hasObligationWithId(resourcePolicySet, obligationValue)){
+        			ObligationWizard owiz = new ObligationWizard(obligationValue);
+        			ObligationsType obligations = ObligationsHelper.build();
+        			obligations.getObligations().add(owiz.getXACML());
+        			resourcePolicySet.setObligations(obligations);
+        		}
+        		
+        	}
+        }
+        
         int index = 0;
 
         if (ruleId != null) {
 
-            index = PolicyHelper.indexOfRule(policy, ruleId);
+            index = PolicyHelper.indexOfRule(actionPolicy, ruleId);
 
             if (index == -1) {
                 throw new XACMLPolicyManagementServiceException("ruleId not found: " + ruleId);
@@ -126,20 +194,23 @@ public class AddRuleOperation extends BasePAPOperation<String> {
             index = -1;
         }
 
-        PolicyHelper.addRule(policy, index, ruleWizard.getXACML());
+        
+        PolicyHelper.addRule(actionPolicy, index, ruleWizard.getXACML());
 
-        String version = policy.getVersion();
+        String version = actionPolicy.getVersion();
 
-        PolicyWizard.increaseVersion(policy);
+        PolicyWizard.increaseVersion(actionPolicy);
+        
 
-        TypeStringUtils.releaseUnneededMemory(policy);
+        TypeStringUtils.releaseUnneededMemory(actionPolicy);
 
-        papContainer.updatePolicy(version, policy);
+        papContainer.updatePolicy(version, actionPolicy);
 
         return ruleWizard.getRuleId();
     }
+    
 
-    /**
+	/**
      * Return the id of the policy identified by the couple action value, resource value. The action
      * value or the resource value cannot be <code>null</code>. The returned action-id is the id of
      * the action having the given action value and found inside a resource having the given
@@ -162,28 +233,15 @@ public class AddRuleOperation extends BasePAPOperation<String> {
     private String getActionId(PapContainer papContainer, String actionValue, String resourceValue,
             boolean bottom) {
 
-        List<PolicySetType> policySetList = papContainer.getAllPolicySets();
-
-        PolicySetType targetPolicySet = null;
-
-        // skipping the first policy set the is the root policy set
-        for (int i = 1; i < policySetList.size(); i++) {
-            PolicySetType policySet = policySetList.get(i);
-            if (resourceValue.equals(PolicySetWizard.getResourceValue(policySet))) {
-                if (targetPolicySet != null) {
-                    throw new HighLevelPolicyManagementServiceException("More than one resource with the same value");
-                }
-                targetPolicySet = policySet;
-            }
-        }
+        
+        PolicySetType targetPolicySet = findResourcePolicySet(papContainer);
         
         if (targetPolicySet == null) {
             String resourceId = createResource(papContainer, resourceValue, bottom);
             return createAction(papContainer, resourceId, actionValue, bottom);
         }
         
-        policySetList = null;
-        
+                
         List<String> policyIdList = PolicySetHelper.getPolicyIdReferencesValues(targetPolicySet);
         
         PolicyType targetPolicy = null;
@@ -218,9 +276,14 @@ public class AddRuleOperation extends BasePAPOperation<String> {
      * @param bottom
      * @return the resource id.
      */
-    private static String createResource(PapContainer papContainer, String resourceValue, boolean bottom) {
+    private String createResource(PapContainer papContainer, String resourceValue, boolean bottom) {
 
-        PolicySetType resource = (new PolicySetWizard(new AttributeWizard("resource", resourceValue))).getXACML();
+    	PolicySetWizard psWizard = new PolicySetWizard(new AttributeWizard("resource", resourceValue));
+    	
+    	if (obligationValue!= null && obligationScope.equals(ObligationScopeType.resource))
+    		psWizard.addObligation(new ObligationWizard(obligationValue));	
+    	
+        PolicySetType resource = psWizard.getXACML();
 
         String resourceId = resource.getPolicySetId();
 
@@ -253,10 +316,16 @@ public class AddRuleOperation extends BasePAPOperation<String> {
      * @param bottom
      * @return the id of the created action.
      */
-    private static String createAction(PapContainer papContainer, String resourceId, String actionValue,
+    private String createAction(PapContainer papContainer, String resourceId, String actionValue,
             boolean bottom) {
 
-        PolicyType action = (new PolicyWizard(new AttributeWizard("action", actionValue))).getXACML();
+    	PolicyWizard pw = new PolicyWizard(new AttributeWizard("action", actionValue));
+    	
+    	if (obligationValue != null && obligationScope.equals(ObligationScopeType.action)){
+    		pw.addObligation(new ObligationWizard(obligationValue));
+    	}
+    	
+        PolicyType action = pw.getXACML();
         
         papContainer.storePolicy(action);
         

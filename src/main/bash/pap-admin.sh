@@ -19,9 +19,24 @@
 
 # This scripts runs the pap-admin command line client
 
-if [ -z $PAP_HOME ]; then
-	PAP_HOME="$(cd "${0%/*}/.." && pwd)"
-fi
+# From catalina.sh startup script, resolve softlinks
+PRG="$0"
+
+while [ -h "$PRG" ]; do
+  ls=`ls -ld "$PRG"`
+  link=`expr "$ls" : '.*-> \(.*\)$'`
+  if expr "$link" : '/.*' > /dev/null; then
+    PRG="$link"
+  else
+    PRG=`dirname "$PRG"`/"$link"
+  fi
+done
+
+# Get standard environment variables
+PRGDIR=`dirname "$PRG"`
+
+# Only set CATALINA_HOME if not already set
+[ -z "$PAP_HOME" ] && PAP_HOME=`cd "$PRGDIR/.." ; pwd`
 
 ENV_INI_FILE="$PAP_HOME/lib/pap-client-env.sh"
 

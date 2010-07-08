@@ -32,6 +32,8 @@
 		<wsdl:part name="resourceValue" type="xsd:string"></wsdl:part>
 		<wsdl:part name="actionIdentifier" type="xsd:string"></wsdl:part>
 		<wsdl:part name="ruleIdentifier" type="xsd:string"></wsdl:part>
+        <wsdl:part name="obligationValue" type="xsd:string"></wsdl:part>
+        <wsdl:part name="obligationScope" type="xsd:string"></wsdl:part>
 		<wsdl:part name="moveAfter" type="xsd:boolean"></wsdl:part>
 	</wsdl:message>
 	<wsdl:message name="addRuleResponse">

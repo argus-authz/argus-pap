@@ -20,6 +20,8 @@ package org.glite.authz.pap.common.xacml.utils;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.glite.authz.pap.common.xacml.wizard.ObligationWizard;
+import org.opensaml.xacml.policy.ObligationType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.policy.RuleType;
 import org.opensaml.xacml.policy.TargetType;
@@ -107,7 +109,7 @@ public class PolicyHelper extends XMLObjectHelper<PolicyType> {
      * @param ruleId the rule id to check for.
      * @return <code>true</code> if a rule with the given id exists, <code>false</code> otherwise.
      */
-    public static boolean hasRuleId(PolicyType policy, String ruleId) {
+    public static boolean hasRuleWithId(PolicyType policy, String ruleId) {
 
         if (ruleId == null) {
             return false;
@@ -123,6 +125,31 @@ public class PolicyHelper extends XMLObjectHelper<PolicyType> {
         return false;
     }
 
+    /**
+     * 
+     * Checks if the policy contains an obligation with the given id
+     * 
+     * @param policy the policy to be checked
+     * @param obligationId the id of the obligation that we are looking for
+     * @return <code>true</code> if such obligation exists, <code>false</code> otherwise.
+     */
+    public static boolean hasObligationWithId(PolicyType policy, String obligationId) {
+    	
+    	if (obligationId == null)
+    		return false;
+    	
+    	if (policy.getObligations() == null)
+    		return false;
+    	
+    	for (ObligationType obligation: policy.getObligations().getObligations()){
+    		if (obligationId.equals(obligation.getObligationId())){
+    			return true;
+    		}
+    	}
+    	
+    	return false;
+    }
+    
     /**
      * Returns the index (in the list of rules) of the rule identified by the given id.
      * 
@@ -200,4 +227,5 @@ public class PolicyHelper extends XMLObjectHelper<PolicyType> {
         }
         return null;
     }
+    
 }

@@ -18,8 +18,8 @@
 package org.glite.authz.pap.authz;
 
 import org.bouncycastle.voms.VOMSAttribute.FQAN;
-import org.glite.authz.pap.authz.util.DNImpl;
 import org.glite.security.util.DN;
+import org.glite.security.util.DNHandler;
 
 /**
  * Creates {@link PAPAdmin} objects currently supported 
@@ -55,8 +55,8 @@ public class PAPAdminFactory {
      */
     public static X509Principal getDn( String dn ) {
 
-        DN theDN = new DNImpl(dn);
-        
+    	DN theDN = DNHandler.getDNRFC2253(dn);
+    	        
         return new X509Principal( theDN.getX500() );
 
     }

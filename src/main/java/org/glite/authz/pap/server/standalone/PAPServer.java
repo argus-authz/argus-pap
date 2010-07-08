@@ -46,12 +46,6 @@ import org.slf4j.LoggerFactory;
  * The standalone PAP daemon
  */
 public final class PAPServer {
-
-	static {
-        if (Security.getProvider("BC") == null) {
-            Security.addProvider(new BouncyCastleProvider());
-        }
-    }
 	
 	/**
 	 * 
@@ -168,6 +162,8 @@ public final class PAPServer {
 		try {
 
 			parseOptions(args);
+			
+			Security.addProvider(new BouncyCastleProvider());
 
 			PAPConfiguration.initialize(papConfigurationDir);
 
@@ -286,7 +282,8 @@ public final class PAPServer {
 		
 		
 	}
-
+	
+	
 	/**
 	 * Performs the jetty server configuration
 	 */
@@ -335,7 +332,7 @@ public final class PAPServer {
 		JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
 				papServer);
 
-		JettyShutdownService.startJettyShutdownService(8151, Collections
+		PapShutdownAndStatusService.startPAPShutdownAndStatusService(8151, Collections
 				.singletonList((Runnable) papShutdownCommand));
 
 		webappContext = new WebAppContext();

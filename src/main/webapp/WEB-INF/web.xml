@@ -55,11 +55,13 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 
   <!-- Servlets -->
   
+  <!-- 
   <servlet>
     <servlet-name>MonitoringServlet</servlet-name>
     <display-name>PAP Monitoring Servlet</display-name>
     <servlet-class>org.glite.authz.pap.monitoring.MonitoringServlet</servlet-class>
   </servlet>
+   -->
   
   <servlet>
     <servlet-name>AxisServlet</servlet-name>
@@ -77,10 +79,12 @@ Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
     <url-pattern>/services/*</url-pattern>
   </servlet-mapping>
 
+  <!-- 
   <servlet-mapping>
     <servlet-name>MonitoringServlet</servlet-name>
     <url-pattern>/status</url-pattern>
   </servlet-mapping>
+  -->
   
   <session-config>
     <!-- Default to 5 minute session timeouts -->

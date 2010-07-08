@@ -24,6 +24,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javax.net.ssl.SSLPeerUnverifiedException;
+
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.GnuParser;
@@ -45,12 +47,14 @@ import org.glite.authz.pap.ui.cli.papmanagement.RemovePap;
 import org.glite.authz.pap.ui.cli.papmanagement.SetOrder;
 import org.glite.authz.pap.ui.cli.papmanagement.SetPollingInterval;
 import org.glite.authz.pap.ui.cli.papmanagement.UpdatePap;
+import org.glite.authz.pap.ui.cli.policymanagement.AddObligation;
 import org.glite.authz.pap.ui.cli.policymanagement.AddPoliciesFromFile;
 import org.glite.authz.pap.ui.cli.policymanagement.AddPolicy;
 import org.glite.authz.pap.ui.cli.policymanagement.BanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.ListPolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.Move;
 import org.glite.authz.pap.ui.cli.policymanagement.RemoveAllPolicies;
+import org.glite.authz.pap.ui.cli.policymanagement.RemoveObligation;
 import org.glite.authz.pap.ui.cli.policymanagement.RemovePolicies;
 import org.glite.authz.pap.ui.cli.policymanagement.UnBanAttribute;
 import org.glite.authz.pap.ui.cli.policymanagement.UpdatePolicy;
@@ -151,16 +155,13 @@ public class PAPCLI {
             
             } else if (e.getCause() instanceof SocketException){
             	
+            	System.out.println("Error contacting the PAP service: "+e.getCause().getMessage());
             	
-            	if (e.getCause().getMessage() != null && e.getCause().getMessage().equals("Broken pipe")){
-            		System.out.println("Error contacting the PAP service: SSL handshake failure. This is very probably caused by the PAP not trusting your certificate. Check the PAP service logs for more detail.");
-            	}else{
-            		System.out.println("Error contacting the PAP service: "+e.getCause().getMessage());
-            	}
             	
             
-            } else {
-                System.out.println("Error: " + e.getMessage());
+            } else if (e.getCause() instanceof SSLPeerUnverifiedException) {
+            	
+                System.out.println("SSL authentication error: " + e.getCause().getMessage());
             }
 
             return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
@@ -233,6 +234,8 @@ public class PAPCLI {
         policyMgmtCommandList.add(new RemoveAllPolicies());
         policyMgmtCommandList.add(new ListPolicies());
         policyMgmtCommandList.add(new Move());
+        policyMgmtCommandList.add(new AddObligation());
+        policyMgmtCommandList.add(new RemoveObligation());
 
         // PAP Management
         papMgmtCommandList.add(new Ping());

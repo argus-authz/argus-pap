@@ -170,7 +170,7 @@ public class MoveOperation extends BasePAPOperation<Object> {
         PolicyType targetPolicy = null;
 
         for (PolicyType policy : papContainer.getAllPolicies()) {
-            if (PolicyHelper.hasRuleId(policy, pivotId)) {
+            if (PolicyHelper.hasRuleWithId(policy, pivotId)) {
                 targetPolicy = policy;
                 break;
             }

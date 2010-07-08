@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.opensaml.xacml.XACMLObject;
 import org.opensaml.xacml.policy.IdReferenceType;
+import org.opensaml.xacml.policy.ObligationType;
 import org.opensaml.xacml.policy.ObligationsType;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
@@ -232,6 +233,20 @@ public class PolicySetHelper extends XMLObjectHelper<PolicySetType> {
             }
         }
         return false;
+    }
+    
+    
+    public static boolean hasObligationWithId(PolicySetType policySet, String obligationId) {
+    	if (policySet.getObligations() == null)
+    		return false;
+    	
+    	for (ObligationType ot: policySet.getObligations().getObligations()){
+    		if (ot.getObligationId().equals(obligationId))
+    			return true;
+    	}
+    	
+    	return false;
+    	
     }
 
 }

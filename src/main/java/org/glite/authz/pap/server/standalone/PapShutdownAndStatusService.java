@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.glite.authz.pap.monitoring.MonitoringServlet;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.BlockingChannelConnector;
@@ -28,7 +29,7 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 /**
- * A Jetty instance that listens on a give port for a request to the URL path <em>/shutdown</em>.
+ * A Jetty instance that listens on a given port for a request to the URL path <em>/shutdown</em> and <em>/status</em>.
  * 
  * This command starts a separate Jetty instance that binds to 127.0.0.1 on a port given during service construction.
  * When a GET request is received a thread is spawned that runs each given shutdown command in turn. Finally, after all
@@ -37,15 +38,15 @@ import org.mortbay.jetty.servlet.ServletHolder;
  * 
  * Additionally, the same shutdown procedure is bound as a JVM shutdown hook in the event that the process is terminated in that fashion.
  */
-public class JettyShutdownService {
+public class PapShutdownAndStatusService {
 
     /**
-     * Creates and starts the shutdown service.
+     * Creates and starts the PAP shutdown and status service.
      * 
      * @param shutdownPort port on which the service will listen
      * @param shutdownCommands list of commands to run at shutdown time
      */
-    public static void startJettyShutdownService(int shutdownPort, List<Runnable> shutdownCommands) {
+    public static void startPAPShutdownAndStatusService(int shutdownPort, List<Runnable> shutdownCommands) {
 
         final Server shutdownService = new Server();
         shutdownService.setSendServerVersion(false);
@@ -63,6 +64,9 @@ public class JettyShutdownService {
 
         ServletHolder shutdownServlet = new ServletHolder(new ShutdownServlet(shutdownCommandThread));
         servletContext.addServlet(shutdownServlet, "/shutdown");
+        
+        ServletHolder statusServlet = new ServletHolder(new MonitoringServlet());
+        servletContext.addServlet(statusServlet, "/status");
 
         JettyRunThread shutdownServiceRunThread = new JettyRunThread(shutdownService);
         shutdownServiceRunThread.start();
