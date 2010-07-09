@@ -70,11 +70,13 @@ public abstract class AbstractObligationManagementCommand extends PolicyManageme
 		
 		ObligationsType obligations = policy.getObligations();
 		
-		if (obligations == null)
-			obligations = ObligationsHelper.build();
+		if (obligations == null){
+			policy.setObligations(ObligationsHelper.build());
+			
+		}
 		
-		obligations.getObligations().add(buildObligation());
-		policy.setObligations(obligations);
+		policy.getObligations().getObligations().add(buildObligation());
+		
 		
 	}
 	
@@ -128,11 +130,12 @@ public abstract class AbstractObligationManagementCommand extends PolicyManageme
 		
 		ObligationsType obligations = policySet.getObligations();
 		
-		if (obligations == null)
-			obligations = ObligationsHelper.build();
+		if (obligations == null){
+			policySet.setObligations(ObligationsHelper.build());
+		}
 		
-		obligations.getObligations().add(buildObligation());
-		policySet.setObligations(obligations);
+		policySet.getObligations().getObligations().add(buildObligation());
+		
 	}
 	
 	
