@@ -74,6 +74,7 @@ public abstract class AbstractObligationManagementCommand extends PolicyManageme
 			obligations = ObligationsHelper.build();
 		
 		obligations.getObligations().add(buildObligation());
+		policy.setObligations(obligations);
 		
 	}
 	
@@ -131,6 +132,7 @@ public abstract class AbstractObligationManagementCommand extends PolicyManageme
 			obligations = ObligationsHelper.build();
 		
 		obligations.getObligations().add(buildObligation());
+		policySet.setObligations(obligations);
 	}
 	
 	
