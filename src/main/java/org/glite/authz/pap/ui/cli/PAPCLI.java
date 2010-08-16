@@ -137,7 +137,7 @@ public class PAPCLI {
                 exitStatus = serviceCLI.execute(args);
 
         } catch (ParseException e) {
-            System.err.println("\nParsing failed.  Reason: " + e.getMessage() + "\n");
+            System.err.println("\nParse error: " + e.getMessage() + "\n");
             return ServiceCLI.ExitStatus.PARSE_ERROR.ordinal();
 
         } catch (HelpMessageException e) {
@@ -145,25 +145,47 @@ public class PAPCLI {
             return ServiceCLI.ExitStatus.SUCCESS.ordinal();
 
         } catch (RemoteException e) {
-            log.error("Remote exception", e);
-
-            if (e.getCause() instanceof java.security.cert.CertificateException) {
-                System.out.println(String.format("Error: bad password or bad certificate/key (%s, %s).",
-                                                 serviceCLI.getServiceClient().getClientCertificate(),
-                                                 serviceCLI.getServiceClient().getClientPrivateKey()));
-                System.out.println(e.getMessage());
             
-            } else if (e.getCause() instanceof SocketException){
-            	
-            	System.out.println("Error contacting the PAP service: "+e.getCause().getMessage());
-            	
-            	
-            
-            } else if (e.getCause() instanceof SSLPeerUnverifiedException) {
-            	
-                System.out.println("SSL authentication error: " + e.getCause().getMessage());
-            }
+        	// Log the exception
+        	log.error("Remote exception", e);
+        	
+        	String errorMessage = e.getMessage();
+        	
+        	// Provide more detailed information if cause of the error
+        	// is set
+        	if (e.getCause() != null){
+        		log.error("Remote exception cause:", e.getCause());
 
+        		String errorMessagePrefix = "Error";
+        	
+        		if (e.getCause() instanceof java.security.cert.CertificateException) {
+            	
+        			errorMessagePrefix = String.format("Certificate error: bad password or bad certificate/key (%s, %s)",
+        					serviceCLI.getServiceClient().getClientCertificate(),
+        					serviceCLI.getServiceClient().getClientPrivateKey());
+            
+        		} else if (e.getCause() instanceof SocketException){
+            	
+        			errorMessagePrefix = "Error contacting the PAP service"; 
+        
+            
+        		} else if (e.getCause() instanceof SSLPeerUnverifiedException) {
+            	
+        			errorMessagePrefix = "SSL authentication error"; 
+            
+        		}
+            
+            	errorMessage = String.format("%s. Caused by %s: %s", 
+                		errorMessagePrefix,
+                		e.getCause().getClass().getName(),
+                		e.getCause().getMessage());	
+            	
+            	if (!errorMessage.endsWith("."))
+            		errorMessage = String.format("%s.", errorMessage);
+        	}
+            
+            System.out.println(errorMessage);
+            
             return ServiceCLI.ExitStatus.REMOTE_EXCEPTION.ordinal();
 
         } catch (Exception e) {

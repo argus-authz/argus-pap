@@ -1,3 +1,7 @@
+PAP version 1.2.1
+
+Improved error PAP cli error message reporting.
+
 PAP version 1.2.0
 
 Fixes for the following bugs:
