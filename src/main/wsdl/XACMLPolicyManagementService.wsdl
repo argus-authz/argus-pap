@@ -12,7 +12,7 @@
 			</xsd:import>
 		</xsd:schema>
 		<xsd:schema targetNamespace="urn:policy:xacml:opensaml:org">
-			<xsd:import schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd"
+			<xsd:import schemaLocation="./access_control-xacml-2.0-policy-schema-os.xsd"
 				namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"></xsd:import>
 			<xsd:complexType name="PolicyList">
 				<xsd:sequence>

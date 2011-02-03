@@ -45,7 +45,10 @@
 			</xsd:complexType>
 		</xsd:schema>
 		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            
 			targetNamespace="http://org.glite.authz/wsdl/pap/services/pap_management">
+            
+            <xsd:import namespace="http://org.glite.authz/wsdl/pap/services/pap_management/pap"/>
 			<xsd:complexType name="PapList">
 				<xsd:sequence>
 					<xsd:element name="papData" type="papns:Pap" maxOccurs="unbounded"

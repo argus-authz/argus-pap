@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.glite.authz</groupId>
+        <artifactId>argus-parent</artifactId>
+        <version>1.3.0</version>
+        <relativePath>../org.glite.authz</relativePath>
+    </parent>
+
     <groupId>org.glite.authz.pap</groupId>
     <artifactId>org.glite.authz.pap</artifactId>
     <packaging>war</packaging>
-    <name>pap</name>
-    <version>1.2.2</version>
+    <name>Argus Policy Administration Point (PAP)</name>
+    <version>1.3.0</version>
     <properties>
         <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
         </pap-services-namespace>
@@ -33,17 +42,32 @@
                 </includes>
                 <filtering>true</filtering>
             </resource>
-
+           
         </resources>
         <finalName>pap</finalName>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <debug>true</debug>
-                </configuration>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>compile</phase>
+                        <goals>
+                           <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target</outputDirectory>
+                            <resources>          
+                                <resource>
+                                    <directory>src/main/wsdl</directory>
+                                    <includes>
+                                        <include>access_control-xacml-2.0-policy-schema-os.xsd</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                      </configuration>
+                      </execution>
+                     </executions>
             </plugin>
 
 
@@ -242,7 +266,6 @@
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
-                <version>1.5.1</version>
                 <configuration>
                     <header>doc/license.txt</header>
 
@@ -255,6 +278,7 @@
                     </excludes>
 
                     <useDefaultExcludes>true</useDefaultExcludes>
+                    <strictCheck>true</strictCheck>
                 </configuration>
                 <executions>
                     <execution>
@@ -313,13 +337,12 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>3.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.opensaml</groupId>
             <artifactId>opensaml</artifactId>
-            <version>2.3.0</version>
+            
             <exclusions>
                 <exclusion>
                     <groupId>org.slf4j</groupId>
@@ -351,13 +374,11 @@
         <dependency>
             <groupId>org.glite.voms</groupId>
             <artifactId>voms-api-java</artifactId>
-            <version>1.9.14</version>
         </dependency>
 
         <dependency>
             <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-ext-jdk15</artifactId>
-            <version>1.43</version>
+            <artifactId>bcprov-jdk15</artifactId>
         </dependency>
 
         <dependency>
@@ -396,15 +417,11 @@
         </dependency>
         <dependency>
             <groupId>org.glite.security</groupId>
-            <artifactId>util-java
-      </artifactId>
-            <version>2.8.2</version>
+            <artifactId>util-java</artifactId>
         </dependency>
         <dependency>
             <groupId>org.glite.security</groupId>
-            <artifactId>trustmanager
-      </artifactId>
-            <version>2.5.5</version>
+            <artifactId>trustmanager</artifactId>          
         </dependency>
         <dependency>
             <groupId>commons-configuration</groupId>
@@ -436,28 +453,26 @@
             <version>1.1</version>
         </dependency>
 
-        <!--  SLF4J stuff -->
+        <!-- SLF4J stuff -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.5.8</version>
+            
         </dependency>
 
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.5.8</version>
             <scope>runtime</scope>
         </dependency>
 
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
-            <version>1.5.8</version>
+            <version>${slf4j.version}</version>
             <scope>runtime</scope>
         </dependency>
-
 
         <dependency>
             <groupId>log4j</groupId>
@@ -466,31 +481,23 @@
         </dependency>
 
 
-        <!--
-            <dependency> <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-            <version>0.9.18</version> <scope>runtime</scope>
-            </dependency> <dependency> <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-            <version>1.5.8</version> <scope>runtime</scope>
-            </dependency>
-        -->
+        <!-- <dependency> <groupId>ch.qos.logback</groupId> <artifactId>logback-classic</artifactId> 
+            <version>0.9.18</version> <scope>runtime</scope> </dependency> <dependency> 
+            <groupId>org.slf4j</groupId> <artifactId>log4j-over-slf4j</artifactId> <version>1.5.8</version> 
+            <scope>runtime</scope> </dependency> -->
 
         <!-- Jetty stuff -->
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty</artifactId>
-            <version>6.1.14</version>
         </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-sslengine</artifactId>
-            <version>6.1.14</version>
         </dependency>
         <dependency>
             <groupId>org.mortbay.jetty</groupId>
             <artifactId>jetty-java5-threadpool</artifactId>
-            <version>6.1.14</version>
         </dependency>
     </dependencies>
 
