@@ -26,34 +26,29 @@
     <format>tar.gz</format>
   </formats>
   
-  <includeBaseDirectory>true</includeBaseDirectory>
+  <includeBaseDirectory>false</includeBaseDirectory>
   
   <fileSets>
   		<fileSet>
             <directory>src/main/config</directory>
-            <outputDirectory>conf</outputDirectory>
-            <excludes>
-              <exclude>logging/war/**</exclude>
-            </excludes>
+            <outputDirectory>/etc/argus/pap</outputDirectory>
             <fileMode>0640</fileMode>
             <directoryMode>0750</directoryMode>
         </fileSet>
         
-        <fileSet>
-        	<directory>target/site</directory>
-        	<outputDirectory>doc/html</outputDirectory>
-        </fileSet>
-        
+                
         <fileSet>
           <directory>doc</directory>
-          <outputDirectory>doc</outputDirectory>
+          <outputDirectory>/usr/share/doc/argus/pap</outputDirectory>
         </fileSet>
         
+        <!-- 
         <fileSet>
           <directory>src/main/wsdl</directory>
           <outputDirectory>wsdls</outputDirectory>
         </fileSet>
-        
+         -->
+         
         <!-- Empty directories for logs & repository -->
         <!-- 
           Actually assembly plugin has a bug that prevents
@@ -64,7 +59,7 @@
          -->
         <fileSet>
           <directory>src</directory>
-          <outputDirectory>logs</outputDirectory>
+          <outputDirectory>/var/log/argus/pap/</outputDirectory>
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
@@ -73,64 +68,27 @@
         
         <fileSet>
           <directory>src</directory>
-          <outputDirectory>repository</outputDirectory>
+          <outputDirectory>/var/lib/argus/pap/repository</outputDirectory>
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
         </fileSet>
-        
-        <fileSet>
-        	<directory>src</directory>
-        	<outputDirectory>sbin</outputDirectory>
-        	<excludes>
-            	<exclude>**/*</exclude>
-          	</excludes>
-          	<directoryMode>0750</directoryMode>
-        </fileSet>
-        <fileSet>
-        	<directory>src</directory>
-        	<outputDirectory>conf</outputDirectory>
-        	<excludes>
-            	<exclude>**/*</exclude>
-          	</excludes>
-          	<directoryMode>0750</directoryMode>
-        </fileSet>
-        <fileSet>
-        	<directory>src</directory>
-        	<outputDirectory>bin</outputDirectory>
-        	<excludes>
-            	<exclude>**/*</exclude>
-          	</excludes>
-          	<directoryMode>0755</directoryMode>
-        </fileSet>
   </fileSets>
    
   <files>
-    <file>
-      <source>target/${project.build.finalName}.war</source>
-      <outputDirectory>wars</outputDirectory>
-      <fileMode>0644</fileMode>
-    </file>
-    
+        
     <file>
       <source>target/${project.build.finalName}-standalone.war</source>
-      <outputDirectory>wars</outputDirectory>
+      <outputDirectory>/usr/share/argus/pap/wars</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
       <source>target/${project.build.finalName}.jar</source>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>/var/lib/argus/pap/lib</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
-    
-    <file>
-      <source>${basedir}/src/main/python/pap-deploy.py</source>
-      <outputDirectory>sbin</outputDirectory>
-      <destName>pap-deploy</destName>
-      <fileMode>0755</fileMode>
-    </file>
-        
+            
     <file>
       <source>${basedir}/src/main/bash/pap-env.sh</source>
       <outputDirectory>lib</outputDirectory>
@@ -145,15 +103,15 @@
     
     <file>
       <source>${basedir}/src/main/bash/pap-standalone.sh</source>
-      <destName>pap-standalone</destName>
-      <outputDirectory>sbin</outputDirectory>
+      <destName>papctl</destName>
+      <outputDirectory>/usr/sbin</outputDirectory>
       <fileMode>0750</fileMode>
     </file>
     
     <file>
       <source>${basedir}/src/main/bash/pap-admin.sh</source>
       <destName>pap-admin</destName>
-      <outputDirectory>bin</outputDirectory>
+      <outputDirectory>/usr/bin</outputDirectory>
       <fileMode>0755</fileMode>
     </file>
     
