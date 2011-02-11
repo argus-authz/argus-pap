@@ -17,12 +17,11 @@
 #
 
 
-# This scripts starts, stop and restarts the pap standalone service
+# This scripts starts, stop and restarts the Argus PAP service
 
 set -e
 
-prog=pap-standalone
-
+prog="$(basename $0)"
 
 if [ -z $PAP_HOME ]; then
 	PAP_HOME="$(cd "${0%/*}/.." && pwd)"
