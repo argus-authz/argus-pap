@@ -232,30 +232,13 @@ public final class PAPServer {
 
 	}
 
-	private Connector configureTMConnector(){
-		
-		int port = getIntFromStandaloneConfiguration("port",
-				PAPStandaloneServiceDefaults.PORT);
-		
-		String host = getStringFromStandaloneConfiguration("hostname",
-				PAPStandaloneServiceDefaults.HOSTNAME);
-		
-		if (host.equals(PAPStandaloneServiceDefaults.HOSTNAME)||host.equals("127.0.0.1")||host.equals("::1")){
-			// Resolve local host name
-			try {
-				host = InetAddress.getLocalHost().getHostName();
-				log.warn("Resolving localhost to '{}', will bind to that.", host);
-			
-			} catch (UnknownHostException e) {
-				host = PAPStandaloneServiceDefaults.HOSTNAME;
-			}
-		}
+	private Connector configureTMConnector(String host, int port){
 		
 		CaseInsensitiveProperties props = new CaseInsensitiveProperties(buildTrustmanagerConfiguration());
 		
 		try {
 			
-			ContextWrapper context = new ContextWrapper(props);
+			ContextWrapper context = new ContextWrapper(props, false);
 			
 			JettySslSelectChannelConnector connector = new JettySslSelectChannelConnector(context.getKeyManager(),context.m_trustmanager);
 			
@@ -327,7 +310,17 @@ public final class PAPServer {
 				TimeUnit.SECONDS, requestQueue);
 
 		papServer.setThreadPool(threadPool);
-		papServer.setConnectors(new Connector[] { configureTMConnector() });
+		
+		// Connectors configuration
+		int port = getIntFromStandaloneConfiguration("port",
+			PAPStandaloneServiceDefaults.PORT);
+	
+		String host = getStringFromStandaloneConfiguration("hostname",
+			PAPStandaloneServiceDefaults.HOSTNAME);
+		
+						
+		papServer.setConnectors(new Connector[] { configureTMConnector(host,port) });    
+		
 
 		JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
 				papServer);

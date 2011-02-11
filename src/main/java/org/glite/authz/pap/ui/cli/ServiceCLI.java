@@ -23,8 +23,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Collection;
 
@@ -240,19 +238,6 @@ public abstract class ServiceCLI {
                 }
             }
 
-            if (Pap.DEFAULT_HOST.equals(host)){
-            	
-            	try {
-            		
-					host = InetAddress.getLocalHost().getHostName();
-				
-            	} catch (UnknownHostException e) {
-					
-            		// swallow exception
-            		host = Pap.DEFAULT_HOST;
-				}
-            	
-            }
             serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL,
                                                           host,
                                                           port,

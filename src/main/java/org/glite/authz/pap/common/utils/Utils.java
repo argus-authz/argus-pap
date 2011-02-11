@@ -138,24 +138,4 @@ public class Utils {
         return true;
     }
 
-    public static void touchURL(String url) {
-
-        try {
-
-            URL u = new URL(url);
-
-            URLConnection conn = u.openConnection();
-
-            // Ignore content...
-            conn.getContent();
-
-        } catch (MalformedURLException e) {
-
-            throw new PAPException("Malformed URL passed as argument: " + e.getMessage(), e);
-
-        } catch (IOException e) {
-
-            throw new PAPException("Error opening URL connection: " + e.getMessage(), e);
-        }
-    }
 }

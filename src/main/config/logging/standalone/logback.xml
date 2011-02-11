@@ -1,45 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-
-    Copyright (c) Members of the EGEE Collaboration. 2006-2009.
-    See http://www.eu-egee.org/partners/ for details on the copyright holders.
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-        http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
+<!-- Copyright (c) Members of the EGEE Collaboration. 2006-2009. See http://www.eu-egee.org/partners/ 
+    for details on the copyright holders. Licensed under the Apache License, 
+    Version 2.0 (the "License"); you may not use this file except in compliance 
+    with the License. You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 
+    Unless required by applicable law or agreed to in writing, software distributed 
+    under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
+    OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
+    the specific language governing permissions and limitations under the License. -->
 
 
 <configuration>
 
-  <appender name="FILE" class="ch.qos.logback.core.FileAppender"> 
-    <File>${PAP_HOME}/logs/pap-standalone.log</File>
-    <Append>true</Append> 
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-    </layout>
-  </appender>
+    <logger name="org.opensaml" level="WARN" />
+    <logger name="org.glite.security.trustmanager" level="INFO" />
+    <logger name="org.glite.security.util" level="ERROR" />
 
-  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-    <layout class="ch.qos.logback.classic.PatternLayout">
-      <Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</Pattern>
-    </layout>
-  </appender>
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+        <File>${PAP_HOME}/logs/pap-standalone.log</File>
+        <Append>true</Append>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!-- General logging pattern, date time in UTC (Zulu) -->
+            <Pattern>%date{yyyy-MM-dd HH:mm:ss.SSS'Z',UTC} - %level [%logger{0}] - %msg%n</Pattern>
+        </layout>
+    </appender>
 
-  <root level="info">
-    <appender-ref ref="FILE" />
-  </root>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <!-- General logging pattern, date time in UTC (Zulu) -->
+            <Pattern>%date{yyyy-MM-dd HH:mm:ss.SSS'Z',UTC} - %level [%logger{0}] - %msg%n</Pattern>
+        </layout>
+    </appender>
 
-  <logger name="org.opensaml" level="WARN"/>
-  <logger name="org.glite.security.trustmanager" level="INFO"/>
-  <logger name="org.glite.security.util" level="ERROR"/>
+    <root level="info">
+        <appender-ref ref="FILE" />
+    </root>
+
 </configuration>

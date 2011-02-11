@@ -8,7 +8,7 @@
 	<wsdl:types>
 		<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 			<xsd:import namespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os"
-				schemaLocation="access_control-xacml-2.0-policy-schema-os.xsd">
+				schemaLocation="./access_control-xacml-2.0-policy-schema-os.xsd">
 			</xsd:import>
 		</xsd:schema>
 		<xsd:schema targetNamespace="urn:policy:xacml:opensaml:org">
