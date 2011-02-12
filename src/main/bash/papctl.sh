@@ -15,9 +15,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
-
-# This scripts starts, stop and restarts the Argus PAP service
+#   chkconfig: 345 97 97
+#   description:  Argus PAP server startup script
+#   processname: argus-pap
 
 set -e
 
