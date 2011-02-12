@@ -31,7 +31,7 @@ import org.glite.authz.pap.authz.operations.papmanagement.SetOrderOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.PapExistsOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.SetPollingIntervalOperation;
 import org.glite.authz.pap.authz.operations.papmanagement.UpdatePapOperation;
-import org.glite.authz.pap.common.PAPVersion;
+import org.glite.authz.pap.common.Version;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.papmanagement.PapManagerException;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;
@@ -118,7 +118,7 @@ public class PAPManagementService implements PAPManagement {
 
     public String ping() throws RemoteException {
         log.info("Requested ping()");
-        return "PAP version: " + PAPVersion.instance().getVersion();
+        return "PAP version: " + Version.getServiceVersion();
     }
 
     public boolean refreshCache(String papAlias) throws RemoteException {

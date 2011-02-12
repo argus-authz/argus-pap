@@ -94,6 +94,8 @@ public abstract class ServiceCLI {
     protected static final String OPT_PRIVATE_LONG = "private";
     protected static final String OPT_PUBLIC_LONG = "public";
 
+    protected static final String PAP_HOST_PROPERTY = "papHost";
+    
     protected static final CommandLineParser parser = new GnuParser();
     private String[] commandNameValues;
     private Options commandOptions;
@@ -219,6 +221,14 @@ public abstract class ServiceCLI {
         } else {
 
             String host = Pap.DEFAULT_HOST;
+            
+            
+            String papHostProperty = System.getProperty(PAP_HOST_PROPERTY);
+            
+            if (papHostProperty != null && !"".equals(papHostProperty.trim())){
+            	host = papHostProperty;
+            }
+            
             String port = Pap.DEFAULT_PORT;
 
             if (commandLine.hasOption(OPT_HOST_LONG)) {

@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.PAPVersion;
+import org.glite.authz.pap.common.Version;
 
 /**
  * 
@@ -83,7 +83,7 @@ public class MonitoredProperties {
 
         PAPConfiguration conf = PAPConfiguration.instance();
 
-        props.put( PAP_VERSION_PROP_NAME, PAPVersion.instance().getVersion() );
+        props.put( PAP_VERSION_PROP_NAME, Version.getServiceVersion() );
         props.put(STATUS_PROP_NAME, "OK");
         props.put(SERVICE_STARTUP_TIME_PROP_NAME, conf.getMonitoringProperty(SERVICE_STARTUP_TIME_PROP_NAME).toString());
 

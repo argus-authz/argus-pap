@@ -125,7 +125,7 @@ public final class PAPServer {
 
 	private static final String DEFAULT_WAR_LOCATION = System
 			.getProperty("PAP_HOME")
-			+ "/wars/pap-standalone.war";
+			+ "/wars/pap.war";
 
 	private static final Logger log = LoggerFactory.getLogger(PAPServer.class);
 

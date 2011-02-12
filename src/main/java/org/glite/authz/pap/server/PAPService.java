@@ -25,7 +25,7 @@ import javax.servlet.ServletContext;
 import org.glite.authz.pap.authz.AuthorizationEngine;
 import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.PAPVersion;
+import org.glite.authz.pap.common.Version;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
 import org.glite.authz.pap.distribution.DistributionModule;
@@ -86,7 +86,7 @@ public final class PAPService {
 
     public static void start(ServletContext context) {
 
-        logger.info("Starting PAP service version {} ...", PAPVersion.instance().getVersion());
+        logger.info("Starting PAP service version {} ...", Version.getServiceVersion());
 
         // Initialize configuaration
         PAPConfiguration conf = PAPConfiguration.initialize(context);
