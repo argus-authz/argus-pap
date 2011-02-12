@@ -120,13 +120,13 @@
         
     <file>
       <source>${basedir}/src/main/bash/pap-env.sh</source>
-      <outputDirectory>etc</outputDirectory>
+      <outputDirectory>sbin</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
       <source>${basedir}/src/main/bash/pap-admin-env.sh</source>
-      <outputDirectory>etc</outputDirectory>
+      <outputDirectory>bin</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     

@@ -28,8 +28,7 @@ function create_symlink(){
 		rm -f $2
 	fi
 	
-	echo "Linking $2 -> $1"
-	ln -s $1 $2
+	ln -sv $1 $2
 }
 
 # conf

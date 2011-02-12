@@ -79,8 +79,8 @@
                             <manifestSection>
                                 <name>org/glite/authz/pap/common/</name>
                                 <manifestEntries>
-                                    <Implementation-Title>${pom.artifactId}</Implementation-Title>
-                                    <Implementation-Version>${pom.version}</Implementation-Version>
+                                    <Implementation-Title>${project.artifactId}</Implementation-Title>
+                                    <Implementation-Version>${project.version}</Implementation-Version>
                                     <Implementation-Vendor>EMI Collaboration</Implementation-Vendor>
                                 </manifestEntries>
                             </manifestSection>
@@ -101,7 +101,7 @@
 							<goal>war</goal>
 						</goals>
 						<configuration>
-							<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+							<packagingExcludes>WEB-INF/lib/*.jar, **/*.class</packagingExcludes>
 						</configuration>
 					</execution>
 				</executions>
@@ -473,7 +473,31 @@
       		<id>gLite</id>	
       		<build>
                 <finalName>pap</finalName>
-            </build>
+            	<plugins>
+            		<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>cleanup-symlinks</id>
+								<phase>pre-clean</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>/bin/rm</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<arguments>
+										<argument>-rf</argument>
+										<argument>pap-service</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					</plugins>
+				</build>
     	</profile>
     	
     	<profile>
