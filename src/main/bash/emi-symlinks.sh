@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # Copyright (c) Members of the EGEE Collaboration. 2006-2009.
 # See http://www.eu-egee.org/partners/ for details on the copyright holders.
@@ -15,4 +16,33 @@
 # limitations under the License.
 #
 
-papVersion = ${version}
+set -e
+
+PAP_HOME=usr/share/argus/pap
+
+prefix='../../../..'
+bin_prefix="$prefix/.."
+
+# conf
+ln -s $prefix/etc/argus/pap $PAP_HOME/conf
+
+# lib
+ln -s $prefix/var/lib/argus/pap/lib $PAP_HOME/lib
+
+# logs
+ln -s $prefix/var/log/argus/pap $PAP_HOME/logs
+
+# repository
+ln -s $prefix/var/lib/argus/pap/repository $PAP_HOME/repository
+
+# doc
+ln -s $prefix/usr/share/doc/argus/pap/ $PAP_HOME/doc
+
+# papctl
+ln -s ../../$PAP_HOME/sbin/papctl usr/sbin/papctl
+ln -s ../../../$PAP_HOME/sbin/papctl etc/rc.d/init.d/argus-pap
+
+# pap-admin
+ln -s ../../$PAP_HOME/bin/pap-admin usr/bin/pap-admin
+
+

@@ -34,10 +34,14 @@ done
 # Get standard environment variables
 PRGDIR=`dirname "$PRG"`
 
+if [ -r "/etc/sysconfig/argus-pap" ]; then
+	source /etc/sysconfig/argus-pap
+fi
+
 # Only set PAP_HOME if not already set
 [ -z "$PAP_HOME" ] && PAP_HOME=`cd "$PRGDIR/.." ; pwd`
 
-ENV_INI_FILE="$PAP_HOME/lib/pap-client-env.sh"
+ENV_INI_FILE="$PAP_HOME/bin/pap-admin-env.sh"
 
 if [ -r $ENV_INI_FILE ]; then
 	. $ENV_INI_FILE

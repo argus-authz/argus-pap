@@ -17,13 +17,13 @@
 
 -->
 
-<assembly xmlns="http://maven.apache.org/POM/4.0.0"
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.0.0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/xsd/assembly-1.1.2.xsd">
     
   <id>service</id>
   <formats>
-    <format>tar.gz</format>
+    <format>dir</format>
   </formats>
   
   <includeBaseDirectory>false</includeBaseDirectory>
@@ -42,12 +42,12 @@
           <outputDirectory>/usr/share/doc/argus/pap</outputDirectory>
         </fileSet>
         
-        <!-- 
+         
         <fileSet>
           <directory>src/main/wsdl</directory>
-          <outputDirectory>wsdls</outputDirectory>
+          <outputDirectory>/usr/share/argus/pap/wsdl</outputDirectory>
         </fileSet>
-         -->
+        
          
         <!-- Empty directories for logs & repository -->
         <!-- 
@@ -73,12 +73,53 @@
             <exclude>**/*</exclude>
           </excludes>
         </fileSet>
+        
+        <fileSet>
+          <directory>src</directory>
+          <outputDirectory>/usr/share/argus/pap</outputDirectory>
+          <excludes>
+            <exclude>**/*</exclude>
+          </excludes>
+          <directoryMode>0750</directoryMode>
+        </fileSet>
+        
+        <fileSet>
+          <directory>src</directory>
+          <outputDirectory>/etc/rc.d/init.d</outputDirectory>
+          <excludes>
+            <exclude>**/*</exclude>
+          </excludes>
+          <directoryMode>0750</directoryMode>
+        </fileSet>
+        
+        <fileSet>
+          <directory>src</directory>
+          <outputDirectory>/usr/bin</outputDirectory>
+          <excludes>
+            <exclude>**/*</exclude>
+          </excludes>
+          <directoryMode>0750</directoryMode>
+        </fileSet>
+        <fileSet>
+          <directory>src</directory>
+          <outputDirectory>/usr/sbin</outputDirectory>
+          <excludes>
+            <exclude>**/*</exclude>
+          </excludes>
+          <directoryMode>0750</directoryMode>
+        </fileSet>
   </fileSets>
    
   <files>
         
     <file>
-      <source>target/${project.build.finalName}-standalone.war</source>
+    	<source>${basedir}/src/main/bash/pap-sysconfig.sh</source>
+    	<destName>argus-pap</destName>
+    	<outputDirectory>/etc/sysconfig</outputDirectory>
+    	<filtered>true</filtered>
+    </file>
+    <file>
+      <source>target/${project.build.finalName}.war</source>
       <outputDirectory>/usr/share/argus/pap/wars</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
@@ -91,27 +132,27 @@
             
     <file>
       <source>${basedir}/src/main/bash/pap-env.sh</source>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>/usr/share/argus/pap/sbin</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
-      <source>${basedir}/src/main/bash/pap-client-env.sh</source>
-      <outputDirectory>lib</outputDirectory>
+      <source>${basedir}/src/main/bash/pap-admin-env.sh</source>
+      <outputDirectory>/usr/share/argus/pap/bin</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
-      <source>${basedir}/src/main/bash/pap-standalone.sh</source>
+      <source>${basedir}/src/main/bash/papctl.sh</source>
       <destName>papctl</destName>
-      <outputDirectory>/usr/sbin</outputDirectory>
+      <outputDirectory>/usr/share/argus/pap/sbin</outputDirectory>
       <fileMode>0750</fileMode>
     </file>
     
     <file>
       <source>${basedir}/src/main/bash/pap-admin.sh</source>
       <destName>pap-admin</destName>
-      <outputDirectory>/usr/bin</outputDirectory>
+      <outputDirectory>usr/share/argus/pap/bin</outputDirectory>
       <fileMode>0755</fileMode>
     </file>
     
@@ -119,9 +160,8 @@
   
   <dependencySets>
     <dependencySet>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>/var/lib/argus/pap/lib</outputDirectory>
       <excludes>
-        <exclude>javax.servlet:servlet-api</exclude>
         <exclude>org.apache.xerces:xml-apis</exclude>
         <exclude>org.apache.xerces:xercesImpl</exclude>
         <exclude>org.apache.xerces:serializer</exclude>
@@ -131,7 +171,7 @@
     </dependencySet>
     
     <dependencySet>
-      <outputDirectory>lib/endorsed</outputDirectory>
+      <outputDirectory>/var/lib/argus/pap/lib/endorsed</outputDirectory>
       <includes>
         <include>org.apache.xerces:xml-apis</include>
         <include>org.apache.xerces:xercesImpl</include>

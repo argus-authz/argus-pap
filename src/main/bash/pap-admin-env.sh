@@ -17,7 +17,7 @@
 #
 
 
-# This script sets up the environment to run the pap client application.
+# This script sets up the environment to run the pap admin CLI.
 # 
 set -e
 
@@ -42,5 +42,10 @@ PAP_CLIENT_CP="$PAP_CLIENT_DEPS$PAP_JAR:$PAP_HOME/conf/logging/client"
 # Environment for the pap client application
 PAP_CLIENT_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS"
 
+if [ -r $PAP_HOME/conf/pap_configuration.ini ]; then
+	PAP_HOST=`grep 'hostname =' $PAP_HOME/conf/pap_configuration.ini | awk '{print $3}'`
+fi
+
 # Command used to start the pap client application
-PAP_CLIENT_CMD="java $PAP_CLIENT_ENV -DconfigureLog4j=false -DeffectiveUserId=$EUID -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
+PAP_CLIENT_CMD="java $PAP_CLIENT_ENV -DeffectiveUserId=$EUID -DpapHost=$PAP_HOST -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
+

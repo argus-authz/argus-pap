@@ -23,6 +23,10 @@ set -e
 
 prog="$(basename $0)"
 
+if [ -r "/etc/sysconfig/argus-pap" ]; then
+	source /etc/sysconfig/argus-pap
+fi
+
 if [ -z $PAP_HOME ]; then
 	PAP_HOME="$(cd "${0%/*}/.." && pwd)"
 fi
@@ -32,9 +36,9 @@ if [ ! -r $PAP_HOME/conf/pap_configuration.ini ]; then
 	exit 1
 fi 
 	
-PAP_RUN_FILE=$PAP_HOME/.pap-standalone.pid
+PAP_RUN_FILE=$PAP_HOME/.pap.pid
 
-. $PAP_HOME/lib/pap-env.sh
+. $PAP_HOME/sbin/pap-env.sh
 
 pre_checks(){
 	check_openssl
@@ -93,7 +97,7 @@ kill_pap_proc(){
 			rm $PAP_RUN_FILE
 		fi
 	else
-		failure "PAP standalone server is not running!"
+		failure "PAP  server is not running!"
 	fi 
 }
 	
@@ -143,12 +147,10 @@ alive_and_kicking(){
 start(){
 
 	# echo -n "Starting $prog: "
-		
-	pre_checks || failure 
 	
 	status && failure "PAP already running..."
 	
-	$PAP_STANDALONE_CMD &
+	$PAP_CMD &
 	
 	if [ $? -eq 0 ]; then
 		echo "$!" > $PAP_RUN_FILE;

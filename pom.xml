@@ -1,601 +1,627 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.glite.authz</groupId>
-        <artifactId>argus-parent</artifactId>
-        <version>1.3.0</version>
-        <relativePath>../org.glite.authz</relativePath>
-    </parent>
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>org.glite.authz</groupId>
+		<artifactId>argus-parent</artifactId>
+		<version>1.3.0</version>
+		<relativePath>../org.glite.authz</relativePath>
+	</parent>
 
-    <groupId>org.glite.authz.pap</groupId>
-    <artifactId>org.glite.authz.pap</artifactId>
-    <packaging>war</packaging>
-    <name>Argus Policy Administration Point (PAP)</name>
-    <version>1.3.0</version>
-    <properties>
-        <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
+	<groupId>org.glite.authz.pap</groupId>
+	<artifactId>org.glite.authz.pap</artifactId>
+	
+	<packaging>war</packaging>
+	<name>Argus Policy Administration Point (PAP)</name>
+	<version>1.3.0</version>
+	<properties>
+		<pap-services-namespace>http://org.glite.authz/wsdl/pap/services
         </pap-services-namespace>
-        <project.build.sourceEncoding>
-            UTF-8
+		<project.build.sourceEncoding>
+			UTF-8
         </project.build.sourceEncoding>
-
-        <project.reporting.outputEncoding>
-            UTF-8
+		<project.reporting.outputEncoding>
+			UTF-8
         </project.reporting.outputEncoding>
-    </properties>
-    <build>
+	</properties>
+	
+	<build>
+		
+		<finalName>pap</finalName>
+		<plugins>
+			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target</outputDirectory>
+							<resources>
+								<resource>
+									<directory>src/main/wsdl</directory>
+									<includes>
+										<include>access_control-xacml-2.0-policy-schema-os.xsd
+										</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>pap-version.properties</exclude>
-                </excludes>
-            </resource>
-            <resource>
-                <directory>src/main/resources</directory>
-                <includes>
-                    <include>pap-version.properties</include>
-                </includes>
-                <filtering>true</filtering>
-            </resource>
-           
-        </resources>
-        <finalName>pap</finalName>
-        <plugins>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-resources</id>
-                        <phase>compile</phase>
-                        <goals>
-                           <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target</outputDirectory>
-                            <resources>          
-                                <resource>
-                                    <directory>src/main/wsdl</directory>
-                                    <includes>
-                                        <include>access_control-xacml-2.0-policy-schema-os.xsd</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                      </configuration>
-                      </execution>
-                     </executions>
-            </plugin>
-
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.2</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>2.1-alpha-2</version>
-                <executions>
-                    <execution>
-                        <id>PAP tomcat war creation</id>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                        <configuration>
-                            <webResources>
-                                <resource>
-                                    <directory>
-                                        src/main/config/logging/war
-                                    </directory>
-                                    <targetPath>WEB-INF/classes
-                                    </targetPath>
-                                </resource>
-                            </webResources>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>PAP standalone war creation</id>
-                        <goals>
-                            <goal>war</goal>
-                        </goals>
-                        <configuration>
-                            <warName>${project.build.finalName}-standalone
-                            </warName>
-                            <webappDirectory>
-                                ${project.build.directory}/${project.build.finalName}-standalone
-                            </webappDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>tomcat-maven-plugin</artifactId>
-                <configuration>
-                    <server>tomcat</server>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin
-        </artifactId>
-                <version>2.0</version>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>axistools-maven-plugin
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<archive>
+                        <index>true</index>
+                        <manifestEntries>
+                        	<Main-Class>org.glite.authz.pap.common.Version</Main-Class>
+                        </manifestEntries>
+                        <manifestSections>
+                            <manifestSection>
+                                <name>org/glite/authz/pap/common/</name>
+                                <manifestEntries>
+                                    <Implementation-Title>${pom.artifactId}</Implementation-Title>
+                                    <Implementation-Version>${pom.version}</Implementation-Version>
+                                    <Implementation-Vendor>EMI Collaboration</Implementation-Vendor>
+                                </manifestEntries>
+                            </manifestSection>
+                        </manifestSections>
+                    </archive>
+				</configuration>
+			</plugin>
+			
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<executions>
+					<execution>
+						<id>PAP war creation</id>
+						<goals>
+							<goal>war</goal>
+						</goals>
+						<configuration>
+							<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>axistools-maven-plugin
 				</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                        <configuration>
-                            <sourceDirectory>src/main/wsdl
+				<executions>
+					<execution>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
+						<configuration>
+							<sourceDirectory>src/main/wsdl
                             </sourceDirectory>
-                            <typeMappingVersion>1.2</typeMappingVersion>
+							<typeMappingVersion>1.2</typeMappingVersion>
 
-                            <!-- ********** Excluded namespaces ********* -->
-                            <nsExcludes>
-                                <nsExclude>urn:oasis:names:tc:xacml:2.0:policy:schema:os
+							<!-- ********** Excluded namespaces ********* -->
+							<nsExcludes>
+								<nsExclude>urn:oasis:names:tc:xacml:2.0:policy:schema:os
+								</nsExclude>
+								<nsExclude>urn:oasis:names:tc:SAML:2.0:protocol
                                 </nsExclude>
-                                <nsExclude>urn:oasis:names:tc:SAML:2.0:protocol
-                                </nsExclude>
-                                <nsExclude>
-                                    urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol
-                                </nsExclude>
-                                <nsExclude>
-                                    http://org.glite.authz/wsdl/pap/services/pap_management/pap
-                                </nsExclude>
-                            </nsExcludes>
+								<nsExclude>
+									urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol
+								</nsExclude>
+								<nsExclude>
+									http://org.glite.authz/wsdl/pap/services/pap_management/pap
+								</nsExclude>
+							</nsExcludes>
 
-                            <!-- *********** Mappings ********** -->
-                            <mappings>
-                                <mapping>
-                                    <namespace>${pap-services-namespace}/authz_management
+							<!-- *********** Mappings ********** -->
+							<mappings>
+								<mapping>
+									<namespace>${pap-services-namespace}/authz_management
+									</namespace>
+									<targetPackage>
+										org.glite.authz.pap.services.authz_management.axis_skeletons
+									</targetPackage>
+								</mapping>
+								<mapping>
+									<namespace>
+										${pap-services-namespace}/highlevel_policy_management
+									</namespace>
+									<targetPackage>
+										org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons
+									</targetPackage>
+								</mapping>
+								<mapping>
+									<namespace>
+										${pap-services-namespace}/xacml_policy_management
                                     </namespace>
-                                    <targetPackage>
-                                        org.glite.authz.pap.services.authz_management.axis_skeletons
-                                    </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>
-                                        ${pap-services-namespace}/highlevel_policy_management
+									<targetPackage>
+										org.glite.authz.pap.services.xacml_policy_management.axis_skeletons
+									</targetPackage>
+								</mapping>
+								<mapping>
+									<namespace>${pap-services-namespace}/pap_management
                                     </namespace>
-                                    <targetPackage>
-                                        org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons
-                                    </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>
-                                        ${pap-services-namespace}/xacml_policy_management
+									<targetPackage>
+										org.glite.authz.pap.services.pap_management.axis_skeletons
+									</targetPackage>
+								</mapping>
+								<mapping>
+									<namespace>${pap-services-namespace}/provisioning
                                     </namespace>
-                                    <targetPackage>
-                                        org.glite.authz.pap.services.xacml_policy_management.axis_skeletons
+									<targetPackage>
+										org.glite.authz.pap.services.provisioning.axis_skeletons
+									</targetPackage>
+								</mapping>
+								<mapping>
+									<namespace>
+										http://org.glite.authz/wsdl/pap/services/pap_management/pap
+									</namespace>
+									<targetPackage>org.glite.authz.pap.common
                                     </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>${pap-services-namespace}/pap_management
+								</mapping>
+								<mapping>
+									<namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os
+									</namespace>
+									<targetPackage>org.opensaml.xacml.policy
+                                    </targetPackage>
+								</mapping>
+								<mapping>
+									<namespace>urn:oasis:names:tc:SAML:2.0:protocol
                                     </namespace>
-                                    <targetPackage>
-                                        org.glite.authz.pap.services.pap_management.axis_skeletons
+									<targetPackage>org.opensaml.saml2.core
                                     </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>${pap-services-namespace}/provisioning
-                                    </namespace>
-                                    <targetPackage>
-                                        org.glite.authz.pap.services.provisioning.axis_skeletons
+								</mapping>
+								<mapping>
+									<namespace>
+										urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol
+									</namespace>
+									<targetPackage>org.opensaml.xacml.profile.saml
                                     </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>
-                                        http://org.glite.authz/wsdl/pap/services/pap_management/pap
-                                    </namespace>
-                                    <targetPackage>org.glite.authz.pap.common
-                                    </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>urn:oasis:names:tc:xacml:2.0:policy:schema:os
-                                    </namespace>
-                                    <targetPackage>org.opensaml.xacml.policy
-                                    </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>urn:oasis:names:tc:SAML:2.0:protocol
-                                    </namespace>
-                                    <targetPackage>org.opensaml.saml2.core
-                                    </targetPackage>
-                                </mapping>
-                                <mapping>
-                                    <namespace>
-                                        urn:oasis:names:tc:xacml:2.0:profile:saml2.0:v2:schema:protocol
-                                    </namespace>
-                                    <targetPackage>org.opensaml.xacml.profile.saml
-                                    </targetPackage>
-                                </mapping>
-                            </mappings>
-                            <!-- ************ General options ********* -->
-                            <serverSide>true</serverSide>
-                            <skeletonDeploy>true</skeletonDeploy>
-                            <helperGen>true</helperGen>
-                            <useEmitter>true</useEmitter>
-                            <wrapArrays>false</wrapArrays>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <!-- Assembly plugin -->
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/main/assembly/pap-service.xml
+								</mapping>
+							</mappings>
+							<!-- ************ General options ********* -->
+							<serverSide>true</serverSide>
+							<skeletonDeploy>true</skeletonDeploy>
+							<helperGen>true</helperGen>
+							<useEmitter>true</useEmitter>
+							<wrapArrays>false</wrapArrays>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+						
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<descriptors>
+						<descriptor>src/main/assembly/pap-service.xml
                         </descriptor>
-                        <descriptor>src/main/assembly/pap-client.xml
-                        </descriptor>
-                    </descriptors>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>assembly</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
+					</descriptors>
+				</configuration>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
-            <!-- License check plugin -->
-            <plugin>
-                <groupId>com.mycila.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <configuration>
-                    <header>doc/license.txt</header>
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<configuration>
+					<header>doc/license.txt</header>
 
-                    <excludes>
-                        <exclude>doc/**</exclude>
-                        <exclude>**/*.jj</exclude>
-                        <exclude>**/*.wsdl</exclude>
-                        <exclude>**/*.wsdd</exclude>
-                        <exclude>**/*.ini</exclude>
-                    </excludes>
+					<excludes>
+						<exclude>doc/**</exclude>
+						<exclude>**/*.jj</exclude>
+						<exclude>**/*.wsdl</exclude>
+						<exclude>**/*.wsdd</exclude>
+						<exclude>**/*.ini</exclude>
+					</excludes>
 
-                    <useDefaultExcludes>true</useDefaultExcludes>
-                    <strictCheck>true</strictCheck>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>check-headers</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-    <repositories>
-        <repository>
-            <id>shibboleth.internet2.edu</id>
-            <name>Internet2</name>
-            <url>http://shibboleth.internet2.edu/downloads/maven2
+					<useDefaultExcludes>true</useDefaultExcludes>
+					<strictCheck>true</strictCheck>
+				</configuration>
+				<executions>
+					<execution>
+						<id>check-headers</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+		</plugins>
+	</build>
+	<repositories>
+		<repository>
+			<id>shibboleth.internet2.edu</id>
+			<name>Internet2</name>
+			<url>http://shibboleth.internet2.edu/downloads/maven2
       </url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 
-        <repository>
-            <id>cnaf</id>
-            <name>CNAF Maven Repository</name>
-            <url>
-                http://radiohead.cnaf.infn.it:9999/mvn
-      </url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+		<repository>
+			<id>codehaus-release-repo</id>
+			<name>Codehaus Release Repo</name>
+			<url>http://repository.codehaus.org</url>
+		</repository>
 
-        <repository>
-            <id>codehaus-release-repo</id>
-            <name>Codehaus Release Repo</name>
-            <url>http://repository.codehaus.org</url>
-        </repository>
-
-        <repository>
-            <id>switch</id>
-            <name>SWITCH Releases</name>
-            <url>http://www.switch.ch/grid/authz/docs/maven2/release
+		<repository>
+			<id>switch</id>
+			<name>SWITCH Releases</name>
+			<url>http://www.switch.ch/grid/authz/docs/maven2/release
             </url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <dependencies>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.opensaml</groupId>
-            <artifactId>opensaml</artifactId>
-            
-            <exclusions>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-log4j12</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>jcl-over-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>log4j-over-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>jul-to-slf4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+		
+		<!-- Jetty  -->
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty-sslengine</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jetty-java5-threadpool</artifactId>
+		</dependency>
+		
+		<!-- Servlet & JSP apis -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jsp-api</artifactId>
+			<version>2.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- OpenSAML -->
+		<dependency>
+			<groupId>org.opensaml</groupId>
+			<artifactId>opensaml</artifactId>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jcl-over-slf4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>log4j-over-slf4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>jul-to-slf4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.bouncycastle</groupId>
+					<artifactId>bcprov-jdk15</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
 
-        <dependency>
-            <groupId>org.glite.voms</groupId>
-            <artifactId>voms-api-java</artifactId>
-        </dependency>
+		<!-- BouncyCastle -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15</artifactId>
+		</dependency>
+		
+		<!-- gLite -->
+		<dependency>
+			<groupId>org.glite.voms</groupId>
+			<artifactId>voms-api-java</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.glite.security</groupId>
+			<artifactId>util-java</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.glite.security</groupId>
+			<artifactId>trustmanager</artifactId>
+		</dependency>
+		
+		<!-- Axis -->
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis</artifactId>
+			<version>1.4</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>commons-logging</artifactId>
+					<groupId>commons-logging</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<dependency>
+			<groupId>axis</groupId>
+			<artifactId>axis-jaxrpc</artifactId>
+			<version>1.4</version>
+		</dependency>
+		
+		<!-- Jakarta Commons -->
+		<dependency>
+			<groupId>commons-configuration</groupId>
+			<artifactId>commons-configuration</artifactId>
+			<version>1.5</version>
+			<exclusions>
+				<exclusion>
+					<groupId>log4j</groupId>
+					<artifactId>log4j</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>logkit</groupId>
+					<artifactId>logkit</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>avalon-framework</groupId>
+					<artifactId>avalon-framework</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>commons-discovery</groupId>
+			<artifactId>commons-discovery</artifactId>
+			<version>0.2</version>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>commons-lang</groupId>
+			<artifactId>commons-lang</artifactId>
+			<version>2.4</version>
+		</dependency>
+		<dependency>
+			<groupId>commons-cli</groupId>
+			<artifactId>commons-cli</artifactId>
+			<version>1.1</version>
+		</dependency>
 
-        <dependency>
-            <groupId>org.bouncycastle</groupId>
-            <artifactId>bcprov-jdk15</artifactId>
-        </dependency>
+		<!-- SLF4J & Logging -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>jcl-over-slf4j</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
-        <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis</artifactId>
-            <version>1.4</version>
-            <exclusions>
-                <exclusion>
-                    <artifactId>commons-logging</artifactId>
-                    <groupId>commons-logging</groupId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.2</version>
-            <scope>runtime</scope>
-        </dependency>
-        <dependency>
-            <groupId>axis</groupId>
-            <artifactId>axis-jaxrpc</artifactId>
-            <version>1.4</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-            <version>2.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.glite.security</groupId>
-            <artifactId>util-java</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.glite.security</groupId>
-            <artifactId>trustmanager</artifactId>          
-        </dependency>
-        <dependency>
-            <groupId>commons-configuration</groupId>
-            <artifactId>commons-configuration</artifactId>
-            <version>1.5</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>log4j</groupId>
-                    <artifactId>log4j</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>logkit</groupId>
-                    <artifactId>logkit</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>avalon-framework</groupId>
-                    <artifactId>avalon-framework</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-cli</groupId>
-            <artifactId>commons-cli</artifactId>
-            <version>1.1</version>
-        </dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>runtime</scope>
+		</dependency>
 
-        <!-- SLF4J stuff -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            
-        </dependency>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+			<version>1.2.14</version>
+		</dependency>
 
+		<!--
+			Logback backend: to be used when trustmanager finally allows us to do
+			so <dependency> <groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId> </dependency> <dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId> </dependency>
+		-->
+		
+	</dependencies>
 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
- 
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>${slf4j.version}</version>
-            <scope>runtime</scope>
-        </dependency>
-         
-
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.14</version>
-        </dependency>
-         
-
-        <!-- Logback backend: to be used when trustmanager finally allows us to do so 
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-classic</artifactId>
-        </dependency>
-        
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>log4j-over-slf4j</artifactId>
-        </dependency>
-         -->
-                  
-
-        <!-- Jetty stuff -->
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-sslengine</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-java5-threadpool</artifactId>
-        </dependency>
-    </dependencies>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <links>
-                        <link>http://java.sun.com/j2se/1.5.0/docs/api/
+	<profiles>
+		<profile>
+      		<id>gLite</id>	
+      		<build>
+                <finalName>pap</finalName>
+            </build>
+    	</profile>
+    	
+    	<profile>
+      		<id>EMI</id>
+      		<activation>
+      			<activeByDefault>true</activeByDefault>
+    		</activation>
+      		<build>
+                <finalName>pap</finalName>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <configuration>
+                        	<filters>
+            					<filter>src/main/assembly/pap-service-emi.properties</filter>
+          					</filters>
+                            <descriptors>
+                                <descriptor>src/main/assembly/pap-service-emi.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </plugin>
+                    
+                    <plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>exec-maven-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>create-symlinks</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>/bin/sh</executable>
+									<workingDirectory>${project.build.directory}/pap-service</workingDirectory>
+									<arguments>
+										<argument>${basedir}/src/main/bash/emi-symlinks.sh</argument>
+									</arguments>
+								</configuration>
+							</execution>
+							<execution>
+								<id>cleanup-symlinks</id>
+								<phase>pre-clean</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>/bin/rm</executable>
+									<workingDirectory>${project.build.directory}</workingDirectory>
+									<arguments>
+										<argument>-rf</argument>
+										<argument>pap-service</argument>
+									</arguments>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+                </plugins>
+            </build>
+    	</profile>
+	</profiles>
+	
+	<reporting>
+		<plugins>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/j2se/1.5.0/docs/api/
                         </link>
-                    </links>
-                    <quiet>true</quiet>
-                    <aggregate>true</aggregate>
-                    <author>false</author>
-                    <version>true</version>
-                    <doctitle>${project.name} ${project.version} Java
-                        API.</doctitle>
-                    <windowtitle>${project.name} ${project.version} Java
-                        API.</windowtitle>
-                    <overview>src/main/java/overview.html
+					</links>
+					<quiet>true</quiet>
+					<aggregate>true</aggregate>
+					<author>false</author>
+					<version>true</version>
+					<doctitle>${project.name} ${project.version} Java
+						API.</doctitle>
+					<windowtitle>${project.name} ${project.version} Java
+						API.</windowtitle>
+					<overview>src/main/java/overview.html
           </overview>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+				</configuration>
+			</plugin>
+		</plugins>
+	</reporting>
 
-    <developers>
-        <developer>
-            <id>forti</id>
-            <name>Alberto Forti</name>
-            <organization>INFN CNAF</organization>
-            <organizationUrl>http://www.cnaf.infn.it
+	<developers>
+		<developer>
+			<id>forti</id>
+			<name>Alberto Forti</name>
+			<organization>INFN CNAF</organization>
+			<organizationUrl>http://www.cnaf.infn.it
       </organizationUrl>
-            <roles>
-                <role>developer</role>
-                <role>documentation</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>ceccanti</id>
-            <name>Andrea Ceccanti</name>
-            <organization>INFN CNAF</organization>
-            <organizationUrl>http://www.cnaf.infn.it
+			<roles>
+				<role>developer</role>
+				<role>documentation</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>ceccanti</id>
+			<name>Andrea Ceccanti</name>
+			<organization>INFN CNAF</organization>
+			<organizationUrl>http://www.cnaf.infn.it
       </organizationUrl>
-            <roles>
-                <role>developer</role>
-                <role>documentation</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>ciaschini</id>
-            <name>Vincenzo Ciaschini</name>
-            <organization>INFN CNAF</organization>
-            <organizationUrl>http://www.cnaf.infn.it
+			<roles>
+				<role>developer</role>
+				<role>documentation</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>ciaschini</id>
+			<name>Vincenzo Ciaschini</name>
+			<organization>INFN CNAF</organization>
+			<organizationUrl>http://www.cnaf.infn.it
       </organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
-        <developer>
-            <id>venturi</id>
-            <name>Valerio Venturi</name>
-            <organization>INFN CNAF</organization>
-            <organizationUrl>http://www.cnaf.infn.it
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<id>venturi</id>
+			<name>Valerio Venturi</name>
+			<organization>INFN CNAF</organization>
+			<organizationUrl>http://www.cnaf.infn.it
       </organizationUrl>
-            <roles>
-                <role>developer</role>
-            </roles>
-            <timezone>+1</timezone>
-        </developer>
-    </developers>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
 
-    <licenses>
-        <license>
-            <name>Apache 2</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt
+	<licenses>
+		<license>
+			<name>Apache 2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt
       </url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
-    <organization>
-        <name>EGEE Collaboration</name>
-        <url>http://www.eu-egee.org/</url>
-    </organization>
+	<organization>
+		<name>EGEE Collaboration</name>
+		<url>http://www.eu-egee.org/</url>
+	</organization>
 
 </project>

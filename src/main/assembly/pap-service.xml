@@ -111,41 +111,28 @@
       <outputDirectory>wars</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
-    
-    <file>
-      <source>target/${project.build.finalName}-standalone.war</source>
-      <outputDirectory>wars</outputDirectory>
-      <fileMode>0644</fileMode>
-    </file>
-    
+       
     <file>
       <source>target/${project.build.finalName}.jar</source>
       <outputDirectory>lib</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
-    
-    <file>
-      <source>${basedir}/src/main/python/pap-deploy.py</source>
-      <outputDirectory>sbin</outputDirectory>
-      <destName>pap-deploy</destName>
-      <fileMode>0755</fileMode>
-    </file>
         
     <file>
       <source>${basedir}/src/main/bash/pap-env.sh</source>
-      <outputDirectory>lib</outputDirectory>
+      <outputDirectory>etc</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
-      <source>${basedir}/src/main/bash/pap-client-env.sh</source>
-      <outputDirectory>lib</outputDirectory>
+      <source>${basedir}/src/main/bash/pap-admin-env.sh</source>
+      <outputDirectory>etc</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
     <file>
-      <source>${basedir}/src/main/bash/pap-standalone.sh</source>
-      <destName>pap-standalone</destName>
+      <source>${basedir}/src/main/bash/papctl.sh</source>
+      <destName>papctl</destName>
       <outputDirectory>sbin</outputDirectory>
       <fileMode>0750</fileMode>
     </file>
