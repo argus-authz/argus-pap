@@ -23,26 +23,35 @@ PAP_HOME=usr/share/argus/pap
 prefix='../../../..'
 bin_prefix="$prefix/.."
 
+function create_symlink(){
+	if [ -L $2 ]; then
+		rm -f $2
+	fi
+	
+	echo "Linking $2 -> $1"
+	ln -s $1 $2
+}
+
 # conf
-ln -s $prefix/etc/argus/pap $PAP_HOME/conf
+create_symlink $prefix/etc/argus/pap $PAP_HOME/conf
 
 # lib
-ln -s $prefix/var/lib/argus/pap/lib $PAP_HOME/lib
+create_symlink $prefix/var/lib/argus/pap/lib $PAP_HOME/lib
 
 # logs
-ln -s $prefix/var/log/argus/pap $PAP_HOME/logs
+create_symlink $prefix/var/log/argus/pap $PAP_HOME/logs
 
 # repository
-ln -s $prefix/var/lib/argus/pap/repository $PAP_HOME/repository
+create_symlink $prefix/var/lib/argus/pap/repository $PAP_HOME/repository
 
 # doc
-ln -s $prefix/usr/share/doc/argus/pap/ $PAP_HOME/doc
+create_symlink $prefix/usr/share/doc/argus/pap/ $PAP_HOME/doc
 
 # papctl
-ln -s ../../$PAP_HOME/sbin/papctl usr/sbin/papctl
-ln -s ../../../$PAP_HOME/sbin/papctl etc/rc.d/init.d/argus-pap
+create_symlink ../../$PAP_HOME/sbin/papctl usr/sbin/papctl
+create_symlink ../../../$PAP_HOME/sbin/papctl etc/rc.d/init.d/argus-pap
 
 # pap-admin
-ln -s ../../$PAP_HOME/bin/pap-admin usr/bin/pap-admin
+create_symlink ../../$PAP_HOME/bin/pap-admin usr/bin/pap-admin
 
 
