@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>org.glite.authz</groupId>
 		<artifactId>argus-parent</artifactId>
@@ -13,7 +13,7 @@
 
 	<groupId>org.glite.authz.pap</groupId>
 	<artifactId>org.glite.authz.pap</artifactId>
-	
+
 	<packaging>war</packaging>
 	<name>Argus Policy Administration Point (PAP)</name>
 	<version>1.3.0</version>
@@ -27,9 +27,9 @@
 			UTF-8
         </project.reporting.outputEncoding>
 	</properties>
-	
+
 	<build>
-		
+
 		<finalName>pap</finalName>
 		<plugins>
 			<plugin>
@@ -71,25 +71,25 @@
 				</executions>
 				<configuration>
 					<archive>
-                        <index>true</index>
-                        <manifestEntries>
-                        	<Main-Class>org.glite.authz.pap.common.Version</Main-Class>
-                        </manifestEntries>
-                        <manifestSections>
-                            <manifestSection>
-                                <name>org/glite/authz/pap/common/</name>
-                                <manifestEntries>
-                                    <Implementation-Title>${project.artifactId}</Implementation-Title>
-                                    <Implementation-Version>${project.version}</Implementation-Version>
-                                    <Implementation-Vendor>EMI Collaboration</Implementation-Vendor>
-                                </manifestEntries>
-                            </manifestSection>
-                        </manifestSections>
-                    </archive>
+						<index>true</index>
+						<manifestEntries>
+							<Main-Class>org.glite.authz.pap.common.Version</Main-Class>
+						</manifestEntries>
+						<manifestSections>
+							<manifestSection>
+								<name>org/glite/authz/pap/common/</name>
+								<manifestEntries>
+									<Implementation-Title>${project.artifactId}</Implementation-Title>
+									<Implementation-Version>${project.version}</Implementation-Version>
+									<Implementation-Vendor>EMI Collaboration</Implementation-Vendor>
+								</manifestEntries>
+							</manifestSection>
+						</manifestSections>
+					</archive>
 				</configuration>
 			</plugin>
-			
-			
+
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
@@ -106,7 +106,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>axistools-maven-plugin
@@ -211,7 +211,7 @@
 					</execution>
 				</executions>
 			</plugin>
-						
+
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
 				<configuration>
@@ -258,7 +258,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
 	</build>
 	<repositories>
@@ -294,7 +294,7 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
-		
+
 		<!-- Jetty  -->
 		<dependency>
 			<groupId>org.mortbay.jetty</groupId>
@@ -308,7 +308,7 @@
 			<groupId>org.mortbay.jetty</groupId>
 			<artifactId>jetty-java5-threadpool</artifactId>
 		</dependency>
-		
+
 		<!-- Servlet & JSP apis -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -322,7 +322,7 @@
 			<version>2.0</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<!-- OpenSAML -->
 		<dependency>
 			<groupId>org.opensaml</groupId>
@@ -360,23 +360,23 @@
 			<groupId>org.bouncycastle</groupId>
 			<artifactId>bcprov-jdk15</artifactId>
 		</dependency>
-		
+
 		<!-- gLite -->
 		<dependency>
 			<groupId>org.glite.voms</groupId>
 			<artifactId>voms-api-java</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.glite.security</groupId>
 			<artifactId>util-java</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.glite.security</groupId>
 			<artifactId>trustmanager</artifactId>
 		</dependency>
-		
+
 		<!-- Axis -->
 		<dependency>
 			<groupId>axis</groupId>
@@ -389,13 +389,13 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>axis</groupId>
 			<artifactId>axis-jaxrpc</artifactId>
 			<version>1.4</version>
 		</dependency>
-		
+
 		<!-- Jakarta Commons -->
 		<dependency>
 			<groupId>commons-configuration</groupId>
@@ -438,12 +438,13 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>jcl-over-slf4j</artifactId>
 			<scope>runtime</scope>
 		</dependency>
+
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -452,29 +453,29 @@
 			<scope>runtime</scope>
 		</dependency>
 
+
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
 		</dependency>
 
+
 		<!--
-			Logback backend: to be used when trustmanager finally allows us to do
-			so <dependency> <groupId>ch.qos.logback</groupId>
+			<dependency> <groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId> </dependency> <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>log4j-over-slf4j</artifactId> </dependency>
 		-->
-		
-	</dependencies>
 
+	</dependencies>
 	<profiles>
 		<profile>
-      		<id>gLite</id>	
-      		<build>
-                <finalName>pap</finalName>
-            	<plugins>
-            		<plugin>
+			<id>gLite</id>
+			<build>
+				<finalName>pap</finalName>
+				<plugins>
+					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.2</version>
@@ -496,31 +497,31 @@
 							</execution>
 						</executions>
 					</plugin>
-					</plugins>
-				</build>
-    	</profile>
-    	
-    	<profile>
-      		<id>EMI</id>
-      		<activation>
-      			<activeByDefault>true</activeByDefault>
-    		</activation>
-      		<build>
-                <finalName>pap</finalName>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                        	<filters>
-            					<filter>src/main/assembly/pap-service-emi.properties</filter>
-          					</filters>
-                            <descriptors>
-                                <descriptor>src/main/assembly/pap-service-emi.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </plugin>
-                    
-                    <plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>EMI</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<finalName>pap</finalName>
+				<plugins>
+					<plugin>
+						<artifactId>maven-assembly-plugin</artifactId>
+						<configuration>
+							<filters>
+								<filter>src/main/assembly/pap-service-emi.properties</filter>
+							</filters>
+							<descriptors>
+								<descriptor>src/main/assembly/pap-service-emi.xml</descriptor>
+							</descriptors>
+						</configuration>
+					</plugin>
+
+					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
 						<version>1.2</version>
@@ -556,11 +557,11 @@
 							</execution>
 						</executions>
 					</plugin>
-                </plugins>
-            </build>
-    	</profile>
+				</plugins>
+			</build>
+		</profile>
 	</profiles>
-	
+
 	<reporting>
 		<plugins>
 			<plugin>

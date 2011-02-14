@@ -150,7 +150,6 @@
     <dependencySet>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-        <exclude>javax.servlet:servlet-api</exclude>
         <exclude>org.apache.xerces:xml-apis</exclude>
         <exclude>org.apache.xerces:xercesImpl</exclude>
         <exclude>org.apache.xerces:serializer</exclude>

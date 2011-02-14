@@ -22,12 +22,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Level;
 import org.apache.log4j.LogManager;
-
 import org.glite.authz.pap.common.PAPConfiguration;
-
-import org.slf4j.LoggerFactory;
-
-
 
 /**
  * This class implement the client that request the shutdown of the local PAP
@@ -89,9 +84,9 @@ public class ShutdownClient {
 
     /** Disables logging messages (logback version) */
     private static void disableLogBackLibraryLogging() {
-//	LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-//	Logger rootLogger = lc.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-//	rootLogger.setLevel(Level.OFF);
+//    	LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+//		Logger rootLogger = lc.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+//		rootLogger.setLevel(Level.OFF);
     }
 
     
@@ -105,6 +100,7 @@ public class ShutdownClient {
     public static void main(String[] args) {
 
 	disableLibraryLogging();
+    // disableLogBackLibraryLogging();
 
 	if (System.getProperty("PAP_HOME") == null) {
 

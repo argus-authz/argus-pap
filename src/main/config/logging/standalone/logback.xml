@@ -12,6 +12,7 @@
 <configuration>
 
     <logger name="org.opensaml" level="WARN" />
+    <logger name="org.apache.axis.utils" level="ERROR" />
     <logger name="org.glite.security.trustmanager" level="INFO" />
     <logger name="org.glite.security.util" level="ERROR" />
 

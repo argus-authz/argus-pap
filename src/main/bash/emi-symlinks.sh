@@ -24,11 +24,11 @@ prefix='../../../..'
 bin_prefix="$prefix/.."
 
 function create_symlink(){
-	if [ -L $2 ]; then
-		rm -f $2
+	if [ -e $2 ]; then
+		rm -rf $2
 	fi
 	
-	ln -sv $1 $2
+	ln -s $1 $2
 }
 
 # conf
