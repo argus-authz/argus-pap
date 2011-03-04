@@ -17,12 +17,17 @@
 
 package org.glite.authz.pap.ui.cli;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.SocketException;
 import java.rmi.RemoteException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
 
@@ -64,6 +69,8 @@ import org.slf4j.LoggerFactory;
 
 public class PAPCLI {
 
+    public static final String DEFAULTS_FILE_NAME = "pap-admin.properties";
+    
     private static final Logger log = LoggerFactory.getLogger(PAPCLI.class);
 
     public static void main(String[] args) {
@@ -113,7 +120,44 @@ public class PAPCLI {
 
         defineCommands();
         defineOptions();
+        loadDefaults();
+        
 
+    }
+
+    private void loadDefaults() {
+	
+	String papHome = System.getProperty("PAP_HOME");
+	
+	if (papHome == null || "".equals(papHome)){
+	    System.err.println("Please define the PAP_HOME environment variable according to your PAP installation before running this program!");
+	    System.exit(ServiceCLI.ExitStatus.INITIALIZATION_ERROR.ordinal());
+	}
+	    
+	String papDefaultsLocation = papHome+"/conf/"+DEFAULTS_FILE_NAME;
+	
+	File adminDefaultsFile = new File(papDefaultsLocation);
+	if (adminDefaultsFile.exists() && adminDefaultsFile.canRead()){
+	    
+	    Properties adminDefaultProps = new Properties();
+	    try {
+		
+		adminDefaultProps.load(new FileReader(adminDefaultsFile));
+		System.getProperties().putAll(adminDefaultProps);
+		
+	    
+	    } catch (IOException e) {
+		System.err.println("Error loading pap-admin default properties file '"+papDefaultsLocation+"': "+e.getMessage());
+		System.err.println("Continuing...");
+	    }
+	    
+	   
+	    
+	}else{
+	    log.warn("Pap admin default properties file not found or unreadable at location: "+papDefaultsLocation);
+	}
+	
+	
     }
 
     public int executeCommand() {

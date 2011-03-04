@@ -20,9 +20,13 @@ package org.glite.authz.pap.server.standalone;
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.log4j.Level;
-import org.apache.log4j.LogManager;
+
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 
 /**
  * This class implement the client that request the shutdown of the local PAP
@@ -84,16 +88,16 @@ public class ShutdownClient {
 
     /** Disables logging messages (logback version) */
     private static void disableLogBackLibraryLogging() {
-//    	LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
-//		Logger rootLogger = lc.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
-//		rootLogger.setLevel(Level.OFF);
+    	LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+		Logger rootLogger = lc.getLogger(org.slf4j.Logger.ROOT_LOGGER_NAME);
+		rootLogger.setLevel(Level.OFF);
     }
 
     
     private static void disableLibraryLogging(){
 	
 	// Switch off log4j logging
-	LogManager.getRootLogger().setLevel(Level.OFF);
+	// LogManager.getRootLogger().setLevel(Level.OFF);
 	
     }
     

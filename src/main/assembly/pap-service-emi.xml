@@ -34,6 +34,9 @@
             <outputDirectory>/etc/argus/pap</outputDirectory>
             <fileMode>0640</fileMode>
             <directoryMode>0750</directoryMode>
+            <excludes>
+                <exclude>pap-admin.properties</exclude>
+            </excludes>
         </fileSet>
         
                 
@@ -154,6 +157,13 @@
       <destName>pap-admin</destName>
       <outputDirectory>usr/share/argus/pap/bin</outputDirectory>
       <fileMode>0755</fileMode>
+    </file>
+    
+    
+    <file>
+      <source>${basedir}/src/main/config/pap-admin.properties</source>
+      <outputDirectory>etc/argus/pap</outputDirectory>
+      <fileMode>0644</fileMode>
     </file>
     
   </files>

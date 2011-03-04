@@ -94,7 +94,8 @@ public abstract class ServiceCLI {
     protected static final String OPT_PRIVATE_LONG = "private";
     protected static final String OPT_PUBLIC_LONG = "public";
 
-    protected static final String PAP_HOST_PROPERTY = "papHost";
+    protected static final String PAP_HOST_PROPERTY = "host";
+    protected static final String PAP_PORT_PROPERTY = "port";
     
     protected static final CommandLineParser parser = new GnuParser();
     private String[] commandNameValues;
@@ -223,6 +224,7 @@ public abstract class ServiceCLI {
             String host = Pap.DEFAULT_HOST;
             
             
+            
             String papHostProperty = System.getProperty(PAP_HOST_PROPERTY);
             
             if (papHostProperty != null && !"".equals(papHostProperty.trim())){
@@ -230,6 +232,11 @@ public abstract class ServiceCLI {
             }
             
             String port = Pap.DEFAULT_PORT;
+            
+            String papPortProperty = System.getProperty(PAP_PORT_PROPERTY);
+            if (papPortProperty != null && !"".equals(papPortProperty.trim())){
+        	port = papPortProperty;
+            }
 
             if (commandLine.hasOption(OPT_HOST_LONG)) {
                 host = commandLine.getOptionValue(OPT_HOST_LONG);
@@ -237,15 +244,15 @@ public abstract class ServiceCLI {
 
             if (commandLine.hasOption(OPT_PORT)) {
                 port = commandLine.getOptionValue(OPT_PORT);
-
-                try {
-                    Integer.valueOf(port);
-                } catch (NumberFormatException e) {
-                    throw new ParseException(String.format("Invalid port number \"%s\" (option -%s, --%s)",
-                                                           port,
-                                                           OPT_PORT,
-                                                           OPT_PORT_LONG));
-                }
+            }
+            
+            try {
+                Integer.valueOf(port);
+            } catch (NumberFormatException e) {
+                throw new ParseException(String.format("Invalid port number \"%s\" (option -%s, --%s)",
+                                                       port,
+                                                       OPT_PORT,
+                                                       OPT_PORT_LONG));
             }
 
             serviceClient.setTargetEndpoint(String.format(DEFAULT_SERVICE_URL,
