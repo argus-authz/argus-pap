@@ -19,5 +19,8 @@
 ## Sets the base of the PAP installation
 PAP_HOME=${PAP_HOME}
 
+## The PAP pid file
+PAP_RUN_FILE=/var/run/argus-pap.pid
+
 # This variable can be used to pass arguments to the JVM used to execute the service.
 #PAP_JAVA_OPTS=

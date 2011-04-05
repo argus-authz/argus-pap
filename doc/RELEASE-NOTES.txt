@@ -1,3 +1,17 @@
+PAP version 1.3.1
+
+What's new:
+
+* EMI packaging
+
+Fixes for the following bugs.
+
+https://savannah.cern.ch/bugs/?78349
+https://savannah.cern.ch/bugs/?75538
+https://savannah.cern.ch/bugs/?77524
+https://savannah.cern.ch/bugs/?77522
+https://savannah.cern.ch/bugs/?80510
+
 PAP version 1.2.1
 
 Improved error PAP cli error message reporting.

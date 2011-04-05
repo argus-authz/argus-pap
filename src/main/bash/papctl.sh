@@ -36,7 +36,9 @@ if [ ! -r $PAP_HOME/conf/pap_configuration.ini ]; then
 	exit 1
 fi 
 	
-PAP_RUN_FILE=$PAP_HOME/.pap.pid
+if [ -z $PAP_RUN_FILE ]; then
+	PAP_RUN_FILE=$PAP_HOME/.argus-pap.pid
+fi
 
 . $PAP_HOME/sbin/pap-env.sh
 
