@@ -40,6 +40,8 @@ public class AuthzConfigurationParserTest extends TestCase {
 	
 	public static final String RFC2253_ENCODED_DN = "CN=Andrea Ceccanti,L=CNAF,OU=Personal Certificate,O=INFN,C=IT";
 	
+	public static final String KERBERIZED_STYLE_DN = "/C=DE/O=GermanGrid/OU=RWTH/CN=host/grid-mon.physik.rwth-aachen.de";
+	
 	public static final String ALL_PERMISSIONS = "ALL";
 	
 	public static final String LEGAL_FQAN = "/atlas";
@@ -138,6 +140,20 @@ public class AuthzConfigurationParserTest extends TestCase {
 	
 	}
 	
+	public void testKeberizedDNParsing(){
+	    StringBuilder confFile = new StringBuilder();
+	    confFile.append(DN_STANZA);
+	    
+	    confFile.append(buildDNPermLine(KERBERIZED_STYLE_DN, ALL_PERMISSIONS));
+	    
+	    AuthzConfigurationParser parser = AuthzConfigurationParser.instance();
+	    ACL acl = parser.parse(new StringReader(confFile.toString()));
+		
+	    assertFalse("The parsed ACL should contain one entry!", acl.getPermissions().isEmpty());
+	    checkDnPermissions(KERBERIZED_STYLE_DN, ALL_PERMISSIONS, acl);
+	    
+	    
+	}
 	public void testFQANParsing(){
 		
 		StringBuilder confFile = new StringBuilder();
