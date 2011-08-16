@@ -1,0 +1,1 @@
+build-jar-repository -s -p /var/lib/argus/pap/lib vomsjapi bcprov trustmanager trustmanager-axis

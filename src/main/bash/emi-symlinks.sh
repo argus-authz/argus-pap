@@ -21,7 +21,6 @@ set -e
 PAP_HOME=usr/share/argus/pap
 
 prefix='../../../..'
-bin_prefix="$prefix/.."
 
 function create_symlink(){
 	if [ -e $2 ]; then
@@ -52,8 +51,3 @@ create_symlink ../../../$PAP_HOME/sbin/papctl etc/rc.d/init.d/argus-pap
 
 # pap-admin
 create_symlink ../../$PAP_HOME/bin/pap-admin usr/bin/pap-admin
-
-# trustmanager
-
-
-# voms

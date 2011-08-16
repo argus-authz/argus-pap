@@ -362,20 +362,8 @@
 			<groupId>org.glite.voms</groupId>
 			<artifactId>voms-api-java</artifactId>
 		</dependency>
-
-        <!-- Trustmanager -->
-        <!-- 
-		<dependency>
-			<groupId>org.glite.security</groupId>
-			<artifactId>util-java</artifactId>
-		</dependency>
-
-		<dependency>
-			<groupId>org.glite.security</groupId>
-			<artifactId>trustmanager</artifactId>
-		</dependency>
-         -->
-         
+		
+		<!-- Trustmanager -->         
         <dependency>
             <groupId>emi</groupId>
             <artifactId>trustmanager</artifactId>

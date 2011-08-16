@@ -171,17 +171,23 @@
   <dependencySets>
     <dependencySet>
       <outputDirectory>/var/lib/argus/pap/lib</outputDirectory>
+      <fileMode>0644</fileMode>
       <excludes>
         <exclude>org.apache.xerces:xml-apis</exclude>
         <exclude>org.apache.xerces:xercesImpl</exclude>
         <exclude>org.apache.xerces:serializer</exclude>
         <exclude>org.apache.xerces:resolver</exclude>
+        <exclude>emi:trustmanager</exclude>
+        <exclude>emi:trustmanager-axis</exclude>
+        <exclude>org.glite.voms:voms-api-java</exclude>
+        <exclude>org.bouncycastle:bcprov-jdk15</exclude>
         <exclude>*:war</exclude>
       </excludes>
     </dependencySet>
     
     <dependencySet>
       <outputDirectory>/var/lib/argus/pap/lib/endorsed</outputDirectory>
+      <fileMode>0644</fileMode>
       <includes>
         <include>org.apache.xerces:xml-apis</include>
         <include>org.apache.xerces:xercesImpl</include>
