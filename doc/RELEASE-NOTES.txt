@@ -1,3 +1,28 @@
+PAP version 1.4.0
+
+What's new:
+
+* The PAP service default logging configuration has been
+changed to fulfill WLCG requirements. Now the logfile
+are automatically rotated and archived following the
+rules defined in [1].
+
+* The PAP default memory limit has been updated according to
+the rules defined in [1]. 
+
+
+Fixes for the following bugs:
+
+* https://savannah.cern.ch/bugs/?84844
+* https://savannah.cern.ch/bugs/?83544
+
+[1] https://twiki.cern.ch/twiki/bin/view/EGEE/ArgusEMIFineTuning
+
+PAP version 1.3.3
+
+Fixes for the following bugs:
+https://savannah.cern.ch/bugs/?82193
+
 PAP version 1.3.1
 
 What's new:

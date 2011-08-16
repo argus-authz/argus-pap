@@ -46,6 +46,7 @@ public final class PAPService {
     protected static void setStartupMonitoringProperties() {
 
         // TODO: find a more reliable naming scheme
+    	// TODO: implement some decent extensible monitoring using the observer pattern
 
         // Property: service startup time
         PAPConfiguration.instance()

@@ -53,4 +53,7 @@ create_symlink ../../../$PAP_HOME/sbin/papctl etc/rc.d/init.d/argus-pap
 # pap-admin
 create_symlink ../../$PAP_HOME/bin/pap-admin usr/bin/pap-admin
 
+# trustmanager
 
+
+# voms

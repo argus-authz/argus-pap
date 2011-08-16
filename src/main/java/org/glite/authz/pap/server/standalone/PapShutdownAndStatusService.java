@@ -55,7 +55,7 @@ public class PapShutdownAndStatusService {
         final Thread shutdownCommandThread = buildServiceShutdownThread(shutdownService, shutdownCommands);
 
         BlockingChannelConnector connector = new BlockingChannelConnector();
-        connector.setHost("127.0.0.1");
+        connector.setHost("localhost");
         connector.setPort(shutdownPort);
         shutdownService.setConnectors(new Connector[] { connector });
 

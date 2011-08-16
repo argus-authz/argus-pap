@@ -59,7 +59,8 @@ public final class AuthzConfigurationParser {
     public static final Pattern anyUserPattern = Pattern.compile( anyUserRegex );
 
     /** The regexp string for matching X509 DNs **/
-    public static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
+    //public static final String dnRegex = "^\"((/[^=]+=([^/]|\\s)+)+)\"\\s*";
+    public static final String dnRegex = "^\"(/[^=]+=.*)\"\\s*";
     
     /** The regexp string used for matching X509 DNs in rfc 2253 format **/
     public static final String rfc2253DnRegex = "^\"([^\"]+)\"\\s*";
@@ -174,7 +175,7 @@ public final class AuthzConfigurationParser {
 
             PAPPermission perm = PAPPermission.fromString( permissions );
 
-            Matcher dnMatcher; 
+            Matcher dnMatcher = null;
             
             if (principalName.startsWith("\"/"))
             	dnMatcher = dnPattern.matcher( principalName );

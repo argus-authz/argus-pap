@@ -80,11 +80,18 @@ public class FileSystemRepositoryManager extends RepositoryManager {
         return XACML_FILENAME_EXTENSION;
     }
 
-    private static void createDirectoryPath(File dir) {
+    /**
+     * This method checks that the directory path leading to the repository is in 
+     * good shape. If the directory path does not exists, it is created.
+     * 
+     * @param dir, the repository directory
+     * @throws RepositoryException, if something goes wrong
+     */
+    private static void setupRepositoryDirectory(File dir) {
 
         if (!dir.exists()) {
             if (!dir.mkdirs()) // Find out what went wrong...
-                createDirectoryPath(dir.getParentFile());
+                setupRepositoryDirectory(dir.getParentFile());
         }
 
         if (!dir.canRead())
@@ -118,7 +125,7 @@ public class FileSystemRepositoryManager extends RepositoryManager {
         File rootDir = new File(fileSystemDatabaseDir);
 
         try {
-            createDirectoryPath(rootDir);
+            setupRepositoryDirectory(rootDir);
         } catch (RepositoryException e) {
             throw new RepositoryException("Cannot create the repository root directory: " + rootDir.getAbsolutePath(), e);
         }
