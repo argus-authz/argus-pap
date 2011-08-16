@@ -7,33 +7,40 @@
     under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES 
     OR CONDITIONS OF ANY KIND, either express or implied. See the License for 
     the specific language governing permissions and limitations under the License. -->
-
-
 <configuration>
 
+    <logger name="org.glite.authz" level="INFO" />
+    
     <logger name="org.opensaml" level="WARN" />
     <logger name="org.apache.axis.utils" level="ERROR" />
-    <logger name="org.glite.security.trustmanager" level="INFO" />
     <logger name="org.glite.security.util" level="ERROR" />
+    <logger name="org.glite.security.trustmanager" level="INFO" />
 
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <File>${PAP_HOME}/logs/pap-standalone.log</File>
-        <Append>true</Append>
+    <appender name="PROCESS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${PAP_HOME}/logs/pap-standalone.log</file>
+        <immediateFlush>true</immediateFlush>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+        
+            <!-- daily rolling policy: %d == yyyy-MM-dd -->
+            <fileNamePattern>${PAP_HOME}/logs/pap-standalone-%d.%i.log.gz</fileNamePattern>
+            
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <!-- or whenever the file size reaches 10MB: %i == [0..n] -->
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            
+            <!-- keeps 90 days of logging -->
+            <maxHistory>90</maxHistory>
+        </rollingPolicy>
+        
         <layout class="ch.qos.logback.classic.PatternLayout">
             <!-- General logging pattern, date time in UTC (Zulu) -->
-            <Pattern>%date{yyyy-MM-dd HH:mm:ss.SSS'Z',UTC} - %level [%logger{0}] - %msg%n</Pattern>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS'Z',UTC} - %level [%logger{0}] - %msg%n</pattern>
         </layout>
     </appender>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <!-- General logging pattern, date time in UTC (Zulu) -->
-            <Pattern>%date{yyyy-MM-dd HH:mm:ss.SSS'Z',UTC} - %level [%logger{0}] - %msg%n</Pattern>
-        </layout>
-    </appender>
-
-    <root level="info">
-        <appender-ref ref="FILE" />
+    <root>
+        <level value="ERROR" />
+        <appender-ref ref="PROCESS" />
     </root>
-
 </configuration>
