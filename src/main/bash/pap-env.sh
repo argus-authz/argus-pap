@@ -35,7 +35,7 @@ PAP_CONF_FILE="$PAP_HOME/conf/pap_configuration.ini"
 
 # Sets the heap size for the JVM  
 if [ -z $PAP_JAVA_OPTS ]; then
-	PAP_JAVA_OPTS="-Xmx512m "
+	PAP_JAVA_OPTS="-Xmx256m "
 fi
 
 # The name of the class that implements the PAP standalone server
