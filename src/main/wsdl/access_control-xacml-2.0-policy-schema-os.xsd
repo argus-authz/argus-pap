@@ -17,7 +17,6 @@
     limitations under the License.
 
 -->
-
 <xs:schema xmlns:xacml="urn:oasis:names:tc:xacml:2.0:policy:schema:os" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:oasis:names:tc:xacml:2.0:policy:schema:os" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<!-- -->
 	<xs:element name="PolicySet" type="xacml:PolicySetType"/>
