@@ -36,6 +36,8 @@
             <directoryMode>0750</directoryMode>
             <excludes>
                 <exclude>pap-admin.properties</exclude>
+                <exclude>attribute-mappings.ini</exclude>
+                <exclude>logging/client/logback.xml</exclude>
             </excludes>
         </fileSet>
         
@@ -105,6 +107,7 @@
           </excludes>
           <directoryMode>0750</directoryMode>
         </fileSet>
+        
         <fileSet>
           <directory>src</directory>
           <outputDirectory>/usr/sbin</outputDirectory>
@@ -161,10 +164,22 @@
       <fileMode>0755</fileMode>
     </file>
     
+    <file>
+      <source>${basedir}/src/main/config/attribute-mappings.ini</source>
+      <outputDirectory>etc/argus/pap</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
     
     <file>
       <source>${basedir}/src/main/config/pap-admin.properties</source>
       <outputDirectory>etc/argus/pap</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
+    
+    
+    <file>
+      <source>${basedir}/src/main/config/logging/client/logback.xml</source>
+      <outputDirectory>etc/argus/pap/logging/client</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
     
