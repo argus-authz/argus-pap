@@ -33,16 +33,16 @@ public class MonitoredProperties {
     /**
      * Number of policies property name
      */
-    public static final String NUM_OF_POLICIES_PROP_NAME = "NumOfPolicies";
+    public static final String NUM_OF_POLICIES_PROP_NAME = "NumberOfPolicies";
     /**
      * Number of local policies property name
      */
-    public static final String NUM_OF_LOCAL_POLICIES_PROP_NAME = "NumOfLocalPolicies";
+    public static final String NUM_OF_LOCAL_POLICIES_PROP_NAME = "NumberOfLocalPolicies";
     
     /**
      * Number of remote policies property name
      */
-    public static final String NUM_OF_REMOTE_POLICIES_PROP_NAME = "NumOfRemotePolicies";
+    public static final String NUM_OF_REMOTE_POLICIES_PROP_NAME = "NumberOfRemotePolicies";
     /**
      * Policy last modification time property name
      */
@@ -82,9 +82,9 @@ public class MonitoredProperties {
         props = new TreeMap<String, String>();
 
         PAPConfiguration conf = PAPConfiguration.instance();
-
-        props.put( PAP_VERSION_PROP_NAME, Version.getServiceVersion() );
+        
         props.put(STATUS_PROP_NAME, "OK");
+        props.put( PAP_VERSION_PROP_NAME, Version.getServiceVersion() );
         props.put(SERVICE_STARTUP_TIME_PROP_NAME, conf.getMonitoringProperty(SERVICE_STARTUP_TIME_PROP_NAME).toString());
 
         props.put(NUM_OF_POLICIES_PROP_NAME, conf.getMonitoringProperty(NUM_OF_POLICIES_PROP_NAME).toString());

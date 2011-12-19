@@ -7,8 +7,7 @@
 	<parent>
 		<groupId>org.glite.authz</groupId>
 		<artifactId>argus-parent</artifactId>
-		<version>1.4</version>
-		<relativePath>../org.glite.authz</relativePath>
+		<version>1.5</version>
 	</parent>
 
 	<groupId>org.glite.authz.pap</groupId>
@@ -16,7 +15,7 @@
 
 	<packaging>war</packaging>
 	<name>Argus Policy Administration Point (PAP)</name>
-	<version>1.4.0</version>
+	<version>1.5.0</version>
 	<properties>
 		<pap-services-namespace>http://org.glite.authz/wsdl/pap/services
         </pap-services-namespace>
