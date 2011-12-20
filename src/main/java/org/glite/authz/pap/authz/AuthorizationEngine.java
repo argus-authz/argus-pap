@@ -34,9 +34,6 @@ public class AuthorizationEngine {
     
     public static final Logger logger = LoggerFactory.getLogger( AuthorizationEngine.class );
 
-    /** A flag static whether the authz engine has been initialized **/
-    private boolean initialized = false;
-
     /** The singleton instance for the AuthorizationEngine class **/
     private static AuthorizationEngine instance;
 
@@ -108,13 +105,6 @@ public class AuthorizationEngine {
         confParser.save( new File( confFileName ), getGlobalContext().getAcl() );
     }
 
-    /**
-     * Returns the status of the initialization flag for the AuthorizationEngine 
-     */
-    public boolean isInitialized() {
-
-        return initialized;
-    }
 
     /**
      * Returns the global context for the authorization engine
