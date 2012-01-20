@@ -17,8 +17,6 @@
 
 package org.glite.authz.pap.server.standalone;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.security.Security;
 import java.util.Collections;
 import java.util.Properties;

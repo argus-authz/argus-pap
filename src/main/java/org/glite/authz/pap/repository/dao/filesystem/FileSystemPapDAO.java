@@ -422,6 +422,6 @@ public class FileSystemPapDAO implements PapDAO {
         iniConfiguration.setProperty(visibilityPublicKey(papAlias), pap.isVisibilityPublic());
         iniConfiguration.setProperty(enabledKey(papAlias), pap.isEnabled());
         iniConfiguration.setProperty(policyLastModificationTimeKey(papAlias),
-                                     pap.getPolicyLastModificationTimeInSecondsString());
+                                     pap.getPolicyLastModificationTimeInMilliseconds());
     }
 }

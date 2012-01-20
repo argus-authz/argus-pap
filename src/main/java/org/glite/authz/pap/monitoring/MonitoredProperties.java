@@ -47,10 +47,22 @@ public class MonitoredProperties {
      * Policy last modification time property name
      */
     public static final String POLICY_LAST_MODIFICATION_TIME_PROP_NAME = "PolicyLastModificationTime";
+    
+    /**
+     * Policy last modification time millis property name
+     */
+    public static final String POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME = "PolicyLastModificationTimeMillis";
+    
     /**
      * Service startup time property name
      */
     public static final String SERVICE_STARTUP_TIME_PROP_NAME = "ServiceStartupTime";
+    
+    /**
+     * Service startup time millis property name
+     */
+    public static final String SERVICE_STARTUP_TIME_MILLIS_PROP_NAME = "ServiceStartupTimeMillis";
+    
     /**
      * Status property name
      */
@@ -63,10 +75,32 @@ public class MonitoredProperties {
      * Max memory property name
      */
     public static final String MAX_MEMORY_PROP_NAME = "MaxMemory";
+    
     /**
      * Pap version property name
      */
-    public static final String PAP_VERSION_PROP_NAME = "PapVersion";
+    public static final String SERVICE_VERSION_PROP_NAME = "ServiceVersion";
+    
+    /**
+     * Service name property name
+     */
+    public static final String SERVICE_NAME_PROP_NAME = "Service";
+    
+    
+    private static final String[] propertyOrdering = {
+    		STATUS_PROP_NAME,
+    		SERVICE_NAME_PROP_NAME,
+    		SERVICE_VERSION_PROP_NAME,
+    		SERVICE_STARTUP_TIME_PROP_NAME,
+    		SERVICE_STARTUP_TIME_MILLIS_PROP_NAME,
+    		MAX_MEMORY_PROP_NAME,
+    		USED_MEMORY_PROP_NAME,
+    		POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+    		POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME,
+    		NUM_OF_POLICIES_PROP_NAME,
+    		NUM_OF_LOCAL_POLICIES_PROP_NAME,
+    		NUM_OF_REMOTE_POLICIES_PROP_NAME
+    };
     
 
     /**
@@ -74,6 +108,7 @@ public class MonitoredProperties {
      */
     TreeMap<String, String> props;
 
+    
     /**
      * Constructor
      */
@@ -84,13 +119,18 @@ public class MonitoredProperties {
         PAPConfiguration conf = PAPConfiguration.instance();
         
         props.put(STATUS_PROP_NAME, "OK");
-        props.put( PAP_VERSION_PROP_NAME, Version.getServiceVersion() );
+        props.put(SERVICE_NAME_PROP_NAME, "Argus PAP");
+        props.put(SERVICE_VERSION_PROP_NAME, Version.getServiceVersion() );
         props.put(SERVICE_STARTUP_TIME_PROP_NAME, conf.getMonitoringProperty(SERVICE_STARTUP_TIME_PROP_NAME).toString());
-
+        props.put(SERVICE_STARTUP_TIME_MILLIS_PROP_NAME, conf.getMonitoringProperty(SERVICE_STARTUP_TIME_MILLIS_PROP_NAME).toString());
+        
         props.put(NUM_OF_POLICIES_PROP_NAME, conf.getMonitoringProperty(NUM_OF_POLICIES_PROP_NAME).toString());
         props.put(NUM_OF_LOCAL_POLICIES_PROP_NAME, conf.getMonitoringProperty(NUM_OF_LOCAL_POLICIES_PROP_NAME).toString());
         props.put(NUM_OF_REMOTE_POLICIES_PROP_NAME, conf.getMonitoringProperty(NUM_OF_REMOTE_POLICIES_PROP_NAME).toString());
         props.put(POLICY_LAST_MODIFICATION_TIME_PROP_NAME, conf.getMonitoringProperty(POLICY_LAST_MODIFICATION_TIME_PROP_NAME)
+                .toString());
+        
+        props.put(POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME, conf.getMonitoringProperty(POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME)
                 .toString());
 
         Runtime r = Runtime.getRuntime();
@@ -108,14 +148,19 @@ public class MonitoredProperties {
         return new MonitoredProperties();
     }
 
+    private String propertyString(String propName){
+    	
+    	return propName + ": "+props.get(propName);
+    }
+    
     @Override
     public String toString() {
 
         StringBuilder builder = new StringBuilder();
-
-        for (Map.Entry<String, String> e : props.entrySet())
-            builder.append(e.getKey() + ": " + e.getValue() + "\n");
-
+        
+        for (String s: propertyOrdering)
+        	builder.append(propertyString(s)+"\n");
+        
         return builder.toString();
     }
 
