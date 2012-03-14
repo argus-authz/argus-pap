@@ -1,0 +1,5 @@
+# Remove old jars
+if [ -d "/var/lib/argus/pap/lib" ]; then
+	rm -f /var/lib/argus/pap/lib/*.jar
+	rm -f /var/lib/argus/pap/lib/endorsed/*.jar
+fi
