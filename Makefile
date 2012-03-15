@@ -13,13 +13,12 @@ clean:
 	rm -rf target $(rpmbuild_dir) tgz RPMS spec/argus-pap.spec
 
 dist: 	prepare-spec
-	
 	mvn -B -s $(settings_file) package
 
 prepare-spec:
 	sed -e 's#@@BUILD_SETTINGS@@#$(settings_file)#g' spec/argus-pap.spec.in > spec/argus-pap.spec
 
-rpm:
+rpm: prepare-spec
 	mkdir -p 	$(rpmbuild_dir)/BUILD $(rpmbuild_dir)/RPMS \
 				$(rpmbuild_dir)/SOURCES $(rpmbuild_dir)/SPECS \
 				$(rpmbuild_dir)/SRPMS

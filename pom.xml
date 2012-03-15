@@ -497,6 +497,9 @@
 							</filters>
 							<descriptors>
 								<descriptor>src/main/assembly/pap-service-emi.xml</descriptor>
+                                <!--
+								<descriptor>src/main/assembly/argus-pap.xml</descriptor>
+                                -->
 								<descriptor>src/main/assembly/sources.xml</descriptor>
 							</descriptors>
 							<finalName>argus-pap</finalName>
@@ -521,6 +524,22 @@
 									</arguments>
 								</configuration>
 							</execution>
+                            <execution>
+								<id>create-tarball</id>
+								<phase>package</phase>
+								<goals>
+									<goal>exec</goal>
+								</goals>
+								<configuration>
+									<executable>/bin/sh</executable>
+									<workingDirectory>${project.build.directory}/argus-pap-service</workingDirectory>
+									<arguments>
+										<argument>${basedir}/src/main/bash/create-tarball.sh</argument>
+                                        <argument>${version}</argument>
+									</arguments>
+								</configuration>
+							</execution>
+
 							<execution>
 								<id>cleanup-symlinks</id>
 								<phase>pre-clean</phase>
@@ -532,7 +551,7 @@
 									<workingDirectory>${project.build.directory}</workingDirectory>
 									<arguments>
 										<argument>-rf</argument>
-										<argument>pap-service</argument>
+										<argument>argus-pap-service</argument>
 									</arguments>
 								</configuration>
 							</execution>

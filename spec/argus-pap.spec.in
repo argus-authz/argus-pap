@@ -52,10 +52,45 @@ tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre
+# Stop service on update
+if [ $1 -gt 1 ] ; then
+    /sbin/service argus-pap stop > /dev/null 2>&1 || :
+
+    # Remove old jars
+    if [ -d "/var/lib/argus/pap/lib" ]; then
+        rm -f /var/lib/argus/pap/lib/*.jar
+        rm -f /var/lib/argus/pap/lib/endorsed/*.jar
+    fi
+fi
+
+%preun
+if [ $1 -eq 0 ] ; then
+    /sbin/service argus-pap stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del argus-pap
+fi
+
+%post
+# prepare jar repository linking selected OS libraries 
+for jarname in bcprov trustmanager trustmanager-axis vomsjapi; do
+    [ -f /usr/share/java/$jarname.jar ] || exit 1
+    ln -fs /usr/share/java/$jarname.jar /var/lib/argus/pap/lib
+done
+
+# register the service in init.d
+if [ $1 -eq 1 ]; then
+    /sbin/chkconfig --add argus-pap
+fi
+
+%postun
+if [ $1 -eq 1 ] ; then
+    # Restart the service after the update
+    /sbin/service argus-pap start > /dev/null 2>&1 || :
+fi
+
 %files
 
 %defattr(-,root,root,-)
-
 %{_initrddir}/argus-pap
 
 %dir %{_sysconfdir}/argus/pap
@@ -98,13 +133,13 @@ rm -rf $RPM_BUILD_ROOT
 %{_docdir}/argus/pap/RELEASE-NOTES.txt
 %{_docdir}/argus/pap/LICENSE.txt
 
-%dir %{_sharedstatedir}/argus/pap
-%dir %{_sharedstatedir}/argus/pap/repository
-%dir %{_sharedstatedir}/argus/pap/lib
-%dir %{_sharedstatedir}/argus/pap/lib/endorsed
+%dir %{_localstatedir}/lib/argus/pap
+%dir %{_localstatedir}/lib/argus/pap/repository
+%dir %{_localstatedir}/lib/argus/pap/lib
+%dir %{_localstatedir}/lib/argus/pap/lib/endorsed
 
-%{_sharedstatedir}/argus/pap/lib/*.jar
-%{_sharedstatedir}/argus/pap/lib/endorsed/*.jar
+%{_localstatedir}/lib/argus/pap/lib/*.jar
+%{_localstatedir}/lib/argus/pap/lib/endorsed/*.jar
 
 %dir %{_localstatedir}/log/argus/pap
 
