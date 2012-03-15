@@ -7,8 +7,7 @@
 	<parent>
 		<groupId>org.glite.authz</groupId>
 		<artifactId>argus-parent</artifactId>
-		<version>1.4</version>
-		<relativePath>../org.glite.authz</relativePath>
+		<version>1.5</version>
 	</parent>
 
 	<groupId>org.glite.authz.pap</groupId>
@@ -16,7 +15,7 @@
 
 	<packaging>war</packaging>
 	<name>Argus Policy Administration Point (PAP)</name>
-	<version>1.4.0</version>
+	<version>1.5.0</version>
 	<properties>
 		<pap-services-namespace>http://org.glite.authz/wsdl/pap/services
         </pap-services-namespace>
@@ -498,14 +497,15 @@
 							</filters>
 							<descriptors>
 								<descriptor>src/main/assembly/pap-service-emi.xml</descriptor>
+								<descriptor>src/main/assembly/sources.xml</descriptor>
 							</descriptors>
+							<finalName>argus-pap</finalName>
 						</configuration>
 					</plugin>
 
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>exec-maven-plugin</artifactId>
-						<version>1.2</version>
 						<executions>
 							<execution>
 								<id>create-symlinks</id>
@@ -515,7 +515,7 @@
 								</goals>
 								<configuration>
 									<executable>/bin/sh</executable>
-									<workingDirectory>${project.build.directory}/pap-service</workingDirectory>
+									<workingDirectory>${project.build.directory}/argus-pap-service</workingDirectory>
 									<arguments>
 										<argument>${basedir}/src/main/bash/emi-symlinks.sh</argument>
 									</arguments>

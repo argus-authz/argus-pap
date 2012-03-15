@@ -1,1 +1,10 @@
-build-jar-repository -s -p /var/lib/argus/pap/lib vomsjapi bcprov trustmanager trustmanager-axis
+# prepare jar repository linking selected OS libraries 
+for jarname in bcprov trustmanager trustmanager-axis vomsjapi; do
+    [ -f /usr/share/java/$jarname.jar ] || exit 1
+    ln -fs /usr/share/java/$jarname.jar /var/lib/argus/pap/lib
+done 
+
+# register the service in init.d
+if [ $1 -eq 1 ]; then 
+	/sbin/chkconfig --add argus-pap
+fi 
