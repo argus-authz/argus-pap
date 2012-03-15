@@ -17,14 +17,16 @@
 
 package org.glite.authz.pap.server;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.NoSuchElementException;
+import java.util.TimeZone;
 
 import javax.servlet.ServletContext;
 
 import org.glite.authz.pap.authz.AuthorizationEngine;
-import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.PAPConfiguration;
+import org.glite.authz.pap.common.Pap;
 import org.glite.authz.pap.common.Version;
 import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.glite.authz.pap.common.xacml.wizard.AttributeWizardTypeConfiguration;
@@ -35,144 +37,170 @@ import org.glite.authz.pap.papmanagement.PapManager;
 import org.glite.authz.pap.repository.RepositoryManager;
 import org.glite.authz.pap.repository.RepositoryUtils;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.joda.time.DateTime;
+import org.joda.time.chrono.ISOChronology;
 import org.opensaml.DefaultBootstrap;
 import org.opensaml.xml.ConfigurationException;
 import org.slf4j.Logger;
 
 public final class PAPService {
 
-    static final Logger logger = org.slf4j.LoggerFactory.getLogger(PAPService.class);
+	static final Logger logger = org.slf4j.LoggerFactory
+			.getLogger(PAPService.class);
 
-    protected static void setStartupMonitoringProperties() {
+	protected static void setStartupMonitoringProperties() {
 
-        // TODO: find a more reliable naming scheme
-    	// TODO: implement some decent extensible monitoring using the observer pattern
+		// Property: service startup time
+		Calendar c = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+		DateTime dt = new DateTime(c.getTimeInMillis())
+				.withChronology(ISOChronology.getInstanceUTC());
 
-        // Property: service startup time
-        PAPConfiguration.instance()
-                        .setMonitoringProperty(MonitoredProperties.SERVICE_STARTUP_TIME_PROP_NAME,
-                                               ((new GregorianCalendar()).getTimeInMillis() / 1000));
+		PAPConfiguration.instance().setMonitoringProperty(
+				MonitoredProperties.SERVICE_STARTUP_TIME_MILLIS_PROP_NAME,
+				c.getTimeInMillis());
 
-        PapManager papManager = PapManager.getInstance();
+		PAPConfiguration.instance().setMonitoringProperty(
+				MonitoredProperties.SERVICE_STARTUP_TIME_PROP_NAME, dt);
 
-        // Property: number of local policies
-        int numberOfLocalPolicies = 0;
-        for (PapContainer papContainer : PapContainer.getContainers(papManager.getLocalPaps())) {
-            numberOfLocalPolicies += papContainer.getNumberOfPolicies();
-        }
-        PAPConfiguration.instance()
-                        .setMonitoringProperty(MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME,
-                                               numberOfLocalPolicies);
+		PapManager papManager = PapManager.getInstance();
 
-        // Property: number of remote policies
-        int numOfRemotePolicies = 0;
-        for (PapContainer papContainer : PapContainer.getContainers(papManager.getRemotePaps())) {
-            numOfRemotePolicies += papContainer.getNumberOfPolicies();
-        }
-        PAPConfiguration.instance()
-                        .setMonitoringProperty(MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME,
-                                               numOfRemotePolicies);
+		// Property: number of local policies
+		int numberOfLocalPolicies = 0;
+		for (PapContainer papContainer : PapContainer.getContainers(papManager
+				.getLocalPaps())) {
+			numberOfLocalPolicies += papContainer.getNumberOfPolicies();
+		}
+		PAPConfiguration.instance().setMonitoringProperty(
+				MonitoredProperties.NUM_OF_LOCAL_POLICIES_PROP_NAME,
+				numberOfLocalPolicies);
 
-        // Property: number of policies
-        PAPConfiguration.instance().setMonitoringProperty(MonitoredProperties.NUM_OF_POLICIES_PROP_NAME,
-                                                          numberOfLocalPolicies + numOfRemotePolicies);
+		// Property: number of remote policies
+		int numOfRemotePolicies = 0;
+		for (PapContainer papContainer : PapContainer.getContainers(papManager
+				.getRemotePaps())) {
+			numOfRemotePolicies += papContainer.getNumberOfPolicies();
+		}
+		PAPConfiguration.instance().setMonitoringProperty(
+				MonitoredProperties.NUM_OF_REMOTE_POLICIES_PROP_NAME,
+				numOfRemotePolicies);
 
-        // Property: policy last modification time
-        String policyLastModificationTimeString = papManager.getPap(Pap.DEFAULT_PAP_ALIAS)
-                                                            .getPolicyLastModificationTimeInSecondsString();
-        PAPConfiguration.instance()
-                        .setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                                               policyLastModificationTimeString);
-    }
+		// Property: number of policies
+		PAPConfiguration.instance().setMonitoringProperty(
+				MonitoredProperties.NUM_OF_POLICIES_PROP_NAME,
+				numberOfLocalPolicies + numOfRemotePolicies);
 
-    public static void start(ServletContext context) {
+		// Property: policy last modification time
+		String policyLastModificationTimeString = papManager.getPap(
+				Pap.DEFAULT_PAP_ALIAS)
+				.getPolicyLastModificationTimeInMilliseconds();
 
-        logger.info("Starting PAP service version {} ...", Version.getServiceVersion());
+		DateTime policyLastModificationTime = papManager.getPap(
+				Pap.DEFAULT_PAP_ALIAS).getPolicyLastModificationTime();
 
-        // Initialize configuaration
-        PAPConfiguration conf = PAPConfiguration.initialize(context);
+		PAPConfiguration
+				.instance()
+				.setMonitoringProperty(
+						MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME,
+						policyLastModificationTimeString);
 
-        // Start autorization service
-        logger.info("Starting authorization engine...");
+		PAPConfiguration.instance().setMonitoringProperty(
+				MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+				policyLastModificationTime);
+	}
 
-        AuthorizationEngine.initialize(conf.getPapAuthzConfigurationFileName());
+	public static void start(ServletContext context) {
 
-        // Bootstrap opensaml
-        try {
+		logger.info("Starting PAP service version {} ...",
+				Version.getServiceVersion());
 
-            logger.info("Bootstraping OpenSAML...");
-            DefaultBootstrap.bootstrap();
+		// Initialize configuaration
+		PAPConfiguration conf = PAPConfiguration.initialize(context);
 
-        } catch (ConfigurationException e) {
+		// Start autorization service
+		logger.info("Starting authorization engine...");
 
-            logger.error("Error configuring OpenSAML:" + e.getMessage());
-            throw new PAPConfigurationException("Error configuring OpenSAML:" + e.getMessage(), e);
-        }
+		AuthorizationEngine.initialize(conf.getPapAuthzConfigurationFileName());
 
-        // Boostrap wizard attributes
-        String configFileName = PAPConfiguration.instance().getPAPConfigurationDir() + "/attribute-mappings.ini";
-        AttributeWizardTypeConfiguration.bootstrap(configFileName);
+		// Bootstrap opensaml
+		try {
 
-        // Start repository manager
-        logger.info("Starting repository manager...");
-        RepositoryManager.bootstrap();
+			logger.info("Bootstraping OpenSAML...");
+			DefaultBootstrap.bootstrap();
 
-        PapManager.initialize();
+		} catch (ConfigurationException e) {
 
-        boolean performRepositoryValidationCheck;
+			logger.error("Error configuring OpenSAML:" + e.getMessage());
+			throw new PAPConfigurationException("Error configuring OpenSAML:"
+					+ e.getMessage(), e);
+		}
 
-        try {
+		// Boostrap wizard attributes
+		String configFileName = PAPConfiguration.instance()
+				.getPAPConfigurationDir() + "/attribute-mappings.ini";
+		AttributeWizardTypeConfiguration.bootstrap(configFileName);
 
-            performRepositoryValidationCheck = PAPConfiguration.instance()
-                                                               .getBoolean("repository.consistency_check");
+		// Start repository manager
+		logger.info("Starting repository manager...");
+		RepositoryManager.bootstrap();
 
-        } catch (NoSuchElementException e) {
+		PapManager.initialize();
 
-            performRepositoryValidationCheck = false;
-            logger.info("Skipping repository validation check");
+		boolean performRepositoryValidationCheck;
 
-        }
+		try {
 
-        if (performRepositoryValidationCheck) {
+			performRepositoryValidationCheck = PAPConfiguration.instance()
+					.getBoolean("repository.consistency_check");
 
-            boolean repair;
+		} catch (NoSuchElementException e) {
 
-            try {
+			performRepositoryValidationCheck = false;
+			logger.info("Skipping repository validation check");
 
-                repair = PAPConfiguration.instance().getBoolean("repository.consistency_check.repair");
+		}
 
-            } catch (NoSuchElementException e) {
+		if (performRepositoryValidationCheck) {
 
-                repair = false;
-            }
+			boolean repair;
 
-            logger.info("Starting repository validation. repair=" + repair);
+			try {
 
-            if (RepositoryUtils.performAllChecks(repair) == false) {
+				repair = PAPConfiguration.instance().getBoolean(
+						"repository.consistency_check.repair");
 
-                throw new RepositoryException("Repository validation check failed");
+			} catch (NoSuchElementException e) {
 
-            }
-        }
+				repair = false;
+			}
 
-        setStartupMonitoringProperties();
+			logger.info("Starting repository validation. repair=" + repair);
 
-        logger.info("Starting pap distribution module...");
-        DistributionModule.getInstance().startDistributionModule();
+			if (RepositoryUtils.performAllChecks(repair) == false) {
 
-    }
+				throw new RepositoryException(
+						"Repository validation check failed");
 
-    public static void stop() {
+			}
+		}
 
-        logger.info("Shutting down PAP service...");
+		setStartupMonitoringProperties();
 
-        logger.info("Shutting down distribution module...");
-        DistributionModule.getInstance().stopDistributionModule();
+		logger.info("Starting pap distribution module...");
+		DistributionModule.getInstance().startDistributionModule();
 
-        logger.info("Shutting down authorization module...");
-        if (AuthorizationEngine.instance() != null)
-            AuthorizationEngine.instance().shutdown();
+	}
 
-    }
+	public static void stop() {
+
+		logger.info("Shutting down PAP service...");
+
+		logger.info("Shutting down distribution module...");
+		DistributionModule.getInstance().stopDistributionModule();
+
+		logger.info("Shutting down authorization module...");
+		if (AuthorizationEngine.instance() != null)
+			AuthorizationEngine.instance().shutdown();
+
+	}
 
 }

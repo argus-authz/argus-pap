@@ -21,6 +21,8 @@ import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
+import org.joda.time.DateTime;
+import org.joda.time.chrono.ISOChronology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -263,8 +265,12 @@ public class Pap {
         return path;
     }
 
-    public String getPolicyLastModificationTimeInSecondsString() {
-        return String.valueOf(policyLastModificationTimeInMillis / 1000);
+    public String getPolicyLastModificationTimeInMilliseconds() {
+        return String.valueOf(policyLastModificationTimeInMillis);
+    }
+    
+    public DateTime getPolicyLastModificationTime(){
+    	return new DateTime(policyLastModificationTimeInMillis).withChronology(ISOChronology.getInstanceUTC());
     }
 
     public String getPort() {
