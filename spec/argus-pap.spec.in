@@ -100,14 +100,14 @@ fi
 %config(noreplace) %{_sysconfdir}/argus/pap/pap_authorization.ini
 %config(noreplace) %{_sysconfdir}/argus/pap/pap-admin.properties
 
-%{_sysconfdir}/argus/pap/attribute-mappings.ini
+%config %{_sysconfdir}/argus/pap/attribute-mappings.ini
 
 %dir %{_sysconfdir}/argus/pap/logging
 %dir %{_sysconfdir}/argus/pap/logging/standalone
 %dir %{_sysconfdir}/argus/pap/logging/client
 
-%{_sysconfdir}/argus/pap/logging/standalone/logback.xml
-%{_sysconfdir}/argus/pap/logging/client/logback.xml
+%config %{_sysconfdir}/argus/pap/logging/standalone/logback.xml
+%config %{_sysconfdir}/argus/pap/logging/client/logback.xml
 
 %{_sbindir}/*
 %{_bindir}/*
