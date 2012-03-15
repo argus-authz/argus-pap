@@ -7,7 +7,7 @@ settings_file=src/main/build/emi-build-settings.xml
 
 .PHONY: etics dist clean rpm
 
-all: 	rpm
+all: dist
 
 clean:	
 	rm -rf target $(rpmbuild_dir) tgz RPMS spec/argus-pap.spec
