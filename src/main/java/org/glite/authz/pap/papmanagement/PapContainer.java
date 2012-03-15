@@ -750,8 +750,13 @@ public class PapContainer {
 
         synchronized (notificationLock) {
             PAPConfiguration.instance()
-                            .setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                                                   pap.getPolicyLastModificationTimeInSecondsString());
+                            .setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME,
+                                                   pap.getPolicyLastModificationTimeInMilliseconds());
+            
+            PAPConfiguration.instance()
+            				.setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
+                                   pap.getPolicyLastModificationTime());
+            
         }
     }
 

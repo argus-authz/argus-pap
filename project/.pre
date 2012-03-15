@@ -1,0 +1,11 @@
+# Stop service on update
+if [ $1 -gt 1 ] ; then
+	/sbin/service argus-pap stop > /dev/null 2>&1 || :
+	
+	# Remove old jars
+	if [ -d "/var/lib/argus/pap/lib" ]; then
+		rm -f /var/lib/argus/pap/lib/*.jar
+		rm -f /var/lib/argus/pap/lib/endorsed/*.jar
+	fi
+fi 
+

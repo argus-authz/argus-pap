@@ -126,9 +126,10 @@ public abstract class BasePAPOperation<T> implements PAPOperation <T> {
      * @param perms, the required permission
      */
     protected final void addRequiredPermission( PAPPermission perms ) {
-
-        assert perms != null : "Cannot add null permissions for the global context!";
-        assert AuthorizationEngine.instance().isInitialized() : "Authz engine not initialized! Cannot get global context!";
+        
+        if (perms == null)
+        	throw new IllegalArgumentException("Cannot add null permissions on the global context!");
+        
 
         requiredPermission.put( AuthorizationEngine.instance()
                 .getGlobalContext(), perms );
