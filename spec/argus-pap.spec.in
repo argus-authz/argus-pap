@@ -113,23 +113,9 @@ fi
 %{_bindir}/*
 
 %{_datadir}/argus/pap
-%{_datadir}/argus/pap/logs
-%{_datadir}/argus/pap/conf
-%{_datadir}/argus/pap/doc
-
-%dir %{_datadir}/argus/pap/bin
-%dir %{_datadir}/argus/pap/sbin
-
-%{_datadir}/argus/pap/bin/*
-%{_datadir}/argus/pap/sbin/*
-
-%dir %{_datadir}/argus/pap/wars
-%dir %{_datadir}/argus/pap/wsdl
-
-%{_datadir}/argus/pap/wars/*
-%{_datadir}/argus/pap/wsdl/*
 
 %dir %{_docdir}/argus/pap
+
 %{_docdir}/argus/pap/RELEASE-NOTES.txt
 %{_docdir}/argus/pap/LICENSE.txt
 

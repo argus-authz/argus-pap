@@ -4,13 +4,14 @@ version=$(shell grep "Version:" $(spec) | sed -e "s/Version://g" -e "s/[ \t]*//g
 release=1
 rpmbuild_dir=$(shell pwd)/rpmbuild
 settings_file=src/main/build/emi-build-settings.xml
+stage_dir=$(shell pwd)/stage
 
 .PHONY: etics dist clean rpm
 
 all: dist
 
 clean:	
-	rm -rf target $(rpmbuild_dir) tgz RPMS spec/argus-pap.spec
+	rm -rf target $(rpmbuild_dir) stage tgz RPMS spec/argus-pap.spec
 
 dist: 	prepare-spec
 	mvn -B -s $(settings_file) package
@@ -30,3 +31,8 @@ etics:	dist rpm
 	mkdir -p tgz RPMS
 	cp target/*.tar.gz tgz
 	cp -r $(rpmbuild_dir)/RPMS/* $(rpmbuild_dir)/SRPMS/* RPMS
+
+stage:
+	echo "Staging tarball in $(stage_dir)"
+	mkdir -p $(stage_dir)
+	tar -C $(stage_dir) -xvzf target/$(name)-$(version).tar.gz
