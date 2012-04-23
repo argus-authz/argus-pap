@@ -761,7 +761,7 @@ public class PapContainer {
             
             PAPConfiguration.instance()
             				.setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                                   lastModificationTime);            
+                                   lastModificationTime);
         }
     }
 
