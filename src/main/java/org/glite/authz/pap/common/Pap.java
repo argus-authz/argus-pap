@@ -17,6 +17,8 @@
 
 package org.glite.authz.pap.common;
 
+import java.io.Serializable;
+
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.papmanagement.PapContainer;
@@ -46,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * @see PapContainer
  * 
  */
-public class Pap {
+public class Pap implements Serializable{
 
     /** Default host: {@value} */
     public static final String DEFAULT_HOST = "localhost";

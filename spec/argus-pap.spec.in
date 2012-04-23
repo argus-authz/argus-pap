@@ -1,0 +1,135 @@
+## Turn off meaningless jar repackaging on SL6
+%define __jar_repack 0
+
+Name: argus-pap
+
+Version: 1.5.0
+Release: 1%{?dist}
+Summary: Argus PAP service
+
+Group: System Environment/Daemons
+License: ASL 2.0
+URL: https://twiki.cern.ch/twiki/bin/view/EGEE/AuthorizationFramework
+
+Source: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildArch: noarch
+
+BuildRequires: maven
+BuildRequires: jpackage-utils
+BuildRequires: java-devel
+
+Requires: emi-trustmanager
+Requires: emi-trustmanager-axis
+Requires: voms-api-java
+Requires: java
+
+%description 
+
+Argus is a system meant to render consistent authorization decisions for
+distributed services (e.g. compute elements, portals). In order to achieve
+this consistency a number of points must be addressed. First, it must be
+possible to author and maintain consistent authorization policies. This is
+handled by the Policy Administration Point (PAP) component in the service.
+Second, authored policies must be evaluated in a consistent manner, a task
+performed by the Policy Decision Point (PDP). Finally, the data provided for
+evaluation against policies must be consistent (in form and definition) and
+this is done by the Policy Enforcement Point (PEP).
+
+This package provides the Argus PAP service.
+
+%prep
+%setup -q -n argus-pap
+
+%build
+mvn -B -s @@BUILD_SETTINGS@@ package
+
+%install
+rm -rf $RPM_BUILD_ROOT
+mkdir -p $RPM_BUILD_ROOT
+tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%pre
+# Stop service on update
+if [ $1 -gt 1 ] ; then
+    /sbin/service argus-pap stop > /dev/null 2>&1 || :
+
+    # Remove old jars
+    if [ -d "/var/lib/argus/pap/lib" ]; then
+        rm -f /var/lib/argus/pap/lib/*.jar
+        rm -f /var/lib/argus/pap/lib/endorsed/*.jar
+    fi
+fi
+
+%preun
+if [ $1 -eq 0 ] ; then
+    /sbin/service argus-pap stop > /dev/null 2>&1 || :
+    /sbin/chkconfig --del argus-pap
+fi
+
+%post
+# prepare jar repository linking selected OS libraries 
+for jarname in bcprov trustmanager trustmanager-axis vomsjapi; do
+    [ -f /usr/share/java/$jarname.jar ] || exit 1
+    ln -fs /usr/share/java/$jarname.jar /var/lib/argus/pap/lib
+done
+
+# register the service in init.d
+if [ $1 -eq 1 ]; then
+    /sbin/chkconfig --add argus-pap
+fi
+
+%postun
+if [ $1 -eq 1 ] ; then
+    # Restart the service after the update
+    /sbin/service argus-pap start > /dev/null 2>&1 || :
+fi
+
+%files
+
+%defattr(-,root,root,-)
+%{_initrddir}/argus-pap
+
+%dir %{_sysconfdir}/argus/pap
+
+%config(noreplace) %{_sysconfdir}/sysconfig/argus-pap
+%config(noreplace) %{_sysconfdir}/argus/pap/pap_configuration.ini
+%config(noreplace) %{_sysconfdir}/argus/pap/pap_authorization.ini
+%config(noreplace) %{_sysconfdir}/argus/pap/pap-admin.properties
+
+%config %{_sysconfdir}/argus/pap/attribute-mappings.ini
+
+%dir %{_sysconfdir}/argus/pap/logging
+%dir %{_sysconfdir}/argus/pap/logging/standalone
+%dir %{_sysconfdir}/argus/pap/logging/client
+
+%config %{_sysconfdir}/argus/pap/logging/standalone/logback.xml
+%config %{_sysconfdir}/argus/pap/logging/client/logback.xml
+
+%{_sbindir}/*
+%{_bindir}/*
+
+%{_datadir}/argus/pap
+
+%dir %{_docdir}/argus/pap
+
+%{_docdir}/argus/pap/RELEASE-NOTES.txt
+%{_docdir}/argus/pap/LICENSE.txt
+
+%dir %{_localstatedir}/lib/argus/pap
+%dir %{_localstatedir}/lib/argus/pap/repository
+%dir %{_localstatedir}/lib/argus/pap/lib
+%dir %{_localstatedir}/lib/argus/pap/lib/endorsed
+
+%{_localstatedir}/lib/argus/pap/lib/*.jar
+%{_localstatedir}/lib/argus/pap/lib/endorsed/*.jar
+
+%dir %{_localstatedir}/log/argus/pap
+
+%changelog
+
+* Thu Mar 15 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 1.5.0-1
+- Self managed packaging

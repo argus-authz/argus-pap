@@ -38,6 +38,8 @@ import org.glite.authz.pap.repository.exceptions.AlreadyExistsException;
 import org.glite.authz.pap.repository.exceptions.InvalidVersionException;
 import org.glite.authz.pap.repository.exceptions.NotFoundException;
 import org.glite.authz.pap.repository.exceptions.RepositoryException;
+import org.joda.time.DateTime;
+import org.joda.time.chrono.ISOChronology;
 import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.slf4j.Logger;
@@ -749,14 +751,17 @@ public class PapContainer {
         }
 
         synchronized (notificationLock) {
+	        String lastModificationTimeString = pap.getPolicyLastModificationTimeInMilliseconds();
+        	
             PAPConfiguration.instance()
                             .setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME,
-                                                   pap.getPolicyLastModificationTimeInMilliseconds());
+                                                   lastModificationTimeString);
+            
+            DateTime lastModificationTime = new DateTime(lastModificationTimeString).withChronology(ISOChronology.getInstanceUTC());
             
             PAPConfiguration.instance()
             				.setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
-                                   pap.getPolicyLastModificationTime());
-            
+                                   lastModificationTime);            
         }
     }
 

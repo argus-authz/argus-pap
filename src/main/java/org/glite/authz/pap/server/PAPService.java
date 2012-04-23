@@ -90,12 +90,13 @@ public final class PAPService {
 				numberOfLocalPolicies + numOfRemotePolicies);
 
 		// Property: policy last modification time
+		
 		String policyLastModificationTimeString = papManager.getPap(
 				Pap.DEFAULT_PAP_ALIAS)
 				.getPolicyLastModificationTimeInMilliseconds();
 
-		DateTime policyLastModificationTime = papManager.getPap(
-				Pap.DEFAULT_PAP_ALIAS).getPolicyLastModificationTime();
+		DateTime policyLastModificationTime = new DateTime(policyLastModificationTimeString)
+			.withChronology(ISOChronology.getInstanceUTC());
 
 		PAPConfiguration
 				.instance()
