@@ -17,12 +17,12 @@
 
 package org.glite.authz.pap.common;
 
+import java.io.Serializable;
+
 import org.glite.authz.pap.common.utils.Utils;
 import org.glite.authz.pap.common.xacml.wizard.WizardUtils;
 import org.glite.authz.pap.papmanagement.PapContainer;
 import org.glite.authz.pap.papmanagement.PapManager;
-import org.joda.time.DateTime;
-import org.joda.time.chrono.ISOChronology;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  * @see PapContainer
  * 
  */
-public class Pap {
+public class Pap implements Serializable{
 
     /** Default host: {@value} */
     public static final String DEFAULT_HOST = "localhost";
@@ -267,10 +267,6 @@ public class Pap {
 
     public String getPolicyLastModificationTimeInMilliseconds() {
         return String.valueOf(policyLastModificationTimeInMillis);
-    }
-    
-    public DateTime getPolicyLastModificationTime(){
-    	return new DateTime(policyLastModificationTimeInMillis).withChronology(ISOChronology.getInstanceUTC());
     }
 
     public String getPort() {
