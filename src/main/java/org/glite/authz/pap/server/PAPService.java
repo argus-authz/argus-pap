@@ -94,8 +94,8 @@ public final class PAPService {
 		String policyLastModificationTimeString = papManager.getPap(
 				Pap.DEFAULT_PAP_ALIAS)
 				.getPolicyLastModificationTimeInMilliseconds();
-
-		DateTime policyLastModificationTime = new DateTime(policyLastModificationTimeString)
+		
+		DateTime policyLastModificationTime = new DateTime(Long.parseLong(policyLastModificationTimeString))
 			.withChronology(ISOChronology.getInstanceUTC());
 
 		PAPConfiguration

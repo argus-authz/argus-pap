@@ -757,7 +757,8 @@ public class PapContainer {
                             .setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_MILLIS_PROP_NAME,
                                                    lastModificationTimeString);
             
-            DateTime lastModificationTime = new DateTime(lastModificationTimeString).withChronology(ISOChronology.getInstanceUTC());
+            DateTime lastModificationTime = new DateTime(Long.parseLong(lastModificationTimeString))
+            	.withChronology(ISOChronology.getInstanceUTC());
             
             PAPConfiguration.instance()
             				.setMonitoringProperty(MonitoredProperties.POLICY_LAST_MODIFICATION_TIME_PROP_NAME,
