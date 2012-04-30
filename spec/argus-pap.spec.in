@@ -3,7 +3,7 @@
 
 Name: argus-pap
 
-Version: 1.5.0
+Version: 1.5.1
 Release: 1%{?dist}
 Summary: Argus PAP service
 
@@ -131,5 +131,5 @@ fi
 
 %changelog
 
-* Thu Mar 15 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 1.5.0-1
+* Thu Mar 15 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 1.5.1-1
 - Self managed packaging
