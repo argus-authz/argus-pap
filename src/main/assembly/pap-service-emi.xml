@@ -190,27 +190,28 @@
       <outputDirectory>/var/lib/argus/pap/lib</outputDirectory>
       <fileMode>0644</fileMode>
       <excludes>
-        <exclude>org.apache.xerces:xml-apis</exclude>
-        <exclude>org.apache.xerces:xercesImpl</exclude>
-        <exclude>org.apache.xerces:serializer</exclude>
-        <exclude>org.apache.xerces:resolver</exclude>
+        <!-- goes in endorsed directory -->
+        <exclude>xerces:*</exclude>
+        <exclude>xml-apis:*</exclude>
+        <exclude>xml-resolver:*</exclude>
+        <exclude>xalan:*</exclude>
+        <!-- from packages dependencies -->
         <exclude>emi:trustmanager</exclude>
         <exclude>emi:trustmanager-axis</exclude>
         <exclude>org.glite.voms:voms-api-java</exclude>
-        <exclude>org.bouncycastle:bcprov-jdk15</exclude>
+        <exclude>org.bouncycastle:*</exclude>
         <exclude>*:war</exclude>
       </excludes>
     </dependencySet>
-    
     <dependencySet>
-      <outputDirectory>/var/lib/argus/pap/lib/endorsed</outputDirectory>
-      <fileMode>0644</fileMode>
-      <includes>
-        <include>org.apache.xerces:xml-apis</include>
-        <include>org.apache.xerces:xercesImpl</include>
-        <include>org.apache.xerces:serializer</include>
-        <include>org.apache.xerces:resolver</include>
-      </includes>
-    </dependencySet>
+        <fileMode>0644</fileMode>
+        <outputDirectory>/var/lib/argus/pap/lib/endorsed</outputDirectory>
+        <includes>
+            <include>xerces:*</include>
+            <include>xml-apis:*</include>
+            <include>xml-resolver:*</include>
+            <include>xalan:*</include>
+        </includes>
+    </dependencySet> 
   </dependencySets>
 </assembly>
