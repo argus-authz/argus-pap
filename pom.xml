@@ -19,8 +19,8 @@
 	<properties>
 		<pap-services-namespace>http://org.glite.authz/wsdl/pap/services
         </pap-services-namespace>
-		<project.build.sourceEncoding>UTF-8    </project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8     </project.reporting.outputEncoding>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 	</properties>
 
 	<build>
@@ -258,22 +258,6 @@
 	</build>
 	<repositories>
 		<repository>
-			<id>shibboleth.internet2.edu</id>
-			<name>Internet2</name>
-			<url>http://shibboleth.internet2.edu/downloads/maven2
-      </url>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-
-		<repository>
-			<id>codehaus-release-repo</id>
-			<name>Codehaus Release Repo</name>
-			<url>http://repository.codehaus.org</url>
-		</repository>
-
-		<repository>
 			<id>switch</id>
 			<name>SWITCH Releases</name>
 			<url>http://www.switch.ch/grid/authz/docs/maven2/release
@@ -281,6 +265,11 @@
 			<snapshots>
 				<enabled>false</enabled>
 			</snapshots>
+		</repository>
+		<repository>
+			<id>codehaus-release-repo</id>
+			<name>Codehaus Release Repo</name>
+			<url>http://repository.codehaus.org</url>
 		</repository>
 	</repositories>
 	<dependencies>

@@ -5,6 +5,7 @@
 	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0  http://maven.apache.org/xsd/settings-1.0.0.xsd">
 	<localRepository>/tmp/m2-repository</localRepository>
 	<interactiveMode>false</interactiveMode>
+<!--
 	<mirrors>
 		<mirror>
 			<id>cern-maven-mirror</id>
@@ -13,4 +14,5 @@
 			<mirrorOf>*</mirrorOf>
 		</mirror>
 	</mirrors>
+-->
 </settings>
