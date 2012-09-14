@@ -1,7 +1,7 @@
 ## conffiles
 etc/argus/pap/pap_configuration.ini
 etc/argus/pap/pap_authorization.ini
-etc/argus/pdp/pap-admin.properties
+etc/argus/pap/pap-admin.properties
 etc/argus/pap/attribute-mappings.ini
 etc/argus/pap/logging/client/logback.xml
 etc/argus/pap/logging/standalone/logback.xml
