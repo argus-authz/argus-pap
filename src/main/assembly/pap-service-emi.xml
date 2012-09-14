@@ -32,8 +32,8 @@
   		<fileSet>
             <directory>src/main/config</directory>
             <outputDirectory>/etc/argus/pap</outputDirectory>
-            <fileMode>0640</fileMode>
-            <directoryMode>0750</directoryMode>
+            <fileMode>0644</fileMode>
+            <directoryMode>0755</directoryMode>
             <excludes>
                 <exclude>pap-admin.properties</exclude>
                 <exclude>attribute-mappings.ini</exclude>
@@ -70,7 +70,7 @@
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
-          <directoryMode>0750</directoryMode>
+          <directoryMode>0755</directoryMode>
         </fileSet>
         
         <fileSet>
@@ -87,16 +87,16 @@
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
-          <directoryMode>0750</directoryMode>
+          <directoryMode>0755</directoryMode>
         </fileSet>
         
         <fileSet>
           <directory>src</directory>
-          <outputDirectory>/etc/rc.d/init.d</outputDirectory>
+          <outputDirectory>/etc/init.d</outputDirectory>
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
-          <directoryMode>0750</directoryMode>
+          <directoryMode>0755</directoryMode>
         </fileSet>
         
         <fileSet>
@@ -105,7 +105,7 @@
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
-          <directoryMode>0750</directoryMode>
+          <directoryMode>0755</directoryMode>
         </fileSet>
         
         <fileSet>
@@ -114,7 +114,7 @@
           <excludes>
             <exclude>**/*</exclude>
           </excludes>
-          <directoryMode>0750</directoryMode>
+          <directoryMode>0755</directoryMode>
         </fileSet>
   </fileSets>
    
@@ -154,7 +154,7 @@
       <source>${basedir}/src/main/bash/papctl.sh</source>
       <destName>papctl</destName>
       <outputDirectory>/usr/share/argus/pap/sbin</outputDirectory>
-      <fileMode>0750</fileMode>
+      <fileMode>0755</fileMode>
     </file>
     
     <file>
