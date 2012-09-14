@@ -1,0 +1,11 @@
+# create links: $2 -> $1
+etc/argus/pap usr/share/argus/pap/conf
+usr/share/argus/pap/sbin/papctl etc/init.d/argus-pap
+usr/share/argus/pap/bin/pap-admin usr/bin/pap-admin
+usr/share/argus/pap/sbin/papctl usr/sbin/papctl
+usr/share/doc/argus-pap usr/share/argus/pap/doc
+var/lib/argus/pap/lib usr/share/argus/pap/lib
+var/lib/argus/pap/repository usr/share/argus/pap/repository
+var/log/argus/pap usr/share/argus/pap/logs
+
+
