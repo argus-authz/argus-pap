@@ -5,7 +5,7 @@ Name: argus-pap
 
 Version: @@VERSION@@
 Release: @@RELEASE@@%{?dist}
-Summary: Argus PAP service
+Summary: Argus PAP
 
 Group: System Environment/Daemons
 License: ASL 2.0
@@ -16,11 +16,13 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 
 BuildRequires: maven
+BuildRequires: jpackage-utils
 BuildRequires: java-devel
 
 Requires: emi-trustmanager
 Requires: emi-trustmanager-axis
 Requires: voms-api-java
+Requires: jpackage-utils
 Requires: java
 
 %description 
@@ -106,7 +108,7 @@ fi
 
 %files
 %defattr(-,root,root,-)
-%{_initrddir}/argus-pap
+%{_sysconfdir}/init.d/argus-pap
 
 %dir %{_sysconfdir}/argus/pap
 
