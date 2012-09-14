@@ -1,2 +1,5 @@
+/*.tar.gz
+/rpmbuild
+/debbuild
 argus-pap.spec
 /target
