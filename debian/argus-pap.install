@@ -1,0 +1,22 @@
+## conffiles
+etc/argus/pap/pap_configuration.ini
+etc/argus/pap/pap_authorization.ini
+etc/argus/pdp/pap-admin.properties
+etc/argus/pap/attribute-mappings.ini
+etc/argus/pap/logging/client/logback.xml
+etc/argus/pap/logging/standalone/logback.xml
+
+
+## default (sysconfig)
+etc/default/argus-pap
+
+## init.d
+#etc/init.d/argus-pap
+
+## others
+usr/share/argus/pap/bin/pap-admin
+usr/share/argus/pap/sbin/papctl
+usr/share/argus/pap/wars/pap.war
+usr/share/argus/pap/wsdl/*
+var/lib/argus/pap/lib/*.jar
+var/lib/argus/pap/lib/endorsed/*.jar
