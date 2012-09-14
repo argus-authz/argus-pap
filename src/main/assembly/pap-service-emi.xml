@@ -142,13 +142,13 @@
     <file>
       <source>${basedir}/src/main/bash/pap-env.sh</source>
       <outputDirectory>/usr/share/argus/pap/sbin</outputDirectory>
-      <fileMode>0644</fileMode>
+      <fileMode>0755</fileMode>
     </file>
     
     <file>
       <source>${basedir}/src/main/bash/pap-admin-env.sh</source>
       <outputDirectory>/usr/share/argus/pap/bin</outputDirectory>
-      <fileMode>0644</fileMode>
+      <fileMode>0755</fileMode>
     </file>
     
     <file>
