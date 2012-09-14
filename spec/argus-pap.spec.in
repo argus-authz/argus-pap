@@ -1,10 +1,10 @@
-## Turn off meaningless jar repackaging on SL6
-%define __jar_repack 0
+# Turn off the brp-java-repack-jars script
+%global __os_install_post %(echo '%{__os_install_post}' | sed -e 's!/usr/lib[^[:space:]]*/brp-java-repack-jars[[:space:]].*$!!g')
 
 Name: argus-pap
 
-Version: 1.5.1
-Release: 1%{?dist}
+Version: @@VERSION@@
+Release: @@RELEASE@@%{?dist}
 Summary: Argus PAP service
 
 Group: System Environment/Daemons
@@ -24,38 +24,46 @@ Requires: voms-api-java
 Requires: java
 
 %description 
-
-Argus is a system meant to render consistent authorization decisions for
-distributed services (e.g. compute elements, portals). In order to achieve
-this consistency a number of points must be addressed. First, it must be
-possible to author and maintain consistent authorization policies. This is
-handled by the Policy Administration Point (PAP) component in the service.
-Second, authored policies must be evaluated in a consistent manner, a task
-performed by the Policy Decision Point (PDP). Finally, the data provided for
-evaluation against policies must be consistent (in form and definition) and
-this is done by the Policy Enforcement Point (PEP).
-
-This package provides the Argus PAP service.
+Argus PAP (Policy Administration Point)
+The Argus Authorization Service renders consistent authorization 
+decisions for distributed services (e.g., user interfaces, 
+portals, computing elements, storage elements). The service is 
+based on the XACML standard, and uses authorization policies to 
+determine if a user is allowed or denied to perform a certain 
+action on a particular service.
+.
+The Argus Authorization Service is composed of three main 
+components:
+- The Policy Administration Point (PAP) provides the tools to 
+author authorization policies, organize them in the local 
+repository and configure policy distribution among remote PAPs.
+- The Policy Decision Point (PDP) implements the authorization 
+engine, and is responsible for the evaluation of the authorization
+requests against the XACML policies retrieved from the PAP.
+- The Policy Enforcement Point Server (PEP Server) ensures the 
+integrity and consistency of the authorization requests received 
+from the PEP clients. Lightweight PEP client libraries are also 
+provided to ease the integration and interoperability with other 
+EMI services or components. 
 
 %prep
-%setup -q -n argus-pap
+%setup -q
 
 %build
-mvn -B -s @@BUILD_SETTINGS@@ package
+export JAVA_HOME=/usr/lib/jvm/java
+make package
 
 %install
 rm -rf $RPM_BUILD_ROOT
-mkdir -p $RPM_BUILD_ROOT
-tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
+make DESTDIR=$RPM_BUILD_ROOT install
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-# Stop service on update
+# on update (1) stop the service, and clean up the lib directory
 if [ $1 -gt 1 ] ; then
     /sbin/service argus-pap stop > /dev/null 2>&1 || :
-
     # Remove old jars
     if [ -d "/var/lib/argus/pap/lib" ]; then
         rm -f /var/lib/argus/pap/lib/*.jar
@@ -63,32 +71,40 @@ if [ $1 -gt 1 ] ; then
     fi
 fi
 
+%post
+# create links to /usr/share/java jar files
+build-jar-repository -s -p /var/lib/argus/pap/lib bcprov trustmanager trustmanager-axis voms-api-java
+# on install (1) register the service in init.d
+if [ $1 -eq 1 ]; then
+    /sbin/chkconfig --add argus-pap
+fi
+# correct files/dirs permission
+chmod -f 640 %{_sysconfdir}/argus/pap/pap_configuration.ini
+chmod -f 640 %{_sysconfdir}/argus/pap/pap_authorization.ini
+chmod -f 750 %{_datadir}/argus/pap/sbin/papctl
+chmod -f 750 %{_localstatedir}/log/argus/pap
+
 %preun
+# on uninstall (0) stop and deregister the service
 if [ $1 -eq 0 ] ; then
     /sbin/service argus-pap stop > /dev/null 2>&1 || :
     /sbin/chkconfig --del argus-pap
 fi
 
-%post
-# prepare jar repository linking selected OS libraries 
-for jarname in bcprov trustmanager trustmanager-axis vomsjapi; do
-    [ -f /usr/share/java/$jarname.jar ] || exit 1
-    ln -fs /usr/share/java/$jarname.jar /var/lib/argus/pap/lib
-done
-
-# register the service in init.d
-if [ $1 -eq 1 ]; then
-    /sbin/chkconfig --add argus-pap
-fi
-
 %postun
+# on update (1) restart the service 
+# on full remove (0) clean up the lib dir
 if [ $1 -eq 1 ] ; then
     # Restart the service after the update
-    /sbin/service argus-pap start > /dev/null 2>&1 || :
+    /sbin/service argus-pap start
+elif [ $1 -eq 0 ] ; then
+    # delete all the links created in %post scriptlet
+    if [ -d /var/lib/argus/pap/lib ] ; then
+        rm -f /var/lib/argus/pap/lib/*.jar
+    fi
 fi
 
 %files
-
 %defattr(-,root,root,-)
 %{_initrddir}/argus-pap
 
@@ -129,6 +145,5 @@ fi
 %dir %{_localstatedir}/log/argus/pap
 
 %changelog
-
 * Thu Mar 15 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 1.5.1-1
 - Self managed packaging
