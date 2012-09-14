@@ -125,6 +125,7 @@
     	<destName>argus-pap</destName>
     	<outputDirectory>/etc/sysconfig</outputDirectory>
     	<filtered>true</filtered>
+    	<fileMode>0644</fileMode>
     </file>
     <file>
       <source>target/${project.build.finalName}.war</source>

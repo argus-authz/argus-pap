@@ -47,7 +47,7 @@ create_symlink $prefix/usr/share/doc/argus/pap/ $PAP_HOME/doc
 
 # papctl
 create_symlink ../../$PAP_HOME/sbin/papctl usr/sbin/papctl
-create_symlink ../../../$PAP_HOME/sbin/papctl etc/rc.d/init.d/argus-pap
+create_symlink ../../$PAP_HOME/sbin/papctl etc/init.d/argus-pap
 
 # pap-admin
 create_symlink ../../$PAP_HOME/bin/pap-admin usr/bin/pap-admin
