@@ -1,4 +1,0 @@
-if [ $1 -eq 1 ] ; then
-	# Restart the service after the update
-    /sbin/service argus-pap start > /dev/null 2>&1 || :
-fi

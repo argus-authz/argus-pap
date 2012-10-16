@@ -3,7 +3,7 @@
 
 Name: argus-pap
 
-Version: 1.5.1
+Version: 1.6.0
 Release: 1%{?dist}
 Summary: Argus PAP service
 
@@ -20,7 +20,6 @@ BuildRequires: java-devel
 
 Requires: emi-trustmanager
 Requires: emi-trustmanager-axis
-Requires: voms-api-java
 Requires: java
 
 %description 
@@ -46,7 +45,7 @@ mvn -B -s @@BUILD_SETTINGS@@ package
 %install
 rm -rf $RPM_BUILD_ROOT
 mkdir -p $RPM_BUILD_ROOT
-tar -C $RPM_BUILD_ROOT -xvzf target/%{name}-%{version}.tar.gz
+tar -C $RPM_BUILD_ROOT -xvzf target/%{name}.tar.gz
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -129,6 +128,9 @@ fi
 %dir %{_localstatedir}/log/argus/pap
 
 %changelog
+
+* Wed Oct 16 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 1.6.0-1
+- Decouple PAP pom version from rpm version.
 
 * Thu Mar 15 2012 Andrea Ceccanti <andrea.ceccanti at cnaf.infn.it> - 1.5.1-1
 - Self managed packaging

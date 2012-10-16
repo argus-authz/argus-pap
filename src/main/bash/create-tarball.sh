@@ -1,3 +1,3 @@
 #!/bin/bash
 set -e 
-tar -cvzf ../argus-pap-$1.tar.gz *
+tar -cvzf ../argus-pap.tar.gz *
