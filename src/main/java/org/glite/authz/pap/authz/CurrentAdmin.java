@@ -24,7 +24,7 @@ import org.apache.commons.lang.StringUtils;
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
 import org.glite.authz.pap.common.exceptions.NullArgumentException;
 import org.glite.security.SecurityContext;
-import org.glite.voms.VOMSAttribute;
+import org.italiangrid.voms.VOMSAttribute;
 import org.glite.voms.VOMSValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

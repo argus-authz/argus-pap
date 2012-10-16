@@ -18,7 +18,7 @@
 
   <packaging>war</packaging>
   <name>Argus Policy Administration Point (PAP)</name>
-  <version>1.5.1</version>
+  <version>1.5.2-SNAPSHOT</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
@@ -231,7 +231,7 @@
         <groupId>com.mycila.maven-license-plugin</groupId>
         <artifactId>maven-license-plugin</artifactId>
         <configuration>
-          <header>doc/license.txt</header>
+          <header>doc/LICENSE.txt</header>
 
           <excludes>
             <exclude>doc/**</exclude>
@@ -343,13 +343,15 @@
     <!-- BouncyCastle -->
     <dependency>
       <groupId>org.bouncycastle</groupId>
-      <artifactId>bcprov-jdk15</artifactId>
+      <artifactId>bcprov-jdk16</artifactId>
+      <version>1.46</version>
     </dependency>
 
     <!-- VOMS -->
     <dependency>
-      <groupId>org.glite.voms</groupId>
+      <groupId>org.italiangrid</groupId>
       <artifactId>voms-api-java</artifactId>
+      <version>3.0-SNAPSHOT</version>
     </dependency>
 
     <!-- Trustmanager -->
