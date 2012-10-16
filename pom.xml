@@ -242,7 +242,7 @@
           </excludes>
 
           <useDefaultExcludes>true</useDefaultExcludes>
-          <strictCheck>true</strictCheck>
+          <strictCheck>false</strictCheck>
         </configuration>
         <executions>
           <execution>
