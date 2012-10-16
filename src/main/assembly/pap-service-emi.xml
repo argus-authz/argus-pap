@@ -196,8 +196,6 @@
         <!-- from packages dependencies -->
         <exclude>emi:trustmanager</exclude>
         <exclude>emi:trustmanager-axis</exclude>
-        <exclude>org.glite.voms:voms-api-java</exclude>
-        <exclude>org.bouncycastle:*</exclude>
         <exclude>*:war</exclude>
       </excludes>
     </dependencySet>
