@@ -1,2 +1,5 @@
 argus-pap.spec
 /target
+/.settings
+/.classpath
+/.project

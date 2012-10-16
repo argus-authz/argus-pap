@@ -191,10 +191,8 @@
       <fileMode>0644</fileMode>
       <excludes>
         <!-- goes in endorsed directory -->
-        <exclude>xerces:*</exclude>
-        <exclude>xml-apis:*</exclude>
-        <exclude>xml-resolver:*</exclude>
-        <exclude>xalan:*</exclude>
+        <exclude>org.apache.xerces:*</exclude>
+        <exclude>org.apache.xalan:*</exclude>
         <!-- from packages dependencies -->
         <exclude>emi:trustmanager</exclude>
         <exclude>emi:trustmanager-axis</exclude>
@@ -207,10 +205,8 @@
         <fileMode>0644</fileMode>
         <outputDirectory>/var/lib/argus/pap/lib/endorsed</outputDirectory>
         <includes>
-            <include>xerces:*</include>
-            <include>xml-apis:*</include>
-            <include>xml-resolver:*</include>
-            <include>xalan:*</include>
+            <include>org.apache.xerces:*</include>
+            <include>org.apache.xalan:*</include>
         </includes>
     </dependencySet> 
   </dependencySets>
