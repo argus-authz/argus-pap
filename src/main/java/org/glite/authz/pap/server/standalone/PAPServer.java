@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
  * The standalone PAP daemon
  */
 public final class PAPServer {
-	
+
 	/**
 	 * 
 	 * Useful defaults for the standalone service
@@ -100,34 +100,22 @@ public final class PAPServer {
 		 * Should CRLs be checked by trustmanager?
 		 */
 		static final boolean CRL_ENABLED = true;
-		
+
 		/**
-		 * How frequently the PAP should update CRLs, CAs and namespaces from the filesystem.
-		 * The interval is defined as a string with the following format:
-		 * <code>N{s,m,h,d}</code> 
-		 * 
-		 * where N in the number of either (s=seconds, m=minutes, h=hours, d=days).
-		 * 
-		 * Example: 30m 
-		 * 
-		 * which means 30 minutes.
-		 *  
-		 * The default is 30 minutes.
+		 * Truststore refresh period in minutes
 		 */
-		static final String CRL_UPDATE_INTERVAL = "30m";
-		
-		
+		static final int TRUST_STORE_REFRESH_PERIOD_IN_MINUTES = 10;
+
 		/**
-		 * The directory containing all the CA certificates, CRLs and namespace definitions.
+		 * The directory containing all the CA certificates, CRLs and namespace
+		 * definitions.
 		 */
 		static final String TRUST_STORE_DIR = "/etc/grid-security/certificates";
-		
 
 	}
 
 	private static final String DEFAULT_WAR_LOCATION = System
-			.getProperty("PAP_HOME")
-			+ "/wars/pap.war";
+			.getProperty("PAP_HOME") + "/wars/pap.war";
 
 	private static final Logger log = LoggerFactory.getLogger(PAPServer.class);
 
@@ -164,7 +152,7 @@ public final class PAPServer {
 		try {
 
 			parseOptions(args);
-			
+
 			Security.addProvider(new BouncyCastleProvider());
 
 			PAPConfiguration.initialize(papConfigurationDir);
@@ -180,8 +168,7 @@ public final class PAPServer {
 
 		} catch (Throwable e) {
 
-			log
-					.error("PAP encountered an error that could not be dealt with, shutting down!");
+			log.error("PAP encountered an error that could not be dealt with, shutting down!");
 
 			log.error(e.getMessage());
 
@@ -206,66 +193,35 @@ public final class PAPServer {
 		}
 
 	}
-	
-	
-	private SSLOptions getSSLOptions(){
+
+	private SSLOptions getSSLOptions() {
 		SSLOptions options = new SSLOptions();
-		
+
 		options.setCertificateFile(getStringFromSecurityConfiguration(
 				"certificate", PAPStandaloneServiceDefaults.CERTIFICATE_PATH));
-		options.setKeyFile(getStringFromSecurityConfiguration(
-				"private_key", PAPStandaloneServiceDefaults.PRIVATE_KEY_PATH));
-		
+		options.setKeyFile(getStringFromSecurityConfiguration("private_key",
+				PAPStandaloneServiceDefaults.PRIVATE_KEY_PATH));
+
 		options.setNeedClientAuth(true);
 		options.setWantClientAuth(true);
-		options.setTrustStoreDirectory(getStringFromSecurityConfiguration("trust_store_dir", String
-				.valueOf(PAPStandaloneServiceDefaults.TRUST_STORE_DIR)));
-		
-		Long trustStoreUpdateInterval = Long.parseLong(getStringFromSecurityConfiguration("crl_update_interval", PAPStandaloneServiceDefaults.CRL_UPDATE_INTERVAL));
-		
-		options.setTrustStoreRefreshIntervalInMsec(trustStoreUpdateInterval);
-		
+		options.setTrustStoreDirectory(getStringFromSecurityConfiguration(
+				"trust_store_dir",
+				String.valueOf(PAPStandaloneServiceDefaults.TRUST_STORE_DIR)));
+
+		int trustStoreRefreshInMinutes = getIntFromStandaloneConfiguration(
+				"crl_update_interval",
+				PAPStandaloneServiceDefaults.TRUST_STORE_REFRESH_PERIOD_IN_MINUTES);
+
+		long trustStoreUpdatePeriod = TimeUnit.MINUTES
+				.toMillis(trustStoreRefreshInMinutes);
+
+		options.setTrustStoreRefreshIntervalInMsec(trustStoreUpdatePeriod);
+
 		return options;
 	}
 
-//	private Connector configureConnector(String host, int port){
-//		
-//		
-//		CaseInsensitiveProperties props = new CaseInsensitiveProperties(buildTrustmanagerConfiguration());
-//		
-//		try {
-//			
-//			ContextWrapper context = new ContextWrapper(props, false);
-//			
-//			JettySslSelectChannelConnector connector = new JettySslSelectChannelConnector(context.getKeyManager(),context.m_trustmanager);
-//			
-//			connector.setPort(port);
-//			connector.setHost(host);
-//		
-//			connector.setWantClientAuth(true);
-//			connector.setNeedClientAuth(true);
-//			
-//			log.info("PAP service will listen on {}:{}",
-//					new Object[] { host, port });
-//			
-//			return connector;
-//			
-//		
-//		} catch (Exception e) {
-//			
-//			log.error("Error initializing trustmanager connector: "+e.getMessage());
-//			if (log.isDebugEnabled())
-//				log.error("Error initializing trustmanager connector: "+e.getMessage(),e);
-//			
-//			throw new PAPException(e);
-//		}
-//		
-//		
-//	}
-	
-	
-	private void configureRequestQueue(){
-		
+	private void configureRequestQueue() {
+
 		int maxRequestQueueSize = getIntFromStandaloneConfiguration(
 				"max_request_queue_size",
 				PAPStandaloneServiceDefaults.MAX_REQUEST_QUEUE_SIZE);
@@ -276,47 +232,45 @@ public final class PAPServer {
 				"max_connections", PAPStandaloneServiceDefaults.MAX_CONNECTIONS);
 
 		if (maxConnections <= 0) {
-			log
-					.error("Please specify a positive value for the 'maxConnections' configuration parameter!");
+			log.error("Please specify a positive value for the 'maxConnections' configuration parameter!");
 			log.error("Will use the hardcoded default '{}' instead...",
 					PAPStandaloneServiceDefaults.MAX_CONNECTIONS);
 			maxConnections = PAPStandaloneServiceDefaults.MAX_CONNECTIONS;
 		}
 
 		log.info("maxConnections = {}", maxConnections);
-		
-		BlockingQueue<Runnable> requestQueue = new ArrayBlockingQueue<Runnable>(maxRequestQueueSize);
-		
-		ThreadPool threadPool = new ExecutorThreadPool(5,maxConnections, 60, TimeUnit.SECONDS, requestQueue);
+
+		BlockingQueue<Runnable> requestQueue = new ArrayBlockingQueue<Runnable>(
+				maxRequestQueueSize);
+
+		ThreadPool threadPool = new ExecutorThreadPool(5, maxConnections, 60,
+				TimeUnit.SECONDS, requestQueue);
 		papServer.setThreadPool(threadPool);
-		
+
 	}
-	
+
 	/**
 	 * Performs the jetty server configuration
 	 */
 	private void configurePAPServer() {
 
 		log.info("Configuring jetty PAP server...");
-		
+
 		int port = getIntFromStandaloneConfiguration("port",
-			PAPStandaloneServiceDefaults.PORT);
-	
+				PAPStandaloneServiceDefaults.PORT);
+
 		String host = getStringFromStandaloneConfiguration("hostname",
-			PAPStandaloneServiceDefaults.HOSTNAME);
-		
-		
+				PAPStandaloneServiceDefaults.HOSTNAME);
+
 		SSLOptions options = getSSLOptions();
-				
+
 		papServer = ServerFactory.newServer(host, port, options);
-		configureRequestQueue();    
-		
+		configureRequestQueue();
 
-		JettyShutdownTask papShutdownCommand = new JettyShutdownTask(
-				papServer);
+		JettyShutdownTask papShutdownCommand = new JettyShutdownTask(papServer);
 
-		PapShutdownAndStatusService.startPAPShutdownAndStatusService(8151, Collections
-				.singletonList((Runnable) papShutdownCommand));
+		PapShutdownAndStatusService.startPAPShutdownAndStatusService(8151,
+				Collections.singletonList((Runnable) papShutdownCommand));
 
 		webappContext = new WebAppContext();
 
@@ -326,7 +280,7 @@ public final class PAPServer {
 		webappContext.setParentLoaderPriority(true);
 
 		HandlerCollection handlers = new HandlerCollection();
-		
+
 		handlers.setHandlers(new Handler[] { webappContext,
 				new DefaultHandler() });
 
