@@ -356,15 +356,7 @@
     </dependency>
 
     <!-- Trustmanager -->
-    <dependency>
-      <groupId>emi</groupId>
-      <artifactId>trustmanager</artifactId>
-    </dependency>
 
-    <dependency>
-      <groupId>emi</groupId>
-      <artifactId>trustmanager-axis</artifactId>
-    </dependency>
 
 
     <!-- Axis -->
@@ -473,6 +465,10 @@
       <version>2.7.1</version>
       <scope>runtime</scope>
     </dependency>
+    <dependency>
+      <groupId>emi</groupId>
+      <artifactId>trustmanager</artifactId>
+    </dependency>
   </dependencies>
   <profiles>
     <profile>
@@ -518,12 +514,10 @@
             <artifactId>maven-assembly-plugin</artifactId>
             <configuration>
               <filters>
-                <filter>src/main/assembly/pap-service-emi.properties</filter>
+                <filter>src/main/assembly/argus-pap.properties</filter>
               </filters>
               <descriptors>
-                <descriptor>src/main/assembly/pap-service-emi.xml</descriptor>
-                <!-- <descriptor>src/main/assembly/argus-pap.xml</descriptor> -->
-                <!-- <descriptor>src/main/assembly/sources.xml</descriptor> -->
+                <descriptor>src/main/assembly/argus-pap.xml</descriptor>
               </descriptors>
               <finalName>argus-pap</finalName>
             </configuration>

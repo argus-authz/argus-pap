@@ -26,6 +26,8 @@ import javax.xml.rpc.encoding.TypeMapping;
 
 import org.apache.axis.AxisProperties;
 import org.glite.authz.pap.client.ServiceClient;
+import org.glite.authz.pap.client.impl.axis.CANLAxis1SocketFactory;
+import org.glite.authz.pap.client.impl.axis.DefaultConfigurator;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagementServiceLocator;
@@ -36,15 +38,13 @@ import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagementS
 import org.glite.authz.pap.services.provisioning.axis_skeletons.Provisioning;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagement;
 import org.glite.authz.pap.services.xacml_policy_management.axis_skeletons.XACMLPolicyManagementServiceLocator;
-import org.glite.security.trustmanager.axis.AXISSocketFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ServiceClientImplAxis implements ServiceClient {
-
-    private static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
-
-    private static final String DEFAULT_SSL_KEY = "/etc/grid-security/hostkey.pem";
+	
+	public static final String AXIS_SOCKET_FACTORY_PROPERTY = "axis.socketSecureFactory";
+    
     public final Logger log = LoggerFactory.getLogger(ServiceClientImplAxis.class);
     private String clientCertificate = null;
     private String clientPrivateKey = null;
@@ -240,43 +240,25 @@ public class ServiceClientImplAxis implements ServiceClient {
 
     protected void initializeAxisProperties() {
 
-        AxisProperties.setProperty("axis.socketSecureFactory",
-                                   "org.glite.security.trustmanager.axis.AXISSocketFactory");
-
-        System.setProperty("crlUpdateInterval", "0s");
-        
-        // need to pass property to AXISSocketFactory
-        Properties properties = AXISSocketFactory.getCurrentProperties();
-        
-        properties.setProperty("wantLog4jSetup", "false");
-
-        // TODO will get cert and key from the configuration, with those as
-        // default
+        DefaultConfigurator socketFactoryConfigurator = new DefaultConfigurator();
 
         if (clientProxy != null) {
             
-            properties.setProperty("gridProxyFile", clientProxy);
+        	socketFactoryConfigurator.setProxyFile(clientProxy);
             
         } else {
 
-            if (clientCertificate == null) {
-                properties.setProperty("sslCertFile", DEFAULT_SSL_CERT_FILE);
-            } else {
-                properties.setProperty("sslCertFile", clientCertificate);
-            }
+        	if (clientCertificate != null)
+        		socketFactoryConfigurator.setCertFile(clientCertificate);
 
-            if (clientPrivateKey == null) {
-                properties.setProperty("sslKey", DEFAULT_SSL_KEY);
-            } else {
-                properties.setProperty("sslKey", clientPrivateKey);
-            }
-
-            if (clientPrivateKeyPassword != null) {
-                properties.setProperty("sslKeyPasswd", clientPrivateKeyPassword);
-            }
+            if (clientPrivateKey != null)
+            	socketFactoryConfigurator.setKeyFile(clientPrivateKey);
+           
+            if (clientPrivateKeyPassword != null)
+            	socketFactoryConfigurator.setKeyPassword(clientPrivateKeyPassword);
         }
 
-        AXISSocketFactory.setCurrentProperties(properties);
-        System.setProperties(properties);
+        CANLAxis1SocketFactory.setConfigurator(socketFactoryConfigurator);
+        AxisProperties.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, CANLAxis1SocketFactory.class.getName());
     }
 }
