@@ -21,12 +21,17 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandler.Context;
+import org.eclipse.jetty.server.nio.BlockingChannelConnector;
+
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 import org.glite.authz.pap.monitoring.MonitoringServlet;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.nio.BlockingChannelConnector;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.italiangrid.utils.https.JettyRunThread;
+import org.italiangrid.utils.https.JettyShutdownTask;
 
 /**
  * A Jetty instance that listens on a given port for a request to the URL path <em>/shutdown</em> and <em>/status</em>.
@@ -59,7 +64,7 @@ public class PapShutdownAndStatusService {
         connector.setPort(shutdownPort);
         shutdownService.setConnectors(new Connector[] { connector });
 
-        Context servletContext = new Context(shutdownService, "/", false, false);
+        ServletContextHandler servletContext = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
         servletContext.setDisplayName("Shutdown Controller");
 
         ServletHolder shutdownServlet = new ServletHolder(new ShutdownServlet(shutdownCommandThread));
@@ -82,7 +87,7 @@ public class PapShutdownAndStatusService {
      * @return the shutdown thread
      */
     private static Thread buildServiceShutdownThread(final Server shutdownService, List<Runnable> commands) {
-        final Runnable shutdownShutdownServiceCommand = new JettyShutdownCommand(shutdownService);
+        final Runnable shutdownShutdownServiceCommand = new JettyShutdownTask(shutdownService);
 
         final List<Runnable> shutdownCommands;
         if (commands == null || commands.isEmpty()) {

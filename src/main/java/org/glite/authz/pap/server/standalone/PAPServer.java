@@ -26,17 +26,21 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+import org.eclipse.jetty.util.thread.ThreadPool;
+import org.eclipse.jetty.webapp.WebAppContext;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.security.trustmanager.ContextWrapper;
 import org.glite.security.util.CaseInsensitiveProperties;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.webapp.WebAppContext;
-import org.mortbay.thread.concurrent.ThreadPool;
+import org.italiangrid.utils.https.JettyShutdownTask;
+import org.italiangrid.utils.https.SSLOptions;
+import org.italiangrid.utils.https.ServerFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -202,78 +206,66 @@ public final class PAPServer {
 		}
 
 	}
-
-	/**
-	 * Utility method to map pap configuration property names to
-	 * glite-security-trustmanager property names
-	 * 
-	 * @return the trustmanager properties
-	 */
-	private Properties buildTrustmanagerConfiguration() {
-
-		Properties tmProps = new Properties();
-
-		tmProps.setProperty("sslCertFile", getStringFromSecurityConfiguration(
+	
+	
+	private SSLOptions getSSLOptions(){
+		SSLOptions options = new SSLOptions();
+		
+		options.setCertificateFile(getStringFromSecurityConfiguration(
 				"certificate", PAPStandaloneServiceDefaults.CERTIFICATE_PATH));
-		tmProps.setProperty("sslKey", getStringFromSecurityConfiguration(
+		options.setKeyFile(getStringFromSecurityConfiguration(
 				"private_key", PAPStandaloneServiceDefaults.PRIVATE_KEY_PATH));
-		tmProps.setProperty("crlEnabled", getStringFromSecurityConfiguration(
-				"crl_enabled", String
-						.valueOf(PAPStandaloneServiceDefaults.CRL_ENABLED)));
 		
-		tmProps.setProperty("crlUpdateInterval", getStringFromSecurityConfiguration("crl_update_interval", PAPStandaloneServiceDefaults.CRL_UPDATE_INTERVAL));
-		
-		tmProps.setProperty("trustStoreDir", getStringFromSecurityConfiguration("trust_store_dir", String
+		options.setNeedClientAuth(true);
+		options.setWantClientAuth(true);
+		options.setTrustStoreDirectory(getStringFromSecurityConfiguration("trust_store_dir", String
 				.valueOf(PAPStandaloneServiceDefaults.TRUST_STORE_DIR)));
 		
-		return tmProps;
-
+		Long trustStoreUpdateInterval = Long.parseLong(getStringFromSecurityConfiguration("crl_update_interval", PAPStandaloneServiceDefaults.CRL_UPDATE_INTERVAL));
+		
+		options.setTrustStoreRefreshIntervalInMsec(trustStoreUpdateInterval);
+		
+		return options;
 	}
 
-	private Connector configureTMConnector(String host, int port){
-		
-		CaseInsensitiveProperties props = new CaseInsensitiveProperties(buildTrustmanagerConfiguration());
-		
-		try {
-			
-			ContextWrapper context = new ContextWrapper(props, false);
-			
-			JettySslSelectChannelConnector connector = new JettySslSelectChannelConnector(context.getKeyManager(),context.m_trustmanager);
-			
-			connector.setPort(port);
-			connector.setHost(host);
-		
-			connector.setWantClientAuth(true);
-			connector.setNeedClientAuth(true);
-			
-			log.info("PAP service will listen on {}:{}",
-					new Object[] { host, port });
-			
-			return connector;
-			
-		
-		} catch (Exception e) {
-			
-			log.error("Error initializing trustmanager connector: "+e.getMessage());
-			if (log.isDebugEnabled())
-				log.error("Error initializing trustmanager connector: "+e.getMessage(),e);
-			
-			throw new PAPException(e);
-		}
-		
-		
-	}
+//	private Connector configureConnector(String host, int port){
+//		
+//		
+//		CaseInsensitiveProperties props = new CaseInsensitiveProperties(buildTrustmanagerConfiguration());
+//		
+//		try {
+//			
+//			ContextWrapper context = new ContextWrapper(props, false);
+//			
+//			JettySslSelectChannelConnector connector = new JettySslSelectChannelConnector(context.getKeyManager(),context.m_trustmanager);
+//			
+//			connector.setPort(port);
+//			connector.setHost(host);
+//		
+//			connector.setWantClientAuth(true);
+//			connector.setNeedClientAuth(true);
+//			
+//			log.info("PAP service will listen on {}:{}",
+//					new Object[] { host, port });
+//			
+//			return connector;
+//			
+//		
+//		} catch (Exception e) {
+//			
+//			log.error("Error initializing trustmanager connector: "+e.getMessage());
+//			if (log.isDebugEnabled())
+//				log.error("Error initializing trustmanager connector: "+e.getMessage(),e);
+//			
+//			throw new PAPException(e);
+//		}
+//		
+//		
+//	}
 	
 	
-	/**
-	 * Performs the jetty server configuration
-	 */
-	private void configurePAPServer() {
-
-		log.info("Configuring jetty PAP server...");
-
-		papServer = new Server();
-
+	private void configureRequestQueue(){
+		
 		int maxRequestQueueSize = getIntFromStandaloneConfiguration(
 				"max_request_queue_size",
 				PAPStandaloneServiceDefaults.MAX_REQUEST_QUEUE_SIZE);
@@ -292,35 +284,35 @@ public final class PAPServer {
 		}
 
 		log.info("maxConnections = {}", maxConnections);
-
-		papServer.setSendServerVersion(false);
-		papServer.setSendDateHeader(false);
-
-		BlockingQueue<Runnable> requestQueue;
-
-		if (maxRequestQueueSize < 1) {
-			requestQueue = new LinkedBlockingQueue<Runnable>();
-		} else {
-			requestQueue = new ArrayBlockingQueue<Runnable>(maxRequestQueueSize);
-		}
-
-		ThreadPool threadPool = new ThreadPool(5, maxConnections, 60,
-				TimeUnit.SECONDS, requestQueue);
-
+		
+		BlockingQueue<Runnable> requestQueue = new ArrayBlockingQueue<Runnable>(maxRequestQueueSize);
+		
+		ThreadPool threadPool = new ExecutorThreadPool(5,maxConnections, 60, TimeUnit.SECONDS, requestQueue);
 		papServer.setThreadPool(threadPool);
 		
-		// Connectors configuration
+	}
+	
+	/**
+	 * Performs the jetty server configuration
+	 */
+	private void configurePAPServer() {
+
+		log.info("Configuring jetty PAP server...");
+		
 		int port = getIntFromStandaloneConfiguration("port",
 			PAPStandaloneServiceDefaults.PORT);
 	
 		String host = getStringFromStandaloneConfiguration("hostname",
 			PAPStandaloneServiceDefaults.HOSTNAME);
 		
-						
-		papServer.setConnectors(new Connector[] { configureTMConnector(host,port) });    
+		
+		SSLOptions options = getSSLOptions();
+				
+		papServer = ServerFactory.newServer(host, port, options);
+		configureRequestQueue();    
 		
 
-		JettyShutdownCommand papShutdownCommand = new JettyShutdownCommand(
+		JettyShutdownTask papShutdownCommand = new JettyShutdownTask(
 				papServer);
 
 		PapShutdownAndStatusService.startPAPShutdownAndStatusService(8151, Collections
@@ -334,6 +326,7 @@ public final class PAPServer {
 		webappContext.setParentLoaderPriority(true);
 
 		HandlerCollection handlers = new HandlerCollection();
+		
 		handlers.setHandlers(new Handler[] { webappContext,
 				new DefaultHandler() });
 

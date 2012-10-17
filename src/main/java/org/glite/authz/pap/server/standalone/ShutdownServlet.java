@@ -25,8 +25,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import org.eclipse.jetty.util.log.Log;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.mortbay.log.Log;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
@@ -69,7 +70,8 @@ public class ShutdownServlet extends HttpServlet {
 		
 		String papShutdownCommand  = PAPConfiguration.instance().getString(PAPConfiguration.STANDALONE_SERVICE_STANZA+".shutdown_command");
 		
-		Log.info("Shutdown request received from {}.", req.getRemoteAddr());
+		org.eclipse.jetty.util.log.Logger jettyLog = Log.getLogger(this.getClass().getName());
+		jettyLog.info("Shutdown request received from {}.", req.getRemoteAddr());
 		
 		if (papShutdownCommand == null){
 			

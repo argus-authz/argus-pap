@@ -18,8 +18,6 @@ BuildArch: noarch
 BuildRequires: maven
 BuildRequires: java-devel
 
-Requires: emi-trustmanager
-Requires: emi-trustmanager-axis
 Requires: java
 
 %description 
