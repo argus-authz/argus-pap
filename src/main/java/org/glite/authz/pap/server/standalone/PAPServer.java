@@ -19,10 +19,8 @@ package org.glite.authz.pap.server.standalone;
 
 import java.security.Security;
 import java.util.Collections;
-import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -34,13 +32,9 @@ import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.eclipse.jetty.util.thread.ThreadPool;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.glite.authz.pap.common.exceptions.PAPException;
-import org.glite.security.trustmanager.ContextWrapper;
-import org.glite.security.util.CaseInsensitiveProperties;
 import org.italiangrid.utils.https.JettyShutdownTask;
 import org.italiangrid.utils.https.SSLOptions;
 import org.italiangrid.utils.https.ServerFactory;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
