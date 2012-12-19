@@ -24,6 +24,8 @@
     </pap-services-namespace>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <slf4jVersion>1.6.6</slf4jVersion>
+    <logbackVersion>1.0.6</logbackVersion>
   </properties>
 
   <build>
@@ -317,14 +319,7 @@
     <dependency>
       <groupId>org.italiangrid</groupId>
       <artifactId>https-utils</artifactId>
-      <version>0.5-SNAPSHOT</version>
-    </dependency>
-
-    <!-- VOMS -->
-    <dependency>
-      <groupId>org.italiangrid</groupId>
-      <artifactId>voms-api-java</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>0.2-SNAPSHOT</version>
     </dependency>
 
     <!-- Axis -->
@@ -384,26 +379,31 @@
     </dependency>
 
     <!-- SLF4J & Logging -->
+     
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <version>${slf4jVersion}</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-    </dependency>
+    
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
+      <version>${slf4jVersion}</version>
     </dependency>
-
+  
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-classic</artifactId>
+      <version>${logbackVersion}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>ch.qos.logback</groupId>
+      <artifactId>logback-core</artifactId>
+      <version>${logbackVersion}</version>
+    </dependency>
+    
     <!-- Xerces, Xalan, Serializer -->
     <dependency>
       <groupId>xerces</groupId>
@@ -423,7 +423,7 @@
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>serializer</artifactId>
-      <version>2.7.1</version>
+      <version>2.7.1</version><!--$NO-MVN-MAN-VER$-->
       <scope>runtime</scope>
     </dependency>
     
@@ -433,10 +433,7 @@
       <version>2.7.1</version>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>emi</groupId>
-      <artifactId>trustmanager</artifactId>
-    </dependency>
+    
   </dependencies>
   <profiles>
     <profile>

@@ -77,7 +77,7 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 		PEMCredential cred;
 
 		if (proxyFile != null){
-			cred = new PEMCredential(new FileInputStream(proxyFile), null);
+			cred = new PEMCredential(new FileInputStream(proxyFile), (char[])null);
 		}else{
 
 			if (keyPassword != null)

@@ -18,16 +18,28 @@
 package org.glite.authz.pap.authz;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.StringUtils;
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
+import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.NullArgumentException;
-import org.glite.security.SecurityContext;
+import org.italiangrid.utils.voms.SecurityContext;
+import org.italiangrid.utils.voms.SecurityContextImpl;
 import org.italiangrid.voms.VOMSAttribute;
-import org.glite.voms.VOMSValidator;
+import org.italiangrid.voms.VOMSValidators;
+import org.italiangrid.voms.ac.VOMSACValidator;
+import org.italiangrid.voms.store.VOMSTrustStore;
+import org.italiangrid.voms.store.VOMSTrustStores;
+import org.italiangrid.voms.store.impl.DefaultVOMSTrustStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.impl.OpensslNameUtils;
+import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 /**
  * This class describes the currently authenticated PAP administrator.
@@ -41,7 +53,7 @@ public class CurrentAdmin {
      * The static validator object used to check VOMS attribute certificate
      * validity
      **/
-    static VOMSValidator validator = null;
+    static VOMSACValidator validator = null;
 
     /** The PAPAdmin object representing the current administrator **/
     private PAPAdmin papAdmin;
@@ -60,35 +72,43 @@ public class CurrentAdmin {
 
         this.papAdmin = admin;
     }
-
+    
+    protected synchronized VOMSACValidator getValidator(){
+    
+    	if (validator == null){
+    		VOMSListener l = new VOMSListener();
+    		VOMSTrustStore ts = VOMSTrustStores.newTrustStore(
+    				Arrays.asList(DefaultVOMSTrustStore.DEFAULT_VOMS_DIR),
+    				TimeUnit.MINUTES.toMillis(30), 
+    				l);
+    
+    		X509CertChainValidatorExt certChainValidator = PAPConfiguration.instance().getCertchainValidator();
+    		validator = VOMSValidators.newValidator(ts,
+    				certChainValidator,
+    				l);
+    	}
+    	
+    	return validator;
+    }
     /**
      * This method looks for trusted VOMS FQANs in the security context. The found
      * fqans are stored in the {@link #fqans} array.
      */
-    protected void getFQANsFromSecurityContext() {
+    protected synchronized void getFQANsFromSecurityContext() {
 
         log.debug( "Fectching FQANs out of the security context");
         
-        SecurityContext theContext = SecurityContext.getCurrentContext();
-        
-        if ( validator == null ) {
-            log.debug("Initializing VOMS validator object...");
-            validator = new VOMSValidator(theContext.getClientCertChain());
-            
-        }else
-            validator.setClientChain( theContext.getClientCertChain() );
+        SecurityContextImpl ctxt = SecurityContextImpl.getCurrentContext();
         
         try {
 
-            validator.validate();
-
-            List <VOMSAttribute> attrs = validator.getVOMSAttributes();
+            List <VOMSAttribute> attrs = validator.validate(ctxt.getClientCertChain());
 
             List <VOMSFQAN> myFQANs = new ArrayList <VOMSFQAN>();
 
             for ( VOMSAttribute voAttr : attrs ) {
 
-                List <String> fqanAttrs = voAttr.getFullyQualifiedAttributes();
+                List <String> fqanAttrs = voAttr.getFQANs();
 
                 if ( fqanAttrs.size() > 0 ) {
 
@@ -129,9 +149,10 @@ public class CurrentAdmin {
      */
     public static CurrentAdmin instance() {
 
-        SecurityContext theContext = SecurityContext.getCurrentContext();
+        SecurityContext theContext = SecurityContextImpl.getCurrentContext();
 
-        String adminDN = theContext.getClientName();
+        String rfcReadableString = X500NameUtils.getReadableForm(theContext.getClientX500Principal());
+        String adminDN = OpensslNameUtils.convertFromRfc2253(rfcReadableString, false);
 
         X509Principal papAdmin = PAPAdminFactory.getDn( adminDN );
 

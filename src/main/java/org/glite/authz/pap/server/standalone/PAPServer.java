@@ -17,13 +17,11 @@
 
 package org.glite.authz.pap.server.standalone;
 
-import java.security.Security;
 import java.util.Collections;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -35,8 +33,13 @@ import org.glite.authz.pap.common.PAPConfiguration;
 import org.italiangrid.utils.https.JettyShutdownTask;
 import org.italiangrid.utils.https.SSLOptions;
 import org.italiangrid.utils.https.ServerFactory;
+import org.italiangrid.utils.https.impl.canl.CANLListener;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.impl.CertificateUtils;
 
 /**
  * The standalone PAP daemon
@@ -147,7 +150,7 @@ public final class PAPServer {
 
 			parseOptions(args);
 
-			Security.addProvider(new BouncyCastleProvider());
+			CertificateUtils.configureSecProvider();
 
 			PAPConfiguration.initialize(papConfigurationDir);
 
@@ -214,8 +217,31 @@ public final class PAPServer {
 		return options;
 	}
 
-	private void configureRequestQueue() {
+	/**
+	 * Performs the jetty server configuration
+	 */
+	private void configurePAPServer() {
 
+		log.info("Configuring jetty PAP server...");
+
+		int port = getIntFromStandaloneConfiguration("port",
+				PAPStandaloneServiceDefaults.PORT);
+
+		String host = getStringFromStandaloneConfiguration("hostname",
+				PAPStandaloneServiceDefaults.HOSTNAME);
+
+		SSLOptions options = getSSLOptions();
+		
+		CANLListener l = new CANLListener();
+		
+		X509CertChainValidatorExt validator = CertificateValidatorBuilder
+				.buildCertificateValidator(options.getTrustStoreDirectory(), 
+						l,
+						l,
+						options.getTrustStoreRefreshIntervalInMsec());
+		
+		PAPConfiguration.instance().setCertChainValidator(validator);
+		
 		int maxRequestQueueSize = getIntFromStandaloneConfiguration(
 				"max_request_queue_size",
 				PAPStandaloneServiceDefaults.MAX_REQUEST_QUEUE_SIZE);
@@ -233,33 +259,13 @@ public final class PAPServer {
 		}
 
 		log.info("maxConnections = {}", maxConnections);
-
-		BlockingQueue<Runnable> requestQueue = new ArrayBlockingQueue<Runnable>(
+		
+		papServer = ServerFactory.newServer(host, 
+				port, 
+				options, 
+				validator,
+				maxConnections,
 				maxRequestQueueSize);
-
-		ThreadPool threadPool = new ExecutorThreadPool(5, maxConnections, 60,
-				TimeUnit.SECONDS, requestQueue);
-		papServer.setThreadPool(threadPool);
-
-	}
-
-	/**
-	 * Performs the jetty server configuration
-	 */
-	private void configurePAPServer() {
-
-		log.info("Configuring jetty PAP server...");
-
-		int port = getIntFromStandaloneConfiguration("port",
-				PAPStandaloneServiceDefaults.PORT);
-
-		String host = getStringFromStandaloneConfiguration("hostname",
-				PAPStandaloneServiceDefaults.HOSTNAME);
-
-		SSLOptions options = getSSLOptions();
-
-		papServer = ServerFactory.newServer(host, port, options);
-		configureRequestQueue();
 
 		JettyShutdownTask papShutdownCommand = new JettyShutdownTask(papServer);
 

@@ -20,11 +20,12 @@ package org.glite.authz.pap.common.xacml.wizard;
 import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.common.xacml.utils.CtxAttributeTypeHelper;
 import org.glite.authz.pap.common.xacml.wizard.exceptions.UnsupportedAttributeException;
-import org.glite.security.util.DNHandler;
 import org.opensaml.xacml.ctx.AttributeType;
 import org.opensaml.xacml.policy.AttributeAssignmentType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.emi.security.authn.x509.impl.OpensslNameUtils;
 
 public class AttributeWizard {
 
@@ -238,11 +239,16 @@ public class AttributeWizard {
 
 	private void setValue(String value) {
 
+		String rfcDN = null;
+		
 		if (attributeWizardType.getDataType().equals(X509_SUBJECT_DATA_TYPE)) {
 
 			try{
 				
-				value = DNHandler.getDNRFC2253(value).getRFCDN();
+				if (value.startsWith("/"))	
+					rfcDN = OpensslNameUtils.opensslToRfc2253(value);
+				else
+					rfcDN = value;
 			
 			}catch(IllegalArgumentException e){
 				

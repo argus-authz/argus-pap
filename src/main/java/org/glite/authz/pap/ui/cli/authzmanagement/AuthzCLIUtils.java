@@ -18,14 +18,14 @@
 package org.glite.authz.pap.ui.cli.authzmanagement;
 
 import org.apache.commons.lang.StringUtils;
-	import org.glite.authz.pap.common.exceptions.PAPException;
+import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.common.exceptions.VOMSSyntaxException;
 import org.glite.authz.pap.common.utils.PathNamingScheme;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPPrincipal;
-import org.glite.security.util.DN;
-import org.glite.security.util.DNHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.emi.security.authn.x509.impl.OpensslNameUtils;
 
 
 public class AuthzCLIUtils {
@@ -36,9 +36,7 @@ public class AuthzCLIUtils {
     public static String convertX500SubjectToRFC2253(String x500Subject){
     	
     	try{	
-    	
-    		DN dn = DNHandler.getDNRFC2253(x500Subject);
-    		return dn.getRFCDN();
+    		return OpensslNameUtils.opensslToRfc2253(x500Subject);
     		
     	}catch(IllegalArgumentException e){
     		
@@ -50,8 +48,7 @@ public class AuthzCLIUtils {
     public static String convertRFC2253toX500Subject(String rfc2253Subject){
     	try{
     		
-    		DN dn = DNHandler.getDNRFC2253(rfc2253Subject);
-    		return dn.getX500();
+    		return OpensslNameUtils.convertFromRfc2253(rfc2253Subject, false);
     		
     	}catch(IllegalArgumentException e){
     		

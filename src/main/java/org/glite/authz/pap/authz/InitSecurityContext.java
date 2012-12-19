@@ -23,11 +23,12 @@ import java.security.cert.X509Certificate;
 import javax.servlet.ServletRequest;
 
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
-import org.glite.security.SecurityContext;
-import org.glite.security.util.DN;
-import org.glite.security.util.DNHandler;
+import org.italiangrid.utils.voms.SecurityContext;
+import org.italiangrid.utils.voms.SecurityContextImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.emi.security.authn.x509.impl.X500NameUtils;
 
 /**
  * 
@@ -49,11 +50,11 @@ public class InitSecurityContext {
      */
     public static void setContextFromRequest( final ServletRequest request ) {
 
-        SecurityContext sc = new SecurityContext();
-        SecurityContext.setCurrentContext( sc );
+        SecurityContextImpl sc = new SecurityContextImpl();
+        SecurityContextImpl.setCurrentContext( sc );
 
         String remoteAddress = request.getRemoteAddr();
-        sc.setProperty( SECURITY_CONTEXT_REMOTE_ADDRESS, remoteAddress );
+        sc.setRemoteAddr(remoteAddress);
 
         X509Certificate[] certChain = null;
         try {
@@ -73,20 +74,14 @@ public class InitSecurityContext {
 
         sc.setClientCertChain( certChain );
 
-        DN subject = DNHandler.getSubject( sc.getClientCert() );
-        DN issuer = DNHandler.getIssuer( sc.getClientCert() );
-
+        String subject = X500NameUtils.getReadableForm(sc.getClientX500Principal());
+        String issuer = X500NameUtils.getReadableForm(sc.getIssuerX500Principal());
+        
         BigInteger sn = sc.getClientCert().getSerialNumber();
         String serialNumber = ( sn == null ) ? "NULL" : sn.toString();
 
-        if ( sc.getClientName() != null )
-            sc.setClientName( subject.getX500() );
-
-        if ( sc.getIssuerName() != null )
-            sc.setIssuerName( issuer.getX500() );
-
         logger.info( "Connection from \"" + remoteAddress + "\" by \""
-                + sc.getClientName() + "\" (issued by \"" + sc.getIssuerName()
+                + subject + "\" (issued by \"" + issuer
                 + "\", " + "serial " + serialNumber + ")" );
 
     }

@@ -121,8 +121,7 @@ public class AuthorizationEngine {
     public void shutdown(){
         
         if (CurrentAdmin.validator != null)
-            // Cleanup VOMS lib - this will not be required after future voms api refactoring
-            CurrentAdmin.validator.cleanup();
+            CurrentAdmin.validator.shutdown();
     }
 
 }

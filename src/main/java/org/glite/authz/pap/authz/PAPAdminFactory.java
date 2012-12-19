@@ -17,9 +17,7 @@
 
 package org.glite.authz.pap.authz;
 
-import org.bouncycastle.voms.VOMSAttribute.FQAN;
-import org.glite.security.util.DN;
-import org.glite.security.util.DNHandler;
+import eu.emi.security.authn.x509.impl.OpensslNameUtils;
 
 /**
  * Creates {@link PAPAdmin} objects currently supported 
@@ -36,7 +34,7 @@ public class PAPAdminFactory {
 
     /** Creats a new {@link VOMSFQAN} admin starting from an FQAN string.
      *  
-     *  @param fqan, the VOMS {@link FQAN} string
+     *  @param fqan, the VOMS fqan string
      *  @return the {@link VOMSFQAN} principal for the given fqan
      * **/
     public static VOMSFQAN getFQAN( String fqan ) {
@@ -54,11 +52,11 @@ public class PAPAdminFactory {
      * @return the {@link X509Principal} principal for the given dn
      */
     public static X509Principal getDn( String dn ) {
-
-    	DN theDN = DNHandler.getDNRFC2253(dn);
-    	        
-        return new X509Principal( theDN.getX500() );
-
+    		
+    	if (dn.startsWith("/"))
+    		return new X509Principal(dn);
+    	else
+    		return new X509Principal(OpensslNameUtils.convertFromRfc2253(dn, false));
     }
 
     /**

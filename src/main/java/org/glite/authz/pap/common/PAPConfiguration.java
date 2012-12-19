@@ -35,6 +35,8 @@ import org.glite.authz.pap.common.exceptions.PAPConfigurationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+
 /** The configuration implementation for the PAP daemon and client **/
 public class PAPConfiguration {
     
@@ -81,7 +83,7 @@ public class PAPConfiguration {
             .getLogger( PAPConfiguration.class );
 
     /** The singleton PAPConfiguration instance **/
-    private static PAPConfiguration instance;
+    private static volatile PAPConfiguration instance;
 
     /** The Commons configuration base object that stores the actual configuration properties and provides a unified facade to multiple 
      *  configuration files
@@ -91,9 +93,9 @@ public class PAPConfiguration {
     /** The PAP startup configuration object**/
     private INIConfiguration startupConfiguration;
     
+    /** The certificate chain validator **/
+    private X509CertChainValidatorExt certChainValidator = null;
     
-    
-
     /**
      * Constructor
      * 
@@ -128,7 +130,7 @@ public class PAPConfiguration {
      * @return the active instance of the PAPConfiguration class
      * @throws PAPConfigurationException, in case the PAPConfiguration hasn't been properly initialized with the initialize method. 
      */
-    public static PAPConfiguration instance() {
+    public synchronized static PAPConfiguration instance() {
 
         if ( instance == null )
             throw new PAPConfigurationException(
@@ -523,5 +525,19 @@ public class PAPConfiguration {
         return configuration.getProperty( MONITORING_PROPERTY_PREFIX+"."+name );
     }
 
+    /**
+     * @return the {@link X509CertChainValidatorExt} configured for this PAP
+     */
+    public synchronized X509CertChainValidatorExt getCertchainValidator(){
+    	return certChainValidator;
+    	
+    }
     
+    /**
+     * Sets the {@link X509CertChainValidatorExt} for this PAP
+     * @param certChainValidator the {@link X509CertChainValidatorExt} configured for this PAP
+     */
+    public void setCertChainValidator(X509CertChainValidatorExt certChainValidator){
+    	this.certChainValidator = certChainValidator;
+    }
 }
