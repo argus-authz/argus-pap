@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
+import java.util.Hashtable;
 import java.util.Map;
 
 import javax.net.SocketFactory;
@@ -25,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import eu.emi.security.authn.x509.NamespaceCheckingMode;
 import eu.emi.security.authn.x509.ValidationError;
 import eu.emi.security.authn.x509.ValidationErrorListener;
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+import eu.emi.security.authn.x509.impl.CertificateUtils;
 import eu.emi.security.authn.x509.impl.HostnameMismatchCallback;
 import eu.emi.security.authn.x509.impl.OpensslCertChainValidator;
 import eu.emi.security.authn.x509.impl.PEMCredential;
@@ -45,15 +48,12 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 
 	private String sslProtocol;
 
-	private String trustAnchorsDir;
-
 	private String certFile;
 
 	private String keyFile;
 	private String keyPassword;
 
 	private String proxyFile;
-	private long refreshInterval;
 
 	private int timeout;
 
@@ -61,10 +61,13 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 	
 	private String secureRandomAlgorithm;
 	
+	private X509CertChainValidatorExt certChainValidator;
+	
 	private static CANLAxis1SocketFactoryConfigurator configurator;
 
-	public CANLAxis1SocketFactory(@SuppressWarnings("rawtypes") final Map attributes) {
-		
+	public CANLAxis1SocketFactory(@SuppressWarnings("rawtypes")Hashtable attributes) {
+		CertificateUtils.configureSecProvider();
+		configurator.configure(this);
 	}
 
 	public static synchronized void setConfigurator(CANLAxis1SocketFactoryConfigurator conf){
@@ -91,14 +94,9 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 	}
 
 	private TrustManager[] getTrustmanagers() throws Exception {
-
-		OpensslCertChainValidator validator = new OpensslCertChainValidator(
-				trustAnchorsDir, NamespaceCheckingMode.EUGRIDPMA_AND_GLOBUS,
-				refreshInterval);
-
 		
 		X509TrustManager trustManager = SocketFactoryCreator
-				.getSSLTrustManager(validator);
+				.getSSLTrustManager(certChainValidator);
 
 		TrustManager[] trustManagers = new TrustManager[] { trustManager };
 
@@ -126,8 +124,6 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 
 	public Socket create(String host, int port, StringBuffer otherHeaders,
 			BooleanHolder useFullURL) throws Exception {
-
-		configurator.configure(this);
 		
 		SocketFactory fac = createSocketFactory();
 
@@ -173,13 +169,6 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 	}
 
 	/**
-	 * @param trustAnchorsDir the trustAnchorsDir to set
-	 */
-	public synchronized void setTrustAnchorsDir(String trustAnchorsDir) {
-		this.trustAnchorsDir = trustAnchorsDir;
-	}
-
-	/**
 	 * @param certFile the certFile to set
 	 */
 	public synchronized void setCertFile(String certFile) {
@@ -208,13 +197,6 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 	}
 
 	/**
-	 * @param refreshInterval the refreshInterval to set
-	 */
-	public synchronized void setRefreshInterval(long refreshInterval) {
-		this.refreshInterval = refreshInterval;
-	}
-
-	/**
 	 * @param timeout the timeout to set
 	 */
 	public synchronized void setTimeout(int timeout) {
@@ -234,6 +216,22 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 	 */
 	public synchronized void setSecureRandomAlgorithm(String secureRandomAlgorithm) {
 		this.secureRandomAlgorithm = secureRandomAlgorithm;
+	}
+
+	/**
+	 * @return the certChainValidator
+	 */
+	public synchronized X509CertChainValidatorExt getCertChainValidator() {
+		return certChainValidator;
+	}
+
+	/**
+	 * @param certChainValidator the certChainValidator to set
+	 */
+	public synchronized void setCertChainValidator(
+			X509CertChainValidatorExt certChainValidator) {
+		this.certChainValidator = certChainValidator;
 	}	
+	
 	
 }

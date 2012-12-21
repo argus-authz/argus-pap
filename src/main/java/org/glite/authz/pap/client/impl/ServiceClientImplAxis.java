@@ -19,7 +19,6 @@ package org.glite.authz.pap.client.impl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.Properties;
 
 import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.encoding.TypeMapping;
@@ -259,6 +258,8 @@ public class ServiceClientImplAxis implements ServiceClient {
         }
 
         CANLAxis1SocketFactory.setConfigurator(socketFactoryConfigurator);
-        AxisProperties.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, CANLAxis1SocketFactory.class.getName());
+        String socketFactoryClass = CANLAxis1SocketFactory.class.getName();
+        AxisProperties.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, socketFactoryClass);
+        // System.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, socketFactoryClass);
     }
 }

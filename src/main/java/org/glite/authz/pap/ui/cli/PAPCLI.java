@@ -18,7 +18,6 @@
 package org.glite.authz.pap.ui.cli;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -67,6 +66,8 @@ import org.glite.authz.pap.ui.cli.samlclient.SAMLClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.emi.security.authn.x509.impl.CertificateUtils;
+
 public class PAPCLI {
 
     public static final String DEFAULTS_FILE_NAME = "pap-admin.properties";
@@ -75,6 +76,8 @@ public class PAPCLI {
 
     public static void main(String[] args) {
 
+    	CertificateUtils.configureSecProvider();
+    	
         PAPCLI cli = new PAPCLI(args);
 
         try {

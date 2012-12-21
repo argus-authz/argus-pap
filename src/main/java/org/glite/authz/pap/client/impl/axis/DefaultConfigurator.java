@@ -1,5 +1,10 @@
 package org.glite.authz.pap.client.impl.axis;
 
+import org.italiangrid.utils.https.impl.canl.CANLListener;
+import org.italiangrid.voms.util.CertificateValidatorBuilder;
+
+import eu.emi.security.authn.x509.X509CertChainValidatorExt;
+
 public class DefaultConfigurator implements CANLAxis1SocketFactoryConfigurator, 
 	CANLAxis1SocketFactoryConfiguration {
 
@@ -35,21 +40,36 @@ public class DefaultConfigurator implements CANLAxis1SocketFactoryConfigurator,
 	
 	private String secureRandomAlgorithm = DEFAULT_SECURE_RANDOM;
 	
+	private static volatile X509CertChainValidatorExt validator = null;
+	
 	public DefaultConfigurator() {
 		
 	}
 
-	public synchronized void configure(CANLAxis1SocketFactory factory) {
-		factory.setSslProtocol(getSslProtocol());
-		factory.setTrustAnchorsDir(getTrustAnchorsDir());
+	private synchronized X509CertChainValidatorExt getValidator(){
 		
+		if (validator == null){
+			
+			CANLListener l = new CANLListener();
+			validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir,
+				l,
+				l,
+				refreshInterval);
+		}
+		
+		return validator;
+	}
+	
+	public synchronized void configure(CANLAxis1SocketFactory factory) {
+		factory.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
+		factory.setSslProtocol(getSslProtocol());
+		factory.setCertChainValidator(getValidator());
 		factory.setCertFile(getCertFile());
 		factory.setKeyFile(getKeyFile());
 		factory.setKeyPassword(getKeyPassword());
 		
 		factory.setProxyFile(getProxyFile());
 		
-		factory.setRefreshInterval(getRefreshInterval());
 		factory.setTimeout(getTimeout());
 		factory.setEnforcingHostnameChecks(isEnforcingHostnameChecks());
 	}
