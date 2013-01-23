@@ -105,7 +105,7 @@ public class CANLAxis1SocketFactory implements SecureSocketFactory,
 	}
 
 	private SecureRandom getSecureRandom() throws NoSuchAlgorithmException {
-		return SecureRandom.getInstance(secureRandomAlgorithm);
+		return new SecureRandom();
 	}
 
 	private SSLSocketFactory createSocketFactory() throws Exception {

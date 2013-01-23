@@ -18,7 +18,7 @@
 
   <packaging>war</packaging>
   <name>Argus Policy Administration Point (PAP)</name>
-  <version>1.6.0-SNAPSHOT</version>
+  <version>1.6.0-rc1</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
@@ -319,7 +319,7 @@
     <dependency>
       <groupId>org.italiangrid</groupId>
       <artifactId>https-utils</artifactId>
-      <version>0.2-SNAPSHOT</version>
+      <version>0.2.1</version>
     </dependency>
 
     <!-- Axis -->

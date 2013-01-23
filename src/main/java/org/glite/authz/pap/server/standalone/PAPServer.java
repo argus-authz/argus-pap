@@ -169,8 +169,6 @@ public final class PAPServer {
 
 			log.error(e.getMessage());
 
-			// Also print error message to standard error
-
 			System.err
 					.println("PAP encountered an error that could not be dealt with, shutting down!");
 			System.err.println("Error: " + e.getMessage());
@@ -272,6 +270,8 @@ public final class PAPServer {
 		PapShutdownAndStatusService.startPAPShutdownAndStatusService(8151,
 				Collections.singletonList((Runnable) papShutdownCommand));
 
+		log.info("Loading war from: {}", DEFAULT_WAR_LOCATION);
+		
 		webappContext = new WebAppContext();
 
 		webappContext.setContextPath("/"
