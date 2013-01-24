@@ -27,7 +27,7 @@
 #
 ### Chkconfig section
 #
-# chkconfig: 2345 97 97
+# chkconfig: 345 97 97
 # description: Argus PAP startup script
 # processname: argus-pap
 ###
