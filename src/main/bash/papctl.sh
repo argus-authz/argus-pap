@@ -15,7 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
+### BEGIN INIT INFO
+# Provides:          argus-pap
+# Required-Start:    $network $remote_fs
+# Required-Stop:     $network $remote_fs
+# Default-Start:     3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: The Argus PAP  
+# Description:       The Argus Policy Administration Point service 
+### END INIT INFO
+#
+### Chkconfig section
+#
+# chkconfig: 2345 97 97
+# description: Argus PAP startup script
+# processname: argus-pap
+###
+# 
 set -e
 
 prog="$(basename $0)"
