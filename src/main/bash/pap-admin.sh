@@ -34,8 +34,10 @@ done
 # Get standard environment variables
 PRGDIR=`dirname "$PRG"`
 
-if [ -r "/etc/sysconfig/argus-pap" ]; then
-	source /etc/sysconfig/argus-pap
+PAP_DEFAULTS="/etc/sysconfig/argus-pap"
+
+if [ -r $PAP_DEFAULTS ]; then
+	source $PAP_DEFAULTS
 fi
 
 # Only set PAP_HOME if not already set

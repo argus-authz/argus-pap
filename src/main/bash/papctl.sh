@@ -20,8 +20,10 @@ set -e
 
 prog="$(basename $0)"
 
-if [ -r "/etc/sysconfig/argus-pap" ]; then
-	source /etc/sysconfig/argus-pap
+PAP_DEFAULTS=/etc/sysconfig/argus-pap
+
+if [ -r $PAP_DEFAULTS ]; then
+	source $PAP_DEFAULTS
 fi
 
 if [ -z $PAP_HOME ]; then
