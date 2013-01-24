@@ -198,8 +198,22 @@
         <exclude>org.apache.xalan:*</exclude>
         <exclude>xml-resolver:*</exclude>
         <!-- from packages dependencies -->
+        
+        <exclude>eu.eu-emi.security:canl:*</exclude>
+        <exclude>org.italiangrid:voms-api-java:*</exclude>
+        <exclude>org.bouncycastle:*</exclude>
+    
         <exclude>*:war</exclude>
       </excludes>
+    </dependencySet>
+    <dependencySet>
+        <fileMode>0644</fileMode>
+        <outputDirectory>/var/lib/argus/pap/lib/provided</outputDirectory>
+        <includes>
+            <include>eu.eu-emi.security:canl:*</include>
+            <include>org.italiangrid:voms-api-java:*</include>
+            <include>org.bouncycastle:*</include>
+        </includes>
     </dependencySet>
     <dependencySet>
         <fileMode>0644</fileMode>

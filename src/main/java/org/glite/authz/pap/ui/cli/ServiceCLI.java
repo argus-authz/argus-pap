@@ -18,12 +18,15 @@
 package org.glite.authz.pap.ui.cli;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Reader;
 import java.rmi.RemoteException;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
 import java.util.Collection;
 
 import org.apache.commons.cli.CommandLine;
@@ -35,6 +38,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PasswordFinder;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.Pap;
@@ -42,6 +46,8 @@ import org.glite.authz.pap.common.exceptions.PAPException;
 import org.glite.authz.pap.common.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import eu.emi.security.authn.x509.impl.PEMCredential;
 
 public abstract class ServiceCLI {
 
@@ -203,6 +209,7 @@ public abstract class ServiceCLI {
         return false;
     }
 
+    
     public int execute(String[] args) throws ParseException, HelpMessageException, RemoteException {
 
         CommandLine commandLine = parser.parse(options, args);
@@ -386,43 +393,40 @@ public abstract class ServiceCLI {
             }
         }
 
-        // Ask for certificate password if needed. The default private key (getClientPrivateKey() ==
-        // null)
-        // is a host certificate key which doesn't need the password
+        
         if (serviceClient.getClientPrivateKey() != null) {
-            try {
-
-                Reader reader = new FileReader(serviceClient.getClientPrivateKey());
-
-                String prompt = "Please enter the passphrase for the private key file " + serviceClient.getClientPrivateKey()
-                        + ": ";
-                PasswordFinderImpl passwordFinder = new PasswordFinderImpl(prompt);
-
-                PEMReader pm = new PEMReader(reader, passwordFinder);
-
-                char[] password = null;
-
-                try {
-                    pm.readObject();
-                } catch (IOException e) {
-                    // doesn't matter certificate stuff is managed later.
-                    // the purpose of this is just to set the password (if needed).
-                }
-
-                password = passwordFinder.getTypedPassword();
-
-                if (password != null) {
-                    serviceClient.setClientPrivateKeyPassword(new String(password));
-                }
-
-            } catch (FileNotFoundException e) {
-                throw new CLIException(e);
-            }
+        	
+        	String keyPassword = getPrivateKeyPasswordFromConsole(serviceClient.getClientPrivateKey(),
+        			serviceClient.getClientCertificate());
+        	
+        	if (keyPassword != null)
+        		serviceClient.setClientPrivateKeyPassword(keyPassword);
+        	
         }
 
         return executeCommandService(commandLine, serviceClient);
     }
 
+    private String getPrivateKeyPasswordFromConsole(String keyFile, String certFile){
+    	String prompt = "Please enter the passphrase for the private key file " + keyFile
+                + ": ";
+    	
+    	ConsolePasswordFinder pf = new ConsolePasswordFinder(prompt);
+    	
+    	try {
+			
+    		new PEMCredential(new FileInputStream(keyFile), 
+					new FileInputStream(certFile), pf);
+			
+		} catch (Exception e) {
+			log.error(e.getMessage(),e);
+			throw new PAPException(e.getMessage(),e);
+		}
+    	
+    	return pf.getLastReadPassword();
+    }
+    
+    
     public String[] getCommandNameValues() {
         return commandNameValues;
     }

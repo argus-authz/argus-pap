@@ -16,19 +16,28 @@
 # limitations under the License.
 #
 
-
 # This script sets up the environment for the PAP service.
 # 
 # DO NOT CHANGE THE CONTENT OF THIS FILE UNLESS YOU REALLY KNOW WHAT YOU ARE DOING
 #
-
 set -e
+
+# OS dependency flags
+[ -z "$PAP_USE_OS_CANL" ] && PAP_USE_OS_CANL="false"
+[ -z "$PAP_USE_OS_BC" ] && PAP_USE_OS_BC="false"
+[ -z "$PAP_USE_OS_VOMS" ] && PAP_USE_OS_VOMS="false"
+
+# Set the directory where we will look for jar packages coming from the OS
+[ -z "$OS_JAR_DIR" ] && OS_JAR_DIR="/usr/share/java"
 
 # Location of the PAP jars
 PAP_LIBS=$PAP_HOME/lib
 
 # Location of the PAP endorsed jars
 PAP_ENDORSED_LIBS=$PAP_LIBS/endorsed
+
+# Location of the PAP provided jars
+PAP_PROVIDED_LIBS=$PAP_LIBS/provided
 
 # PAP configuration file location
 PAP_CONF_FILE="$PAP_HOME/conf/pap_configuration.ini"
@@ -45,7 +54,34 @@ PAP_CLASS="org.glite.authz.pap.server.standalone.PAPServer"
 PAP_SHUTDOWN_CLASS="org.glite.authz.pap.server.standalone.ShutdownClient"
 
 # ':' separated list of  PAP dependencies, used to build the classpath
-PAP_DEPS=`ls -x $PAP_LIBS/*.jar | tr '\n' ':'`
+PAP_DEPS=$(ls -x $PAP_LIBS/*.jar | tr '\n' ':'| sed 's/:$//')
+
+# Include CANL from OS or embedded dir
+if [ "$PAP_USE_OS_CANL" = "false" ]; then
+    for jar in $PAP_PROVIDED_LIBS/canl-*.jar; do
+        [ -f $jar ] && PAP_DEPS="$PAP_DEPS:$jar"
+    done
+else
+    PAP_DEPS="$PAP_DEPS:$OS_JAR_DIR/canl.jar"
+fi
+
+# Include BC from OS or embedded dir
+if [ "$PAP_USE_OS_BC" = "false" ]; then
+    for jar in $PAP_PROVIDED_LIBS/bcmail*.jar $PAP_PROVIDED_LIBS/bcprov*.jar; do 
+        [ -f $jar ] &&  PAP_DEPS="$PAP_DEPS:$jar"
+    done
+else
+    PAP_DEPS="$PAP_DEPS:$OS_JAR_DIR/bcprov-1.46.jar:$OS_JAR_DIR/bcmail-1.46.jar"
+fi
+
+# Include VOMS from OS or embedded dir
+if [ "$PAP_USE_OS_VOMS" = "false" ]; then
+    for jar in $PAP_PROVIDED_LIBS/voms-api-java-*.jar; do
+      [ -f $jar ] && PAP_DEPS="$PAP_DEPS:$jar"
+    done
+else
+    PAP_DEPS="$PAP_DEPS:$OS_JAR_DIR/voms-api-java3.jar"
+fi
 
 # Location of the PAP jar file
 PAP_JAR="$PAP_HOME/lib/pap.jar"

@@ -72,6 +72,8 @@ public class PapShutdownAndStatusService {
 
         JettyRunThread shutdownServiceRunThread = new JettyRunThread(shutdownService);
         shutdownServiceRunThread.start();
+        
+        shutdownService.setHandler(servletContext);
     }
 
     /**

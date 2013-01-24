@@ -17,6 +17,7 @@
 
 package org.glite.authz.pap.client;
 
+import org.bouncycastle.openssl.PasswordFinder;
 import org.glite.authz.pap.services.authz_management.axis_skeletons.PAPAuthorizationManagement;
 import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.HighLevelPolicyManagement;
 import org.glite.authz.pap.services.pap_management.axis_skeletons.PAPManagement;

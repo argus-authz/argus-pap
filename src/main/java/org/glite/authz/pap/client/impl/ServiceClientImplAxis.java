@@ -24,6 +24,7 @@ import javax.xml.rpc.ServiceException;
 import javax.xml.rpc.encoding.TypeMapping;
 
 import org.apache.axis.AxisProperties;
+import org.bouncycastle.openssl.PasswordFinder;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.impl.axis.CANLAxis1SocketFactory;
 import org.glite.authz.pap.client.impl.axis.DefaultConfigurator;
@@ -50,6 +51,7 @@ public class ServiceClientImplAxis implements ServiceClient {
     private String clientPrivateKeyPassword = null;
     private String clientProxy = null;
     private String serviceURL = null;
+    private PasswordFinder passwordFinder = null;
 
     public ServiceClientImplAxis() {}
 
@@ -252,7 +254,7 @@ public class ServiceClientImplAxis implements ServiceClient {
 
             if (clientPrivateKey != null)
             	socketFactoryConfigurator.setKeyFile(clientPrivateKey);
-           
+            
             if (clientPrivateKeyPassword != null)
             	socketFactoryConfigurator.setKeyPassword(clientPrivateKeyPassword);
         }
@@ -260,6 +262,5 @@ public class ServiceClientImplAxis implements ServiceClient {
         CANLAxis1SocketFactory.setConfigurator(socketFactoryConfigurator);
         String socketFactoryClass = CANLAxis1SocketFactory.class.getName();
         AxisProperties.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, socketFactoryClass);
-        // System.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, socketFactoryClass);
-    }
+    }    
 }
