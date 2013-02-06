@@ -182,7 +182,8 @@ public final class PAPServer {
 
 			System.exit(1);
 		}
-
+		
+		
 	}
 
 	private SSLOptions getSSLOptions() {
@@ -261,10 +262,10 @@ public final class PAPServer {
 				maxConnections,
 				maxRequestQueueSize);
 
-		JettyShutdownTask papShutdownCommand = new JettyShutdownTask(papServer);
+		Runnable papShutdownCommand = new PAPShutdownCommand(papServer);
 
-		PapShutdownAndStatusService.startPAPShutdownAndStatusService(8151,
-				Collections.singletonList((Runnable) papShutdownCommand));
+		PAPShutdownAndStatusService.startPAPShutdownAndStatusService(8151,
+				Collections.singletonList(papShutdownCommand));
 
 		log.info("Loading war from: {}", DEFAULT_WAR_LOCATION);
 		

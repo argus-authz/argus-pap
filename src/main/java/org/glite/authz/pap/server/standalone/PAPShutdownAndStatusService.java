@@ -28,7 +28,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glite.authz.pap.monitoring.MonitoringServlet;
 import org.italiangrid.utils.https.JettyRunThread;
-import org.italiangrid.utils.https.JettyShutdownTask;
 
 /**
  * A Jetty instance that listens on a given port for a request to the URL path <em>/shutdown</em> and <em>/status</em>.
@@ -40,7 +39,7 @@ import org.italiangrid.utils.https.JettyShutdownTask;
  * 
  * Additionally, the same shutdown procedure is bound as a JVM shutdown hook in the event that the process is terminated in that fashion.
  */
-public class PapShutdownAndStatusService {
+public class PAPShutdownAndStatusService {
 
     /**
      * Creates and starts the PAP shutdown and status service.
@@ -86,7 +85,7 @@ public class PapShutdownAndStatusService {
      * @return the shutdown thread
      */
     private static Thread buildServiceShutdownThread(final Server shutdownService, List<Runnable> commands) {
-        final Runnable shutdownShutdownServiceCommand = new JettyShutdownTask(shutdownService);
+        final Runnable shutdownShutdownServiceCommand = new PAPShutdownCommand(shutdownService);
 
         final List<Runnable> shutdownCommands;
         if (commands == null || commands.isEmpty()) {
