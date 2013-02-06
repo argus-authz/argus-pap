@@ -201,6 +201,12 @@ public final class PAPService {
 		logger.info("Shutting down authorization module...");
 		if (AuthorizationEngine.instance() != null)
 			AuthorizationEngine.instance().shutdown();
+		
+		logger.info("Disposing CANL validator...");
+		if (PAPConfiguration.instance().getCertchainValidator() != null)
+			PAPConfiguration.instance().getCertchainValidator().dispose();
+		
+		logger.info("PAP service stopped.");
 
 	}
 
