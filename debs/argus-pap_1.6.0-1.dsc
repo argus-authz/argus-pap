@@ -10,11 +10,11 @@ Vcs-Browser: https://github.com/argus-authz/argus-pap
 Vcs-Git: git://github.com/argus-authz/argus-pap.git
 Build-Depends: debhelper (>= 7.0.50~), maven2, default-jdk
 Checksums-Sha1: 
- 91718d97d2d83b30a1feff50abd63870800ec779 193440 argus-pap_1.6.0.orig.tar.gz
- 43ab59a9dfedeb3a5e449b081a205bf351d22ef5 4011 argus-pap_1.6.0-1.debian.tar.gz
+ 0602be7142b112a4389d7071ec17381d2f1d015b 193636 argus-pap_1.6.0.orig.tar.gz
+ 5a3b86ace95b3b2e3bf92a466b97a15bcef57df3 3990 argus-pap_1.6.0-1.debian.tar.gz
 Checksums-Sha256: 
- dd120650eb7603ca571a8cde38cfc1aed9a4f7d04f50cdc2086e692952002e48 193440 argus-pap_1.6.0.orig.tar.gz
- 36d3ae3994c30f33ea76a63c9386bd303321c1cc8866d32798947c4929b228a0 4011 argus-pap_1.6.0-1.debian.tar.gz
+ 164d6470c0833a795c46eb72347afed30f83971ab1d94efc6ba95d050d30714d 193636 argus-pap_1.6.0.orig.tar.gz
+ d51e63441a31e4981b024456f9f759539acd4d70b075410d56fa32ac8d3bfb0b 3990 argus-pap_1.6.0-1.debian.tar.gz
 Files: 
- 5fc6986dbc86e5812f79dce356cc728a 193440 argus-pap_1.6.0.orig.tar.gz
- 89ad959a29b91f4951b0cd6db8427bec 4011 argus-pap_1.6.0-1.debian.tar.gz
+ f01f09302a03e7d722c9f093c306426d 193636 argus-pap_1.6.0.orig.tar.gz
+ 1ee5eb07323ac2e20008bc204515a6d7 3990 argus-pap_1.6.0-1.debian.tar.gz
