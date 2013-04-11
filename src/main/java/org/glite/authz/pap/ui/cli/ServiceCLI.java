@@ -19,14 +19,8 @@ package org.glite.authz.pap.ui.cli;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Reader;
 import java.rmi.RemoteException;
-import java.security.KeyStoreException;
-import java.security.cert.CertificateException;
 import java.util.Collection;
 
 import org.apache.commons.cli.CommandLine;
@@ -37,8 +31,6 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.bouncycastle.openssl.PEMReader;
-import org.bouncycastle.openssl.PasswordFinder;
 import org.glite.authz.pap.client.ServiceClient;
 import org.glite.authz.pap.client.ServiceClientFactory;
 import org.glite.authz.pap.common.Pap;

@@ -238,18 +238,18 @@ public class AttributeWizard {
 	}
 
 	private void setValue(String value) {
-
-		String rfcDN = null;
 		
 		if (attributeWizardType.getDataType().equals(X509_SUBJECT_DATA_TYPE)) {
 
 			try{
 				
 				if (value.startsWith("/"))	
-					rfcDN = OpensslNameUtils.opensslToRfc2253(value);
+					this.value= OpensslNameUtils.opensslToRfc2253(value);
 				else
-					rfcDN = value;
-			
+					this.value = value;
+		
+				return;
+				
 			}catch(IllegalArgumentException e){
 				
 				throw new PAPException("The string passed as argument is not a valid certificate subject!", e);
