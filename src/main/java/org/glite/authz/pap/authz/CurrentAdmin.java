@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
 import org.glite.authz.pap.common.PAPConfiguration;
 import org.glite.authz.pap.common.exceptions.NullArgumentException;
+import org.italiangrid.utils.voms.CurrentSecurityContext;
 import org.italiangrid.utils.voms.SecurityContext;
 import org.italiangrid.utils.voms.SecurityContextImpl;
 import org.italiangrid.voms.VOMSAttribute;
@@ -98,7 +99,8 @@ public class CurrentAdmin {
 
         log.debug( "Fectching FQANs out of the security context");
         
-        SecurityContextImpl ctxt = SecurityContextImpl.getCurrentContext();
+        SecurityContext ctxt = CurrentSecurityContext.get();
+        
         
         try {
 
@@ -149,7 +151,7 @@ public class CurrentAdmin {
      */
     public static CurrentAdmin instance() {
 
-        SecurityContext theContext = SecurityContextImpl.getCurrentContext();
+        SecurityContext theContext = CurrentSecurityContext.get();
 
         String rfcReadableString = X500NameUtils.getReadableForm(theContext.getClientX500Principal());
         String adminDN = OpensslNameUtils.convertFromRfc2253(rfcReadableString, false);

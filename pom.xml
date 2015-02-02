@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.glite.authz</groupId>
     <artifactId>argus-parent</artifactId>
-    <version>1.5</version>
+    <version>1.6</version>
   </parent>
 
   <groupId>org.glite.authz.pap</groupId>
@@ -18,7 +18,7 @@
 
   <packaging>war</packaging>
   <name>Argus Policy Administration Point (PAP)</name>
-  <version>1.6.1</version>
+  <version>1.6.2-SNAPSHOT</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
@@ -319,8 +319,16 @@
     <dependency>
       <groupId>org.italiangrid</groupId>
       <artifactId>https-utils</artifactId>
-      <version>0.2.1</version>
+      <version>0.3.6</version>
     </dependency>
+    
+    <dependency>
+      <groupId>org.italiangrid</groupId>
+      <artifactId>voms-api-java</artifactId>
+      <version>3.0.5</version>
+    </dependency>
+    
+    
 
     <!-- Axis -->
     <dependency>
@@ -379,31 +387,31 @@
     </dependency>
 
     <!-- SLF4J & Logging -->
-     
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>${slf4jVersion}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
       <version>${slf4jVersion}</version>
     </dependency>
-  
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <version>${logbackVersion}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
       <version>${logbackVersion}</version>
     </dependency>
-    
+
     <!-- Xerces, Xalan, Serializer -->
     <dependency>
       <groupId>xerces</groupId>
@@ -426,14 +434,14 @@
       <version>2.7.1</version><!--$NO-MVN-MAN-VER$-->
       <scope>runtime</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
       <version>2.7.1</version>
       <scope>runtime</scope>
     </dependency>
-    
+
   </dependencies>
   <profiles>
     <profile>
