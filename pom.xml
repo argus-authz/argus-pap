@@ -328,6 +328,11 @@
       <version>3.1.0.rc1-SNAPSHOT</version>
     </dependency>
 
+    <dependency>
+      <groupId>eu.eu-emi.security</groupId>
+      <artifactId>canl</artifactId>
+      <version>2.1.1</version>
+    </dependency>
     <!-- Axis -->
     <dependency>
       <groupId>axis</groupId>
