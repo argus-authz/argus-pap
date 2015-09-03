@@ -328,8 +328,6 @@
       <version>3.1.0.rc1-SNAPSHOT</version>
     </dependency>
 
-
-
     <!-- Axis -->
     <dependency>
       <groupId>axis</groupId>
