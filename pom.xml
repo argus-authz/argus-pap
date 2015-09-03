@@ -319,13 +319,13 @@
     <dependency>
       <groupId>org.italiangrid</groupId>
       <artifactId>https-utils</artifactId>
-      <version>0.3.6</version>
+      <version>0.4.0-SNAPSHOT</version>
     </dependency>
 
     <dependency>
       <groupId>org.italiangrid</groupId>
       <artifactId>voms-api-java</artifactId>
-      <version>3.0.5</version>
+      <version>3.1.0.rc1-SNAPSHOT</version>
     </dependency>
 
 
