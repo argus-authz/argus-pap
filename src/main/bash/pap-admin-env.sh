@@ -52,11 +52,11 @@ fi
 
 # Include BC from OS or embedded dir
 if [ "$PAP_USE_OS_BC" = "false" ]; then
-    for jar in $PAP_PROVIDED_LIBS/bcmail*.jar $PAP_PROVIDED_LIBS/bcprov*.jar; do
+    for jar in $PAP_PROVIDED_LIBS/bcpkix*.jar $PAP_PROVIDED_LIBS/bcprov*.jar; do
         [ -f $jar ] &&  PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$jar"
     done
 else
-    PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$OS_JAR_DIR/bcprov-1.46.jar:$OS_JAR_DIR/bcmail-1.46.jar"
+    PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$OS_JAR_DIR/bcprov.jar:$OS_JAR_DIR/bcpkix.jar"
 fi
 
 # Include VOMS from OS or embedded dir
