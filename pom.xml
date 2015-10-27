@@ -259,22 +259,7 @@
 
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>switch</id>
-      <name>SWITCH Releases</name>
-      <url>http://www.switch.ch/grid/authz/docs/maven2/release
-            </url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>codehaus-release-repo</id>
-      <name>Codehaus Release Repo</name>
-      <url>http://repository.codehaus.org</url>
-    </repository>
-  </repositories>
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
