@@ -36,7 +36,9 @@ import org.opensaml.xacml.policy.PolicySetType;
 import org.opensaml.xacml.policy.PolicyType;
 import org.opensaml.xacml.policy.TargetType;
 import org.opensaml.xml.Namespace;
+import org.opensaml.xml.NamespaceManager;
 import org.opensaml.xml.XMLObject;
+import org.opensaml.xml.schema.XSBooleanValue;
 import org.opensaml.xml.util.IDIndex;
 import org.opensaml.xml.util.IndexedXMLObjectChildrenList;
 import org.opensaml.xml.validation.ValidationException;
@@ -410,5 +412,25 @@ public class PolicySetTypeString implements PolicySetType {
     private void invalidatePolicySetString() {
         log.trace("Invalidating policySetString");
         policySetString = null;
+    }
+
+    public NamespaceManager getNamespaceManager() {
+      return policySet.getNamespaceManager();
+    }
+
+    public Boolean isNil() {
+      return policySet.isNil();
+    }
+
+    public XSBooleanValue isNilXSBoolean() {
+      return policySet.isNilXSBoolean();
+    }
+
+    public void setNil(Boolean newNil) {
+      policySet.setNil(newNil);
+    }
+
+    public void setNil(XSBooleanValue newNil) {
+      policySet.setNil(newNil);
     }
 }
