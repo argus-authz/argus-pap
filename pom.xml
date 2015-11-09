@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.glite.authz</groupId>
     <artifactId>argus-parent</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.7-SNAPSHOT</version>
   </parent>
 
   <groupId>org.glite.authz.pap</groupId>
