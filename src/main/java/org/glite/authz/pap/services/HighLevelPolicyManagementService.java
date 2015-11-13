@@ -33,6 +33,7 @@ import org.glite.authz.pap.services.highlevel_policy_management.axis_skeletons.U
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class HighLevelPolicyManagementService implements HighLevelPolicyManagement {
 
     private static final Logger log = LoggerFactory.getLogger(HighLevelPolicyManagementService.class);
@@ -79,6 +80,7 @@ public class HighLevelPolicyManagementService implements HighLevelPolicyManageme
                                resource,
                                action,
                                isPublic));
+        
         try {
             AttributeWizard banAttributeWizard = new AttributeWizard(id, value);
             AttributeWizard resourceAttributeWizard = new AttributeWizard(AttributeWizardTypeConfiguration.getInstance()

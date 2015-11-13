@@ -45,17 +45,15 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
 
     private static final String[] commandNameValues = { "add-policies-from-file", "apf" };
     private static final String DESCRIPTION = "Add policies defined in the given file.\nParameters:\n"
-            + "<file>       policy file defining a set of resource elements or a set of action elements.\n"
-            + "[resourceId] resource id where insert actions into.\n";
+	    + "<file>       policy file defining a set of resource elements or a set of action elements.\n"
+	    + "[resourceId] resource id where insert actions into.\n";
 
     private static final String LONG_DESCRIPTION = "If <file> defines a set of resource elements \"resourceId\" must not "
-            + "be provided, otherwise if only action elements are defined \"resourceId\" indentifies the resource element "
-            + "in which inserting the given action elements into. By default elements are inserted at the bottom."
-            + " To change this behaviour two options can be used: \"--"
-            + OPT_BEFORE_ID_LONG
-            + " <id>\" to insert before the given <id>, and \"--"
-            + OPT_AFTER_ID_LONG
-            + " <id>\" to insert after the given <id>.";
+	    + "be provided, otherwise if only action elements are defined \"resourceId\" indentifies the resource element "
+	    + "in which inserting the given action elements into. By default elements are inserted at the bottom."
+	    + " To change this behaviour two options can be used: \"--" + OPT_BEFORE_ID_LONG
+	    + " <id>\" to insert before the given <id>, and \"--" + OPT_AFTER_ID_LONG
+	    + " <id>\" to insert after the given <id>.";
     private static final String USAGE = "[options] <file> [resourceId]";
     private PolicyFileEncoder policyFileEncoder = new PolicyFileEncoder();
     private List<XACMLWizard> xacmlWizardList;
@@ -65,279 +63,264 @@ public class AddPoliciesFromFile extends PolicyManagementCLI {
     private boolean moveAfter = false;
 
     public AddPoliciesFromFile() {
-        super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
+	super(commandNameValues, USAGE, DESCRIPTION, LONG_DESCRIPTION);
     }
 
     private boolean addResources() throws RemoteException {
 
-        for (XACMLWizard xacmlWizard : xacmlWizardList) {
-            if (!(xacmlWizard instanceof PolicySetWizard)) {
-                System.out.println(String.format("Error: found action element (%s). Only highlevel \"resource\" elements are allowed.",
-                                                 ((PolicyWizard) xacmlWizard).getTagAndValue()));
-                return false;
-            }
-        }
+	for (XACMLWizard xacmlWizard : xacmlWizardList) {
+	    if (!(xacmlWizard instanceof PolicySetWizard)) {
+		System.out.println(String.format(
+			"Error: found action element (%s). Only highlevel \"resource\" elements are allowed.",
+			((PolicyWizard) xacmlWizard).getTagAndValue()));
+		return false;
+	    }
+	}
 
-        if (resourceId != null) {
-            System.out.println("Error cannot use \"resourceId\" to insert resource elements.");
-            return false;
-        }
+	if (resourceId != null) {
+	    System.out.println("Error cannot use \"resourceId\" to insert resource elements.");
+	    return false;
+	}
 
-        int position = -1;
+	int position = -1;
 
-        if (pivotId != null) {
-            PolicySetType rootPolicySet = xacmlPolicyMgmtClient.getRootPolicySet(null);
-            position = PolicySetHelper.getPolicySetIdReferenceIndex(rootPolicySet, pivotId);
-            if (position == -1) {
-                System.out.println("id \"" + pivotId + "\" not found (or it's not a resource id).");
-                return false;
-            }
-            if (moveAfter) {
-                position++;
-            }
-        }
+	if (pivotId != null) {
+	    PolicySetType rootPolicySet = xacmlPolicyMgmtClient.getRootPolicySet(null);
+	    position = PolicySetHelper.getPolicySetIdReferenceIndex(rootPolicySet, pivotId);
+	    if (position == -1) {
+		System.out.println("id \"" + pivotId + "\" not found (or it's not a resource id).");
+		return false;
+	    }
+	    if (moveAfter) {
+		position++;
+	    }
+	}
 
-        boolean result = true;
+	boolean result = true;
 
-        for (XACMLWizard xacmlWizard : xacmlWizardList) {
+	for (XACMLWizard xacmlWizard : xacmlWizardList) {
 
-            PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
+	    PolicySetWizard policySetWizard = (PolicySetWizard) xacmlWizard;
 
-            PolicySetType policySet = policySetWizard.getXACML();
+	    PolicySetType policySet = policySetWizard.getXACML();
 
-            policySet.getPolicyIdReferences().clear();
+	    policySet.getPolicyIdReferences().clear();
 
-            policySetWizard.releaseDOM();
+	    policySetWizard.releaseDOM();
 
-            String policySetId = xacmlPolicyMgmtClient.addPolicySet(alias, position, policySet);
+	    String policySetId = xacmlPolicyMgmtClient.addPolicySet(alias, position, policySet);
 
-            if (position != -1) {
-                position++;
-            }
+	    if (position != -1) {
+		position++;
+	    }
 
-            if (policySetId == null) {
-                System.out.println(String.format("Error policy set not added: %s (id=%s). Skipping all the policies defined inside.",
-                                                 policySetWizard.getTagAndValue(),
-                                                 policySetWizard.getPolicySetId()));
-                result = false;
-                continue;
-            }
+	    if (policySetId == null) {
+		System.out.println(String.format(
+			"Error policy set not added: %s (id=%s). Skipping all the policies defined inside.",
+			policySetWizard.getTagAndValue(), policySetWizard.getPolicySetId()));
+		result = false;
+		continue;
+	    }
 
-            if (verboseMode) {
-                System.out.println(String.format("Added policy set: %s (id=%s)",
-                                                 policySetWizard.getTagAndValue(),
-                                                 policySetId));
-            }
+	    if (verboseMode) {
+		System.out.println(
+			String.format("Added policy set: %s (id=%s)", policySetWizard.getTagAndValue(), policySetId));
+	    }
 
-            int size = policySetWizard.getPolicyWizardList().size();
-            PolicyType[] policyArray = new PolicyType[size];
-            String[] idPrefixArray = new String[size];
-            String[] tagAndValueArray = new String[size];
+	    int size = policySetWizard.getPolicyWizardList().size();
+	    PolicyType[] policyArray = new PolicyType[size];
+	    String[] idPrefixArray = new String[size];
+	    String[] tagAndValueArray = new String[size];
 
-            for (int i = 0; i < size; i++) {
-                PolicyWizard policyWizard = policySetWizard.getPolicyWizardList().get(i);
-                policyArray[i] = policyWizard.getXACML();
-                TypeStringUtils.releaseUnneededMemory(policyArray[i]);
-                idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
-                tagAndValueArray[i] = policyWizard.getTagAndValue();
-                TypeStringUtils.releaseUnneededMemory(policyWizard);
-            }
+	    for (int i = 0; i < size; i++) {
+		PolicyWizard policyWizard = policySetWizard.getPolicyWizardList().get(i);
+		policyArray[i] = policyWizard.getXACML();
+		TypeStringUtils.releaseUnneededMemory(policyArray[i]);
+		idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
+		tagAndValueArray[i] = policyWizard.getTagAndValue();
+		TypeStringUtils.releaseUnneededMemory(policyWizard);
+	    }
 
-            String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias,
-                                                                       0,
-                                                                       policySetId,
-                                                                       idPrefixArray,
-                                                                       policyArray);
+	    String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias, 0, policySetId, idPrefixArray,
+		    policyArray);
 
-            for (int i = 0; i < size; i++) {
-                String policyId = policyIdArray[i];
-                String tagAndValue = tagAndValueArray[i];
+	    for (int i = 0; i < size; i++) {
+		String policyId = policyIdArray[i];
+		String tagAndValue = tagAndValueArray[i];
 
-                if (policyId == null) {
-                    System.out.println(String.format("Error policy not added: %s", tagAndValue));
-                    result = false;
-                    continue;
-                }
+		if (policyId == null) {
+		    System.out.println(String.format("Error policy not added: %s", tagAndValue));
+		    result = false;
+		    continue;
+		}
 
-                if (verboseMode) {
-                    System.out.println(String.format("Added policy: %s (id=%s)", tagAndValue, policyId));
-                }
-            }
+		if (verboseMode) {
+		    System.out.println(String.format("Added policy: %s (id=%s)", tagAndValue, policyId));
+		}
+	    }
 
-            if (verboseMode) {
-                System.out.println();
-            }
-        }
-        return result;
+	    if (verboseMode) {
+		System.out.println();
+	    }
+	}
+	return result;
     }
 
     private boolean addActions() throws RemoteException {
 
-        List<PolicyWizard> policyWizardList = new ArrayList<PolicyWizard>(xacmlWizardList.size());
+	List<PolicyWizard> policyWizardList = new ArrayList<PolicyWizard>(xacmlWizardList.size());
 
-        for (XACMLWizard xacmlWizard : xacmlWizardList) {
-            if (!(xacmlWizard instanceof PolicyWizard)) {
-                System.out.println(String.format("Error: found resource element (%s). Only \"action\" highlevel elements are allowed.",
-                                                 ((PolicySetWizard) xacmlWizard).getTagAndValue()));
-                return false;
-            }
-            policyWizardList.add((PolicyWizard) xacmlWizard);
-        }
+	for (XACMLWizard xacmlWizard : xacmlWizardList) {
+	    if (!(xacmlWizard instanceof PolicyWizard)) {
+		System.out.println(String.format(
+			"Error: found resource element (%s). Only \"action\" highlevel elements are allowed.",
+			((PolicySetWizard) xacmlWizard).getTagAndValue()));
+		return false;
+	    }
+	    policyWizardList.add((PolicyWizard) xacmlWizard);
+	}
 
-        if (resourceId == null) {
-            System.out.println("Error \"resourceId\" is needed to insert action elements");
-            return false;
-        }
+	if (resourceId == null) {
+	    System.out.println("Error \"resourceId\" is needed to insert action elements");
+	    return false;
+	}
 
-        PolicySetType targetPolicySet = xacmlPolicyMgmtClient.getPolicySet(alias, resourceId);
+	PolicySetType targetPolicySet = xacmlPolicyMgmtClient.getPolicySet(alias, resourceId);
 
-        int position = -1;
+	int position = -1;
 
-        if (pivotId != null) {
-            position = PolicySetHelper.getPolicyIdReferenceIndex(targetPolicySet, pivotId);
-            TypeStringUtils.releaseUnneededMemory(targetPolicySet);
-            if (position == -1) {
-                System.out.println("id \"" + pivotId
-                        + "\" not found inside resource the given resource (id = \"" + resourceId + "\").");
-                return false;
-            }
-            if (moveAfter) {
-                position++;
-            }
-        }
+	if (pivotId != null) {
+	    position = PolicySetHelper.getPolicyIdReferenceIndex(targetPolicySet, pivotId);
+	    TypeStringUtils.releaseUnneededMemory(targetPolicySet);
+	    if (position == -1) {
+		System.out.println("id \"" + pivotId + "\" not found inside resource the given resource (id = \""
+			+ resourceId + "\").");
+		return false;
+	    }
+	    if (moveAfter) {
+		position++;
+	    }
+	}
 
-        boolean result = true;
+	boolean result = true;
 
-        int size = xacmlWizardList.size();
-        PolicyType[] policyArray = new PolicyType[size];
-        String[] idPrefixArray = new String[size];
-        String[] tagAndValueArray = new String[size];
+	int size = xacmlWizardList.size();
+	PolicyType[] policyArray = new PolicyType[size];
+	String[] idPrefixArray = new String[size];
+	String[] tagAndValueArray = new String[size];
 
-        for (int i = 0; i < size; i++) {
-            PolicyWizard policyWizard = policyWizardList.get(i);
-            policyArray[i] = policyWizard.getXACML();
-            TypeStringUtils.releaseUnneededMemory(policyArray[i]);
-            idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
-            tagAndValueArray[i] = policyWizard.getTagAndValue();
-            TypeStringUtils.releaseUnneededMemory(policyWizard);
-            policyWizard = null;
-        }
+	for (int i = 0; i < size; i++) {
+	    PolicyWizard policyWizard = policyWizardList.get(i);
+	    policyArray[i] = policyWizard.getXACML();
+	    TypeStringUtils.releaseUnneededMemory(policyArray[i]);
+	    idPrefixArray[i] = policyWizard.getPolicyIdPrefix();
+	    tagAndValueArray[i] = policyWizard.getTagAndValue();
+	    TypeStringUtils.releaseUnneededMemory(policyWizard);
+	    policyWizard = null;
+	}
 
-        log.debug("Inserting actions into position: " + position);
+	log.debug("Inserting actions into position: " + position);
 
-        String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias,
-                                                                   position,
-                                                                   resourceId,
-                                                                   idPrefixArray,
-                                                                   policyArray);
-        for (int i = 0; i < size; i++) {
-            String policyId = policyIdArray[i];
-            String tagAndValue = tagAndValueArray[i];
+	String[] policyIdArray = xacmlPolicyMgmtClient.addPolicies(alias, position, resourceId, idPrefixArray,
+		policyArray);
+	for (int i = 0; i < size; i++) {
+	    String policyId = policyIdArray[i];
+	    String tagAndValue = tagAndValueArray[i];
 
-            if (policyId == null) {
-                System.out.println(String.format("Error policy not added: %s", tagAndValue));
-                result = false;
-                continue;
-            }
+	    if (policyId == null) {
+		System.out.println(String.format("Error policy not added: %s", tagAndValue));
+		result = false;
+		continue;
+	    }
 
-            if (verboseMode) {
-                System.out.println(String.format("Added policy: %s (id=%s)", tagAndValue, policyId));
-            }
-        }
+	    if (verboseMode) {
+		System.out.println(String.format("Added policy: %s (id=%s)", tagAndValue, policyId));
+	    }
+	}
 
-        if (verboseMode) {
-            System.out.println();
-        }
-        return result;
+	if (verboseMode) {
+	    System.out.println();
+	}
+	return result;
     }
 
     @SuppressWarnings("static-access")
     @Override
     protected Options defineCommandOptions() {
-        Options options = new Options();
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withDescription(OPT_AFTER_ID_DESCRIPTION)
-                                       .withLongOpt(OPT_AFTER_ID_LONG)
-                                       .withArgName("id")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withDescription(OPT_BEFORE_ID_DESCRIPTION)
-                                       .withLongOpt(OPT_BEFORE_ID_LONG)
-                                       .withArgName("id")
-                                       .create());
-        options.addOption(OptionBuilder.hasArg(true)
-                                       .withDescription(OPT_PAPALIAS_DESCRIPTION)
-                                       .withLongOpt(OPT_PAPALIAS_LONG)
-                                       .withArgName("alias")
-                                       .create());
-        return options;
+	Options options = new Options();
+	options.addOption(OptionBuilder.hasArg(true).withDescription(OPT_AFTER_ID_DESCRIPTION)
+		.withLongOpt(OPT_AFTER_ID_LONG).withArgName("id").create());
+	options.addOption(OptionBuilder.hasArg(true).withDescription(OPT_BEFORE_ID_DESCRIPTION)
+		.withLongOpt(OPT_BEFORE_ID_LONG).withArgName("id").create());
+	options.addOption(OptionBuilder.hasArg(true).withDescription(OPT_PAPALIAS_DESCRIPTION)
+		.withLongOpt(OPT_PAPALIAS_LONG).withArgName("alias").create());
+	return options;
     }
 
     @Override
-    protected int executeCommand(CommandLine commandLine) throws CLIException, ParseException,
-            RemoteException {
-        String[] args = commandLine.getArgs();
+    protected int executeCommand(final CommandLine commandLine) throws CLIException, ParseException, RemoteException {
+	String[] args = commandLine.getArgs();
 
-        if ((args.length < 2) || (args.length > 3)) {
-            throw new ParseException("Wrong number of arguments.");
-        }
+	if ((args.length < 2) || (args.length > 3)) {
+	    throw new ParseException("Wrong number of arguments.");
+	}
 
-        if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
-            alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
-        }
+	if (commandLine.hasOption(OPT_PAPALIAS_LONG)) {
+	    alias = commandLine.getOptionValue(OPT_PAPALIAS_LONG);
+	}
 
-        if ((args.length == 3)) {
-            resourceId = args[2];
-        }
+	if ((args.length == 3)) {
+	    resourceId = args[2];
+	}
 
-        if (commandLine.hasOption(OPT_BEFORE_ID_LONG)) {
-            pivotId = commandLine.getOptionValue(OPT_BEFORE_ID_LONG);
-            moveAfter = false;
-        }
+	if (commandLine.hasOption(OPT_BEFORE_ID_LONG)) {
+	    pivotId = commandLine.getOptionValue(OPT_BEFORE_ID_LONG);
+	    moveAfter = false;
+	}
 
-        if (commandLine.hasOption(OPT_AFTER_ID_LONG)) {
-            pivotId = commandLine.getOptionValue(OPT_AFTER_ID_LONG);
-            moveAfter = true;
-        }
+	if (commandLine.hasOption(OPT_AFTER_ID_LONG)) {
+	    pivotId = commandLine.getOptionValue(OPT_AFTER_ID_LONG);
+	    moveAfter = true;
+	}
 
-        log.trace("args.lengh=" + args.length);
-        log.trace("resourceId=" + resourceId);
-        log.trace("pivotId=" + pivotId);
-        log.trace("moveAfter=" + moveAfter);
+	log.trace("args.lengh=" + args.length);
+	log.trace("resourceId=" + resourceId);
+	log.trace("pivotId=" + pivotId);
+	log.trace("moveAfter=" + moveAfter);
 
-        File file = new File(args[1]);
+	File file = new File(args[1]);
 
-        XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
+	XACMLPolicyCLIUtils.initOpenSAMLAndAttributeWizard();
 
-        try {
-            xacmlWizardList = policyFileEncoder.parse(file);
-        } catch (EncodingException e) {
-            System.out.println("Syntax error no policies has been added from file:" + file.getAbsolutePath());
-            System.out.println("Reason:");
-            System.out.println(e.getMessage());
-            return ExitStatus.FAILURE.ordinal();
-        }
+	try {
+	    xacmlWizardList = policyFileEncoder.parse(file);
+	} catch (EncodingException e) {
+	    System.out.println("Syntax error no policies has been added from file:" + file.getAbsolutePath());
+	    System.out.println("Reason:");
+	    System.out.println(e.getMessage());
+	    return ExitStatus.FAILURE.ordinal();
+	}
 
-        if (xacmlWizardList.isEmpty()) {
-            System.out.println("No policies defined in the given file");
-            return ExitStatus.FAILURE.ordinal();
-        }
+	if (xacmlWizardList.isEmpty()) {
+	    System.out.println("No policies defined in the given file");
+	    return ExitStatus.FAILURE.ordinal();
+	}
 
-        boolean result;
+	boolean result;
 
-        if (xacmlWizardList.get(0) instanceof PolicySetWizard) {
-            result = addResources();
-        } else {
-            result = addActions();
-        }
+	if (xacmlWizardList.get(0) instanceof PolicySetWizard) {
+	    result = addResources();
+	} else {
+	    result = addActions();
+	}
 
-        if (result == true) {
-            if (verboseMode) {
-                System.out.println("Success: policies has been added from file " + file.getAbsolutePath());
-            }
-        } else {
-            return ExitStatus.FAILURE.ordinal();
-        }
-        return ExitStatus.SUCCESS.ordinal();
+	if (result == true) {
+	    if (verboseMode) {
+		System.out.println("Success: policies has been added from file " + file.getAbsolutePath());
+	    }
+	} else {
+	    return ExitStatus.FAILURE.ordinal();
+	}
+	return ExitStatus.SUCCESS.ordinal();
     }
 }
