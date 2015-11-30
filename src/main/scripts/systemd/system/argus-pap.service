@@ -1,0 +1,13 @@
+[Unit]
+Description=Argus Policy Administration Point server
+After=syslog.target network.target
+
+[Service]
+Type=forking
+EnvironmentFile=/etc/sysconfig/argus-pap
+ExecStart=/usr/sbin/papctl start
+ExecStop=/usr/sbin/papctl stop
+PIDFile=/var/run/argus-pap.pid
+
+[Install]
+WantedBy=multi-user.target
