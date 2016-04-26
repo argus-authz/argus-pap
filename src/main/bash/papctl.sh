@@ -117,6 +117,11 @@ function kill_pap_proc(){
 			fi
 
 		else
+			# Still running? Force kill
+			if [ `ps --pid $pid | grep -c $pid` -eq 1 ]; then
+				kill -KILL $pid
+			fi
+
 			## remove pid file
 			rm $PAP_RUN_FILE
 		fi
