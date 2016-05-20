@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.glite.authz</groupId>
     <artifactId>argus-parent</artifactId>
-    <version>1.7-SNAPSHOT</version>
+    <version>1.7.0</version>
   </parent>
 
   <groupId>org.glite.authz.pap</groupId>
@@ -17,7 +17,7 @@
 
   <packaging>war</packaging>
   <name>Argus Policy Administration Point (PAP)</name>
-  <version>1.7.0-SNAPSHOT</version>
+  <version>1.7.0</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
@@ -301,7 +301,7 @@
     <dependency>
       <groupId>org.italiangrid</groupId>
       <artifactId>https-utils</artifactId>
-      <version>0.4.0.jetty9-SNAPSHOT</version>
+      <version>0.4.0.jetty9</version>
     </dependency>
 
     <dependency>
