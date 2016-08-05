@@ -18,13 +18,8 @@
 
 
 # This script sets up the environment to run the pap admin CLI.
-# 
+#
 set -e
-
-# OS dependency flags
-[ -z "$PAP_USE_OS_CANL" ] && PAP_USE_OS_CANL="false"
-[ -z "$PAP_USE_OS_BC" ] && PAP_USE_OS_BC="false"
-[ -z "$PAP_USE_OS_VOMS" ] && PAP_USE_OS_VOMS="false"
 
 # Location of the PAP jars
 PAP_LIBS=$PAP_HOME/lib
@@ -41,32 +36,20 @@ PAP_CLIENT_CLASS="org.glite.authz.pap.ui.cli.PAPCLI"
 # ':' separated list of client PAP dependencies, used to build the classpath
 PAP_CLIENT_DEPS=$(ls -x $PAP_LIBS/*.jar | tr '\n' ':' | sed 's/:$//')
 
-# Include CANL from OS or embedded dir
-if [ "$PAP_USE_OS_CANL" = "false" ]; then
-    for jar in $PAP_PROVIDED_LIBS/canl-*.jar; do
-        [ -f $jar ] && PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$jar"
-    done
-else
-    PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$OS_JAR_DIR/canl.jar"
-fi
+# Include CANL from embedded dir
+for jar in $PAP_PROVIDED_LIBS/canl-*.jar; do
+    [ -f $jar ] && PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$jar"
+done
 
-# Include BC from OS or embedded dir
-if [ "$PAP_USE_OS_BC" = "false" ]; then
-    for jar in $PAP_PROVIDED_LIBS/bcmail*.jar $PAP_PROVIDED_LIBS/bcprov*.jar; do
-        [ -f $jar ] &&  PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$jar"
-    done
-else
-    PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$OS_JAR_DIR/bcprov-1.46.jar:$OS_JAR_DIR/bcmail-1.46.jar"
-fi
+# Include BC from embedded dir
+for jar in $PAP_PROVIDED_LIBS/bcpkix*.jar $PAP_PROVIDED_LIBS/bcprov*.jar; do
+    [ -f $jar ] &&  PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$jar"
+done
 
-# Include VOMS from OS or embedded dir
-if [ "$PAP_USE_OS_VOMS" = "false" ]; then
-    for jar in $PAP_PROVIDED_LIBS/voms-api-java-*.jar; do
-      [ -f $jar ] && PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$jar"
-    done
-else
-    PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$OS_JAR_DIR/voms-api-java3.jar"
-fi
+# Include VOMS from embedded dir
+for jar in $PAP_PROVIDED_LIBS/voms-api-java-*.jar; do
+  [ -f $jar ] && PAP_CLIENT_DEPS="$PAP_CLIENT_DEPS:$jar"
+done
 
 # Location of the PAP jar file
 PAP_JAR="$PAP_HOME/lib/pap.jar"

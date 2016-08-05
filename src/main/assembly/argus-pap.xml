@@ -182,6 +182,11 @@
       <outputDirectory>etc/argus/pap/logging/client</outputDirectory>
       <fileMode>0644</fileMode>
     </file>
+    <file>
+      <source>${basedir}/src/main/scripts/systemd/system/argus-pap.service</source>
+      <outputDirectory>lib/systemd/system</outputDirectory>
+      <fileMode>0644</fileMode>
+    </file>
     
   </files>
   

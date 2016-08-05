@@ -23,7 +23,7 @@ import java.security.cert.X509Certificate;
 import javax.servlet.ServletRequest;
 
 import org.glite.authz.pap.authz.exceptions.PAPAuthzException;
-import org.italiangrid.utils.voms.SecurityContext;
+import org.italiangrid.utils.voms.CurrentSecurityContext;
 import org.italiangrid.utils.voms.SecurityContextImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,51 +39,51 @@ import eu.emi.security.authn.x509.impl.X500NameUtils;
  */
 public class InitSecurityContext {
 
-    /** The index string for the remote address as stored in the security context **/
-    static public final String SECURITY_CONTEXT_REMOTE_ADDRESS = "org.glite.authz.pap.remote_address";
+  /** The index string for the remote address as stored in the security context **/
+  static public final String SECURITY_CONTEXT_REMOTE_ADDRESS = "org.glite.authz.pap.remote_address";
 
-    static Logger logger = LoggerFactory.getLogger( InitSecurityContext.class );
+  static Logger logger = LoggerFactory.getLogger(InitSecurityContext.class);
 
-    /**
-     * Initializes the context from a servlet request.
-     * @param request
-     */
-    public static void setContextFromRequest( final ServletRequest request ) {
+  /**
+   * Initializes the context from a servlet request.
+   * 
+   * @param request
+   */
+  public static void setContextFromRequest(final ServletRequest request) {
 
-        SecurityContextImpl sc = new SecurityContextImpl();
-        SecurityContextImpl.setCurrentContext( sc );
+    SecurityContextImpl sc = new SecurityContextImpl();
+    CurrentSecurityContext.set(sc);
 
-        String remoteAddress = request.getRemoteAddr();
-        sc.setRemoteAddr(remoteAddress);
+    String remoteAddress = request.getRemoteAddr();
+    sc.setRemoteAddr(remoteAddress);
 
-        X509Certificate[] certChain = null;
-        try {
+    X509Certificate[] certChain = null;
+    try {
 
-            certChain = (X509Certificate[]) request
-                    .getAttribute( "javax.servlet.request.X509Certificate" );
+      certChain = (X509Certificate[]) request
+        .getAttribute("javax.servlet.request.X509Certificate");
 
-        } catch ( Exception e ) {
+    } catch (Exception e) {
 
-            logger.error( "Exception during certificate chain retrieval: " + e );
-            throw new PAPAuthzException( "No certificate found in request!", e );
-
-        }
-        
-        if (certChain == null)
-            throw new PAPAuthzException( "No certificate found in request!"); 
-
-        sc.setClientCertChain( certChain );
-
-        String subject = X500NameUtils.getReadableForm(sc.getClientX500Principal());
-        String issuer = X500NameUtils.getReadableForm(sc.getIssuerX500Principal());
-        
-        BigInteger sn = sc.getClientCert().getSerialNumber();
-        String serialNumber = ( sn == null ) ? "NULL" : sn.toString();
-
-        logger.info( "Connection from \"" + remoteAddress + "\" by \""
-                + subject + "\" (issued by \"" + issuer
-                + "\", " + "serial " + serialNumber + ")" );
+      logger.error("Exception during certificate chain retrieval: " + e);
+      throw new PAPAuthzException("No certificate found in request!", e);
 
     }
+
+    if (certChain == null)
+      throw new PAPAuthzException("No certificate found in request!");
+
+    sc.setClientCertChain(certChain);
+
+    String subject = X500NameUtils.getReadableForm(sc.getClientX500Principal());
+    String issuer = X500NameUtils.getReadableForm(sc.getIssuerX500Principal());
+
+    BigInteger sn = sc.getClientCert().getSerialNumber();
+    String serialNumber = (sn == null) ? "NULL" : sn.toString();
+
+    logger.info("Connection from \"" + remoteAddress + "\" by \"" + subject
+      + "\" (issued by \"" + issuer + "\", " + "serial " + serialNumber + ")");
+
+  }
 
 }

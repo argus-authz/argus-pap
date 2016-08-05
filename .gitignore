@@ -3,3 +3,4 @@ argus-pap.spec
 /.settings
 /.classpath
 /.project
+/bin/

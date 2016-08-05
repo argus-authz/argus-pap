@@ -2,15 +2,14 @@
 <project
   xmlns="http://maven.apache.org/POM/4.0.0"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd"
->
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.glite.authz</groupId>
     <artifactId>argus-parent</artifactId>
-    <version>1.5</version>
+    <version>1.7.0</version>
   </parent>
 
   <groupId>org.glite.authz.pap</groupId>
@@ -18,14 +17,12 @@
 
   <packaging>war</packaging>
   <name>Argus Policy Administration Point (PAP)</name>
-  <version>1.6.1</version>
+  <version>1.7.0</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <slf4jVersion>1.6.6</slf4jVersion>
-    <logbackVersion>1.0.6</logbackVersion>
   </properties>
 
   <build>
@@ -260,22 +257,7 @@
 
     </plugins>
   </build>
-  <repositories>
-    <repository>
-      <id>switch</id>
-      <name>SWITCH Releases</name>
-      <url>http://www.switch.ch/grid/authz/docs/maven2/release
-            </url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>codehaus-release-repo</id>
-      <name>Codehaus Release Repo</name>
-      <url>http://repository.codehaus.org</url>
-    </repository>
-  </repositories>
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -319,9 +301,18 @@
     <dependency>
       <groupId>org.italiangrid</groupId>
       <artifactId>https-utils</artifactId>
-      <version>0.2.1</version>
+      <version>0.4.0.jetty9</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.italiangrid</groupId>
+      <artifactId>voms-api-java</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>eu.eu-emi.security</groupId>
+      <artifactId>canl</artifactId>
+    </dependency>
     <!-- Axis -->
     <dependency>
       <groupId>axis</groupId>
@@ -379,31 +370,27 @@
     </dependency>
 
     <!-- SLF4J & Logging -->
-     
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>${slf4jVersion}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>log4j-over-slf4j</artifactId>
-      <version>${slf4jVersion}</version>
     </dependency>
-  
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>${logbackVersion}</version>
     </dependency>
-    
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-core</artifactId>
-      <version>${logbackVersion}</version>
     </dependency>
-    
+
     <!-- Xerces, Xalan, Serializer -->
     <dependency>
       <groupId>xerces</groupId>
@@ -423,17 +410,17 @@
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>serializer</artifactId>
-      <version>2.7.1</version><!--$NO-MVN-MAN-VER$-->
+      <version>2.7.1</version><!--$NO-MVN-MAN-VER$ -->
       <scope>runtime</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>xalan</groupId>
       <artifactId>xalan</artifactId>
       <version>2.7.1</version>
       <scope>runtime</scope>
     </dependency>
-    
+
   </dependencies>
   <profiles>
     <profile>

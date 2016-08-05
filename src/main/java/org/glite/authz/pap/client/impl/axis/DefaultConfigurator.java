@@ -18,7 +18,6 @@
 package org.glite.authz.pap.client.impl.axis;
 
 import org.bouncycastle.openssl.PasswordFinder;
-import org.glite.authz.pap.authz.operations.papmanagement.GetPapOperation;
 import org.italiangrid.utils.https.impl.canl.CANLListener;
 import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
@@ -28,7 +27,7 @@ public class DefaultConfigurator implements CANLAxis1SocketFactoryConfigurator,
 	CANLAxis1SocketFactoryConfiguration {
 
 	public static final String DEFAULT_TRUST_ANCHORS_DIR = "/etc/grid-security/certificates";
-	public static final String DEFAULT_PROTOCOL = "SSLv3";
+	public static final String DEFAULT_PROTOCOL = "TLSv1";
 	public static final String DEFAULT_SECURE_RANDOM = "SHA1PRNG";
 	
 	public static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";

@@ -26,7 +26,6 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerCollection;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.glite.authz.pap.common.PAPConfiguration;
-import org.italiangrid.utils.https.JettyShutdownTask;
 import org.italiangrid.utils.https.SSLOptions;
 import org.italiangrid.utils.https.ServerFactory;
 import org.italiangrid.utils.https.impl.canl.CANLListener;
@@ -34,6 +33,8 @@ import org.italiangrid.voms.util.CertificateValidatorBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import eu.emi.security.authn.x509.CrlCheckingMode;
+import eu.emi.security.authn.x509.OCSPCheckingMode;
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 import eu.emi.security.authn.x509.impl.CertificateUtils;
 
@@ -229,11 +230,15 @@ public final class PAPServer {
 		
 		CANLListener l = new CANLListener();
 		
-		X509CertChainValidatorExt validator = CertificateValidatorBuilder
-				.buildCertificateValidator(options.getTrustStoreDirectory(), 
-						l,
-						l,
-						options.getTrustStoreRefreshIntervalInMsec());
+		final X509CertChainValidatorExt validator = new CertificateValidatorBuilder()
+		  .trustAnchorsDir(options.getTrustStoreDirectory())
+		  .lazyAnchorsLoading(false)
+		  .crlChecks(CrlCheckingMode.IF_VALID)
+		  .ocspChecks(OCSPCheckingMode.IGNORE)
+		  .trustAnchorsUpdateInterval(options.getTrustStoreRefreshIntervalInMsec())
+		  .validationErrorListener(l)
+		  .storeUpdateListener(l)
+		  .build();
 		
 		PAPConfiguration.instance().setCertChainValidator(validator);
 		
@@ -254,6 +259,8 @@ public final class PAPServer {
 		}
 
 		log.info("maxConnections = {}", maxConnections);
+		
+		options.setExcludeProtocols("SSLv3");
 		
 		papServer = ServerFactory.newServer(host, 
 				port, 
