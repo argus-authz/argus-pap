@@ -17,7 +17,7 @@
 
   <packaging>war</packaging>
   <name>Argus Policy Administration Point (PAP)</name>
-  <version>1.7.0</version>
+  <version>1.7.1-SNAPSHOT</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
