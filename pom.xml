@@ -59,7 +59,8 @@
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
-            <phase>package</phase>
+            <id>make-a-jar</id>
+            <phase>compile</phase>
             <goals>
               <goal>jar</goal>
             </goals>
@@ -315,7 +316,7 @@
     </dependency>
     <!-- Axis -->
     <dependency>
-      <groupId>axis</groupId>
+      <groupId>org.apache.axis</groupId>
       <artifactId>axis</artifactId>
       <version>1.4</version>
       <exclusions>
@@ -327,7 +328,7 @@
     </dependency>
 
     <dependency>
-      <groupId>axis</groupId>
+      <groupId>org.apache.axis</groupId>
       <artifactId>axis-jaxrpc</artifactId>
       <version>1.4</version>
     </dependency>
