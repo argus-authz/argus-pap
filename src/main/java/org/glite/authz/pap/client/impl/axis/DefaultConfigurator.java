@@ -23,215 +23,212 @@ import org.italiangrid.voms.util.CertificateValidatorBuilder;
 
 import eu.emi.security.authn.x509.X509CertChainValidatorExt;
 
-public class DefaultConfigurator implements CANLAxis1SocketFactoryConfigurator, 
-	CANLAxis1SocketFactoryConfiguration {
+public class DefaultConfigurator
+    implements CANLAxis1SocketFactoryConfigurator, CANLAxis1SocketFactoryConfiguration {
 
-	public static final String DEFAULT_TRUST_ANCHORS_DIR = "/etc/grid-security/certificates";
-    public static final String DEFAULT_PROTOCOL = "TLSv1.2";
-	public static final String DEFAULT_SECURE_RANDOM = "SHA1PRNG";
-	
-	public static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
-    public static final String DEFAULT_SSL_KEY = "/etc/grid-security/hostkey.pem";
-    
-	public static final boolean DEFAULT_CHECK_HOSTNAME_POLICY = false;
-	
-	public static final long DEFAULT_REFRESH_INTERVAL = 60000L;
-	public static final int DEFAULT_TIMEOUT = 60000;
-	
-	private String sslProtocol = DEFAULT_PROTOCOL;
+  public static final String DEFAULT_TRUST_ANCHORS_DIR = "/etc/grid-security/certificates";
+  public static final String DEFAULT_PROTOCOL = "TLSv1.2";
+  public static final String DEFAULT_SECURE_RANDOM = "SHA1PRNG";
 
-	private String trustAnchorsDir = DEFAULT_TRUST_ANCHORS_DIR;
+  public static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
+  public static final String DEFAULT_SSL_KEY = "/etc/grid-security/hostkey.pem";
 
-	private String certFile = DEFAULT_SSL_CERT_FILE;
+  public static final boolean DEFAULT_CHECK_HOSTNAME_POLICY = false;
 
-	private String keyFile = DEFAULT_SSL_KEY;
-	
-	private String keyPassword = null;
+  public static final long DEFAULT_REFRESH_INTERVAL = 60000L;
+  public static final int DEFAULT_TIMEOUT = 60000;
 
-	private String proxyFile = null;
-	
-	private long refreshInterval = DEFAULT_REFRESH_INTERVAL;
+  private String sslProtocol = DEFAULT_PROTOCOL;
 
-	private int timeout = DEFAULT_TIMEOUT;
+  private String trustAnchorsDir = DEFAULT_TRUST_ANCHORS_DIR;
 
-	private boolean enforcingHostnameChecks = DEFAULT_CHECK_HOSTNAME_POLICY;
-	
-	private String secureRandomAlgorithm = DEFAULT_SECURE_RANDOM;
-	
-	private static volatile X509CertChainValidatorExt validator = null;
-	
-	private PasswordFinder passwordFinder = null;
-	
-	public DefaultConfigurator() {
-		
-	}
+  private String certFile = DEFAULT_SSL_CERT_FILE;
 
-	private synchronized X509CertChainValidatorExt getValidator(){
-		
-		if (validator == null){
-			
-			CANLListener l = new CANLListener();
-			validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir,
-				l,
-				l,
-				refreshInterval);
-		}
-		
-		return validator;
-	}
-	
-	public synchronized void configure(CANLAxis1SocketFactory factory) {
-		factory.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
-		factory.setSslProtocol(getSslProtocol());
-		factory.setCertChainValidator(getValidator());
-		factory.setCertFile(getCertFile());
-		factory.setKeyFile(getKeyFile());
-		factory.setKeyPassword(getKeyPassword());
-		factory.setProxyFile(getProxyFile());
-		
-		factory.setTimeout(getTimeout());
-		factory.setEnforcingHostnameChecks(isEnforcingHostnameChecks());
-	}
+  private String keyFile = DEFAULT_SSL_KEY;
 
-	/**
-	 * @return the sslProtocol
-	 */
-	public synchronized String getSslProtocol() {
-		return sslProtocol;
-	}
+  private String keyPassword = null;
 
-	/**
-	 * @param sslProtocol the sslProtocol to set
-	 */
-	public synchronized void setSslProtocol(String sslProtocol) {
-		this.sslProtocol = sslProtocol;
-	}
+  private String proxyFile = null;
 
-	/**
-	 * @return the trustAnchorsDir
-	 */
-	public synchronized String getTrustAnchorsDir() {
-		return trustAnchorsDir;
-	}
+  private long refreshInterval = DEFAULT_REFRESH_INTERVAL;
 
-	/**
-	 * @param trustAnchorsDir the trustAnchorsDir to set
-	 */
-	public synchronized void setTrustAnchorsDir(String trustAnchorsDir) {
-		this.trustAnchorsDir = trustAnchorsDir;
-	}
+  private int timeout = DEFAULT_TIMEOUT;
 
-	/**
-	 * @return the certFile
-	 */
-	public synchronized String getCertFile() {
-		return certFile;
-	}
+  private boolean enforcingHostnameChecks = DEFAULT_CHECK_HOSTNAME_POLICY;
 
-	/**
-	 * @param certFile the certFile to set
-	 */
-	public synchronized void setCertFile(String certFile) {
-		this.certFile = certFile;
-	}
+  private String secureRandomAlgorithm = DEFAULT_SECURE_RANDOM;
 
-	/**
-	 * @return the keyFile
-	 */
-	public synchronized String getKeyFile() {
-		return keyFile;
-	}
+  private static volatile X509CertChainValidatorExt validator = null;
 
-	/**
-	 * @param keyFile the keyFile to set
-	 */
-	public synchronized void setKeyFile(String keyFile) {
-		this.keyFile = keyFile;
-	}
+  private PasswordFinder passwordFinder = null;
 
-	/**
-	 * @return the keyPassword
-	 */
-	public synchronized String getKeyPassword() {
-		return keyPassword;
-	}
+  public DefaultConfigurator() {
 
-	/**
-	 * @param keyPassword the keyPassword to set
-	 */
-	public synchronized void setKeyPassword(String keyPassword) {
-		this.keyPassword = keyPassword;
-	}
+  }
 
-	/**
-	 * @return the proxyFile
-	 */
-	public synchronized String getProxyFile() {
-		return proxyFile;
-	}
+  private synchronized X509CertChainValidatorExt getValidator() {
 
-	/**
-	 * @param proxyFile the proxyFile to set
-	 */
-	public synchronized void setProxyFile(String proxyFile) {
-		this.proxyFile = proxyFile;
-	}
+    if (validator == null) {
 
-	/**
-	 * @return the refreshInterval
-	 */
-	public synchronized long getRefreshInterval() {
-		return refreshInterval;
-	}
+      CANLListener l = new CANLListener();
+      validator = CertificateValidatorBuilder.buildCertificateValidator(trustAnchorsDir, l, l,
+          refreshInterval);
+    }
 
-	/**
-	 * @param refreshInterval the refreshInterval to set
-	 */
-	public synchronized void setRefreshInterval(long refreshInterval) {
-		this.refreshInterval = refreshInterval;
-	}
+    return validator;
+  }
 
-	/**
-	 * @return the timeout
-	 */
-	public synchronized int getTimeout() {
-		return timeout;
-	}
+  public synchronized void configure(CANLAxis1SocketFactory factory) {
+    factory.setSecureRandomAlgorithm(getSecureRandomAlgorithm());
+    factory.setSslProtocol(getSslProtocol());
+    factory.setCertChainValidator(getValidator());
+    factory.setCertFile(getCertFile());
+    factory.setKeyFile(getKeyFile());
+    factory.setKeyPassword(getKeyPassword());
+    factory.setProxyFile(getProxyFile());
 
-	/**
-	 * @param timeout the timeout to set
-	 */
-	public synchronized void setTimeout(int timeout) {
-		this.timeout = timeout;
-	}
+    factory.setTimeout(getTimeout());
+    factory.setEnforcingHostnameChecks(isEnforcingHostnameChecks());
+  }
 
-	/**
-	 * @return the enforcingHostnameChecks
-	 */
-	public synchronized boolean isEnforcingHostnameChecks() {
-		return enforcingHostnameChecks;
-	}
+  /**
+   * @return the sslProtocol
+   */
+  public synchronized String getSslProtocol() {
+    return sslProtocol;
+  }
 
-	/**
-	 * @param enforcingHostnameChecks the enforcingHostnameChecks to set
-	 */
-	public synchronized void setEnforcingHostnameChecks(
-			boolean enforcingHostnameChecks) {
-		this.enforcingHostnameChecks = enforcingHostnameChecks;
-	}
+  /**
+   * @param sslProtocol the sslProtocol to set
+   */
+  public synchronized void setSslProtocol(String sslProtocol) {
+    this.sslProtocol = sslProtocol;
+  }
 
-	/**
-	 * @return the secureRandomAlgorithm
-	 */
-	public synchronized String getSecureRandomAlgorithm() {
-		return secureRandomAlgorithm;
-	}
+  /**
+   * @return the trustAnchorsDir
+   */
+  public synchronized String getTrustAnchorsDir() {
+    return trustAnchorsDir;
+  }
 
-	/**
-	 * @param secureRandomAlgorithm the secureRandomAlgorithm to set
-	 */
-	public synchronized void setSecureRandomAlgorithm(String secureRandomAlgorithm) {
-		this.secureRandomAlgorithm = secureRandomAlgorithm;
-	}
-	
+  /**
+   * @param trustAnchorsDir the trustAnchorsDir to set
+   */
+  public synchronized void setTrustAnchorsDir(String trustAnchorsDir) {
+    this.trustAnchorsDir = trustAnchorsDir;
+  }
+
+  /**
+   * @return the certFile
+   */
+  public synchronized String getCertFile() {
+    return certFile;
+  }
+
+  /**
+   * @param certFile the certFile to set
+   */
+  public synchronized void setCertFile(String certFile) {
+    this.certFile = certFile;
+  }
+
+  /**
+   * @return the keyFile
+   */
+  public synchronized String getKeyFile() {
+    return keyFile;
+  }
+
+  /**
+   * @param keyFile the keyFile to set
+   */
+  public synchronized void setKeyFile(String keyFile) {
+    this.keyFile = keyFile;
+  }
+
+  /**
+   * @return the keyPassword
+   */
+  public synchronized String getKeyPassword() {
+    return keyPassword;
+  }
+
+  /**
+   * @param keyPassword the keyPassword to set
+   */
+  public synchronized void setKeyPassword(String keyPassword) {
+    this.keyPassword = keyPassword;
+  }
+
+  /**
+   * @return the proxyFile
+   */
+  public synchronized String getProxyFile() {
+    return proxyFile;
+  }
+
+  /**
+   * @param proxyFile the proxyFile to set
+   */
+  public synchronized void setProxyFile(String proxyFile) {
+    this.proxyFile = proxyFile;
+  }
+
+  /**
+   * @return the refreshInterval
+   */
+  public synchronized long getRefreshInterval() {
+    return refreshInterval;
+  }
+
+  /**
+   * @param refreshInterval the refreshInterval to set
+   */
+  public synchronized void setRefreshInterval(long refreshInterval) {
+    this.refreshInterval = refreshInterval;
+  }
+
+  /**
+   * @return the timeout
+   */
+  public synchronized int getTimeout() {
+    return timeout;
+  }
+
+  /**
+   * @param timeout the timeout to set
+   */
+  public synchronized void setTimeout(int timeout) {
+    this.timeout = timeout;
+  }
+
+  /**
+   * @return the enforcingHostnameChecks
+   */
+  public synchronized boolean isEnforcingHostnameChecks() {
+    return enforcingHostnameChecks;
+  }
+
+  /**
+   * @param enforcingHostnameChecks the enforcingHostnameChecks to set
+   */
+  public synchronized void setEnforcingHostnameChecks(boolean enforcingHostnameChecks) {
+    this.enforcingHostnameChecks = enforcingHostnameChecks;
+  }
+
+  /**
+   * @return the secureRandomAlgorithm
+   */
+  public synchronized String getSecureRandomAlgorithm() {
+    return secureRandomAlgorithm;
+  }
+
+  /**
+   * @param secureRandomAlgorithm the secureRandomAlgorithm to set
+   */
+  public synchronized void setSecureRandomAlgorithm(String secureRandomAlgorithm) {
+    this.secureRandomAlgorithm = secureRandomAlgorithm;
+  }
+
 }
