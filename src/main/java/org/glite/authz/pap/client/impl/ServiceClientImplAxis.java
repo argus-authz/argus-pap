@@ -259,6 +259,9 @@ public class ServiceClientImplAxis implements ServiceClient {
             	socketFactoryConfigurator.setKeyPassword(clientPrivateKeyPassword);
         }
 
+        final String tlsProtocol = System.getProperty("tlsProtocol", "TLSv1.2");
+        socketFactoryConfigurator.setSslProtocol(tlsProtocol);
+
         CANLAxis1SocketFactory.setConfigurator(socketFactoryConfigurator);
         String socketFactoryClass = CANLAxis1SocketFactory.class.getName();
         AxisProperties.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, socketFactoryClass);

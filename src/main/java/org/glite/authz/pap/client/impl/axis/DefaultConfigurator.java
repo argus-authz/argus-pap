@@ -27,7 +27,7 @@ public class DefaultConfigurator implements CANLAxis1SocketFactoryConfigurator,
 	CANLAxis1SocketFactoryConfiguration {
 
 	public static final String DEFAULT_TRUST_ANCHORS_DIR = "/etc/grid-security/certificates";
-	public static final String DEFAULT_PROTOCOL = "TLSv1";
+    public static final String DEFAULT_PROTOCOL = "TLSv1.2";
 	public static final String DEFAULT_SECURE_RANDOM = "SHA1PRNG";
 	
 	public static final String DEFAULT_SSL_CERT_FILE = "/etc/grid-security/hostcert.pem";
