@@ -72,11 +72,14 @@ PAP_JAR="$PAP_HOME/lib/pap.jar"
 # Classpath for the pap service
 PAP_CP="$PAP_DEPS:$PAP_HOME/conf/logging/standalone"
 
+# PAP JAVA command
+PAP_JAVA=${PAP_JAVA:-java}
+
 # Environment for the pap service
 PAP_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS"
 
 # Command used to start the pap  service
-PAP_CMD="java $PAP_JAVA_OPTS $PAP_ENV -cp $PAP_CP $PAP_CLASS --conf-dir $PAP_HOME/conf"
+PAP_CMD="${PAP_JAVA} $PAP_JAVA_OPTS $PAP_ENV -cp $PAP_CP $PAP_CLASS --conf-dir $PAP_HOME/conf"
 
 # The hostname property as appears in the pap configuration file
 PAP_HOST=`grep 'hostname =' $PAP_CONF_FILE | awk '{print $3}'`
@@ -94,4 +97,4 @@ PAP_CERT=`grep 'certificate =' $PAP_CONF_FILE  | awk '{print $3}'`
 PAP_KEY=`grep 'private_key =' $PAP_CONF_FILE | awk '{print $3}'`
 
 # The command used to shutdown the pap service
-PAP_SHUTDOWN_CMD="java -DPAP_HOME=$PAP_HOME -cp $PAP_CP $PAP_SHUTDOWN_CLASS"
+PAP_SHUTDOWN_CMD="${PAP_JAVA} -DPAP_HOME=$PAP_HOME -cp $PAP_CP $PAP_SHUTDOWN_CLASS"
