@@ -61,5 +61,5 @@ PAP_CLIENT_CP="$PAP_CLIENT_DEPS:$PAP_HOME/conf/logging/client"
 PAP_CLIENT_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS"
 
 # Command used to start the pap client application
-PAP_CLIENT_CMD="java $PAP_CLIENT_ENV -DwantLog4jSetup=false -DeffectiveUserId=$EUID -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
+PAP_CLIENT_CMD="${PAP_JAVA} $PAP_CLIENT_ENV -DwantLog4jSetup=false -DeffectiveUserId=$EUID -cp $PAP_CLIENT_CP $PAP_CLIENT_CLASS"
 
