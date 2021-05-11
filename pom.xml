@@ -316,7 +316,7 @@
     </dependency>
     <!-- Axis -->
     <dependency>
-      <groupId>org.apache.axis</groupId>
+      <groupId>axis</groupId>
       <artifactId>axis</artifactId>
       <version>1.4</version>
       <exclusions>
@@ -328,7 +328,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.axis</groupId>
+      <groupId>axis</groupId>
       <artifactId>axis-jaxrpc</artifactId>
       <version>1.4</version>
     </dependency>
