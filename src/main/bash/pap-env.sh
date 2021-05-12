@@ -76,7 +76,7 @@ PAP_CP="$PAP_DEPS:$PAP_HOME/conf/logging/standalone"
 PAP_ENV="-DPAP_HOME=$PAP_HOME -Djava.endorsed.dirs=$PAP_ENDORSED_LIBS"
 
 # Command used to start the pap  service
-PAP_CMD="${PAP_JAVA} $PAP_JAVA_OPTS $PAP_ENV -cp $PAP_CP $PAP_CLASS --conf-dir $PAP_HOME/conf"
+PAP_CMD="${PAP_JAVA:-java} $PAP_JAVA_OPTS $PAP_ENV -cp $PAP_CP $PAP_CLASS --conf-dir $PAP_HOME/conf"
 
 # The hostname property as appears in the pap configuration file
 PAP_HOST=`grep 'hostname =' $PAP_CONF_FILE | awk '{print $3}'`
