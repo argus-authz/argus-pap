@@ -9,7 +9,7 @@
   <parent>
     <groupId>org.glite.authz</groupId>
     <artifactId>argus-parent</artifactId>
-    <version>1.7.4</version>
+    <version>1.7.5-SNAPSHOT</version>
   </parent>
 
   <groupId>org.glite.authz.pap</groupId>
@@ -17,7 +17,7 @@
 
   <packaging>war</packaging>
   <name>Argus Policy Administration Point (PAP)</name>
-  <version>1.7.3-SNAPSHOT</version>
+  <version>1.7.3</version>
   <properties>
     <pap-services-namespace>http://org.glite.authz/wsdl/pap/services
     </pap-services-namespace>
@@ -316,7 +316,7 @@
     </dependency>
     <!-- Axis -->
     <dependency>
-      <groupId>org.apache.axis</groupId>
+      <groupId>axis</groupId>
       <artifactId>axis</artifactId>
       <version>1.4</version>
       <exclusions>
@@ -328,7 +328,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.apache.axis</groupId>
+      <groupId>axis</groupId>
       <artifactId>axis-jaxrpc</artifactId>
       <version>1.4</version>
     </dependency>

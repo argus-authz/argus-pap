@@ -19,9 +19,9 @@ package org.glite.authz.pap.ui.cli;
 
 import java.io.Console;
 
-import org.bouncycastle.openssl.PasswordFinder;
+import eu.emi.security.authn.x509.helpers.PasswordSupplier;
 
-public class ConsolePasswordFinder implements PasswordFinder{
+public class ConsolePasswordFinder implements PasswordSupplier {
 
 	private final String promptMessage;
 	

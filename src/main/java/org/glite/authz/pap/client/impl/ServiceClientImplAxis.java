@@ -42,225 +42,231 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ServiceClientImplAxis implements ServiceClient {
-	
-	public static final String AXIS_SOCKET_FACTORY_PROPERTY = "axis.socketSecureFactory";
-    
-    public final Logger log = LoggerFactory.getLogger(ServiceClientImplAxis.class);
-    private String clientCertificate = null;
-    private String clientPrivateKey = null;
-    private String clientPrivateKeyPassword = null;
-    private String clientProxy = null;
-    private String serviceURL = null;
-    private PasswordFinder passwordFinder = null;
 
-    public ServiceClientImplAxis() {}
+  public static final String AXIS_SOCKET_FACTORY_PROPERTY = "axis.socketSecureFactory";
 
-    public ServiceClientImplAxis(String serviceURL) {
-        this.serviceURL = serviceURL;
-    }
+  public final Logger log = LoggerFactory.getLogger(ServiceClientImplAxis.class);
+  private String clientCertificate = null;
+  private String clientPrivateKey = null;
+  private String clientPrivateKeyPassword = null;
+  private String clientProxy = null;
+  private String serviceURL = null;
+  private PasswordFinder passwordFinder = null;
 
-    public String getClientCertificate() {
-        return clientCertificate;
-    }
+  public ServiceClientImplAxis() {}
 
-    public String getClientPrivateKey() {
-        return clientPrivateKey;
-    }
+  public ServiceClientImplAxis(String serviceURL) {
+    this.serviceURL = serviceURL;
+  }
 
-    public String getClientPrivateKeyPassword() {
-        return clientPrivateKeyPassword;
-    }
+  public String getClientCertificate() {
+    return clientCertificate;
+  }
 
-    public String getClientProxy() {
+  public String getClientPrivateKey() {
+    return clientPrivateKey;
+  }
 
-        return clientProxy;
-    }
+  public String getClientPrivateKeyPassword() {
+    return clientPrivateKeyPassword;
+  }
 
-    public HighLevelPolicyManagement getHighLevelPolicyManagementService(String url) {
+  public String getClientProxy() {
 
-        initializeAxisProperties();
-        HighLevelPolicyManagementServiceLocator loc = new HighLevelPolicyManagementServiceLocator();
+    return clientProxy;
+  }
 
-        try {
-            return loc.getHighLevelPolicyManagementService(new URL(url));
+  public HighLevelPolicyManagement getHighLevelPolicyManagementService(String url) {
 
-        } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting Highlevel Policy management service: " + e.getMessage(),
-                                   e);
+    initializeAxisProperties();
+    HighLevelPolicyManagementServiceLocator loc = new HighLevelPolicyManagementServiceLocator();
 
-        } catch (ServiceException e) {
-            throw new PAPException("Error contacting HighLevel Policy management service: " + e.getMessage(),
-                                   e);
+    try {
+      return loc.getHighLevelPolicyManagementService(new URL(url));
 
-        }
-    }
+    } catch (MalformedURLException e) {
+      throw new PAPException(
+          "Error contacting Highlevel Policy management service: " + e.getMessage(), e);
 
-    public String getHighLevelPolicyManagementServiceName() {
-        return "HighLevelPolicyManagementService";
-    }
-
-    public PAPAuthorizationManagement getPAPAuthorizationManagementService(String url) {
-
-        initializeAxisProperties();
-        PAPAuthorizationManagementServiceLocator loc = new PAPAuthorizationManagementServiceLocator();
-
-        try {
-            return loc.getPAPAuthorizationManagement(new URL(url));
-
-        } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting PAP Authorization management service: " + e.getMessage(),
-                                   e);
-
-        } catch (ServiceException e) {
-            throw new PAPException("Error contacting PAP Authorization management service: " + e.getMessage(),
-                                   e);
-
-        }
-    }
-
-    public String getPAPAuthorizationManagementServiceName() {
-        return "AuthorizationManagementService";
-    }
-
-    public PAPManagement getPAPManagementService(String url) {
-
-        initializeAxisProperties();
-        PAPManagementServiceLocator loc = new PAPManagementServiceLocator();
-
-        try {
-            return loc.getPAPManagementService(new URL(url));
-
-        } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting PAP Management service: " + e.getMessage(), e);
-
-        } catch (ServiceException e) {
-            throw new PAPException("Error contacting PAP Management service: " + e.getMessage(), e);
-
-        }
-    }
-
-    public String getPAPManagementServiceName() {
-        return "PAPManagementService";
-    }
-
-    public Provisioning getProvisioningService(String url) {
-
-        initializeAxisProperties();
-
-        ProvisioningServiceLocator loc = new ProvisioningServiceLocator();
-
-        TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
-
-        typeMapping.register(org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.class,
-                             org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
-                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                             new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
-
-        typeMapping.register(org.opensaml.saml2.core.Response.class,
-                             org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
-                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                             new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
-
-        try {
-            return loc.getProvisioningService(new URL(url));
-
-        } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting Provisioning Policy management service: "
-                    + e.getMessage(), e);
-
-        } catch (ServiceException e) {
-            throw new PAPException("Error contacting Provisioning Policy management service: "
-                    + e.getMessage(), e);
-
-        }
-    }
-
-    public String getProvisioningServiceName() {
-        return "ProvisioningService";
-    }
-
-    public String getTargetEndpoint() {
-        return serviceURL;
-    }
-
-    public XACMLPolicyManagement getXACMLPolicyManagementService(String url) {
-
-        initializeAxisProperties();
-        XACMLPolicyManagementServiceLocator loc = new XACMLPolicyManagementServiceLocator();
-        TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
-
-        typeMapping.register(org.opensaml.xacml.policy.PolicyType.class,
-                             org.opensaml.xacml.policy.PolicyType.SCHEMA_TYPE_NAME,
-                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                             new org.glite.authz.pap.common.opensamlserializer.PolicyTypeDeserializerFactory());
-
-        typeMapping.register(org.opensaml.xacml.policy.PolicySetType.class,
-                             org.opensaml.xacml.policy.PolicySetType.SCHEMA_TYPE_NAME,
-                             new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
-                             new org.glite.authz.pap.common.opensamlserializer.PolicySetTypeDeserializerFactory());
-
-        try {
-            return loc.getXACMLPolicyManagementService(new URL(url));
-
-        } catch (MalformedURLException e) {
-            throw new PAPException("Error contacting XACML Policy management service: " + e.getMessage(), e);
-
-        } catch (ServiceException e) {
-            throw new PAPException("Error contacting XACML Policy management service: " + e.getMessage(), e);
-
-        }
-    }
-
-    public String getXACMLPolicyManagementServiceName() {
-        return "XACMLPolicyManagementService";
-    }
-
-    public void setClientCertificate(String certFile) {
-        log.debug("clientCertificate=" + certFile);
-        clientCertificate = certFile;
-    }
-
-    public void setClientPrivateKey(String keyFile) {
-        log.debug("clientPrivateKey=" + keyFile);
-        clientPrivateKey = keyFile;
-    }
-
-    public void setClientPrivateKeyPassword(String privateKeyPassword) {
-        clientPrivateKeyPassword = privateKeyPassword;
-    }
-
-    public void setClientProxy(String clientProxy) {
-
-        this.clientProxy = clientProxy;
+    } catch (ServiceException e) {
+      throw new PAPException(
+          "Error contacting HighLevel Policy management service: " + e.getMessage(), e);
 
     }
+  }
 
-    public void setTargetEndpoint(String endpointURL) {
-        serviceURL = endpointURL;
+  public String getHighLevelPolicyManagementServiceName() {
+    return "HighLevelPolicyManagementService";
+  }
+
+  public PAPAuthorizationManagement getPAPAuthorizationManagementService(String url) {
+
+    initializeAxisProperties();
+    PAPAuthorizationManagementServiceLocator loc = new PAPAuthorizationManagementServiceLocator();
+
+    try {
+      return loc.getPAPAuthorizationManagement(new URL(url));
+
+    } catch (MalformedURLException e) {
+      throw new PAPException(
+          "Error contacting PAP Authorization management service: " + e.getMessage(), e);
+
+    } catch (ServiceException e) {
+      throw new PAPException(
+          "Error contacting PAP Authorization management service: " + e.getMessage(), e);
+
+    }
+  }
+
+  public String getPAPAuthorizationManagementServiceName() {
+    return "AuthorizationManagementService";
+  }
+
+  public PAPManagement getPAPManagementService(String url) {
+
+    initializeAxisProperties();
+    PAPManagementServiceLocator loc = new PAPManagementServiceLocator();
+
+    try {
+      return loc.getPAPManagementService(new URL(url));
+
+    } catch (MalformedURLException e) {
+      throw new PAPException("Error contacting PAP Management service: " + e.getMessage(), e);
+
+    } catch (ServiceException e) {
+      throw new PAPException("Error contacting PAP Management service: " + e.getMessage(), e);
+
+    }
+  }
+
+  public String getPAPManagementServiceName() {
+    return "PAPManagementService";
+  }
+
+  public Provisioning getProvisioningService(String url) {
+
+    initializeAxisProperties();
+
+    ProvisioningServiceLocator loc = new ProvisioningServiceLocator();
+
+    TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
+
+    typeMapping.register(org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.class,
+        org.opensaml.xacml.profile.saml.XACMLPolicyQueryType.DEFAULT_ELEMENT_NAME_XACML20,
+        new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+        new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
+
+    typeMapping.register(org.opensaml.saml2.core.Response.class,
+        org.opensaml.saml2.core.Response.DEFAULT_ELEMENT_NAME,
+        new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+        new org.glite.authz.pap.common.opensamlserializer.DeserializerFactory());
+
+    try {
+      return loc.getProvisioningService(new URL(url));
+
+    } catch (MalformedURLException e) {
+      throw new PAPException(
+          "Error contacting Provisioning Policy management service: " + e.getMessage(), e);
+
+    } catch (ServiceException e) {
+      throw new PAPException(
+          "Error contacting Provisioning Policy management service: " + e.getMessage(), e);
+
+    }
+  }
+
+  public String getProvisioningServiceName() {
+    return "ProvisioningService";
+  }
+
+  public String getTargetEndpoint() {
+    return serviceURL;
+  }
+
+  public XACMLPolicyManagement getXACMLPolicyManagementService(String url) {
+
+    initializeAxisProperties();
+    XACMLPolicyManagementServiceLocator loc = new XACMLPolicyManagementServiceLocator();
+    TypeMapping typeMapping = loc.getTypeMappingRegistry().getDefaultTypeMapping();
+
+    typeMapping.register(org.opensaml.xacml.policy.PolicyType.class,
+        org.opensaml.xacml.policy.PolicyType.SCHEMA_TYPE_NAME,
+        new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+        new org.glite.authz.pap.common.opensamlserializer.PolicyTypeDeserializerFactory());
+
+    typeMapping.register(org.opensaml.xacml.policy.PolicySetType.class,
+        org.opensaml.xacml.policy.PolicySetType.SCHEMA_TYPE_NAME,
+        new org.glite.authz.pap.common.opensamlserializer.SerializerFactory(),
+        new org.glite.authz.pap.common.opensamlserializer.PolicySetTypeDeserializerFactory());
+
+    try {
+      return loc.getXACMLPolicyManagementService(new URL(url));
+
+    } catch (MalformedURLException e) {
+      throw new PAPException("Error contacting XACML Policy management service: " + e.getMessage(),
+          e);
+
+    } catch (ServiceException e) {
+      throw new PAPException("Error contacting XACML Policy management service: " + e.getMessage(),
+          e);
+
+    }
+  }
+
+  public String getXACMLPolicyManagementServiceName() {
+    return "XACMLPolicyManagementService";
+  }
+
+  public void setClientCertificate(String certFile) {
+    log.debug("clientCertificate=" + certFile);
+    clientCertificate = certFile;
+  }
+
+  public void setClientPrivateKey(String keyFile) {
+    log.debug("clientPrivateKey=" + keyFile);
+    clientPrivateKey = keyFile;
+  }
+
+  public void setClientPrivateKeyPassword(String privateKeyPassword) {
+    clientPrivateKeyPassword = privateKeyPassword;
+  }
+
+  public void setClientProxy(String clientProxy) {
+
+    this.clientProxy = clientProxy;
+
+  }
+
+  public void setTargetEndpoint(String endpointURL) {
+    serviceURL = endpointURL;
+  }
+
+  protected void initializeAxisProperties() {
+
+    DefaultConfigurator socketFactoryConfigurator = new DefaultConfigurator();
+
+    if (clientProxy != null) {
+
+      socketFactoryConfigurator.setProxyFile(clientProxy);
+
+    } else {
+
+      if (clientCertificate != null)
+        socketFactoryConfigurator.setCertFile(clientCertificate);
+
+      if (clientPrivateKey != null)
+        socketFactoryConfigurator.setKeyFile(clientPrivateKey);
+
+      if (clientPrivateKeyPassword != null)
+        socketFactoryConfigurator.setKeyPassword(clientPrivateKeyPassword);
     }
 
-    protected void initializeAxisProperties() {
+    final String tlsProtocol =
+        System.getProperty("tlsProtocol", DefaultConfigurator.DEFAULT_PROTOCOL);
+    socketFactoryConfigurator.setSslProtocol(tlsProtocol);
 
-        DefaultConfigurator socketFactoryConfigurator = new DefaultConfigurator();
-
-        if (clientProxy != null) {
-            
-        	socketFactoryConfigurator.setProxyFile(clientProxy);
-            
-        } else {
-
-        	if (clientCertificate != null)
-        		socketFactoryConfigurator.setCertFile(clientCertificate);
-
-            if (clientPrivateKey != null)
-            	socketFactoryConfigurator.setKeyFile(clientPrivateKey);
-            
-            if (clientPrivateKeyPassword != null)
-            	socketFactoryConfigurator.setKeyPassword(clientPrivateKeyPassword);
-        }
-
-        CANLAxis1SocketFactory.setConfigurator(socketFactoryConfigurator);
-        String socketFactoryClass = CANLAxis1SocketFactory.class.getName();
-        AxisProperties.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, socketFactoryClass);
-    }    
+    CANLAxis1SocketFactory.setConfigurator(socketFactoryConfigurator);
+    String socketFactoryClass = CANLAxis1SocketFactory.class.getName();
+    AxisProperties.setProperty(AXIS_SOCKET_FACTORY_PROPERTY, socketFactoryClass);
+  }
 }
