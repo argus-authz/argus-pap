@@ -25,22 +25,24 @@ import org.xml.sax.SAXException;
 
 public class PolicySetTypeDeserializer extends DeserializerImpl {
 
-    private static final long serialVersionUID = -7846958394617129664L;
+  private static final long serialVersionUID = -7846958394617129664L;
 
-    public void onStartElement(java.lang.String namespace, java.lang.String localName, java.lang.String prefix,
-            org.xml.sax.Attributes attributes, DeserializationContext context) throws SAXException {
+  public void onStartElement(java.lang.String namespace, java.lang.String localName,
+      java.lang.String prefix, org.xml.sax.Attributes attributes, DeserializationContext context)
+      throws SAXException {
 
-        try {
+    try {
 
-            MessageElement messageElement = context.getCurElement();
-            String element = messageElement.getAsString();
+      MessageElement messageElement = context.getCurElement();
+      String element = messageElement.getAsString();
 
-            PolicySetTypeString object = new PolicySetTypeString(element);
+      PolicySetTypeString object = new PolicySetTypeString(element);
 
-            setValue(object);
-            
-        } catch (Exception exception) {
-            throw new SAXException("Error deserializing " + " : " + exception.getClass() + " : " + exception.getMessage());
-        }
+      setValue(object);
+
+    } catch (Exception exception) {
+      throw new SAXException(
+          "Error deserializing " + " : " + exception.getClass() + " : " + exception.getMessage());
     }
+  }
 }
